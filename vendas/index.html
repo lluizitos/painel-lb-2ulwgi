@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#141218">
+<title>Vendas LB</title>
+<link rel="icon" href="../icone.png"><link rel="apple-touch-icon" href="../icone.png">
+<style>
+:root{--bg:#141218;--card:#1E1C24;--card2:#26232D;--line:#2E2B36;--ink:#F3F1F6;--sub:#B8B3C3;--muted:#8B8697;--pink:#CF1D51;--pinkl:#F0507E;--neg:#FF8FA8;--pos:#7FDDA9;--amber:#F2B66B}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:15px;line-height:1.45;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%;padding-bottom:90px}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:20;background:rgba(20,18,24,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:58px;gap:10px}
+header img{height:24px;display:block}
+.links{display:flex;gap:6px}
+.links a{text-decoration:none;color:var(--sub);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:7px 11px;border:1px solid var(--line);border-radius:99px}
+@media(max-width:480px){header img{height:18px}.links{gap:4px}.links a{font-size:10px;letter-spacing:.08em;padding:6px 8px}}
+.links a.on{background:var(--pink);border-color:var(--pink);color:#fff}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--pinkl);margin:24px 0 6px}
+h1{font-size:30px;font-weight:900;text-transform:uppercase;margin:0;line-height:1.05}h1 em{font-style:normal;color:var(--pink)}
+h3{font-size:11px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--pinkl);margin:22px 0 10px}
+.note{color:var(--muted);font-size:12.5px;margin:8px 0 0}
+.grid{display:grid;gap:10px}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:720px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.card{background:var(--card);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden}
+.bar::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--pink)}
+.k .l{font-size:10.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--sub)}
+.k .v{font-size:21px;font-weight:800;margin-top:4px;white-space:nowrap}.k .s{font-size:12px;color:var(--muted)}
+.pos{color:var(--pos)}.neg{color:var(--neg)}.pk{color:var(--pinkl)}.mut{color:var(--muted)}
+.pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:var(--card2);color:var(--sub);white-space:nowrap}
+.pill.pk{background:rgba(207,29,81,.18);color:var(--pinkl)}.pill.ok{background:rgba(127,221,169,.14);color:var(--pos)}.pill.am{background:rgba(242,182,107,.14);color:var(--amber)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 10px}
+.chip{border:1px solid var(--line);background:transparent;border-radius:99px;padding:6px 12px;font-size:12.5px;color:var(--sub)}.chip.on{background:var(--card2);color:var(--ink);border-color:var(--sub)}
+.list{display:flex;flex-direction:column;gap:10px}
+.show .hd{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.show .dt{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--pinkl)}
+.show .hd b{font-size:16px;display:block;margin-top:2px}.show .hd span{font-size:12.5px;color:var(--muted)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 10px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.calc div{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.calc div b{display:block;font-size:14px;letter-spacing:0;color:var(--ink);margin-top:2px;white-space:nowrap}
+.show .ft{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;font-size:11.5px;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--card2);border-radius:99px;padding:8px 14px;font-size:13px;font-weight:600}
+.btn.pkb{background:var(--pink);border-color:var(--pink);color:#fff}
+.fab{position:fixed;right:16px;bottom:18px;z-index:30;padding:14px 20px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.empty{color:var(--muted);font-size:13px;padding:14px;background:var(--card);border-radius:12px}
+.aviso{background:rgba(242,182,107,.1);border:1px solid rgba(242,182,107,.35);color:var(--amber);border-radius:12px;padding:10px 14px;font-size:13px;margin-top:14px}
+/* formulário */
+#ed{position:fixed;inset:0;z-index:40;background:rgba(10,9,12,.7);display:none;align-items:flex-end;justify-content:center}
+#ed.open{display:flex}
+#ed form{background:var(--bg);border:1px solid var(--line);border-radius:18px 18px 0 0;width:100%;max-width:640px;max-height:92vh;overflow:auto;padding:18px 16px 24px}
+@media(min-width:700px){#ed{align-items:center}#ed form{border-radius:18px}}
+#ed h2{font-size:20px;font-weight:900;text-transform:uppercase;margin:0 0 12px}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:10px}.f .w{grid-column:1/-1}
+label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--sub)}
+label input,label select,label textarea{display:block;width:100%;margin-top:5px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;letter-spacing:0;text-transform:none;font-weight:400}
+label textarea{min-height:64px;resize:vertical}
+.prev{margin-top:14px}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+#msg{min-height:20px;font-size:13px;margin-top:8px;text-align:right}
+/* senha */
+#lock{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+#lock form{width:100%;max-width:340px;text-align:center}#lock img{width:180px;margin:0 auto 10px;display:block}
+#lock p{color:var(--sub);font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin:0 0 22px}
+#lock input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:16px;text-align:center;margin-top:8px}
+#lock button{width:100%;margin-top:10px;padding:14px;border:0;border-radius:12px;background:var(--pink);color:#fff;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px}
+#lock .err{color:var(--neg);font-size:13px;min-height:20px;margin-top:10px}
+#app{display:none}
+</style>
+</head>
+<body>
+<div id="lock"><form id="lf">
+  <img src="../logo.png" alt="Lucas Barros"><p>Vendas</p>
+  <input id="nome" placeholder="Seu nome" autocomplete="name" aria-label="Seu nome">
+  <input id="pw" type="password" placeholder="Senha" autocomplete="current-password" aria-label="Senha">
+  <button type="submit">Entrar</button><div class="err" id="err"></div>
+</form></div>
+
+<div id="app">
+<header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div></header>
+<main class="wrap">
+  <p class="eyebrow">Shows vendidos</p>
+  <h1>Ven<em>das</em></h1>
+  <div id="modo"></div>
+  <div class="grid g4" id="resumo" style="margin-top:16px"></div>
+  <div class="chips" id="fil">
+    <button class="chip on" data-f="prox">Próximos</button><button class="chip" data-f="contrato">Sem contrato</button>
+    <button class="chip" data-f="nota">NF a definir</button><button class="chip" data-f="receber">Falta receber</button><button class="chip" data-f="todos">Todos</button>
+  </div>
+  <div class="list" id="lista"></div>
+  <p class="note" id="regras"></p>
+</main>
+<button class="btn pkb fab" id="novo">+ Novo show</button>
+</div>
+
+<div id="ed"><form id="ef" autocomplete="off">
+  <h2 id="edt">Novo show</h2>
+  <div class="f">
+    <label>Data<input type="date" name="data" required></label>
+    <label>Horário<input type="time" name="horario"></label>
+    <label>Cidade<input name="cidade" required></label>
+    <label>Local<input name="local"></label>
+    <label>Tipo de evento<select name="tipo"></select></label>
+    <label>Situação<select name="status"><option>Confirmado</option><option>A confirmar</option><option>Realizado</option><option>Cancelado</option></select></label>
+    <label class="w">Evento (nome interno)<input name="evento" placeholder="ex.: Aniversário da Silvéria"></label>
+    <label class="w">Contratante<input name="contratante" placeholder="nome / empresa / prefeitura"></label>
+    <label>Cachê (R$)<input name="valor" inputmode="decimal" placeholder="0"></label>
+    <label>Já recebido (R$)<input name="recebido" inputmode="decimal" placeholder="0"></label>
+    <label>Contrato<select name="contrato"><option>Assinado</option><option>Enviado, aguardando</option><option>Não assinado</option><option>Sem contrato</option><option>Não informado</option></select></label>
+    <label>Nota fiscal<select name="nota"><option>Com NF</option><option>Sem NF</option><option>Não informado</option></select></label>
+    <label>Vendedor<input name="vendedor"></label>
+    <label>Comissão (%)<input name="comissao_pct" inputmode="decimal" placeholder="padrão"></label>
+    <label class="w">Observações<textarea name="obs"></textarea></label>
+  </div>
+  <div class="card prev" id="prev"></div>
+  <div id="msg"></div>
+  <div class="acts"><button type="button" class="btn" id="cancel">Cancelar</button><button type="submit" class="btn pkb" id="salvar">Salvar</button></div>
+</form></div>
+
+<script>
+const TIPOS=['Show','Prefeitura','Casamento','Aniversário','Formatura','Evento corporativo','Evento de fim de ano','Réveillon','Rodeio','Exposição','Show próprio (Sem Roteiro)','Show próprio (Colab)'];
+const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=v=>{if(v==null||v==='')return null;if(typeof v==='number')return v;const n=parseFloat(String(v).replace(/\./g,'').replace(',','.'));return isNaN(n)?null:n};
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const SEM=['dom','seg','ter','qua','qui','sex','sáb'];
+const fdata=s=>{const d=new Date(s+'T12:00');return `${SEM[d.getDay()]} · ${s.slice(8,10)}/${s.slice(5,7)}/${s.slice(2,4)}`};
+const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
+let CFG={},API='',PW='',NOME='',PAPEL='',SHOWS=[],CONF={},RO=true,filtro='prox';
+
+/* cálculos de cada show */
+function calc(s){
+  const v=num(s.valor)||0,rec=num(s.recebido)||0;
+  const aliq=CONF.aliquota,pct=num(s.comissao_pct)??CONF.comissao;
+  const imp=s.nota==='Com NF'?(aliq!=null?v*aliq/100:null):0;
+  const com=pct!=null?v*pct/100:null;
+  const custo=/próprio/i.test(s.tipo||'')?CONF.custo_colab:CONF.custo_padrao;
+  const liq=(imp==null||com==null)?null:v-imp-com-custo;
+  return {v,rec,falta:Math.max(0,v-rec),imp,com,pct,custo,liq};
+}
+
+/* entrar */
+async function cfg(){try{CFG=await (await fetch('../config.json',{cache:'no-store'})).json()}catch(e){CFG={}};API=CFG.api_url||''}
+async function abrirLocal(pw){
+  const j=await (await fetch('../vendas.enc.json',{cache:'no-store'})).json();
+  const b=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+  for(const k of j.chaves){try{
+    const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+    const kek=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b(k.salt),iterations:j.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+    const raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:b(k.iv)},kek,b(k.chave));
+    const dk=await crypto.subtle.importKey('raw',raw,'AES-GCM',false,['decrypt']);
+    const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b(j.iv)},dk,b(j.ct));
+    const d=JSON.parse(new TextDecoder().decode(pt));
+    return {papel:k.papel,shows:d.shows,config:{aliquota:d.aliquota,comissao:d.comissao,custo_padrao:d.custo_padrao,custo_colab:d.custo_colab}};
+  }catch(e){}}
+  throw new Error('senha');
+}
+async function api(corpo){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({senha:PW,nome:NOME},corpo))});
+  return r.json();
+}
+async function carregar(){
+  if(API){const r=await api({acao:'listar'});if(!r.ok)throw new Error(r.erro);RO=false;return r}
+  RO=true;return abrirLocal(PW);
+}
+async function entrar(pw,nome,auto){
+  const err=document.getElementById('err');if(!auto)err.textContent='Abrindo…';
+  PW=pw;NOME=nome||store.get('lb_nome')||'';
+  try{const r=await carregar();PAPEL=r.papel;SHOWS=r.shows;CONF=r.config;store.set('lb_vendas_pw',pw);if(nome)store.set('lb_nome',nome);iniciar()}
+  catch(e){if(!auto){err.textContent=e.message==='senha'?'Senha incorreta.':'Não consegui abrir agora. Tente de novo.'}else store.del('lb_vendas_pw')}
+}
+document.getElementById('lf').addEventListener('submit',e=>{e.preventDefault();entrar(document.getElementById('pw').value.trim(),document.getElementById('nome').value.trim())});
+(async()=>{await cfg();document.getElementById('nome').value=store.get('lb_nome')||'';
+  const s=store.get('lb_vendas_pw')||store.get('lb_pw');if(s)entrar(s,null,true)})();
+
+function iniciar(){
+  const l=document.getElementById('lock');if(l)l.remove();document.getElementById('app').style.display='block';
+  document.getElementById('links').innerHTML=(PAPEL==='admin'?'<a href="../">Painel</a>':'')+'<a href="./" class="on">Vendas</a><a href="../agenda/">Agenda</a>';
+  document.getElementById('modo').innerHTML=RO?`<div class="aviso">Modo consulta: a planilha de vendas ainda não está ligada. Para cadastrar ou mudar um show, avise o Luiz.</div>`:'';
+  document.getElementById('novo').style.display=RO?'none':'block';
+  const t=document.querySelector('[name=tipo]');t.innerHTML=TIPOS.map(x=>`<option>${x}</option>`).join('');
+  document.getElementById('regras').innerHTML=`Imposto: ${CONF.aliquota!=null?CONF.aliquota+'% do cachê quando o show tem NF':'<b class="pk">alíquota a definir</b>'} · Comissão padrão: ${CONF.comissao!=null?CONF.comissao+'% do cachê':'<b class="pk">a definir</b>'} · Custo da equipe estimado: ${brl(CONF.custo_padrao)} por show (show próprio ${brl(CONF.custo_colab)}).`;
+  render();
+}
+document.getElementById('fil').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;filtro=b.dataset.f;document.querySelectorAll('#fil .chip').forEach(c=>c.classList.toggle('on',c===b));render()};
+
+function pills(s){
+  const st={'Confirmado':'pk','A confirmar':'am','Realizado':'ok','Cancelado':''}[s.status]??'';
+  const ct={'Assinado':'ok','Enviado, aguardando':'am','Não assinado':'pk','Sem contrato':'pk'}[s.contrato]??'';
+  const nf={'Com NF':'ok','Sem NF':'','Não informado':'am'}[s.nota]??'am';
+  return `<span class="pill ${st}">${esc(s.status||'—')}</span><span class="pill ${ct}">contrato: ${esc(s.contrato||'não informado')}</span><span class="pill ${nf}">${s.nota==='Com NF'?'com NF':s.nota==='Sem NF'?'sem NF':'NF a definir'}</span>`;
+}
+function render(){
+  const fut=SHOWS.filter(s=>s.data>=HOJE&&s.status!=='Cancelado');
+  let l=SHOWS;
+  if(filtro==='prox')l=fut;
+  if(filtro==='contrato')l=fut.filter(s=>s.contrato!=='Assinado');
+  if(filtro==='nota')l=fut.filter(s=>!s.nota||s.nota==='Não informado');
+  if(filtro==='receber')l=SHOWS.filter(s=>s.status!=='Cancelado'&&calc(s).falta>0);
+  const cs=fut.map(calc);
+  const vend=cs.reduce((a,c)=>a+c.v,0),fal=cs.reduce((a,c)=>a+c.falta,0),com=cs.some(c=>c.com==null)?null:cs.reduce((a,c)=>a+c.com,0);
+  const semc=fut.filter(s=>s.contrato!=='Assinado').length;
+  const k=(l,v,s,c)=>`<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div><div class="s">${s}</div></div>`;
+  document.getElementById('resumo').innerHTML=k('Shows marcados',fut.length,'daqui pra frente')+k('Vendido',brl(vend),'soma dos cachês')+k('Falta receber',brl(fal),'dos próximos shows','pk')+k('Sem contrato assinado',semc,com==null?'comissão: % a definir':'comissões '+brl(com),semc?'neg':'');
+  document.getElementById('lista').innerHTML=l.length?l.map(s=>{const c=calc(s);
+    return `<div class="card bar show"><div class="hd"><div><div class="dt">${fdata(s.data)}${s.horario?' · '+esc(s.horario):''}</div><b>${esc(s.evento||s.tipo||'Show')}</b><span>${esc(s.cidade||'')}${s.local&&s.local!==s.cidade?' · '+esc(s.local):''}${s.contratante?' · '+esc(s.contratante):''}</span></div>${RO?'':`<button class="btn" data-ed="${esc(s.id)}">Editar</button>`}</div>
+    <div class="tags">${pills(s)}</div>
+    <div class="calc"><div>Cachê<b>${c.v?brl(c.v):'a definir'}</b></div><div>Recebido<b>${brl(c.rec)}</b></div><div>Falta<b class="${c.falta?'pk':''}">${brl(c.falta)}</b></div>
+    <div>Imposto${s.nota==='Com NF'&&CONF.aliquota!=null?' '+CONF.aliquota+'%':''}<b>${s.nota==='Com NF'?brl(c.imp):s.nota==='Sem NF'?'sem NF':'—'}</b></div><div>Comissão${c.pct!=null?' '+c.pct+'%':''}<b>${brl(c.com)}</b></div><div>Sobra p/ empresa<b class="${c.liq==null?'':c.liq<0?'neg':'pos'}">${brl(c.liq)}</b></div></div>
+    <div class="ft"><span>${s.vendedor?'Vendido por '+esc(s.vendedor):'Vendedor não informado'}</span><span>${s.atualizado_por?'Atualizado '+esc(String(s.atualizado_em||'').slice(8,10)+'/'+String(s.atualizado_em||'').slice(5,7))+' por '+esc(s.atualizado_por):''}</span></div>
+    ${s.obs?`<div class="note">${esc(s.obs)}</div>`:''}</div>`}).join(''):`<div class="empty">Nenhum show neste filtro.</div>`;
+}
+
+/* formulário */
+const ed=document.getElementById('ed'),ef=document.getElementById('ef');let editId=null;
+function abrirEd(s){editId=s?s.id:null;document.getElementById('edt').textContent=s?'Editar show':'Novo show';ef.reset();
+  const d=s||{status:'Confirmado',contrato:'Não informado',nota:'Não informado',tipo:'Show',vendedor:NOME};
+  [...ef.elements].forEach(el=>{if(el.name&&d[el.name]!=null)el.value=d[el.name]});
+  document.getElementById('msg').textContent='';prev();ed.classList.add('open')}
+function lerForm(){const o={};[...ef.elements].forEach(el=>{if(el.name)o[el.name]=el.value.trim()});
+  o.valor=num(o.valor);o.recebido=num(o.recebido)||0;o.comissao_pct=num(o.comissao_pct);if(editId)o.id=editId;return o}
+function prev(){const c=calc(lerForm());
+  document.getElementById('prev').innerHTML=`<div class="calc" style="border:0;margin:0;padding:0"><div>Cachê<b>${brl(c.v)}</b></div><div>Imposto<b>${brl(c.imp)}</b></div><div>Comissão<b>${brl(c.com)}</b></div><div>Equipe (estim.)<b>${brl(c.custo)}</b></div><div>Falta receber<b class="pk">${brl(c.falta)}</b></div><div>Sobra p/ empresa<b class="${c.liq==null?'':c.liq<0?'neg':'pos'}">${brl(c.liq)}</b></div></div>`}
+ef.addEventListener('input',prev);
+document.getElementById('novo').onclick=()=>abrirEd(null);
+document.getElementById('cancel').onclick=()=>ed.classList.remove('open');
+document.getElementById('lista').onclick=e=>{const b=e.target.closest('[data-ed]');if(b)abrirEd(SHOWS.find(s=>String(s.id)===b.dataset.ed))};
+ef.addEventListener('submit',async e=>{e.preventDefault();const m=document.getElementById('msg'),bt=document.getElementById('salvar');
+  const o=lerForm();if(!o.data||!o.cidade){m.innerHTML='<span class="neg">Preencha data e cidade.</span>';return}
+  bt.disabled=true;m.textContent='Salvando…';
+  try{const r=await api({acao:'salvar',show:o});if(!r.ok)throw new Error(r.erro);
+    const d=await api({acao:'listar'});SHOWS=d.shows;render();ed.classList.remove('open')}
+  catch(err){m.innerHTML='<span class="neg">Não salvou ('+esc(err.message)+'). Tente de novo.</span>'}
+  bt.disabled=false});
+</script>
+</body>
+</html>

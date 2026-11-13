@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#141218">
+<title>Agenda LB</title>
+<link rel="icon" href="../icone.png"><link rel="apple-touch-icon" href="../icone.png">
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#141218;--card:#1E1C24;--card2:#26232D;--line:#2E2B36;--ink:#F3F1F6;--sub:#B8B3C3;--muted:#8B8697;--pink:#CF1D51;--pinkl:#F0507E;--amber:#F2B66B}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%;padding-bottom:40px}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+header{padding:22px 0 6px;text-align:center}
+header img{height:30px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--pinkl);margin:18px 0 4px;text-align:center}
+h1{font-size:34px;font-weight:900;text-transform:uppercase;margin:0;text-align:center;line-height:1}h1 em{font-style:normal;color:var(--pink)}
+.upd{text-align:center;color:var(--muted);font-size:12px;margin-top:6px}
+/* próximo show */
+.next{margin-top:20px;background:var(--card);border-radius:18px;padding:18px;position:relative;overflow:hidden}
+.next::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--pink)}
+.next .l{font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--pinkl)}
+.next .q{font-size:30px;font-weight:900;margin-top:4px;line-height:1.1}
+.next .c{font-size:20px;font-weight:700;margin-top:6px}
+.next .m{color:var(--sub);margin-top:4px}
+.next .falta{display:inline-block;margin-top:10px;background:var(--card2);border-radius:99px;padding:5px 12px;font-size:13px;font-weight:700;color:var(--pinkl)}
+.mes{font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--pinkl);margin:26px 2px 8px}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:14px;align-items:center;background:var(--card);border-radius:14px;padding:12px 14px}
+.row.past{opacity:.5}
+.d{flex:none;width:52px;text-align:center;line-height:1.05}
+.d b{display:block;font-size:24px;font-weight:900}
+.d span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.t{flex:1;min-width:0}
+.t b{display:block;font-size:16px}
+.t span{font-size:13px;color:var(--sub)}
+.h{flex:none;text-align:right;font-weight:800;font-size:16px}
+.h small{display:block;font-size:11px;font-weight:600;color:var(--muted)}
+.pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:rgba(242,182,107,.14);color:var(--amber);margin-left:6px;vertical-align:1px}
+.cal{background:none;border:1px solid var(--line);border-radius:10px;width:38px;height:38px;flex:none;display:grid;place-items:center;color:var(--sub)}
+.btn{display:block;margin:18px auto 0;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:9px 16px;font-size:13px;font-weight:600}
+.empty{color:var(--muted);text-align:center;padding:30px 0}
+footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><img src="../logo.png" alt="Lucas Barros"></header>
+<p class="eyebrow">Equipe e músicos</p>
+<h1>Agen<em>da</em></h1>
+<div class="upd" id="upd">Carregando…</div>
+<div id="next"></div>
+<div id="lista"></div>
+<button class="btn" id="ant" hidden>Ver shows anteriores</button>
+<footer>Horários previstos podem mudar. Confirme com a produção antes de sair.</footer>
+</div>
+<script>
+const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const SEM=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
+let LISTA=[],verAnt=false;
+async function carregar(){
+  let api='';try{api=(await (await fetch('../config.json',{cache:'no-store'})).json()).api_url||''}catch(e){}
+  if(api){try{const r=await (await fetch(api+'?acao=agenda',{cache:'no-store'})).json();if(r.ok)return r}catch(e){}}
+  return (await fetch('agenda.json',{cache:'no-store'})).json();
+}
+function ics(s){
+  const d=s.data.replace(/-/g,'');let dt;
+  if(s.horario){const [h,m]=s.horario.split(':');dt=`DTSTART;TZID=America/Sao_Paulo:${d}T${h}${m}00\nDURATION:PT3H`}
+  else dt=`DTSTART;VALUE=DATE:${d}`;
+  const txt=`BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//LB//Agenda//PT\nBEGIN:VEVENT\nUID:${d}-${encodeURIComponent(s.cidade)}@agenda-lb\nDTSTAMP:${d}T000000Z\n${dt}\nSUMMARY:Show Lucas Barros – ${s.cidade}\nLOCATION:${s.cidade}\nDESCRIPTION:${s.tipo||''}${s.horario?'':' (horário a definir)'}\nEND:VEVENT\nEND:VCALENDAR`;
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt.replace(/\n/g,'\r\n')],{type:'text/calendar'}));a.download=`show-${s.data}.ics`;a.click();
+}
+function render(){
+  const fut=LISTA.filter(s=>s.data>=HOJE),ant=LISTA.filter(s=>s.data<HOJE);
+  const n=fut[0];
+  if(n){const d=new Date(n.data+'T12:00');const dias=Math.round((new Date(n.data)-new Date(HOJE))/864e5);
+    document.getElementById('next').innerHTML=`<div class="next"><div class="l">Próximo show</div><div class="q">${SEM[d.getDay()]}, ${+n.data.slice(8,10)} de ${MESES[+n.data.slice(5,7)-1]}</div>
+    <div class="c">${esc(n.cidade)}${n.status==='A confirmar'?'<span class="pill">a confirmar</span>':''}</div><div class="m">${n.horario?'Horário previsto '+esc(n.horario):'Horário a definir'}${n.tipo?' · '+esc(n.tipo):''}</div>
+    <span class="falta">${dias===0?'É hoje!':dias===1?'É amanhã':'Faltam '+dias+' dias'}</span></div>`}
+  const lst=(verAnt?ant.concat(fut):fut);let h='',mes='';
+  lst.forEach((s,i)=>{const k=s.data.slice(0,7);if(k!==mes){if(mes)h+='</div>';mes=k;h+=`<div class="mes">${MESES[+k.slice(5,7)-1]} ${k.slice(0,4)}</div><div class="list">`}
+    const d=new Date(s.data+'T12:00');
+    h+=`<div class="row${s.data<HOJE?' past':''}"><div class="d"><b>${s.data.slice(8,10)}</b><span>${SEM[d.getDay()].slice(0,3)}</span></div>
+    <div class="t"><b>${esc(s.cidade)}${s.status==='A confirmar'?'<span class="pill">a confirmar</span>':''}</b><span>${esc(s.tipo||'Show')}</span></div>
+    <div class="h">${s.horario?esc(s.horario):'—'}<small>${s.horario?'previsto':'a definir'}</small></div>
+    <button class="cal" data-i="${LISTA.indexOf(s)}" aria-label="Adicionar ao calendário" title="Adicionar ao calendário">📅</button></div>`});
+  if(mes)h+='</div>';
+  document.getElementById('lista').innerHTML=h||'<div class="empty">Nenhum show marcado.</div>';
+  const b=document.getElementById('ant');b.hidden=!ant.length;b.textContent=verAnt?'Esconder anteriores':'Ver shows anteriores';
+}
+document.getElementById('lista').onclick=e=>{const b=e.target.closest('.cal');if(b)ics(LISTA[+b.dataset.i])};
+document.getElementById('ant').onclick=()=>{verAnt=!verAnt;render()};
+carregar().then(r=>{
+  LISTA=(r.shows||[]).map(s=>({data:s.data,horario:s.horario,cidade:s.cidade,tipo:s.tipo,status:s.status})).filter(s=>s.status!=='Cancelado').sort((a,b)=>(a.data+a.horario).localeCompare(b.data+b.horario));
+  document.getElementById('upd').textContent='Atualizado em '+r.atualizado.split('-').reverse().join('/');render();
+}).catch(()=>{document.getElementById('upd').textContent='Não consegui carregar a agenda. Tente de novo.'});
+</script>
+</body>
+</html>
