@@ -303,7 +303,9 @@ const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','d
 const brl=v=>v==null?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
 const brl2=v=>v==null?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const kf=v=>{const a=Math.abs(v);return (v<0?'−':'')+(a>=1000?(a/1000).toLocaleString('pt-BR',{maximumFractionDigits:a>=10000?0:1})+' mil':a.toFixed(0))};
-const ddmm=s=>s.slice(8,10)+'/'+s.slice(5,7);
+const ANO_AT=new Date(Date.now()-3*3600e3).toISOString().slice(0,4);
+const ddmm=s=>s.slice(8,10)+'/'+s.slice(5,7)+(s.slice(0,4)!==ANO_AT?'/'+s.slice(2,4):''); // de outro ano leva o ano
+const dtx=s=>s?+s.slice(8,10)+' de '+['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][+s.slice(5,7)-1]+(s.slice(0,4)!==ANO_AT?' '+s.slice(2,4):''):''; // 1 de fev 27
 const mkey=s=>s.slice(0,7);
 const mname=k=>MESES[+k.slice(5,7)-1]+' '+k.slice(0,4);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -324,7 +326,7 @@ function iniciar(){
   KEYS=[...ks].sort();mesAtual=KEYS.includes(mkey(HOJE))?mkey(HOJE):KEYS[KEYS.length-1];
   D.borderos=D.borderos||{};
   montaMeses();renderMes();renderPagar();renderTarefas();renderTL();renderEst();navSpy();bordAoVivo();tarAoVivo();pagAoVivo();
-  document.getElementById('ocp').innerHTML=(D.ocorrencias||[]).slice().sort((x,y)=>y.data.localeCompare(x.data)).map(o=>`<div class="row"><div class="d"><b>${o.data.slice(8,10)}</b><span>${MES3[+o.data.slice(5,7)-1]}</span></div><div class="t"><b>${esc(o.titulo)} ${o.confirmado?'':'<span class="pill am">sem confirmação</span>'}</b><span>${esc(o.detalhe||'')}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`).join('')||'<div class="empty">Nenhuma.</div>';
+  document.getElementById('ocp').innerHTML=(D.ocorrencias||[]).slice().sort((x,y)=>y.data.localeCompare(x.data)).map(o=>`<div class="row"><div class="d"><b>${o.data.slice(8,10)}</b><span>${MES3[+o.data.slice(5,7)-1]}${o.data.slice(0,4)!==ANO_AT?' '+o.data.slice(2,4):''}</span></div><div class="t"><b>${esc(o.titulo)} ${o.confirmado?'':'<span class="pill am">sem confirmação</span>'}</b><span>${esc(o.detalhe||'')}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`).join('')||'<div class="empty">Nenhuma.</div>';
   document.getElementById('ptabs').onclick=e=>{const b=e.target.closest('button');if(b)aba(b.dataset.p)};
   const h=location.hash.slice(1);if(h==='vendas'||h==='rendimento')aba(h==='vendas'?'ven':'ren');
 }
@@ -458,7 +460,7 @@ function atv(r,MA){const A=D.atividades||{metas:{},feito:{}},mn=MESES[+MA.slice(
   const vazio=v=>v==null||v===''||v==='a definir';
   if(/Bruninho|Bruno/.test(r.nome)){const l=((D.vendas&&D.vendas.shows)||[]).filter(s=>s.status!=='Cancelado'&&mkey(s.data)===MA&&(ALIAS[LB.norm(s.vendedor||'')]||s.vendedor)==='Bruninho');
     mt=vazio(meta)?'<span class="pk">a definir</span>':esc(meta);
-    corpo=l.length?`<div class="list" data-max="4">${l.map(s=>`<div class="it"><span>${ddmm(s.data)} · ${esc(s.evento)} · ${esc(s.cidade)}</span><b>${s.valor?brl(s.valor):'—'}</b></div>`).join('')}</div><div class="vend">${l.length} show${l.length>1?'s':''} vendidos para ${mn} · ${brl(l.reduce((a,s)=>a+(+s.valor||0),0))}</div>`:'<div class="vend">Nenhum show vendido para este mês ainda.</div>'}
+    corpo=l.length?`<div class="list" data-max="4">${l.map(s=>`<div class="it"><span>${dtx(s.data)} · ${esc(s.evento)} · ${esc(s.cidade)}</span><b>${s.valor?brl(s.valor):'—'}</b></div>`).join('')}</div><div class="vend">${l.length} show${l.length>1?'s':''} vendidos para ${mn} · ${brl(l.reduce((a,s)=>a+(+s.valor||0),0))}</div>`:'<div class="vend">Nenhum show vendido para este mês ainda.</div>'}
   else if(meta&&typeof meta==='object'){const f=fe||{};const lin=(n,feito,alvo)=>`<div class="it"><span>${n}</span><b>${feito==null?'a informar':feito}${alvo?' / '+alvo+(feito!=null?(feito>=alvo?' <span class="pos">✓ meta</span>':' <span class="pk">abaixo</span>'):''):''}</b></div>`;
     mt=meta.postagens||meta.conteudos?[meta.postagens?meta.postagens+' postagens':'',meta.conteudos?meta.conteudos+' conteúdos':''].filter(Boolean).join(' + ')+' por mês':'<span class="pk">a definir</span>';
     corpo=`<div class="list" data-max="0">${lin('Postagens',f.postagens,meta.postagens)}${lin('Conteúdos produzidos',f.conteudos,meta.conteudos)}</div>`}
@@ -528,7 +530,8 @@ function renderInfo(){const el=document.getElementById('infobase');if(!el||!D)re
   ((TAR&&TAR.metas)||[]).filter(x=>x.painel==='sim'&&!['Atingida','Não atingida','Pago','Resolvido'].includes(x.situacao)).forEach(x=>
     av.push(`<div class="av">${x.tipo==='alerta'?'⚠️':x.tipo==='despesa'?'💸':'🎯'} <b>${esc(x.titulo)}</b>${x.valor?' · '+brl(+x.valor):''}${x.prazo?' · '+esc(x.prazo):''}</div>`));
   const min=LB.store.get('lb_av_min')==='1';
-  el.innerHTML=`<div class="avh"><span>📌 Último extrato: <b>${D.ext_ate?ddmm(D.ext_ate):'—'}</b> · depois disso, estimativa.</span>${av.length?`<button class="avt" id="avt">${min?'🔔 '+av.length+' aviso'+(av.length>1?'s':'')+' ▾':'minimizar ▴'}</button>`:''}</div>${av.length&&!min?`<div class="avl">${av.join('')}</div>`:''}`;
+  el.style.display=av.length?'':'none';if(!av.length){el.innerHTML='';return}
+  el.innerHTML=`<div class="avh"><span>🔔 <b>${av.length} aviso${av.length>1?'s':''}</b></span><button class="avt" id="avt">${min?'ver ▾':'minimizar ▴'}</button></div>${!min?`<div class="avl">${av.join('')}</div>`:''}`;
   const b=document.getElementById('avt');if(b)b.onclick=()=>{LB.store.set('lb_av_min',min?'0':'1');renderInfo()}}
 let PEND=null;
 function etpHtml(et,sub){const tt=et.sinal+et.cache+et.aporte+et.outros;if(!tt)return '';
@@ -539,7 +542,7 @@ function renderMes(){
   const k=mesAtual,m=D.meses[k],i=KEYS.indexOf(k);
   document.getElementById('prev').disabled=i<=0;document.getElementById('next').disabled=i>=KEYS.length-1;
   document.getElementById('mesnome').textContent=mname(k);
-  document.getElementById('mestipo').textContent=m?{fechado:'Mês fechado',parcial:'Mês atual · realizado + previsto',estimativa:'Estimativa'}[m.tipo]:'Sem balanço deste mês';
+  document.getElementById('mestipo').textContent=m?{fechado:'Mês fechado',parcial:'Mês atual · extrato até '+(D.ext_ate?ddmm(D.ext_ate):'—')+' + estimativa',estimativa:'Estimativa'}[m.tipo]:'Sem balanço deste mês';
   document.querySelectorAll('#meses button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
   let h='';
   if(m){
@@ -600,7 +603,7 @@ function movList(ms){
     const te=l.filter(x=>x.valor>0).reduce((a,x)=>a+x.valor,0),ts=l.filter(x=>x.valor<0).reduce((a,x)=>a+x.valor,0);
     const n=l.length;l=l.slice(0,lim);let h='',dia='';
     l.forEach(x=>{if(x.data!==dia){dia=x.data;h+=`<div class="day">${ddmm(dia)}</div>`}
-      h+=`<div class="row"><div class="t"><b>${esc(x.quem||'—')}</b><span>${x.tipo==='sinal'?`<span class="pill pk">sinal · show ${ddmm(x.show_data||'')}</span> `:x.tipo==='cache'?'<span class="pill ok">cachê</span> ':''}${esc(x.cat||'')}${(x.show_nome||x.show)?' · '+esc(x.show_nome||x.show):''}${x.meio==='dinheiro'?' · <span class="pill">dinheiro</span>':''}${x.app?' · <span class="pill am">lançado no app</span>':''}${x.obs?'<br>'+esc(x.obs):''}</span></div><div class="v ${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl2(x.valor)}</div></div>`});
+      h+=`<div class="row"><div class="t"><b>${esc(x.quem||'—')}</b><span>${x.tipo==='sinal'?`<span class="pill pk">sinal · show ${dtx(x.show_data||'')}</span> `:x.tipo==='cache'?'<span class="pill ok">cachê</span> ':''}${esc(x.cat||'')}${(x.show_nome||x.show)?' · '+esc(x.show_nome||x.show):''}${x.meio==='dinheiro'?' · <span class="pill">dinheiro</span>':''}${x.app?' · <span class="pill am">lançado no app</span>':''}${x.obs?'<br>'+esc(x.obs):''}</span></div><div class="v ${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl2(x.valor)}</div></div>`});
     h=`<div class="list" data-max="0">${h||'<div class="empty">Nada encontrado.</div>'}</div>`;
     if(n>lim)h+=`<div class="center" style="margin-top:10px"><button class="btn" id="mais">Mostrar todos (${n})</button></div>`;
     const tg=l.length&&ms.filter(x=>x.tipo==='sinal').reduce((a,x)=>a+x.valor,0);
@@ -623,7 +626,7 @@ function stPill(s){
 function corSit(s){const fut=s.data>HOJE;if(s.sit==='Cancelado'||s.sit==='Permuta'||s.sit==='Projeto')return 's-cx';if(fut)return s.sit==='A confirmar'?'s-am':'s-pk';return s.falta>0?'s-fr':'s-ok'}
 function showCard(s,tl){
   const fut=s.data>HOJE,d=new Date(s.data+'T12:00');
-  const dt=`${['dom','seg','ter','qua','qui','sex','sáb'][d.getDay()]} · ${ddmm(s.data)}/${s.data.slice(2,4)}`;
+  const dt=`${['dom','seg','ter','qua','qui','sex','sáb'][d.getDay()]} · ${dtx(s.data)}`;
   const pr=s.valor?Math.min(100,(s.rec||0)/s.valor*100):0;
   const luc=s.lucro==null?'—':`<span class="${cls(s.lucro)}">${brl(s.lucro)}</span>`;
   const b=bordDe(s),fm=b?fmChips(b):'',ip=D.shows.indexOf(s);
@@ -690,10 +693,10 @@ function renderEst(){
   document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=()=>{ap=+b.dataset.ap;document.querySelectorAll('[data-ap]').forEach(c=>c.classList.toggle('on',c===b));chartSaldo(ap)});
   chartSaldo(1);chartMes();
   const fut=D.linha.filter(l=>l.data>=HOJE&&l.v).slice(0,14);
-  document.getElementById('prox').innerHTML=fut.map(l=>`<div class="row"><div class="d"><b>${l.data.slice(8,10)}</b><span>${MES3[+l.data.slice(5,7)-1]}</span></div><div class="t"><b>${esc(l.txt)}</b><span>saldo depois: <span class="${cls(l.saldo)}">${brl(l.saldo)}</span></span></div><div class="v ${l.v>0?'pos':''}">${l.v>0?'+':''}${brl(l.v)}</div></div>`).join('')
+  document.getElementById('prox').innerHTML=fut.map(l=>`<div class="row"><div class="d"><b>${l.data.slice(8,10)}</b><span>${MES3[+l.data.slice(5,7)-1]}${l.data.slice(0,4)!==ANO_AT?' '+l.data.slice(2,4):''}</span></div><div class="t"><b>${esc(l.txt)}</b><span>saldo depois: <span class="${cls(l.saldo)}">${brl(l.saldo)}</span></span></div><div class="v ${l.v>0?'pos':''}">${l.v>0?'+':''}${brl(l.v)}</div></div>`).join('')
     +`<div class="center" style="margin-top:4px"><button class="btn" id="todosprox">Ver todos até 31/01</button></div>`;
   document.getElementById('todosprox').onclick=e=>{const all=D.linha.filter(l=>l.data>=HOJE&&l.v);
-    e.target.parentNode.outerHTML=all.slice(14).map(l=>`<div class="row"><div class="d"><b>${l.data.slice(8,10)}</b><span>${MES3[+l.data.slice(5,7)-1]}</span></div><div class="t"><b>${esc(l.txt)}</b><span>saldo depois: <span class="${cls(l.saldo)}">${brl(l.saldo)}</span></span></div><div class="v ${l.v>0?'pos':''}">${l.v>0?'+':''}${brl(l.v)}</div></div>`).join('')};
+    e.target.parentNode.outerHTML=all.slice(14).map(l=>`<div class="row"><div class="d"><b>${l.data.slice(8,10)}</b><span>${MES3[+l.data.slice(5,7)-1]}${l.data.slice(0,4)!==ANO_AT?' '+l.data.slice(2,4):''}</span></div><div class="t"><b>${esc(l.txt)}</b><span>saldo depois: <span class="${cls(l.saldo)}">${brl(l.saldo)}</span></span></div><div class="v ${l.v>0?'pos':''}">${l.v>0?'+':''}${brl(l.v)}</div></div>`).join('')};
   document.getElementById('riscos').innerHTML=D.riscos.map(r=>`<div class="row"><div class="t"><span style="color:var(--sub);font-size:13.5px">${esc(r)}</span></div></div>`).join('');
 }
 let W=640;const setW=id=>{W=Math.max(330,Math.min(760,document.getElementById(id).clientWidth||640))};
