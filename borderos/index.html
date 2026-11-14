@@ -85,6 +85,9 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
 #pm form{background:var(--bg);border:1px solid var(--line);border-radius:18px 18px 0 0;width:100%;max-width:560px;padding:18px 16px 24px;max-height:92vh;overflow:auto}
 @media(min-width:700px){#pm{align-items:center}#pm form{border-radius:18px}}
 #pm h2{font-size:19px;font-weight:900;text-transform:uppercase;margin:0 0 12px}
+.pts{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}.pt{border:1px solid var(--line);background:var(--card2);color:var(--sub);border-radius:999px;padding:5px 10px;font:inherit;font-size:12px;cursor:pointer}.pt.ok{border-color:var(--pos);color:var(--pos)}.st.parc{border-color:var(--amber);color:var(--amber)}
+.massa{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}.massa summary{cursor:pointer;font-weight:700;color:var(--pinkl)}
+.pp.flash{outline:2px solid var(--pinkl);outline-offset:2px;transition:outline .3s}
 </style>
 </head>
 <body>
@@ -137,6 +140,12 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
     <h3>Equipe <small id="e_fm"></small></h3>
     <div class="res"><input class="search" id="e_busca" placeholder="Adicionar pessoa: digite o nome ou apelido" autocomplete="off"><div class="dd" id="e_dd"></div></div>
     <div id="e_eq" style="margin-top:10px"></div>
+    <details class="massa"><summary>Pagamento em massa</summary>
+      <p class="note">Ex.: pagou a diária de todo mundo num dia. Escolha as partes, quem e a data; depois salve o borderô.</p>
+      <div class="pts" id="m_partes"></div>
+      <div class="f4" style="grid-template-columns:1fr 1fr;margin-top:6px"><label>Quem<select id="m_grupo"></select></label><label>Data do pagamento<input type="date" id="m_data"></label></div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button type="button" class="btn sm pkb" id="m_pagar">Marcar como pago</button><button type="button" class="btn sm" id="m_desf">Desmarcar</button><span class="note" id="m_res" style="margin:0;align-self:center"></span></div>
+    </details>
     <datalist id="dl_fun"></datalist>
     <h3>Itens <small>som, CO2, alimentação, hotel…</small></h3>
     <div id="e_it"></div>
@@ -227,8 +236,8 @@ function renderShows(){
   Object.values(BORD).filter(b=>!usados.has(b.id)).forEach(b=>it.push({s:{id:null,data:b.data,evento:b.show,cidade:b.local,valor:b.valor,status:''},b}));
   if(filtro==='prox')it=it.filter(x=>x.s.data>=HOJE).sort((a,b)=>a.s.data.localeCompare(b.s.data));
   if(filtro==='hist')it=it.filter(x=>x.s.data<HOJE).sort((a,b)=>b.s.data.localeCompare(a.s.data));
-  if(filtro==='pend')it=it.filter(x=>x.b&&x.b.equipe.some(e=>e.status==='Pendente'&&!e.fora)).sort((a,b)=>a.s.data.localeCompare(b.s.data));
-  document.getElementById('lshows').innerHTML=it.length?it.map(({s,b})=>{const t=b?totais(b):null,pend=b?b.equipe.filter(e=>e.status==='Pendente'&&!e.fora):[];
+  if(filtro==='pend')it=it.filter(x=>x.b&&x.b.equipe.some(e=>LB.pg.falta(e)>0)).sort((a,b)=>a.s.data.localeCompare(b.s.data));
+  document.getElementById('lshows').innerHTML=it.length?it.map(({s,b})=>{const t=b?totais(b):null,pend=b?b.equipe.filter(e=>LB.pg.falta(e)>0):[];
     return `<div class="card sc"><div class="d"><b>${s.data.slice(8,10)}</b><span>${MES[+s.data.slice(5,7)-1]} ${s.data.slice(2,4)}</span></div>
     <div class="t"><b>${esc(s.evento||b&&b.show||'Show')}</b><span>${esc(s.cidade||'')}${s.valor?' · cachê '+brl(s.valor):''}${s.status==='A confirmar'?' · a confirmar':''}</span>
     <span style="display:block;margin-top:3px">${b?`${esc(fmTxt(resumo(b)))} · gasto ${brl(t.g)}${t.luc!=null?' · lucro <b class="'+(t.luc<0?'neg':'pos')+'" style="display:inline;font-size:12px">'+brl(t.luc)+'</b>':''}${pend.length?' · <b class="pk" style="display:inline;font-size:12px">'+pend.length+' a pagar</b>':''}`:'<span class="pill am">sem borderô</span>'}</span></div>
@@ -277,25 +286,39 @@ function addPessoa(p){if(!p)return;const u=(D.ultimo||{})[p.id]||{};const f=D.fu
   $('e_busca').value='';res=[];$('e_dd').classList.remove('open');ED._sujo=true;renderEq();calcTot();$('e_busca').focus()}
 
 /* linhas da equipe */
-function renderEq(){const r=resumo(ED);$('e_fm').textContent=fmTxt(r);
+function renderMassa(){const sel=new Set([...document.querySelectorAll('#m_partes [data-mk].ok')].map(b=>b.dataset.mk));
+  $('m_partes').innerHTML=LB.pg.PARTES.filter(([k])=>ED.equipe.some(e=>num(e[k])>0)).map(([k,n])=>`<button type="button" class="pt${sel.has(k)?' ok':''}" data-mk="${k}">${sel.has(k)?'✓':'○'} ${n}</button>`).join('')||'<span class="note">Sem valores na equipe ainda.</span>';
+  const g=$('m_grupo').value;$('m_grupo').innerHTML=['Todos',...GR.filter(x=>ED.equipe.some(e=>e.grupo===x))].map(x=>`<option${x===g?' selected':''}>${x}</option>`).join('');if(!$('m_data').value)$('m_data').value=HOJE}
+function massa(pago){const ks=[...document.querySelectorAll('#m_partes [data-mk].ok')].map(b=>b.dataset.mk);if(!ks.length){$('m_res').textContent='Escolha ao menos uma parte.';return}
+  const g=$('m_grupo').value,d=$('m_data').value||HOJE;let n=0;
+  ED.equipe.forEach(e=>{if(e.fora||(g!=='Todos'&&e.grupo!==g)||!ks.some(k=>num(e[k])>0))return;LB.pg.marca(e,ks,d,pago);n++});
+  ED._sujo=true;renderEq();calcTot();$('m_res').textContent=n?`${n} pessoa${n>1?'s':''} ${pago?(n>1?'marcadas como pagas':'marcada como paga'):(n>1?'desmarcadas':'desmarcada')} · salve o borderô`:'Ninguém com essas partes.'}
+$('m_partes').addEventListener('click',e=>{const b=e.target.closest('[data-mk]');if(!b)return;b.classList.toggle('ok');b.textContent=(b.classList.contains('ok')?'✓ ':'○ ')+b.textContent.slice(2)});
+$('m_pagar').onclick=()=>massa(true);$('m_desf').onclick=()=>massa(false);
+function renderEq(){const r=resumo(ED);$('e_fm').textContent=fmTxt(r);renderMassa();
   $('e_eq').innerHTML=ED.equipe.length?GR.map(g=>{const l=ED.equipe.map((e,i)=>({e,i})).filter(x=>x.e.grupo===g);if(!l.length)return '';
     return `<div class="note" style="margin:10px 2px 6px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;font-size:10.5px;color:var(--pinkl)">${g} · ${l.length}</div>`+l.map(({e,i})=>`<div class="pp" data-i="${i}">
     <div class="top"><div><b>${esc(e.nome)}</b><span>${e.doc?'CPF/doc '+esc(doc11(e.doc))+' · ':''}${e.pix?'PIX '+esc(e.pix):'<span class="pk">sem PIX</span>'}</span></div>
-    <div style="display:flex;gap:4px;align-items:center"><button type="button" class="st${e.status==='Pago'?' pago':''}" data-st>${e.status==='Pago'?'pago':'a pagar'}</button><button type="button" class="x" data-rm title="Tirar">×</button></div></div>
+    <div style="display:flex;gap:4px;align-items:center"><button type="button" class="st${e.status==='Pago'?' pago':e.status==='Parcial'?' parc':''}" data-st>${e.status==='Pago'?'pago':e.status==='Parcial'?'parcial':'a pagar'}</button><button type="button" class="x" data-rm title="Tirar">×</button></div></div>
     <div class="f4 ex"><label>Grupo<select data-k="grupo">${GR.map(x=>`<option${x===e.grupo?' selected':''}>${x}</option>`).join('')}</select></label>
     <label>Função<input data-k="funcao" list="dl_fun" value="${esc(e.funcao)}"></label><label>Cachê (R$)<input data-k="valor" inputmode="decimal" value="${nf(e.valor)}"></label>
     <label>Gasolina (R$) <a href="#" data-gas style="color:var(--pinkl);text-transform:none;letter-spacing:0">calcular</a><input data-k="gasolina" inputmode="decimal" value="${nf(e.gasolina)}"></label>
     <label>Diária (R$)<input data-k="diaria" inputmode="decimal" value="${nf(e.diaria)}"></label><label>Ajuda de custo<input data-k="ajuda" inputmode="decimal" value="${nf(e.ajuda)}"></label><label>Estacionamento<input data-k="estacionamento" inputmode="decimal" value="${nf(e.estacionamento)}"></label>
-    <div style="align-self:end;text-align:right;font-weight:800;padding-bottom:9px">${brl2(totP(e))}</div></div><div data-gc></div></div>`).join('')}).join('')
+    <div style="align-self:end;text-align:right;font-weight:800;padding-bottom:9px">${brl2(totP(e))}</div></div>
+    ${LB.pg.partes(e).length>1||e.status==='Parcial'?`<div class="pts">${LB.pg.partes(e).map(p=>`<button type="button" class="pt${p.pago?' ok':''}" data-pt="${p.k}" title="${p.pago?'Pago em '+(p.em?ddmm(p.em):'—')+' · toque para desmarcar':'Toque para marcar como pago'}">${p.pago?'✓':'○'} ${p.n} ${brl2(p.v)}</button>`).join('')}</div>`:''}<div data-gc></div></div>`).join('')}).join('')
     :'<div class="empty">Ninguém ainda. Busque pelo nome acima (ou comece com a equipe do último show ao criar).</div>'}
 $('e_eq').addEventListener('input',e=>{const t=e.target,c=t.closest('[data-i]');if(!c||!t.dataset.k)return;const p=ED.equipe[+c.dataset.i];
   p[t.dataset.k]=['valor','gasolina','diaria','ajuda','estacionamento'].includes(t.dataset.k)?num(t.value):t.value;
-  if(t.dataset.k==='funcao'){const f=D.funcoes.find(x=>LB.norm(x.funcao)===LB.norm(t.value));if(f&&!p.valor){p.valor=f.valor;c.querySelector('[data-k=valor]').value=nf(f.valor)}if(f&&f.grupo!==p.grupo){p.grupo=f.grupo;ED._sujo=true;renderEq();calcTot();return}}
+  if(t.dataset.k==='funcao'){const f=D.funcoes.find(x=>LB.norm(x.funcao)===LB.norm(t.value));if(f&&!p.valor){p.valor=f.valor;c.querySelector('[data-k=valor]').value=nf(f.valor)}}
   ED._sujo=true;c.querySelector('.ex>div:last-child').textContent=brl2(totP(p));calcTot()});
-$('e_eq').addEventListener('change',e=>{if(e.target.dataset.k==='grupo'){renderEq();calcTot()}});
+$('e_eq').addEventListener('change',e=>{const t=e.target;if(t.dataset.k==='grupo'){renderEq();calcTot();return}
+  if(t.dataset.k==='funcao'){const c=t.closest('[data-i]'),i=+c.dataset.i,p=ED.equipe[i];const f=D.funcoes.find(x=>LB.norm(x.funcao)===LB.norm(t.value));
+    if(f&&f.grupo&&f.grupo!==p.grupo&&GR.includes(f.grupo)){p.grupo=f.grupo;ED._sujo=true;renderEq();calcTot();
+      const n=document.querySelector(`#e_eq [data-i="${i}"]`);if(n){n.scrollIntoView({block:'center'});n.classList.add('flash');setTimeout(()=>n.classList.remove('flash'),1600)}}}});
 $('e_eq').addEventListener('click',e=>{const c=e.target.closest('[data-i]');if(!c)return;const i=+c.dataset.i,p=ED.equipe[i];
   if(e.target.closest('[data-rm]')){ED.equipe.splice(i,1);ED._sujo=true;renderEq();calcTot()}
-  if(e.target.closest('[data-st]')){p.status=p.status==='Pago'?'Pendente':'Pago';ED._sujo=true;renderEq();calcTot()}
+  if(e.target.closest('[data-st]')){LB.pg.marca(p,'tudo',HOJE,p.status!=='Pago');ED._sujo=true;renderEq();calcTot()}
+  const pt=e.target.closest('[data-pt]');if(pt){const k=pt.dataset.pt,ja=LB.pg.partes(p).find(x=>x.k===k);LB.pg.marca(p,[k],HOJE,!(ja&&ja.pago));ED._sujo=true;renderEq();calcTot()}
   if(e.target.closest('[data-gas]')){e.preventDefault();gasCalc(c,p)}});
 /* calculadora de gasolina: km ida e volta ÷ autonomia do carro × preço */
 function gasCalc(c,p){const box=c.querySelector('[data-gc]');if(box.innerHTML){box.innerHTML='';return}
@@ -319,7 +342,7 @@ $('e_it').addEventListener('click',e=>{const c=e.target.closest('[data-ii]');if(
 function calcTot(){const t=totais(ED),d=dieselDe(ED.diesel);
   $('d_ad').placeholder='auto: '+nf(+(num(ED.diesel.km_ida)*num(CFG.adicional_pct)/100).toFixed(1));
   $('d_res').innerHTML=d.km?`${nf(+d.km.toFixed(1))} km (ida + volta + ${nf(+d.ad.toFixed(1))} adicional) ÷ ${nf(d.kml)} km/L = <b>${nf(+d.litros.toFixed(1))} L</b> × R$ ${nf(d.pr)} = <b>${brl2(d.calc)}</b>${num(ED.diesel.abastecido)?` · vale o abastecido: <b>${brl2(num(ED.diesel.abastecido))}</b>`:''}`:'Sem ônibus: deixe os km em branco.';
-  const pend=ED.equipe.filter(e=>e.status==='Pendente'&&!e.fora).reduce((a,e)=>a+totP(e),0);
+  const pend=ED.equipe.reduce((a,e)=>a+LB.pg.falta(e),0);
   $('e_tot').innerHTML=`<div>Equipe<b>${brl(t.eq)}</b></div><div>Itens<b>${brl(t.it)}</b></div><div>Diesel<b>${brl(t.dz)}</b></div><div>Gasto<b>${brl(t.g)}</b></div><div>Lucro<b class="${t.luc==null?'':t.luc<0?'neg':'pos'}">${t.luc==null?'—':brl(t.luc)}</b></div>${pend?`<div style="grid-column:1/-1;font-size:11px;letter-spacing:.04em;text-transform:none">a pagar para a equipe: <b style="display:inline;color:var(--pinkl);font-size:12px">${brl(pend)}</b></div>`:''}`}
 
 /* salvar / excluir */
