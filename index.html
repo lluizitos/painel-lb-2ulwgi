@@ -83,6 +83,8 @@ h3 small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)
 /* barra realizado x previsto */
 .prog{height:8px;border-radius:99px;background:var(--card2);overflow:hidden;margin-top:8px}
 .prog i{display:block;height:100%;background:var(--pink);border-radius:99px}
+.prog.pst{display:flex}.prog.pst i{border-radius:0}.prog.pst i:first-child{border-radius:99px 0 0 99px}
+.pleg{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:11px;color:var(--sub)}.pleg i{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--pink);margin-right:5px}
 /* listas */
 .list{display:flex;flex-direction:column;gap:8px}
 .row{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:12px;padding:11px 14px}
@@ -539,7 +541,7 @@ function renderInfo(){const el=document.getElementById('infobase');if(!el||!D)re
   const b=document.getElementById('avt');if(b)b.onclick=()=>{LB.store.set('lb_av_min',min?'0':'1');renderInfo()}}
 let PEND=null;
 function etpHtml(et,sub){const tt=et.sinal+et.cache+et.aporte+et.outros;if(!tt)return '';
-  return `<div class="card k" style="margin-top:10px"><div class="l">De onde veio o dinheiro que entrou</div><div class="etp">${[['Sinais (shows de meses seguintes)',et.sinal,'var(--pinkl)'],['Cachês de shows do mês',et.cache,'var(--pos)'],['Aporte do sócio',et.aporte,'var(--amber)'],['Outras entradas',et.outros,'var(--muted)']].filter(x=>x[1]).map(x=>`<div><i style="background:${x[2]}"></i>${x[0]}<b>${brl(x[1])}</b><small>${Math.round(x[1]/tt*100)}%</small></div>`).join('')}</div><div class="s" style="margin-top:6px">${sub}</div></div>`}
+  return `<div class="card k" style="margin-top:10px"><div class="l">De onde veio o dinheiro que entrou</div><div class="etp">${[['Sinais (shows de meses seguintes)',et.sinal,'var(--amber)'],['Cachês de shows do mês',et.cache,'var(--pos)'],['Aporte do sócio',et.aporte,'var(--pinkl)'],['Outras entradas',et.outros,'var(--muted)']].filter(x=>x[1]).map(x=>`<div><i style="background:${x[2]}"></i>${x[0]}<b>${brl(x[1])}</b><small>${Math.round(x[1]/tt*100)}%</small></div>`).join('')}</div><div class="s" style="margin-top:6px">${sub}</div></div>`}
 function sinaisHtml(S){if(!S||!S.total)return '';
   return `<div class="card k" style="margin-top:10px;border-left:3px solid var(--pinkl)"><div class="l">Do caixa, quanto é sinal</div><div class="v" style="font-size:20px">${brl(S.total)}</div><div class="s">já recebido de shows que ainda vão acontecer · a equipe e os custos desses shows ainda vão sair</div><div class="sxl">${S.shows.map(x=>`<span>${esc(x.show)} <b>${brl(x.valor)}</b></span>`).join('')}</div></div>`}
 function renderMes(){
@@ -556,15 +558,14 @@ function renderMes(){
       k4('Saídas',brl(m.sai),'equipe, fixos e contas')+
       k4(m.tipo==='fechado'?'Saldo no fim':'Saldo previsto no fim',brl(m.fim),`resultado do mês ${(m.res>=0?'+':'')+brl(m.res)}`,cls(m.fim))+`</div>`;
     if(m.tipo==='parcial'){
-      const pe=m.ent_real/m.ent*100,ps=m.sai_real/m.sai*100;
-      h+=`<div class="grid g2" style="margin-top:10px"><div class="card k"><div class="l">Já entrou</div><div class="v" style="font-size:18px">${brl(m.ent_real)}</div><div class="s">de ${brl(m.ent)} previstos</div><div class="prog"><i style="width:${pe}%"></i></div></div>
+      const et=m.ent_tipos||{sinal:0},sn=et.sinal||0,er=Math.max(m.ent_real,(et.cache||0)+(et.aporte||0)+(et.outros||0)+sn),bs=Math.max(m.ent,er),ps=m.sai_real/m.sai*100; // sinal em outra cor na barra
+      h+=`<div class="grid g2" style="margin-top:10px"><div class="card k"><div class="l">Já entrou</div><div class="v" style="font-size:18px">${brl(er)}</div><div class="s">de ${brl(m.ent)} previstos</div><div class="prog pst"><i style="width:${(er-sn)/bs*100}%"></i><i style="width:${sn/bs*100}%;background:var(--amber)"></i></div>${sn?`<div class="pleg"><span><i></i>cachês ${brl(er-sn)}</span><span><i style="background:var(--amber)"></i>sinal ${brl(sn)}</span></div>`:''}</div>
       <div class="card k"><div class="l">Já saiu</div><div class="v" style="font-size:18px">${brl(m.sai_real)}</div><div class="s">de ${brl(m.sai)} previstos</div><div class="prog"><i style="width:${ps}%;background:var(--sai)"></i></div></div></div>`;
     }
     if(m.aporte&&m.tipo!=='fechado'){const sem=m.fim-(k==='2026-12'?2*m.aporte:m.aporte);
       h+=`<p class="note">Sem o aporte do investidor, este mês terminaria em <b class="${cls(sem)}">${brl(sem)}</b>.</p>`}
     if(m.nota)h+=`<p class="note">${esc(m.nota)}</p>`;
     if(m.ent_tipos)h+=etpHtml(m.ent_tipos,k>=D.ext_ate.slice(0,7)?'extrato conferido até '+ddmm(D.ext_ate)+' + recebimentos lançados no app depois disso':'pelo extrato do mês');
-    if(k===mkey(HOJE))h+=sinaisHtml(D.sinais_caixa);
   }else h+=`<div class="empty" style="margin-top:16px">O balanço mês a mês começa em janeiro de 2026. Abaixo, os shows e as movimentações que existem deste mês.</div>`;
   // contas
   const cs=D.contas.filter(c=>mkey(c.venc)===k);
