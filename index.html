@@ -537,7 +537,7 @@ function renderSaldo(){const el=document.getElementById('saldoat');if(!el||!D.li
   const HJ=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),x=D.linha[0],l=D.linha.filter(y=>y.data<=HJ),u=l[l.length-1]||x,est=(D.ext_ate||'')<HJ&&u!==x;
   el.innerHTML=`<div class="card k" style="margin-top:12px"><div class="l">Saldo atual${est?' (estimado)':''}</div><div class="v ${u.saldo<0?'neg':''}">${brl(u.saldo)}</div><div class="s">conta + dinheiro${est?` · extrato ${ddmm(D.ext_ate)}: ${brl(x.saldo)}`:' · conferido no extrato'}</div></div>`+pendShows()}
 /* shows de meses passados que ainda têm valor a receber */
-function pendShows(){const M0=new Date(Date.now()-3*3600e3).toISOString().slice(0,7)+'-01',l=D.shows.filter(s=>s.data<M0&&s.sit==='Realizado'&&(s.falta||0)>=1).sort((a,b)=>b.data.localeCompare(a.data));if(!l.length)return '';
+function pendShows(){const l=D.pend_shows||[];if(!l.length)return '';
   const t=l.reduce((a,s)=>a+s.falta,0);
   return `<details class="card k pshw" style="margin-top:10px"><summary><span class="l" style="margin:0">${l.length} shows passados a receber</span><b class="pos">${brl(t)}</b><small>▾</small></summary><div class="psl">${l.map(s=>`<div><span>${dtx(s.data)} · ${esc(s.nome)}</span><b>${brl(s.falta)}</b></div>`).join('')}</div></details>`}
 function renderInfo(){const el=document.getElementById('infobase');if(!el||!D)return; // topo: só o essencial + avisos (pendências e os escolhidos no Admin)

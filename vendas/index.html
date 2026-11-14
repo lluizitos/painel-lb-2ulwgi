@@ -323,7 +323,7 @@ function abrirEd(s){editId=s?s.id:null;document.getElementById('edt').textConten
   const d=s||{status:'Confirmado',contrato:'Não informado',nota:'Não informado',tipo:'Show',uf:'MG',vendedor:ALIAS[LB.norm(NOME)]||NOME};
   [...ef.elements].forEach(el=>{if(el.name&&d[el.name]!=null)el.value=d[el.name]});
   const adm=PAPEL==='admin';['vendedor','comissao_pct'].forEach(k=>{ef[k].readOnly=!adm;ef[k].title=adm?'':'Só a administração muda'});if(!adm&&!s)ef.vendedor.value=ALIAS[LB.norm(NOME)]||NOME;
-  PL=jp(d.plano)||{tipo:'',parcelas:[]};PL.parcelas=PL.parcelas||[];RC=jp(d.recebimentos)||[];RCED=null;
+  PL=jp(d.plano)||{tipo:'',parcelas:[]};PL.parcelas=PL.parcelas||[];RC=jp(d.recebimentos)||[];if(!RC.length&&+d.recebido>0)RC=[{data:'',valor:+d.recebido,obs:'total lançado antes, sem detalhe'}];RCED=null; // não some o que já tinha sido lançado só como total
   if(!PL.tipo&&num(d.sinal)>0){PL={tipo:'sinal',parcelas:[{v:num(d.sinal),venc:''},{v:Math.max(0,(num(d.valor)||0)-num(d.sinal)),venc:d.venc_restante||''}]}} // shows antigos com sinal
   renderPg();document.getElementById('msg').textContent='';prev();ed.classList.add('open')}
 function lerForm(){const o={};[...ef.elements].forEach(el=>{if(el.name)o[el.name]=el.value.trim()});
