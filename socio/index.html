@@ -68,6 +68,13 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 .etp{display:flex;flex-direction:column;gap:6px;margin-top:8px}.etp div{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--sub)}.etp i{width:10px;height:10px;border-radius:3px;flex:none}.etp b{margin-left:auto;color:var(--ink)}.etp small{color:var(--muted);width:38px;text-align:right}
 .sxl{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px;color:var(--sub)}.sxl b{color:var(--ink)}
 .mvh{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+.g2d{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g2d>div{min-width:0}.dnt .etp div{min-width:0}@media(max-width:640px){.g2d{grid-template-columns:1fr}}
+.dn{background:var(--card);border-radius:14px;padding:14px 16px;height:100%}.dn .l{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--sub)}
+.dnt{display:flex;align-items:center;gap:12px;margin-top:10px;min-width:0}.dnt svg{width:100px;height:100px;flex:none}.dnt .etp{flex:1;min-width:0;margin:0}.dnt .etp span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dnt .etp b{margin-left:6px}
+.fb{background:var(--card);border-radius:14px;padding:14px 12px}.fb .leg{display:flex;gap:14px;font-size:12px;color:var(--sub);margin:0 4px 10px}.fb .leg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}
+.fbc{display:flex;gap:6px;align-items:flex-end;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.fbc::-webkit-scrollbar{display:none}
+.fbm{flex:1 0 34px;display:flex;flex-direction:column;align-items:center;gap:4px}.fbb{height:120px;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px}.fbb i{width:40%;max-width:14px;border-radius:3px 3px 0 0;min-height:2px}
+.fbm b{font-size:11px}.fbm span{font-size:10.5px;color:var(--muted);text-transform:capitalize}
 </style>
 </head>
 <body>
@@ -87,9 +94,8 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <div class="grid g4" id="kagora" style="margin-top:14px"></div>
   <h3>O que aconteceu <small>no mês</small></h3>
   <div class="list" id="ocm"></div>
-  <h3>Para onde foi o dinheiro <small id="gsub"></small></h3>
-  <div class="gb" id="gastos"></div>
-  <div id="entt"></div>
+  <h3>Entrou e saiu <small id="gsub"></small></h3>
+  <div class="g2d"><div id="entt"></div><div id="gastos"></div></div>
   <h3>Movimentações do mês <small id="mvsub"></small></h3>
   <div class="list" id="mvl"></div>
   <h3>Shows do mês</h3>
@@ -118,10 +124,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <p class="eyebrow">3 · Geral</p>
   <h1 style="font-size:24px">Temporada <em id="anonm"></em></h1>
   <div class="grid g4" id="kpis" style="margin-top:14px"></div>
-  <h3>Mês a mês <small>cachês dos shows e lucro depois de pagar equipe, itens e diesel</small></h3>
+  <h3>Mês a mês <small>cachês × lucro</small></h3>
   <div class="chart"><div class="leg"><span><i style="background:var(--pink)"></i>Cachês</span><span><i style="background:var(--pos)"></i>Lucro dos shows</span></div><div id="ch"></div><div class="tip" id="tip">Toque num mês para ver os valores.</div></div>
-  <h3>Meses fechados <small>tudo que entrou e saiu da empresa</small></h3>
-  <table class="fe" id="fech"></table>
+  <h3>Meses fechados <small>entrou × saiu</small></h3>
+  <div class="card fb"><div class="leg"><span><i style="background:var(--pos)"></i>Entrou</span><span><i style="background:var(--sai)"></i>Saiu</span></div><div class="fbc" id="fech"></div></div>
   <h3>Investimento do sócio</h3>
   <div class="list" id="aportes"></div>
   <h3>Tudo o que aconteceu</h3>
@@ -131,7 +137,6 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <h3>Documentos</h3>
   <div class="list" id="docs"></div>
   </div>
-  <p class="note" style="margin-top:22px">Aqui entram só valores confirmados: o que já está no extrato, shows confirmados e gastos comprovados. O que ainda depende de confirmação aparece depois de conferido.</p>
   <footer>Lucas Barros Ltda · números do extrato bancário, do caixa em dinheiro e das planilhas de cada show (borderôs)</footer>
 </main>
 </div>
@@ -148,8 +153,14 @@ LB.entrar({pagina:'socio',base:'../',titulo:'Prestação de contas',ok:r=>{D=r.d
 const k4=(l,v,s,c)=>`<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`;
 const dia=d=>`<div class="d"><b>${d.slice(8,10)}</b><span>${MES3[+d.slice(5,7)-1]} ${d.slice(2,4)}</span></div>`;
 const ocRow=o=>`<div class="oc">${dia(o.data)}<div class="t"><b>${esc(o.titulo)}</b><span>${esc(o.detalhe||'')}${o.doc?` · <a href="#docs" style="color:var(--pinkl)">ver documento</a>`:''}${o.data>D.atualizado?' · <span class="pill">programado</span>':''}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`;
-function etpHtml(et,sub){const tt=et.sinal+et.cache+et.aporte+et.outros;if(!tt)return '';
-  return `<div class="card k" style="margin-top:10px"><div class="l">De onde veio o dinheiro que entrou</div><div class="etp">${[['Sinais (shows de meses seguintes)',et.sinal,'var(--pinkl)'],['Cachês de shows do mês',et.cache,'var(--pos)'],['Aporte do sócio',et.aporte,'var(--amber)'],['Outras entradas',et.outros,'var(--muted)']].filter(x=>x[1]).map(x=>`<div><i style="background:${x[2]}"></i>${x[0]}<b>${brl(x[1])}</b><small>${Math.round(x[1]/tt*100)}%</small></div>`).join('')}</div><div class="s" style="margin-top:6px">${sub}</div></div>`}
+const PAL=['var(--pink)','var(--amber)','#8EC5FF','var(--pos)','#C9A0FF','var(--sai)','#5FD3C6'];
+/* rosca: S = [[nome, valor, cor]] · centro = total */
+function dnt(titulo,S){S=S.filter(x=>x[1]>0.5);const tt=S.reduce((a,x)=>a+x[1],0);if(!tt)return '';let a0=0;const R=15.9155;
+  const arc=S.map(x=>{const p=x[1]/tt*100,d=Math.max(p-.6,.1),c=`<circle r="${R}" cx="21" cy="21" fill="none" stroke="${x[2]}" stroke-width="6" stroke-dasharray="${d} ${100-d}" stroke-dashoffset="${25-a0}"/>`;a0+=p;return c}).join('');
+  return `<div class="card dn"><div class="l">${titulo}</div><div class="dnt"><svg viewBox="0 0 42 42" aria-hidden="true"><circle r="${R}" cx="21" cy="21" fill="none" stroke="var(--card2)" stroke-width="6"/>${arc}<text x="21" y="22.6" text-anchor="middle" font-size="5" font-weight="700" fill="var(--ink)">${brl(tt).replace('R$ ','')}</text></svg><div class="etp">${S.map(x=>`<div><i style="background:${x[2]}"></i><span>${x[0]}</span><b>${Math.round(x[1]/tt*100)}%</b></div>`).join('')}</div></div></div>`}
+function etpHtml(et){return dnt('De onde entrou',[['Cachês',et.cache,'var(--pos)'],['Sinal',et.sinal,'var(--amber)'],['Investidor',et.aporte,'var(--pinkl)'],['Outras',et.outros,'var(--sai)']])}
+function gastHtml(G){const l=G.slice().sort((a,b)=>b.valor-a.valor),top=l.slice(0,5),resto=l.slice(5).reduce((a,g)=>a+g.valor,0);
+  return dnt('Para onde foi',top.map((g,i)=>[g.grupo,g.valor,PAL[i]]).concat(resto?[['Outros',resto,'var(--sai)']]:[]))}
 function sinaisHtml(S){if(!S||!S.total)return '';
   return `<div class="card k" style="margin-top:10px;border-left:3px solid var(--pinkl)"><div class="l">Do caixa, quanto é sinal</div><div class="v" style="font-size:20px">${brl(S.total)}</div><div class="s">já recebido de shows que ainda vão acontecer · a equipe e os custos desses shows ainda vão sair</div><div class="sxl">${S.shows.map(x=>`<span>${esc(x.show)} <b>${brl(x.valor)}</b></span>`).join('')}</div></div>`}
 function render(){
@@ -163,7 +174,7 @@ function render(){
     document.getElementById('equipe').innerHTML=E.pessoas.map(p=>`<div class="eq"><div class="n"><b>${esc(p.nome)}</b><span class="f">${p.feito_total} entrega${p.feito_total===1?'':'s'} no mês</span></div><div class="f">${esc(p.funcao)}</div>${p.meta?`<div class="me">Meta: ${esc(p.meta)}</div>`:''}
       <div class="nums"><span>Tarefas concluídas <b>${p.concluidas}</b></span><span>Em aberto <b>${p.abertas}</b></span>${p.atrasadas?`<span>Atrasadas <b style="color:var(--neg)">${p.atrasadas}</b></span>`:''}</div>${p.feito.length?`<ul>${p.feito.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`:''}</div>`).join('')}}}
   {const a=D.extrato_ate||(D.agora&&D.agora.ate)||'';document.getElementById('infobase').style.display='none';document.getElementById('mestp').textContent='Mês atual · extrato até '+a} // igual ao painel: texto pequeno ao lado do mês, sem quadro
-  document.getElementById('upd').textContent='Atualizado em '+hoje.split('-').reverse().join('/')+' · primeiro o mês atual, depois os próximos meses e por fim o geral.';
+  document.getElementById('upd').textContent='Atualizado em '+hoje.split('-').reverse().join('/');
   // 1 · agora
   document.getElementById('mesnm').innerHTML=`${MESES[+mk.slice(5,7)-1]} <em>${mk.slice(0,4)}</em>`;
   const cx=A.caixa.conta+A.caixa.maos,feitos=A.shows.filter(s=>s.data<=hoje),mesF=A.shows.reduce((a,s)=>a+(s.valor||0),0);
@@ -174,10 +185,10 @@ function render(){
   const tg=A.gastos.reduce((a,g)=>a+g.valor,0)||1,mg=Math.max(...A.gastos.map(g=>g.valor),1);
   document.getElementById('gsub').textContent=`${brl(A.saiu)} até ${A.ate}`;
   {const T=A.ent_tipos,mv=(A.movs||[]).slice().reverse();
-    document.getElementById('entt').innerHTML=(T?etpHtml(T,'extrato até '+A.ate+' + sinais lançados no app depois disso'):'')+sinaisHtml(A.sinais_caixa);
+    document.getElementById('entt').innerHTML=T?etpHtml(T):''; // sinal já aparece na rosca
     document.getElementById('mvsub').textContent=mv.length?mv.length+' lançamentos (conta, dinheiro e app)':'';
     document.getElementById('mvl').innerHTML=mv.map(x=>`<div class="row">${dia(x.data)}<div class="t"><b>${esc(x.quem||'—')}</b><span>${x.tipo==='sinal'?'<span class="pill pk">sinal</span> ':x.tipo==='cache'?'<span class="pill ok">cachê</span> ':''}${esc(x.cat||'')}${x.show_nome?' · '+esc(x.show_nome):''}${x.meio==='dinheiro'?' · dinheiro':''}${x.app?' · <span class="pill">ainda não conferido no extrato</span>':''}</span></div><div class="v ${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl(x.valor)}</div></div>`).join('')||'<div class="oc"><div class="t"><span>Nenhuma movimentação neste mês ainda.</span></div></div>'}
-  document.getElementById('gastos').innerHTML=A.gastos.map(g=>`<div class="it"><div class="top"><span>${esc(g.grupo)}</span><b>${brl(g.valor)} <span class="mut" style="font-weight:400">· ${Math.round(g.valor/tg*100)}%</span></b></div><div class="tr"><i style="width:${g.valor/mg*100}%"></i></div></div>`).join('')||'<span class="mut">Nenhuma saída no mês ainda.</span>';
+  document.getElementById('gastos').innerHTML=gastHtml(A.gastos)||'<span class="mut">Nenhuma saída no mês ainda.</span>';
   document.getElementById('smes').innerHTML=A.shows.map(s=>`<div class="row">${dia(s.data)}<div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')} · ${s.data<=hoje?'<span class="pill ok">realizado</span>':'<span class="pill pk">confirmado</span>'}</span></div><div class="v">${brl(s.valor)}<small>${s.lucro!=null?'lucro <span class="'+(s.lucro<0?'neg':'pos')+'">'+brl(s.lucro)+'</span>':(s.rec?'já recebido '+brl(s.rec):'nada recebido ainda')}</small></div></div>`).join('')||'<div class="oc"><div class="t"><span>Sem shows confirmados neste mês.</span></div></div>';
   // 2 · próximos meses
   const vend=P.shows.reduce((a,s)=>a+(s.valor||0),0),recA=P.shows.reduce((a,s)=>a+(s.rec||0),0);
@@ -188,12 +199,13 @@ function render(){
   const mf=Math.max(...P.fixos.map(f=>f.valor),1);
   document.getElementById('fixs').textContent=`${brl(P.total_fixos)} por mês`;
   document.getElementById('fixos').innerHTML=P.fixos.map(f=>`<div class="it"><div class="top"><span>${esc(f.desc)}</span><b>${brl(f.valor)}</b></div><div class="tr"><i style="width:${f.valor/mf*100}%;background:var(--sai)"></i></div></div>`).join('');
-  document.getElementById('apnota').textContent=`Fora os fixos, cada show tem o custo da equipe, itens e diesel daquele dia. Investimento do sócio combinado: ${brl(P.aporte_mensal)} por mês.`;
+  document.getElementById('apnota').textContent=P.aporte_mensal?`Investimento combinado: ${brl(P.aporte_mensal)}/mês`:'';
   // 3 · geral
   const a=G.ano;document.getElementById('anonm').textContent=hoje.slice(0,4);
   document.getElementById('kpis').innerHTML=k4('Shows',a.shows,'realizados com cachê')+k4('Cachês',brl(a.fat),'soma dos shows')+k4('Lucro dos shows',brl(a.lucro),Math.round(a.lucro/a.fat*100)+'% dos cachês','pos')+k4('Cachê médio',brl(a.media),'por show');
   const fk=Object.keys(G.fechados).sort();
-  document.getElementById('fech').innerHTML=`<tr><th>Mês</th><th class="hs">Começou</th><th>Entrou</th><th>Saiu</th><th>Resultado</th><th class="hs">Terminou</th></tr>`+fk.map(k=>{const m=G.fechados[k];return `<tr><td style="text-transform:capitalize">${MES3[+k.slice(5,7)-1]}/${k.slice(2,4)}</td><td class="hs">${brl(m.ini)}</td><td>${brl(m.ent)}</td><td>${brl(m.sai)}</td><td class="${m.res<0?'neg':'pos'}">${(m.res>=0?'+':'')+brl(m.res)}</td><td class="hs">${brl(m.fim)}</td></tr>`}).join('');
+  {const mx=Math.max(...fk.map(k=>Math.max(G.fechados[k].ent,G.fechados[k].sai)),1);
+  document.getElementById('fech').innerHTML=fk.map(k=>{const m=G.fechados[k];return `<div class="fbm" title="${MES3[+k.slice(5,7)-1]}/${k.slice(2,4)} · entrou ${brl(m.ent)} · saiu ${brl(m.sai)}"><div class="fbb"><i style="height:${m.ent/mx*100}%;background:var(--pos)"></i><i style="height:${m.sai/mx*100}%;background:var(--sai)"></i></div><b class="${m.res<0?'neg':'pos'}">${(m.res>=0?'+':'−')+(Math.abs(m.res)>=1000?Math.round(Math.abs(m.res)/1000)+'k':Math.round(Math.abs(m.res)))}</b><span>${MES3[+k.slice(5,7)-1]}</span></div>`}).join('')}
   const ap=G.aportes.reduce((s,x)=>s+x.valor,0);
   document.getElementById('aportes').innerHTML=G.aportes.map(x=>`<div class="row">${dia(x.data)}<div class="t"><b>Aporte${x.quando?' de '+x.quando:' recebido na conta'}</b><span style="display:block;font-size:12.5px;color:var(--muted)">Foi para: ${x.destino||'a informar'}${x.obs?' · '+x.obs:''}</span></div><div class="v">${brl(x.valor)}</div></div>`).join('')+`<div class="row"><div class="t"><b>Total investido</b></div><div class="v">${brl(ap)}</div></div>`;
   document.getElementById('ocall').innerHTML=G.ocorrencias.slice().sort((x,y)=>y.data.localeCompare(x.data)).map(ocRow).join('');
