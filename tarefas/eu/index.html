@@ -41,6 +41,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px;margin:20px 2px 8
 <p class="eyebrow">Minhas tarefas</p>
 <div id="app"><p class="fn">Carregando…</p></div>
 </div>
+<script src="../../lbmetas.js"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),MES=HOJE.slice(0,7);
@@ -48,23 +49,9 @@ const ddmm=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
 const K=new URLSearchParams(location.hash.slice(1)).get('k')||'';
 let API='',P=null,T=[];
 async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({k:K},c))})).json();if(!r.ok)throw new Error(r.erro||'erro');P=r.perfil;T=r.tarefas;return r}
-function card(t){const atr=t.status!=='Concluída'&&t.prazo&&t.prazo<HOJE,c=t.status==='Concluída'?'ok':atr?'atr':t.status==='Em andamento'?'and':'';
-  return `<div class="tf ${c}"><b>${esc(t.titulo)}</b>${t.descricao?`<div class="ds">${esc(t.descricao)}</div>`:''}
-    <div class="pz">${t.status==='Concluída'?'Concluída em '+ddmm(t.concluido_em):t.prazo?(atr?'<span class="neg">Atrasada · era até '+ddmm(t.prazo)+'</span>':'Entregar até '+ddmm(t.prazo)):'Sem prazo'}</div>
-    <div class="bts">${t.status==='Concluída'?`<button class="bt" data-id="${esc(t.id)}" data-s="A fazer">Reabrir</button>`
-      :`<button class="bt${t.status==='Em andamento'?' on':''}" data-id="${esc(t.id)}" data-s="${t.status==='Em andamento'?'A fazer':'Em andamento'}">${t.status==='Em andamento'?'◐ Em andamento':'Comecei'}</button><button class="bt done" data-id="${esc(t.id)}" data-s="Concluída">✓ Concluí</button>`}</div></div>`}
-function render(){const ab=T.filter(t=>t.status!=='Concluída').sort((a,b)=>(a.prazo||'9').localeCompare(b.prazo||'9')),ok=T.filter(t=>t.status==='Concluída').sort((a,b)=>(b.concluido_em||'').localeCompare(a.concluido_em||'')),okm=ok.filter(t=>(t.concluido_em||'').startsWith(MES));
-  document.title=P.nome+' · tarefas LB';
-  document.getElementById('app').innerHTML=`<h1>${esc(P.nome)}</h1><p class="fn">${esc(P.funcao||'')}</p>
-    ${P.meta?`<div class="meta"><span>Minha meta</span>${esc(P.meta)}</div>`:''}
-    <div class="res"><div>A fazer<b>${ab.length}</b></div><div>Atrasadas<b style="${ab.some(t=>t.prazo&&t.prazo<HOJE)?'color:var(--neg)':''}">${ab.filter(t=>t.prazo&&t.prazo<HOJE).length}</b></div><div>Feitas no mês<b style="color:var(--pos)">${okm.length}</b></div></div>
-    <h3>Em aberto</h3><div class="list">${ab.map(card).join('')||'<div class="empty">Nada pendente. 👏</div>'}</div>
-    ${ok.length?`<details${ok.length<=3?' open':''}><summary>Concluídas (${ok.length})</summary><div class="list">${ok.slice(0,30).map(card).join('')}</div></details>`:''}`}
-document.getElementById('app').addEventListener('click',async e=>{const b=e.target.closest('[data-id]');if(!b)return;b.disabled=true;b.textContent='salvando…';
-  try{await api({acao:'marcar_tarefa',id:b.dataset.id,status:b.dataset.s});render()}catch(err){b.textContent='não salvou, tente de novo';b.disabled=false}});
 (async()=>{const app=document.getElementById('app');
   if(!K){app.innerHTML='<p class="err">Link incompleto. Peça o seu link ao Luiz.</p>';return}
-  try{API=(await (await fetch('../../config.json',{cache:'no-store'})).json()).api_url;await api({acao:'minhas_tarefas'});render()}
+  try{API=(await (await fetch('../../config.json',{cache:'no-store'})).json()).api_url;await LBROT.pagina(app,api,'tarefas LB')}
   catch(e){app.innerHTML=`<p class="err">${e.message==='link'?'Este link não vale mais. Peça o novo ao Luiz.':'Não consegui abrir agora. Tente de novo em instantes.'}</p>`}})();
 </script>
 </body>
