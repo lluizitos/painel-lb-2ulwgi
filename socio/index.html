@@ -148,6 +148,8 @@ const brl=v=>v==null?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-B
 const kf=v=>{const a=Math.abs(v);return (v<0?'−':'')+(a>=1000?Math.round(a/1000)+' mil':a.toFixed(0))};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ddmm=s=>s.slice(8,10)+'/'+s.slice(5,7);
+const ANO_AT=new Date(Date.now()-3*3600e3).toISOString().slice(0,4);
+const dtx=s=>s?+s.slice(8,10)+' de '+MES3[+s.slice(5,7)-1]+(s.slice(0,4)!==ANO_AT?' '+s.slice(2,4):''):''; // 1 de fev 27 (igual ao painel)
 let D;
 LB.entrar({pagina:'socio',base:'../',titulo:'Prestação de contas',ok:r=>{D=r.dados;document.getElementById('links').innerHTML=LB.links(r.paginas,'socio','../');render()}});
 const k4=(l,v,s,c)=>`<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`;
@@ -187,9 +189,9 @@ function render(){
   {const T=A.ent_tipos,mv=(A.movs||[]).slice().reverse();
     document.getElementById('entt').innerHTML=T?etpHtml(T):''; // sinal já aparece na rosca
     document.getElementById('mvsub').textContent=mv.length?mv.length+' lançamentos (conta, dinheiro e app)':'';
-    document.getElementById('mvl').innerHTML=mv.map(x=>`<div class="row">${dia(x.data)}<div class="t"><b>${esc(x.quem||'—')}</b><span>${x.tipo==='sinal'?'<span class="pill pk">sinal</span> ':x.tipo==='cache'?'<span class="pill ok">cachê</span> ':''}${esc(x.cat||'')}${x.show_nome?' · '+esc(x.show_nome):''}${x.meio==='dinheiro'?' · dinheiro':''}${x.app?' · <span class="pill">ainda não conferido no extrato</span>':''}</span></div><div class="v ${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl(x.valor)}</div></div>`).join('')||'<div class="oc"><div class="t"><span>Nenhuma movimentação neste mês ainda.</span></div></div>'}
+    document.getElementById('mvl').innerHTML=mv.map(x=>`<div class="row">${dia(x.data)}<div class="t"><b>${esc(x.quem||'—')}</b><span>${x.tipo==='sinal'?`<span class="pill pk">sinal · show ${dtx(x.show_data||'')}</span> `:x.tipo==='cache'?'<span class="pill ok">cachê</span> ':''}${esc(x.cat||'')}${x.show_nome?' · '+esc(x.show_nome):''}${x.meio==='dinheiro'?' · dinheiro':''}${x.app?' · <span class="pill">a conferir</span>':''}</span></div><div class="v ${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl(x.valor)}</div></div>`).join('')||'<div class="oc"><div class="t"><span>Nenhuma movimentação neste mês ainda.</span></div></div>'}
   document.getElementById('gastos').innerHTML=gastHtml(A.gastos)||'<span class="mut">Nenhuma saída no mês ainda.</span>';
-  document.getElementById('smes').innerHTML=A.shows.map(s=>`<div class="row">${dia(s.data)}<div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')} · ${s.data<=hoje?'<span class="pill ok">realizado</span>':'<span class="pill pk">confirmado</span>'}</span></div><div class="v">${brl(s.valor)}<small>${s.lucro!=null?'lucro <span class="'+(s.lucro<0?'neg':'pos')+'">'+brl(s.lucro)+'</span>':(s.rec?'já recebido '+brl(s.rec):'nada recebido ainda')}</small></div></div>`).join('')||'<div class="oc"><div class="t"><span>Sem shows confirmados neste mês.</span></div></div>';
+  document.getElementById('smes').innerHTML=A.shows.map(s=>`<div class="row">${dia(s.data)}<div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')} · ${s.sit==='A confirmar'?'<span class="pill">a confirmar</span>':s.data<=hoje?'<span class="pill ok">realizado</span>':'<span class="pill pk">confirmado</span>'}</span></div><div class="v">${brl(s.valor)}<small>${s.lucro!=null?'lucro <span class="'+(s.lucro<0?'neg':'pos')+'">'+brl(s.lucro)+'</span>':(s.rec?'já recebido '+brl(s.rec):'nada recebido ainda')}</small></div></div>`).join('')||'<div class="oc"><div class="t"><span>Sem shows confirmados neste mês.</span></div></div>';
   // 2 · próximos meses
   const vend=P.shows.reduce((a,s)=>a+(s.valor||0),0),recA=P.shows.reduce((a,s)=>a+(s.rec||0),0);
   document.getElementById('proxs').textContent=`${P.shows.length} shows · ${brl(vend)} em cachês · ${brl(recA)} já recebido de sinal`;
