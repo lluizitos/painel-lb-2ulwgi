@@ -8,6 +8,7 @@
 <title>Lucas Barros · Sócio</title>
 <link rel="icon" href="../icone.png"><link rel="apple-touch-icon" href="../icone.png">
 <style>
+.info{margin:14px 0 4px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:10px;background:var(--card);font-size:13.5px;color:var(--sub)}.info b{color:var(--ink)}.info ul{margin:6px 0 0;padding-left:18px}.info li{margin:2px 0}
 :root{--bg:#141218;--card:#1E1C24;--card2:#26232D;--line:#2E2B36;--ink:#F3F1F6;--sub:#B8B3C3;--muted:#8B8697;--pink:#CF1D51;--pinkl:#F0507E;--neg:#FF8FA8;--pos:#7FDDA9;--sai:#6F697D;--amber:#F2B66B}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink)}
 body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:15px;line-height:1.45;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%;padding-bottom:40px}
@@ -70,6 +71,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <p class="eyebrow">Prestação de contas para o sócio</p>
   <h1>Lucas <em>Barros</em></h1>
   <p class="note" id="upd"></p>
+  <div class="info" id="infobase"></div>
 
   <div class="blk" id="b1">
   <p class="eyebrow">1 · Agora</p>
@@ -130,6 +132,10 @@ const ocRow=o=>`<div class="oc">${dia(o.data)}<div class="t"><b>${esc(o.titulo)}
 function render(){
   document.getElementById('app').style.display='block';
   const hoje=D.atualizado,mk=D.mes,A=D.agora,P=D.proximos,G=D.geral;
+  {const a=D.extrato_ate||(D.agora&&D.agora.ate)||'';document.getElementById('infobase').innerHTML=
+  `📌 <b>Extrato conferido até ${a}</b>. Os valores que entraram e saíram vêm do extrato e dos comprovantes até essa data.
+  <br>Aqui <b>não há estimativa</b> de caixa. Os shows futuros mostram o <b>valor combinado</b>, que ainda não foi recebido.
+  O que acontecer depois de ${a} entra quando o próximo extrato for conferido.`}
   document.getElementById('upd').textContent='Atualizado em '+hoje.split('-').reverse().join('/')+' · primeiro o mês atual, depois os próximos meses e por fim o geral.';
   // 1 · agora
   document.getElementById('mesnm').innerHTML=`${MESES[+mk.slice(5,7)-1]} <em>${mk.slice(0,4)}</em>`;

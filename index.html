@@ -9,6 +9,8 @@
 <link rel="icon" href="icone.png">
 <link rel="apple-touch-icon" href="icone.png">
 <style>
+#bds.sempix .pe .px{display:none}.pxb{margin:10px 0 0;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card2);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+.info{margin:14px 0 4px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:10px;background:var(--card);font-size:13.5px;color:var(--sub)}.info b{color:var(--ink)}.info ul{margin:6px 0 0;padding-left:18px}.info li{margin:2px 0}
 :root{
   --bg:#141218; --card:#1E1C24; --card2:#26232D; --line:#2E2B36; --ink:#F3F1F6; --sub:#B8B3C3; --muted:#8B8697;
   --pink:#CF1D51; --pinkl:#F0507E; --neg:#FF8FA8; --pos:#7FDDA9; --sai:#6F697D; --amber:#F2B66B;
@@ -136,6 +138,10 @@ h3 small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)
 .fmc{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .fm{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:99px;background:var(--card2);color:var(--sub);white-space:nowrap}
 .fm b{color:var(--ink)}.fm.mu{background:rgba(207,29,81,.16);color:var(--pinkl)}.fm.mu b{color:#fff}
+.show{--sc:var(--pink)}.show.bar::before{background:var(--sc)}
+.show.s-ok{--sc:#3FB97A}.show.s-am{--sc:var(--amber)}.show.s-pk{--sc:var(--pink)}.show.s-fr{--sc:#FF6B6B}.show.s-cx{--sc:#5E5868}
+.show.s-ok,.show.s-am,.show.s-pk,.show.s-fr,.show.s-cx{box-shadow:0 0 0 1px color-mix(in srgb,var(--sc) 35%,transparent),0 6px 22px -8px color-mix(in srgb,var(--sc) 60%,transparent)}
+.tl .show .dt{color:var(--sc)}.show.bar .vb{color:var(--sc)}
 .show.clk{cursor:pointer}.show .vb{font-size:12px;color:var(--pinkl);font-weight:700;margin-top:8px}
 #bd{position:fixed;inset:0;z-index:45;background:rgba(10,9,12,.72);display:none;align-items:flex-end;justify-content:center}
 #bd.open{display:flex}
@@ -194,6 +200,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 <section id="mes">
   <p class="eyebrow">Balanço</p>
   <h1>O <em>mês</em></h1>
+  <div class="info" id="infobase"></div>
   <div class="mesbar">
     <button class="ib" id="prev" aria-label="Mês anterior">‹</button>
     <div class="nm"><b id="mesnome"></b><span id="mestipo"></span></div>
@@ -211,7 +218,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <h1>Paga<em>mentos</em></h1>
   <p class="note">O que falta pagar para a equipe, somado por pessoa (se a mesma pessoa tem dois shows pendentes, já vem junto). Toque em "copiar" para levar a chave PIX.</p>
   <div class="grid g3" id="pgk" style="margin-top:14px"></div>
-  <div class="list" id="pgl" style="margin-top:10px"></div>
+  <div class="list" id="pgl" data-max="3" style="margin-top:10px"></div>
 </section>
 
 <section id="tarefas">
@@ -293,7 +300,7 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},se
 let D,HOJE,mesAtual,KEYS;
 
 /* ---------- login (lb.js) ---------- */
-LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar()}});
+LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}}});
 let PAG=[];
 
 /* ---------- início ---------- */
@@ -322,9 +329,25 @@ function copiar(t,btn){const ok=()=>{if(btn){const o=btn.textContent;btn.textCon
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,()=>{fb();ok()});else{fb();ok()}
   function fb(){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove()}}
 document.addEventListener('click',e=>{const c=e.target.closest('[data-cp]');if(c){e.stopPropagation();copiar(c.dataset.cp,c);return}
-  const k=e.target.closest('[data-bord]');if(k&&!e.target.closest('#bd'))abrirBord(k.dataset.bord)});
+  if(e.target.closest('#bd'))return;
+  const k=e.target.closest('[data-bord]');if(k){abrirBord(k.dataset.bord);return}
+  const pv=e.target.closest('[data-prev]');if(pv)abrirPrevia(+pv.dataset.prev)});
+/* prévia de um show (sem borderô ainda): valores, contrato e o que falta */
+function abrirPrevia(i){const s=D.shows[i];if(!s)return;const fut=s.data>HOJE,d=new Date(s.data+'T12:00');
+  const V=((D.vendas&&D.vendas.shows)||[]).filter(v=>v.data===s.data);
+  const w=LB.norm(s.nome).split(' ').filter(x=>x.length>3);const v=V.length<2?V[0]:(V.find(x=>w.some(y=>LB.norm(x.evento||'').includes(y)))||V[0]);
+  const ln=(a,b)=>b?`<div class="pe"><div class="t"><b>${a}</b></div><div class="v" style="font-weight:500">${b}</div></div>`:'';
+  const gasto=s.gasto==null?null:s.gasto;
+  document.getElementById('bds').innerHTML=`<div class="top"><div><p class="eyebrow" style="margin:0">${fut?'Prévia do show':'Show'} · ${['dom','seg','ter','qua','qui','sex','sáb'][d.getDay()]} ${ddmm(s.data)}/${s.data.slice(2,4)}</p><h2>${esc(s.nome)}</h2><span class="mut" style="font-size:13px">${esc(s.local||'')}</span> ${stPill(s)}</div><button class="x" onclick="fecharBord()" aria-label="Fechar">×</button></div>
+  <div class="bt"><div>Cachê<b>${s.valor?brl(s.valor):'a definir'}</b></div><div>Recebido<b>${brl(s.rec||0)}</b></div><div>Falta receber<b class="${s.falta>0?'pk':''}">${s.falta==null?'—':brl(s.falta)}</b></div>
+  <div>${fut?'Gasto previsto':'Gasto'}<b>${gasto==null?'—':brl(gasto)}</b></div><div>${fut?'Lucro previsto':'Lucro'}<b class="${(s.lucro??0)<0?'neg':'pos'}">${s.lucro==null?'—':brl(s.lucro)}</b></div></div>
+  ${s.obs?`<div class="gp"><h4>Observação</h4><div class="note" style="margin:0">${esc(s.obs)}</div></div>`:''}
+  ${v?`<div class="gp"><h4>Venda</h4>${ln('Horário',esc(v.horario||''))}${ln('Tipo',esc(v.tipo||''))}${ln('Contratante',esc(v.contratante||''))}${ln('Contrato',esc(v.contrato||''))}${ln('Nota fiscal',esc(v.nota||''))}${ln('Vendido por',esc(v.vendedor||''))}${ln('Duração',esc(v.duracao||''))}${ln('Estrutura',esc(v.estrutura||''))}</div>`:''}
+  <div class="gp"><h4>Equipe</h4><div class="note" style="margin:0">${fut?'Borderô ainda não montado. Quando o Luiz montar na página Borderôs, a equipe, os valores de cada um e o PIX aparecem aqui.':'Sem borderô deste show.'}</div></div>
+  ${fut&&gasto!=null?`<p class="note">Gasto previsto = custo padrão do show${s.colab?' na Colab (só a banda)':''}; vira o valor real quando o borderô for montado. Tudo aqui é estimativa até o show acontecer.</p>`:''}`;
+  document.getElementById('bd').classList.add('open');document.body.style.overflow='hidden'}
 const pxBtn=x=>x?`<span style="overflow-wrap:anywhere">PIX ${esc(x)}</span><button class="cp" data-cp="${esc(x.replace(/\s*\((nubank|picpay|inter|banco c6)\)\s*$/i,'').replace(/\s+(Inter|Banco c6)$/i,''))}">copiar</button>`:'<span class="mut">sem PIX no cadastro</span>';
-function abrirBord(id){const b=(D.borderos||{})[id];if(!b)return;const t=b.totais||{};
+function abrirBord(id){const b=(D.borderos||{})[id];if(!b)return;document.getElementById('bds').classList.add('sempix');const t=b.totais||{};
   const extras=e=>[['diaria','diária'],['gasolina','gasolina'],['ajuda','ajuda de custo'],['estacionamento','estacionamento']].filter(([k])=>e[k]).map(([k,n])=>n+' '+brl(e[k])).join(' + ');
   const gr=BG.map(g=>{const l=b.equipe.filter(e=>e.grupo===g);if(!l.length)return '';const tot=l.reduce((a,e)=>a+(e.fora?0:e.total),0);
     return `<div class="gp"><h4>${g} <span>${l.length} · ${brl(tot)}</span></h4>${l.map(e=>`<div class="pe"><div class="t"><b>${esc(e.nome)}</b><span>${esc(e.funcao)}${extras(e)?' · '+brl(e.valor)+' + '+extras(e):''}${e.fora?' · fora do custo do show':''}</span><div class="px" style="font-size:12px;color:var(--sub);margin-top:3px">${pxBtn(e.pix)}</div></div><div class="v">${brl(e.fora?e.valor:e.total)}<small><span class="pill ${e.status==='Pago'?'ok':'am'}">${esc(e.status||'—').toLowerCase()}</span></small></div></div>`).join('')}</div>`}).join('');
@@ -334,6 +357,7 @@ function abrirBord(id){const b=(D.borderos||{})[id];if(!b)return;const t=b.totai
   const d=new Date(b.data+'T12:00');
   document.getElementById('bds').innerHTML=`<div class="top"><div><p class="eyebrow" style="margin:0">Borderô · ${['dom','seg','ter','qua','qui','sex','sáb'][d.getDay()]} ${ddmm(b.data)}/${b.data.slice(2,4)}</p><h2>${esc(b.show||'')}</h2><span class="mut" style="font-size:13px">${esc(b.local||'')}</span></div><button class="x" onclick="fecharBord()" aria-label="Fechar">×</button></div>
   ${fmChips(b)}
+  <button class="pxb" onclick="const s=document.getElementById('bds');s.classList.toggle('sempix');this.textContent=s.classList.contains('sempix')?'Mostrar PIX de todos':'Esconder PIX'">Mostrar PIX de todos</button>
   <div class="bt"><div>Cachê<b>${b.valor?brl(b.valor):'—'}</b></div><div>Equipe<b>${brl(t.equipe)}</b></div><div>Itens<b>${brl(t.itens)}</b></div><div>Diesel<b>${brl(t.diesel)}</b></div><div>Gasto total<b>${brl(t.gasto??((t.equipe||0)+(t.itens||0)+(t.diesel||0)))}</b></div><div>Lucro<b class="${(t.lucro??0)<0?'neg':'pos'}">${t.lucro==null?(b.valor?brl(b.valor-(t.equipe||0)-(t.itens||0)-(t.diesel||0)):'—'):brl(t.lucro)}</b></div></div>
   ${gr}
   ${it?`<div class="gp"><h4>Itens <span>${brl(t.itens)}</span></h4>${it}</div>`:''}
@@ -434,6 +458,12 @@ function montaMeses(){
   document.getElementById('next').onclick=()=>{const i=KEYS.indexOf(mesAtual);if(i<KEYS.length-1){mesAtual=KEYS[i+1];renderMes()}};
 }
 function k4(l,v,s,c){return `<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`}
+function renderInfo(){const a=D.extrato_ate||'';document.getElementById('infobase').innerHTML=
+  `📌 <b>Extrato conferido até ${a}</b> (conta Sicredi e caixa em dinheiro). Tudo até essa data é <b>real</b>.
+  <br>É <b>estimativa</b>:<ul><li>tudo depois de ${a}: entradas e saídas previstas, saldo projetado e a aba Estimativa;</li>
+  <li>meses marcados como <i>parcial</i> (real até ${a} + previsto) ou <i>estimativa</i>;</li>
+  <li>shows futuros (cachê combinado, ainda não recebido) e gastos de equipe previstos;</li>
+  <li>contas e fixos a vencer, e o que estiver marcado "a confirmar".</li></ul>`}
 function renderMes(){
   const k=mesAtual,m=D.meses[k],i=KEYS.indexOf(k);
   document.getElementById('prev').disabled=i<=0;document.getElementById('next').disabled=i>=KEYS.length-1;
@@ -508,17 +538,18 @@ function stPill(s){
   if(s.falta>0)return '<span class="pill am">falta receber</span>';
   return '<span class="pill ok">realizado</span>';
 }
+function corSit(s){const fut=s.data>HOJE;if(s.sit==='Cancelado'||s.sit==='Permuta'||s.sit==='Projeto')return 's-cx';if(fut)return s.sit==='A confirmar'?'s-am':'s-pk';return s.falta>0?'s-fr':'s-ok'}
 function showCard(s,tl){
   const fut=s.data>HOJE,d=new Date(s.data+'T12:00');
   const dt=`${['dom','seg','ter','qua','qui','sex','sáb'][d.getDay()]} · ${ddmm(s.data)}/${s.data.slice(2,4)}`;
   const pr=s.valor?Math.min(100,(s.rec||0)/s.valor*100):0;
   const luc=s.lucro==null?'—':`<span class="${cls(s.lucro)}">${brl(s.lucro)}</span>`;
-  const b=bordDe(s),fm=b?fmChips(b):'';
-  return `<div class="show bar${tl&&!fut?' past':''}${b?' clk':''}"${b?` data-bord="${esc(b.id)}"`:''}>${tl?`<div class="dt">${dt}</div>`:''}
+  const b=bordDe(s),fm=b?fmChips(b):'',ip=D.shows.indexOf(s);
+  return `<div class="show bar clk ${corSit(s)}${tl&&!fut?' past':''}"${b?` data-bord="${esc(b.id)}"`:` data-prev="${ip}"`}>${tl?`<div class="dt">${dt}</div>`:''}
   <div class="hd"><div><b>${esc(s.nome)}</b><span>${tl?'':dt+' · '}${esc(s.local||'')}</span></div>${stPill(s)}</div>
   <div class="nums"><div>Cachê<b>${s.valor?brl(s.valor):'a definir'}</b></div><div>Recebido<b>${brl(s.rec||0)}</b></div><div>Falta<b class="${s.falta>0?'pk':''}">${s.falta==null?'—':brl(s.falta)}</b></div><div>${fut?'Lucro prev.':'Lucro'}<b>${luc}</b></div></div>
   ${s.valor?`<div class="prog"><i style="width:${pr}%"></i></div>`:''}
-  ${s.obs?`<div class="ob">${esc(s.obs)}</div>`:''}${fm}${b?'<div class="vb">Ver borderô ›</div>':''}</div>`;
+  ${s.obs?`<div class="ob">${esc(s.obs)}</div>`:''}${fm}<div class="vb">${b?(fut?'Ver prévia e equipe ›':'Ver borderô ›'):(fut?'Ver prévia ›':'Ver detalhes ›')}</div></div>`;
 }
 
 /* ---------- AGENDA DO MÊS ---------- */
@@ -646,8 +677,15 @@ function chartMes(){setW('chmes');
 /* ---------- navegação ---------- */
 function navSpy(){
   const as=[...document.querySelectorAll('#nav a')];
-  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)as.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-45% 0px -50% 0px'});
-  document.querySelectorAll('section').forEach(s=>io.observe(s));
+  // marca a seção cujo topo já passou do menu (não a do meio da tela: seção curta, como Pagamentos vazio, sumia)
+  const ss=as.map(a=>document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+  let trava=0;const marca=id=>as.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+id));
+  const upd=()=>{if(Date.now()<trava)return;const lim=document.querySelector('header').offsetHeight+40;let at=ss[0];
+    ss.forEach(s=>{if(s.getBoundingClientRect().top<=lim)at=s});marca(at.id)};
+  addEventListener('scroll',upd,{passive:true});
+  as.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const s=document.getElementById(a.getAttribute('href').slice(1));if(!s)return;
+    marca(s.id);trava=Date.now()+1200;scrollTo({top:s.getBoundingClientRect().top+scrollY-document.querySelector('header').offsetHeight-6,behavior:'smooth'});a.scrollIntoView({block:'nearest',inline:'center'})}));
+  upd();
 }
 </script>
 </body>
