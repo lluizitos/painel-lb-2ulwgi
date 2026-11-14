@@ -208,6 +208,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 .clg{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:center;margin-top:8px;font-size:11px;color:var(--muted)}.clg em{margin-right:4px;vertical-align:middle}
 #tfsem{display:flex;align-items:center}#tfsem small{margin-left:auto;font-size:18px;letter-spacing:0}
 .atrb{margin-top:12px;border-left:3px solid var(--neg)}.atrb summary{list-style:none;display:flex;align-items:center;cursor:pointer;font-size:14px}.atrb summary::-webkit-details-marker{display:none}.atrb summary small{margin-left:auto;color:var(--muted)}.atrb[open] summary small{visibility:hidden}
+.mtal{display:block;text-decoration:none;color:inherit;background:linear-gradient(135deg,rgba(225,29,72,.2),rgba(225,29,72,.06));border:1px solid rgba(240,80,126,.45);border-radius:14px;padding:12px 14px;margin:14px 0 4px}.mtal b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--pinkl);margin-bottom:4px}.mtal span{display:block;font-size:14.5px;font-weight:600;margin-top:3px}.mtal small{color:var(--pinkl);font-weight:700}.mtal i{display:block;font-style:normal;font-size:13px;font-weight:700;color:var(--pinkl);margin-top:6px}
 </style>
 </head>
 <body>
@@ -219,6 +220,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <nav id="nav"><a href="#mes" class="on">Mês</a><a href="#pagar">Pagamentos</a><a href="#tarefas">Agenda do mês</a><a href="#shows">Shows</a><a href="#estimativa">Estimativa</a></nav>
 </header>
 <main class="wrap">
+<div id="mtal"></div>
 <div id="pfin">
 <section id="mes">
   <p class="eyebrow">Balanço</p>
@@ -316,6 +318,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </div>
 
 <script src="lb.js"></script>
+<script src="lbmetas.js"></script>
 <script src="lbvendas.js"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
@@ -440,8 +443,12 @@ document.addEventListener('click',e=>{
   const a=e.target.closest('[data-pgk]');if(a){const[id,i,k]=a.dataset.pgk.split('|');marcarPago([i.startsWith('it')?{id,it:+i.slice(2),data:HOJE}:{id,i:+i,partes:[k],data:HOJE}],a);return}
   const g=e.target.closest('[data-pga]');if(g){const[id,ref]=g.dataset.pga.split('|');marcarPago([],g,[{id,ref}]);return}
   const b=e.target.closest('[data-pgp]');if(b){const x=PAGP[b.dataset.pgp];if(x)marcarPago(x.it.filter(i=>!i.g).map(i=>i.item!=null?{id:i.b.id,it:i.item,data:HOJE}:{id:i.b.id,i:i.i,partes:'tudo',data:HOJE}),b,x.it.filter(i=>i.g).map(i=>({id:i.g.id,ref:i.o.ref})))}});
+async function metasAlerta(url){ // metas com check da própria pessoa (Luiz, Lucas): o que falta marcar hoje / nesta semana
+  try{const r=await (await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'minhas_tarefas',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
+    if(!r.ok||!window.LBROT)return;const PD=(r.rotinas||[]).map(x=>[x,LBROT.pend(x)]).filter(y=>y[1]);
+    document.getElementById('mtal').innerHTML=PD.length?`<a class="mtal" href="metas/"><b>⏰ Falta marcar</b>${PD.map(([x,q])=>`<span>${esc(x.titulo)} <small>${esc(q)}</small></span>`).join('')}<i>Marcar →</i></a>`:''}catch(e){}}
 async function pagAoVivo(){ // pagamentos avulsos e fixos da página Admin
-  try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;API_URL=API_URL||c.api_url;
+  try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;API_URL=API_URL||c.api_url;metasAlerta(c.api_url);
     const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'pagamentos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
     if(r.ok){PAGS=r.pagamentos||[];PAGS_OK=true;renderPagar();renderMes()}
     const l=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'lancamentos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json(); // ajustes e lançamentos novos do Admin

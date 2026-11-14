@@ -76,6 +76,7 @@ label textarea{min-height:60px;resize:vertical}
 .cfok{margin-top:16px;font-size:12.5px;color:var(--pos);background:rgba(127,221,169,.08);border-radius:10px;padding:8px 12px}
 .sh.ro .f,.sh.ro .acts{display:none}.sh:not(.ro) #ln_ro{display:none}
 .lnx{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;background:var(--bg);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:var(--sub)}.lnx b{font-size:17px;color:var(--ink)}.lnx b.pos{color:var(--pos)}
+.rtadm{margin-top:10px}.rtadm>summary{cursor:pointer;font-size:12.5px;color:var(--pinkl);font-weight:600}.rtadm .rt{margin-top:8px;border-left-color:var(--line);background:var(--card2)}.rtadm .rt .cal button:not(.ok){background:var(--card)}
 </style>
 </head>
 <body>
@@ -111,8 +112,8 @@ label textarea{min-height:60px;resize:vertical}
     <div class="list" id="r_lista"></div>
     <div class="card" style="margin-top:8px"><div class="f">
       <label class="w">Meta<input id="r_tit" placeholder="ex.: 1 postagem por dia"></label>
-      <label>Frequência<select id="r_freq"><option value="dia">Todo dia</option><option value="util">Dias úteis (seg a sex)</option><option value="mes">X vezes no mês</option></select></label>
-      <label id="r_alvol" style="display:none">Quantas vezes no mês<input id="r_alvo" type="number" min="1" inputmode="numeric"></label>
+      <label>Frequência<select id="r_freq"><option value="dia">Todo dia</option><option value="util">Dias úteis (seg a sex)</option><option value="semana">X vezes por semana (ex.: reunião)</option><option value="mes">X vezes no mês</option></select></label>
+      <label id="r_alvol" style="display:none"><span id="r_alvt">Quantas vezes no mês</span><input id="r_alvo" type="number" min="1" inputmode="numeric"></label>
       <label>Começa em<input type="date" id="r_ini"></label>
       <label>Termina em (opcional)<input type="date" id="r_fim"></label>
     </div><div class="acts"><button class="btn pkb" id="r_ok">Salvar meta</button><button class="btn" id="r_can" style="display:none">Cancelar edição</button><span class="msg" id="r_msg"></span></div></div>
@@ -321,21 +322,26 @@ function renderRot(){const p=PF.find(x=>x.id===SEL);if(!p){$('r_lista').innerHTM
   const MES=HOJE.slice(0,7),ant=new Date(+MES.slice(0,4),+MES.slice(5,7)-2,1),MA=ant.getFullYear()+'-'+String(ant.getMonth()+1).padStart(2,'0');
   const l=RT.filter(r=>r.pessoa===p.id).sort((a,b)=>(a.ativo==='não')-(b.ativo==='não')||a.titulo.localeCompare(b.titulo));
   $('r_lista').innerHTML=l.length?l.map(r=>{const x=LBROT.pct(r,MES,HOJE),y=LBROT.pct(r,MA,HOJE),tv=r.inicio&&r.inicio<=MA+'-31';
-    return `<div class="tf" style="border-left-color:${r.ativo==='não'?'var(--line)':LBROT.cor(x.ritmo)}${r.ativo==='não'?';opacity:.6':''}"><div class="hd"><div><b>${esc(r.titulo)}</b><div class="ds">${r.freq==='mes'?'meta '+r.alvo+'× no mês':LBROT.FREQ[r.freq]}${r.fim?' · até '+ddmm(r.fim):''}${r.ativo==='não'?' · pausada':''}</div></div>
+    return `<div class="tf" style="border-left-color:${r.ativo==='não'?'var(--line)':LBROT.cor(x.ritmo)}${r.ativo==='não'?';opacity:.6':''}"><div class="hd"><div><b>${esc(r.titulo)}</b><div class="ds">${r.freq==='mes'?'meta '+r.alvo+'× no mês':r.freq==='semana'?r.alvo+'× por semana':LBROT.FREQ[r.freq]}${(p=>p?' · <span class="pill pk">falta '+esc(p)+'</span>':'')(LBROT.pend(r,HOJE))}${r.fim?' · até '+ddmm(r.fim):''}${r.ativo==='não'?' · pausada':''}</div></div>
       <b style="font-size:20px;color:${LBROT.cor(x.ritmo)}">${LBROT.P100(x.ritmo)}</b></div>
-      <div class="mt">${LBROT.MESES[+MES.slice(5,7)-1]}: ${x.feitos} de ${r.freq==='mes'?x.total:x.ate+' dias até hoje'} · ${LBROT.P100(x.pct)} do mês inteiro${tv?` · ${LBROT.MESES[ant.getMonth()]}: <b style="display:inline;color:${LBROT.cor(y.pct)}">${LBROT.P100(y.pct)}</b>`:''}</div>
-      <div class="mt"><a href="#" data-red="${esc(r.id)}" style="color:var(--pinkl)">editar</a> · <a href="#" data-rpa="${esc(r.id)}" style="color:var(--pinkl)">${r.ativo==='não'?'reativar':'pausar'}</a> · <a href="#" data-rdel="${esc(r.id)}" style="color:var(--muted)">excluir</a></div></div>`}).join('')
+      <div class="mt">${LBROT.MESES[+MES.slice(5,7)-1]}: ${x.feitos} de ${r.freq==='mes'||r.freq==='semana'?x.total:x.ate+' dias até hoje'} · ${LBROT.P100(x.pct)} do mês inteiro${tv?` · ${LBROT.MESES[ant.getMonth()]}: <b style="display:inline;color:${LBROT.cor(y.pct)}">${LBROT.P100(y.pct)}</b>`:''}</div>
+      <div class="mt"><a href="#" data-red="${esc(r.id)}" style="color:var(--pinkl)">editar</a> · <a href="#" data-rpa="${esc(r.id)}" style="color:var(--pinkl)">${r.ativo==='não'?'reativar':'pausar'}</a> · <a href="#" data-rdel="${esc(r.id)}" style="color:var(--muted)">excluir</a></div>
+      <details class="rtadm"${RTOPEN===r.id?' open':''} data-rto="${esc(r.id)}"><summary>Marcações e justificativas · corrigir</summary>${LBROT.card(r,HOJE,null,{adm:1})}</details></div>`}).join('')
     :'<div class="empty">Nenhuma meta com check para '+esc(p.nome)+'.</div>'}
+let RTOPEN='';
+LBROT.css();$('r_lista')._rot=()=>RT;
+$('r_lista').addEventListener('toggle',e=>{const d=e.target;if(d.dataset&&d.dataset.rto)RTOPEN=d.open?d.dataset.rto:(RTOPEN===d.dataset.rto?'':RTOPEN)},true);
+LBROT.liga($('r_lista'),c=>api(Object.assign({pessoa:SEL},c)),r=>{(r.rotinas||[]).forEach(n=>{const i=RT.findIndex(x=>x.id===n.id);if(i>=0)RT[i]=n});renderRot()});
 function limpaR(){EDR=null;$('r_tit').value=$('r_alvo').value=$('r_fim').value='';$('r_freq').value='dia';$('r_ini').value=HOJE;$('r_alvol').style.display='none';$('r_can').style.display='none';$('r_ok').textContent='Salvar meta';$('r_msg').textContent=''}
-$('r_freq').onchange=()=>{$('r_alvol').style.display=$('r_freq').value==='mes'?'':'none'};
+const alvoR=()=>{const f=$('r_freq').value;$('r_alvol').style.display=f==='mes'||f==='semana'?'':'none';$('r_alvt').textContent=f==='semana'?'Quantas vezes por semana':'Quantas vezes no mês'};$('r_freq').onchange=alvoR;
 $('r_can').onclick=limpaR;
 const salvaR=x=>api({acao:'salvar_rotina',rotina:x});
 $('r_ok').onclick=async()=>{const m=$('r_msg'),t=$('r_tit').value.trim();if(!t){m.innerHTML='<span class="neg">Escreva a meta.</span>';return}
-  if($('r_freq').value==='mes'&&!(+$('r_alvo').value>0)){m.innerHTML='<span class="neg">Quantas vezes no mês?</span>';return}
+  if(['mes','semana'].includes($('r_freq').value)&&!(+$('r_alvo').value>0)){m.innerHTML='<span class="neg">Quantas vezes?</span>';return}
   const at=EDR?RT.find(r=>r.id===EDR):null;m.textContent='Salvando…';
   try{await salvaR({id:EDR||undefined,pessoa:SEL,titulo:t,freq:$('r_freq').value,alvo:$('r_alvo').value,inicio:$('r_ini').value,fim:$('r_fim').value,ativo:at?at.ativo:'sim'});limpaR();m.innerHTML='<span class="pos">Salva ✓</span>';renderRot()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
 $('r_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data-red]'),pa=e.target.closest('[data-rpa]'),del=e.target.closest('[data-rdel]');if(!ed&&!pa&&!del)return;e.preventDefault();
-  if(ed){const r=RT.find(x=>x.id===ed.dataset.red);EDR=r.id;$('r_tit').value=r.titulo;$('r_freq').value=r.freq;$('r_alvo').value=r.freq==='mes'?r.alvo:'';$('r_ini').value=r.inicio;$('r_fim').value=r.fim;$('r_alvol').style.display=r.freq==='mes'?'':'none';$('r_can').style.display='';$('r_ok').textContent='Salvar alteração';$('r_tit').focus();return}
+  if(ed){const r=RT.find(x=>x.id===ed.dataset.red);EDR=r.id;$('r_tit').value=r.titulo;$('r_freq').value=r.freq;$('r_alvo').value=r.freq==='mes'||r.freq==='semana'?r.alvo:'';$('r_ini').value=r.inicio;$('r_fim').value=r.fim;alvoR();$('r_can').style.display='';$('r_ok').textContent='Salvar alteração';$('r_tit').focus();return}
   if(pa){const r=RT.find(x=>x.id===pa.dataset.rpa);pa.textContent='salvando…';try{await salvaR(Object.assign({},r,{ativo:r.ativo==='não'?'sim':'não'}));renderRot()}catch(err){pa.textContent='erro'}return}
   if(del.dataset.ok!=='1'){del.dataset.ok='1';del.textContent='toque de novo para excluir (apaga os checks)';return}
   try{await api({acao:'excluir_rotina',id:del.dataset.rdel});renderRot()}catch(err){del.textContent='erro'}});
