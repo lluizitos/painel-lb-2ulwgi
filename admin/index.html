@@ -85,7 +85,7 @@ label textarea{min-height:60px;resize:vertical}
   <p class="eyebrow">Administração</p>
   <h1>Ad<em>min</em></h1>
   <p class="note">Logins e equipe, tarefas, metas da empresa e pagamentos fora dos shows. Só a administração vê esta página.</p>
-  <div class="tabs" id="tabs"><button class="on" data-t="equipe">Equipe e logins</button><button data-t="todos">Tarefas para todos</button><button data-t="ind">Individuais</button><button data-t="emp">Empresa</button><button data-t="pag">Pagamentos</button><button data-t="lan">Lançamentos</button></div>
+  <div class="tabs" id="tabs"><button class="on" data-t="equipe">Equipe e logins</button><button data-t="todos">Tarefas para todos</button><button data-t="ind">Individuais</button><button data-t="emp">Empresa</button><button data-t="pag">Pagamentos</button><button data-t="lan">Lançamentos</button><button data-t="soc">Sócio</button></div>
 
   <!-- PARA TODOS -->
   <div id="t_todos" style="display:none">
@@ -208,15 +208,37 @@ label textarea{min-height:60px;resize:vertical}
   </div></div>
   <datalist id="ln_cdl"></datalist><datalist id="ln_sdl"></datalist>
 
+  <!-- PÁGINA DO SÓCIO -->
+  <div id="t_soc" style="display:none">
+    <p class="note">Tudo o que aparece na página do sócio e não vem do extrato: acontecimentos, documentos e para onde foi cada aporte. "Oculto" fica só aqui. As mudanças aparecem na página do sócio na próxima atualização do site.</p>
+    <div class="chips" id="so_fil"><button class="chip on" data-f="ocorrencia">Acontecimentos</button><button class="chip" data-f="doc">Documentos</button><button class="chip" data-f="nota_aporte">Destino dos aportes</button></div>
+    <div class="list" id="so_lista" data-max="0"></div>
+    <div class="acts"><button class="btn pkb" id="so_novo">+ Novo</button></div>
+  </div>
+  <div class="sh" id="so_sh" aria-hidden="true"><div class="shb" id="so_shb"></div><div class="shc">
+    <div class="shh"><b id="so_t">Editar</b><button class="btn sm" id="so_x" aria-label="Fechar">✕</button></div>
+    <div class="f">
+      <label class="so-o so-n">Data<input type="date" id="so_dt"></label>
+      <label class="so-o so-d w"><span id="so_tl">Título</span><input id="so_ti"></label>
+      <label class="so-o">Valor (R$, opcional)<input id="so_vl" inputmode="decimal"></label>
+      <label class="so-o so-n w"><span id="so_dl">Detalhe</span><textarea id="so_de"></textarea></label>
+      <label class="so-o so-d w">Arquivo<select id="so_doc"></select></label>
+      <label class="so-d w">Ou link (Google Drive etc.)<input id="so_lk" placeholder="https://"></label>
+      <label class="so-o so-d">Na página do sócio<select id="so_vi"><option value="sim">Visível</option><option value="não">Oculto</option></select></label>
+    </div>
+    <div class="acts"><button class="btn pkb" id="so_ok">Salvar</button><button class="btn" id="so_del" style="display:none">Excluir</button><span class="msg" id="so_msg"></span></div>
+  </div></div>
   <!-- PAGAMENTOS AVULSOS E FIXOS -->
   <div id="t_pag" style="display:none">
-    <p class="note">Pagamentos que não são de show: avulsos (uma vez, numa data) e fixos (todo mês, num dia). Na data, entram no assistente de pagamento do painel até serem marcados como pagos. Gasto pequeno que já foi pago (lanche, compra) marque "Já pago": vai direto para as Movimentações.</p>
-    <div class="chips" id="g2_fil"><button class="chip on" data-f="">Tudo</button><button class="chip" data-f="pend">Pendentes</button><button class="chip" data-f="fixo">Fixos</button><button class="chip" data-f="avulso">Avulsos</button></div>
+    <p class="note">Tudo o que é programado e não é de show: contas e fixos (aluguel, contabilidade, equipe fixa, pró-labore) e entradas programadas (aportes do investidor). É daqui que saem as contas a pagar e o saldo previsto do painel. "Fora da estimativa" = aparece como pendente, mas não entra no saldo previsto.</p>
+    <div class="chips" id="g2_fil"><button class="chip on" data-f="">Tudo</button><button class="chip" data-f="pend">Pendentes</button><button class="chip" data-f="fixo">Fixos</button><button class="chip" data-f="avulso">Avulsos</button><button class="chip" data-f="entrada">Entradas</button></div>
     <div class="list" id="pg_lista"></div>
+    <div id="pg_arec"></div>
     <h3 id="pg_h">Novo pagamento</h3>
     <div class="card"><div class="f">
+      <label>É<select id="pg_dir"><option value="saida">Saída (a pagar)</option><option value="entrada">Entrada (a receber: aporte etc.)</option></select></label>
       <label>Tipo<select id="pg_tp"><option value="avulso">Avulso (uma vez)</option><option value="fixo">Fixo mensal</option></select></label>
-      <label>Quem recebe<input id="pg_pes" list="pes_dl" autocomplete="off" placeholder="da lista da equipe, ou escreva (ex.: padaria)"></label>
+      <label><span id="pg_qrl">Quem recebe</span><input id="pg_pes" list="pes_dl" autocomplete="off" placeholder="da lista da equipe, ou escreva (ex.: padaria)"></label>
       <label>Meio<select id="pg_meio"><option>Pix</option><option>Transferência bancária</option><option>Dinheiro</option><option>Boleto</option></select></label>
       <label>Chave PIX<input id="pg_pix"></label>
       <label class="w" id="pg_dl" style="display:none">Dados bancários / boleto<input id="pg_dados" placeholder="banco, agência, conta, titular · ou linha do boleto"></label>
@@ -227,6 +249,7 @@ label textarea{min-height:60px;resize:vertical}
       <label class="fx" style="display:none">Começa em (mês)<input type="month" id="pg_ini"></label>
       <label class="fx" style="display:none">Último mês (vazio = sem fim)<input type="month" id="pg_fim"></label>
       <label class="av">Situação<select id="pg_sit"><option value="">A pagar (entra no assistente)</option><option value="pago">Já pago (ex.: lanche, compra feita)</option></select></label>
+      <label>Saldo previsto<select id="pg_est"><option value="sim">Entra na estimativa</option><option value="não">Fora da estimativa (só pendente)</option></select></label>
       <label>Ativo<select id="pg_at"><option value="sim">Sim</option><option value="não">Não (pausado)</option></select></label>
     </div><div class="acts"><button class="btn pkb" id="pg_ok">Salvar pagamento</button><button class="btn" id="pg_can" style="display:none">Cancelar edição</button><span class="msg" id="pg_msg"></span></div></div>
   </div>
@@ -396,19 +419,29 @@ $('p_lista').addEventListener('click',async e=>{const ep=e.target.closest('[data
 let G2F='',EDG=null,PGID='';
 const MESN=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'],mesn=k=>MESN[+k.slice(5,7)-1]+'/'+k.slice(2,4);
 const pendDe=g=>g.ativo==='não'?[]:LB.pgx.ocorr(g,HOJE).filter(o=>!o.pago);
-function renderPag(){const fe=g=>g.tipo==='fixo'&&g.fim&&g.fim<HOJE.slice(0,7)?1:0;const l=PAGS.filter(g=>!G2F||(G2F==='pend'?pendDe(g).length:g.tipo===G2F)).sort((a,b)=>fe(a)-fe(b)||pendDe(b).length-pendDe(a).length||a.tipo.localeCompare(b.tipo)||a.nome.localeCompare(b.nome));
+let ARQ=false;
+async function arecAbre(){if(!ARQ){try{const v=await api({acao:'listar'});VS=v.shows||VS;ARQ=true}catch(e){}}arecRender()}
+function arecRender(){const P=[];const jp=v=>{try{return typeof v==='object'?v:JSON.parse(v||'null')}catch(e){return null}};
+  VS.filter(s=>s.status!=='Cancelado').forEach(s=>{const pl=jp(s.plano);if(!pl||!pl.parcelas||!pl.parcelas.length)return;let acc=(jp(s.recebimentos)||[]).reduce((a,r)=>a+(+r.valor||0),0);
+    pl.parcelas.forEach((p,i,a)=>{const v=+p.v||0,pg=Math.min(v,Math.max(0,acc));acc-=pg;if(v&&pg<v-.005)P.push({s,p,i,n:a.length,tp:pl.tipo,falta:v-pg,pg})})});
+  P.sort((a,b)=>(a.p.venc||'9999').localeCompare(b.p.venc||'9999'));
+  const nm=x=>x.tp==='sinal'?(x.i===0?'Sinal':'Restante'):x.tp==='avista'?'À vista':'Parcela '+(x.i+1)+'/'+x.n;
+  $('pg_arec').innerHTML=P.length?`<h3>A receber de shows <small>sinais e parcelas combinados em Vendas · ${brl(P.reduce((a,x)=>a+x.falta,0))}</small></h3><div class="list" data-max="4">${P.map(x=>`<div class="tf ${x.p.venc&&x.p.venc<HOJE?'s-atrasada':''}"><div class="hd"><div><span class="pill ok">entrada</span> <span class="pill">${nm(x)}</span> <b style="display:inline">${esc(x.s.evento||x.s.cidade||'')} · ${brl(x.falta)}</b><div class="ds" style="color:var(--muted)">show ${ddmm(x.s.data)}${x.p.venc?' · '+(x.p.venc<HOJE?'venceu ':'vence ')+ddmm(x.p.venc):' · sem data'}${x.pg?' · já entrou '+brl(x.pg):''}${x.s.contratante?' · '+esc(x.s.contratante):''}</div></div><a class="btn sm" href="../vendas/#ed=${encodeURIComponent(x.s.id)}" style="text-decoration:none">editar em Vendas</a></div></div>`).join('')}</div>`:`<h3>A receber de shows</h3><div class="empty">Nenhum sinal ou parcela programado. Para programar, abra o show em <a href="../vendas/" style="color:var(--pinkl)">Vendas</a> → Combinado (sinal + restante, parcelado…): aparece aqui e lá.</div>`}
+function renderPag(){const fe=g=>g.tipo==='fixo'&&g.fim&&g.fim<HOJE.slice(0,7)?1:0;const l=PAGS.filter(g=>!G2F||(G2F==='pend'?pendDe(g).length:G2F==='entrada'?g.direcao==='entrada':g.tipo===G2F)).sort((a,b)=>fe(a)-fe(b)||pendDe(b).length-pendDe(a).length||a.tipo.localeCompare(b.tipo)||a.nome.localeCompare(b.nome));
   $('pg_lista').innerHTML=l.length?l.map(g=>{const pd=pendDe(g),pr=LB.pgx.prox(g,HOJE),pagos=LB.pgx.ocorr(g,'9999-12-31').filter(o=>o.pago);
     const enc=g.tipo==='fixo'&&g.fim&&g.fim<HOJE.slice(0,7);
-    return `<div class="tf ${g.ativo==='não'||enc?'':pd.length?'s-atrasada':'s-concluida'}" style="${g.ativo==='não'||enc?'opacity:.55':''}"><div class="hd"><div><span class="pill">${g.tipo==='fixo'?'fixo mensal':'avulso'}</span>${enc?' <span class="pill">encerrado</span>':g.tipo==='fixo'&&g.fim?' <span class="pill am">até '+mesn(g.fim)+'</span>':''} <b style="display:inline">${esc(g.nome)} · ${brl(g.valor)}</b>${g.descricao?`<div class="ds">${esc(g.descricao)}</div>`:''}<div class="ds" style="color:var(--muted)">${esc(g.meio)}${g.meio==='Pix'&&g.pix?' · '+esc(g.pix):''}${g.dados&&g.meio!=='Pix'?' · '+esc(g.dados):''}</div></div><button class="btn sm" data-eg="${esc(g.id)}">editar</button></div>
-      <div class="mt">${g.tipo==='fixo'?'todo dia '+g.dia+' · desde '+mesn(g.inicio)+(g.fim?' até '+mesn(g.fim):''):'pagar em '+g.data.split('-').reverse().join('/')}${pr?' · próximo '+ddmm(pr.data):''}${g.ativo==='não'?' · pausado':''}</div>
-      ${pd.length?`<div class="resumo">${pd.map(o=>`<button class="btn sm pkb" data-gp="${esc(g.id)}|${o.ref}">✓ pago ${g.tipo==='fixo'?mesn(o.ref):''} (venceu ${ddmm(o.data)})</button>`).join('')}</div>`:''}
-      ${pagos.length?`<div class="mt">pago: ${pagos.slice(-3).map(o=>`${g.tipo==='fixo'?mesn(o.ref)+' ':''}em ${ddmm(o.pago)} <a href="#" data-gu="${esc(g.id)}|${o.ref}" style="color:var(--muted)">desfazer</a>`).join(' · ')}</div>`:''}
+    return `<div class="tf ${g.ativo==='não'||enc?'':pd.length?'s-atrasada':'s-concluida'}" style="${g.ativo==='não'||enc?'opacity:.55':''}"><div class="hd"><div>${g.direcao==='entrada'?'<span class="pill ok">entrada</span> ':''}<span class="pill">${g.tipo==='fixo'?'fixo mensal':'avulso'}</span>${g.estimativa==='não'?' <span class="pill am">fora da estimativa</span>':''}${enc?' <span class="pill">encerrado</span>':g.tipo==='fixo'&&g.fim?' <span class="pill am">até '+mesn(g.fim)+'</span>':''} <b style="display:inline">${esc(g.nome)} · ${brl(g.valor)}</b>${g.descricao?`<div class="ds">${esc(g.descricao)}</div>`:''}<div class="ds" style="color:var(--muted)">${esc(g.meio)}${g.meio==='Pix'&&g.pix?' · '+esc(g.pix):''}${g.dados&&g.meio!=='Pix'?' · '+esc(g.dados):''}</div></div><button class="btn sm" data-eg="${esc(g.id)}">editar</button></div>
+      <div class="mt">${g.tipo==='fixo'?'todo dia '+g.dia+' · desde '+mesn(g.inicio)+(g.fim?' até '+mesn(g.fim):''):(g.direcao==='entrada'?'receber em ':'pagar em ')+g.data.split('-').reverse().join('/')}${pr?' · próximo '+ddmm(pr.data):''}${g.ativo==='não'?' · pausado':''}</div>
+      ${pd.length?`<div class="resumo">${pd.map(o=>`<button class="btn sm pkb" data-gp="${esc(g.id)}|${o.ref}">✓ ${g.direcao==='entrada'?'recebido':'pago'} ${g.tipo==='fixo'?mesn(o.ref):''} (venceu ${ddmm(o.data)})</button>`).join('')}</div>`:''}
+      ${pagos.length?`<div class="mt">${g.direcao==='entrada'?'recebido':'pago'}: ${pagos.slice(-3).map(o=>`${g.tipo==='fixo'?mesn(o.ref)+' ':''}em ${ddmm(o.pago)} <a href="#" data-gu="${esc(g.id)}|${o.ref}" style="color:var(--muted)">desfazer</a>`).join(' · ')}</div>`:''}
       <div class="mt">${g.tipo==='fixo'?(g.fim&&g.fim<=HOJE.slice(0,7)?`<a href="#" data-gfim="${esc(g.id)}|" style="color:var(--pinkl)">reabrir (tirar o fim)</a> · `:`<a href="#" data-gfim="${esc(g.id)}|${HOJE.slice(0,7)}" style="color:var(--pinkl)">encerrar: ${mesn(HOJE.slice(0,7))} é o último</a> · `):''}<a href="#" data-gx="${esc(g.id)}" style="color:var(--muted)">excluir</a></div></div>`}).join(''):'<div class="empty">Nenhum pagamento aqui.</div>'}
 function tipoPg(){const f=$('pg_tp').value==='fixo';document.querySelectorAll('#t_pag .fx').forEach(x=>x.style.display=f?'':'none');document.querySelectorAll('#t_pag .av').forEach(x=>x.style.display=f?'none':'')}
+function dirPg(){const e=$('pg_dir').value==='entrada';$('pg_qrl').textContent=e?'Quem paga':'Quem recebe';$('pg_sit').options[0].text=e?'A receber':'A pagar (entra no assistente)';$('pg_sit').options[1].text=e?'Já recebido':'Já pago (ex.: lanche, compra feita)'}
+$('pg_dir').onchange=dirPg;
 function meioPg(){$('pg_dl').style.display=$('pg_meio').value==='Pix'?'none':''}
 $('pg_tp').onchange=tipoPg;$('pg_meio').onchange=meioPg;
 $('pg_pes').addEventListener('input',()=>{const x=PESK[$('pg_pes').value];PGID=x?x.id:'';if(x&&x.pix)$('pg_pix').value=x.pix});
-function limpaG(){EDG=null;PGID='';['pg_pes','pg_pix','pg_dados','pg_desc','pg_val','pg_data','pg_dia','pg_fim'].forEach(i=>$(i).value='');$('pg_ini').value=HOJE.slice(0,7);$('pg_tp').value='avulso';$('pg_sit').value='';$('pg_meio').value='Pix';$('pg_at').value='sim';tipoPg();meioPg();$('pg_can').style.display='none';$('pg_h').textContent='Novo pagamento'}
+function limpaG(){EDG=null;PGID='';['pg_pes','pg_pix','pg_dados','pg_desc','pg_val','pg_data','pg_dia','pg_fim'].forEach(i=>$(i).value='');$('pg_ini').value=HOJE.slice(0,7);$('pg_tp').value='avulso';$('pg_sit').value='';$('pg_meio').value='Pix';$('pg_at').value='sim';$('pg_dir').value='saida';$('pg_est').value='sim';tipoPg();meioPg();dirPg();$('pg_can').style.display='none';$('pg_h').textContent='Novo pagamento'}
 $('pg_can').onclick=()=>{limpaG();$('pg_msg').textContent=''};
 $('g2_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;G2F=b.dataset.f;document.querySelectorAll('#g2_fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderPag()};
 $('pg_ok').onclick=async()=>{const m=$('pg_msg'),nome=$('pg_pes').value.trim(),x=PESK[nome];const er=t=>m.innerHTML='<span class="neg">'+t+'</span>';
@@ -417,15 +450,15 @@ $('pg_ok').onclick=async()=>{const m=$('pg_msg'),nome=$('pg_pes').value.trim(),x
   if(tp==='fixo'&&!(+$('pg_dia').value>=1&&+$('pg_dia').value<=31&&$('pg_ini').value))return er('Dia do mês e mês de início.');
   m.textContent='Salvando…';
   try{const r=await api({acao:'salvar_pagamento',pagamento:{id:EDG||undefined,tipo:tp,pessoa:x?x.id:PGID,nome:x?x.nome:nome,pix:$('pg_pix').value,meio:$('pg_meio').value,dados:$('pg_dados').value,
-      descricao:$('pg_desc').value,valor:v,data:$('pg_data').value,dia:$('pg_dia').value,inicio:$('pg_ini').value,fim:$('pg_fim').value,ativo:$('pg_at').value}});
+      descricao:$('pg_desc').value,valor:v,data:$('pg_data').value,dia:$('pg_dia').value,inicio:$('pg_ini').value,fim:$('pg_fim').value,ativo:$('pg_at').value,direcao:$('pg_dir').value,estimativa:$('pg_est').value}});
     let nv=r.pagamentos;if(!EDG&&tp==='avulso'&&$('pg_sit').value==='pago'){const g=nv.find(x=>!PAGS.some(o=>o.id===x.id));if(g)nv=(await api({acao:'pagar_pagamento',id:g.id,ref:'unico',data:$('pg_data').value})).pagamentos}
     PAGS=nv;limpaG();m.innerHTML='<span class="pos">Salvo ✓</span>';render()}catch(e){er('Não salvou ('+esc(e.message)+')')}};
 $('pg_lista').addEventListener('click',async e=>{const fm=e.target.closest('[data-gfim]');if(fm){e.preventDefault();const[id,fim]=fm.dataset.gfim.split('|'),g=PAGS.find(y=>y.id===id);fm.textContent='salvando…';
     try{const r=await api({acao:'salvar_pagamento',pagamento:Object.assign({},g,{fim})});PAGS=r.pagamentos;render()}catch(err){fm.textContent='erro: '+err.message}return}
   const ed=e.target.closest('[data-eg]'),pg=e.target.closest('[data-gp]'),un=e.target.closest('[data-gu]'),dx=e.target.closest('[data-gx]');if(!ed&&!pg&&!un&&!dx)return;e.preventDefault();
   if(ed){const g=PAGS.find(y=>y.id===ed.dataset.eg);EDG=g.id;PGID=g.pessoa;$('pg_tp').value=g.tipo;$('pg_pes').value=rotPes(pesDe(g.pessoa))||g.nome;$('pg_pix').value=g.pix;$('pg_meio').value=g.meio;$('pg_dados').value=g.dados;
-    $('pg_desc').value=g.descricao;$('pg_val').value=String(g.valor).replace('.',',');$('pg_data').value=g.data;$('pg_dia').value=g.dia;$('pg_ini').value=g.inicio||HOJE.slice(0,7);$('pg_fim').value=g.fim;$('pg_at').value=g.ativo==='não'?'não':'sim';
-    tipoPg();meioPg();$('pg_can').style.display='';$('pg_h').textContent='Editar pagamento';$('pg_msg').textContent='';$('pg_pes').scrollIntoView({block:'center'});return}
+    $('pg_desc').value=g.descricao;$('pg_val').value=String(g.valor).replace('.',',');$('pg_data').value=g.data;$('pg_dia').value=g.dia;$('pg_ini').value=g.inicio||HOJE.slice(0,7);$('pg_fim').value=g.fim;$('pg_at').value=g.ativo==='não'?'não':'sim';$('pg_dir').value=g.direcao==='entrada'?'entrada':'saida';$('pg_est').value=g.estimativa==='não'?'não':'sim';
+    tipoPg();meioPg();dirPg();$('pg_can').style.display='';$('pg_h').textContent='Editar pagamento';$('pg_msg').textContent='';$('pg_pes').scrollIntoView({block:'center'});return}
   const b=pg||un||dx;if(b.dataset.ok!=='1'){b.dataset.ok='1';b.textContent=dx?'toque de novo para excluir':'toque de novo para confirmar';return}
   b.textContent='salvando…';
   try{let r;if(dx)r=await api({acao:'excluir_pagamento',id:dx.dataset.gx});
@@ -471,7 +504,7 @@ function lnTodos(){const aj={};LN.forEach(l=>{if(l.ref)aj[l.ref]=l});
   const ex=(AD.movs||[]).map(m=>{const a=aj[m.id];return a?Object.assign({},m,{quem:a.quem||m.quem,cat:a.cat||m.cat,show:a.show||m.show,obs:a.obs||m.obs,aj:a}):m});
   const nv=LN.filter(l=>!l.ref&&l.data).map(l=>({id:'ln-'+l.id,novo:l,data:l.data,quem:l.quem,valor:+l.valor,cat:l.cat||'Outros (a classificar)',show:l.show,obs:l.obs,meio:l.meio||'conta'}));
   /* do app, depois do último extrato (antes disso o extrato já tem): pagamentos marcados como pagos e recebimentos lançados em Vendas */
-  const pg=[];PAGS.forEach(g=>{let p={};try{p=JSON.parse(g.pagos||'{}')||{}}catch(e){}Object.entries(p).forEach(([ref,q])=>{if(q&&q>AD.ext_ate)pg.push({id:'pg-'+g.id+'-'+ref,src:'pg',g,data:q,quem:g.nome,valor:-(+g.valor),cat:g.descricao||(g.tipo==='fixo'?'Fixo mensal':'Pagamento avulso'),meio:g.meio==='Dinheiro'?'dinheiro':'conta',obs:g.tipo==='fixo'?'fixo de '+mesn(ref):''})})});
+  const pg=[];PAGS.forEach(g=>{let p={};try{p=JSON.parse(g.pagos||'{}')||{}}catch(e){}Object.entries(p).forEach(([ref,q])=>{if(q&&q>AD.ext_ate)pg.push({id:'pg-'+g.id+'-'+ref,src:'pg',g,data:q,quem:g.nome,valor:(g.direcao==='entrada'?1:-1)*(+g.valor),cat:g.direcao==='entrada'?(/aporte/i.test(g.descricao||'')?'Aporte de sócio':'Outras entradas'):g.descricao||(g.tipo==='fixo'?'Fixo mensal':'Pagamento avulso'),meio:g.meio==='Dinheiro'?'dinheiro':'conta',obs:g.tipo==='fixo'?'fixo de '+mesn(ref):''})})});
   const rc=[];VS.forEach(sh=>{let l=[];try{l=JSON.parse(sh.recebimentos||'[]')||[]}catch(e){}l.forEach((r,i)=>{const d=String(r.data||'').slice(0,10);if(d&&d>AD.ext_ate&&+r.valor>0)rc.push({id:'rc-'+sh.id+'-'+i,src:'rc',sh,data:d,quem:r.quem||sh.contratante||sh.evento,valor:+r.valor,cat:sh.data.slice(0,7)>d.slice(0,7)?'Sinal de show':'Cachês de shows',show:ddmm(sh.data)+' '+(sh.evento||sh.cidade||''),meio:/dinheiro/i.test(r.meio||'')?'dinheiro':'conta',obs:[r.obs,r.por?'lançado por '+r.por:''].filter(Boolean).join(' · ')})})});
   return ex.concat(nv,pg,rc)}
 function lnConf(){const C=AD.conf||[];const T={a_mais:['a mais','lançado e não está no extrato'],a_menos:['a menos','no extrato e não lançado'],valor:['valor diferente','']};
@@ -504,6 +537,29 @@ function lnSheet(x){LED=x||null;const ext=x&&!x.novo&&!x.src,nv=!x||x.novo;$('ln
   $('ln_qm').value=x?x.quem||'':'';$('ln_ct').value=x?x.cat||'':'';$('ln_shw').value=x?x.show||'':'';$('ln_ob').value=x&&(x.aj||x.novo)?x.obs||'':'';
   const d=$('ln_del');d.dataset.ok='';d.style.display=x&&(x.aj||x.novo)?'':'none';d.textContent=x&&x.novo?'Excluir':'Desfazer ajuste';
   $('ln_sh').classList.add('on');$('ln_sh').setAttribute('aria-hidden','false');setTimeout(()=>(nv&&!x?$('ln_vl'):$('ln_ct')).focus(),50)}
+/* aba Sócio */
+let SO=[],SOOK=false,SOF='ocorrencia',SOED=null;
+async function socAbre(){if(!SOOK){$('so_lista').innerHTML='<div class="empty">Carregando…</div>';try{SO=(await api({acao:'socio'})).socio||[];SOOK=true}catch(e){$('so_lista').innerHTML=`<div class="empty">Não consegui carregar (${esc(e.message)}).</div>`;return}}socRender()}
+function socRender(){const l=SO.filter(x=>x.tipo===SOF).sort((a,b)=>(b.data||'').localeCompare(a.data||'')||a.titulo.localeCompare(b.titulo));
+  $('so_lista').innerHTML=l.length?l.map(x=>`<div class="tf" style="${x.visivel==='não'?'opacity:.55':''}"><div class="hd"><div>${x.visivel==='não'?'<span class="pill">oculto</span> ':''}<b style="display:inline">${x.data?ddmm(x.data)+' · ':''}${esc(x.titulo||(x.tipo==='nota_aporte'?'Aporte':''))}${x.valor?' · '+brl(+x.valor):''}</b>${x.detalhe?`<div class="ds">${esc(x.detalhe)}</div>`:''}${x.doc||x.link?`<div class="ds" style="color:var(--muted)">${x.doc?'📎 '+esc(x.doc):'🔗 link'}</div>`:''}</div><button class="btn sm" data-so="${esc(x.id)}">editar</button></div></div>`).join(''):'<div class="empty">Nada aqui ainda.</div>'}
+$('so_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;SOF=b.dataset.f;$('so_fil').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b));socRender()};
+function soAbre(x){SOED=x;const t=x?x.tipo:SOF;$('so_t').textContent=(x?'Editar ':'Novo ')+(t==='doc'?'documento':t==='nota_aporte'?'destino de aporte':'acontecimento');
+  document.querySelectorAll('#so_sh .f label').forEach(l=>l.style.display=l.classList.contains(t==='doc'?'so-d':t==='nota_aporte'?'so-n':'so-o')?'':'none');
+  $('so_tl').textContent=t==='doc'?'Nome do documento':'Título';$('so_dl').textContent=t==='nota_aporte'?'Para onde foi o dinheiro':'Detalhe';
+  $('so_doc').innerHTML='<option value="">— nenhum —</option>'+(AD.arqs||[]).map(n=>`<option${x&&x.doc===n?' selected':''}>${esc(n)}</option>`).join('');
+  $('so_dt').value=x?x.data:'';$('so_ti').value=x?x.titulo:'';$('so_vl').value=x&&x.valor?String(x.valor).replace('.',','):'';$('so_de').value=x?x.detalhe:'';$('so_lk').value=x?x.link:'';$('so_vi').value=x&&x.visivel==='não'?'não':'sim';
+  $('so_del').style.display=x?'':'none';$('so_del').dataset.ok='';$('so_del').textContent='Excluir';$('so_msg').textContent='';$('so_sh').classList.add('on');$('so_sh').setAttribute('aria-hidden','false')}
+const soFecha=()=>{$('so_sh').classList.remove('on');$('so_sh').setAttribute('aria-hidden','true')};
+$('so_x').onclick=soFecha;$('so_shb').onclick=soFecha;$('so_novo').onclick=()=>soAbre(null);
+$('so_lista').onclick=e=>{const b=e.target.closest('[data-so]');if(b)soAbre(SO.find(x=>x.id===b.dataset.so))};
+$('so_doc').onchange=()=>{if($('so_doc').value&&!$('so_ti').value)$('so_ti').value=$('so_doc').value};
+$('so_ok').onclick=async()=>{const t=SOED?SOED.tipo:SOF,m=$('so_msg');if(t!=='nota_aporte'&&!$('so_ti').value.trim())return m.innerHTML='<span class="neg">Escreva o título.</span>';
+  if(t==='nota_aporte'&&!$('so_dt').value)return m.innerHTML='<span class="neg">Data do aporte.</span>';
+  if(t==='doc'&&!$('so_doc').value&&!/^https:\/\//.test($('so_lk').value))return m.innerHTML='<span class="neg">Escolha o arquivo ou cole um link https://</span>';
+  m.textContent='Salvando…';try{const r=await api({acao:'salvar_socio',item:{id:SOED?SOED.id:undefined,tipo:t,data:$('so_dt').value,titulo:$('so_ti').value,detalhe:$('so_de').value,valor:$('so_vl').value.trim().replace(/\./g,'').replace(',','.'),doc:t==='doc'?$('so_doc').value:'',link:$('so_lk').value.trim(),visivel:$('so_vi').value}});
+    SO=r.socio;socRender();soFecha()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
+$('so_del').onclick=async()=>{const b=$('so_del');if(b.dataset.ok!=='1'){b.dataset.ok='1';b.textContent='toque de novo para excluir';return}b.textContent='excluindo…';
+  try{SO=(await api({acao:'excluir_socio',id:SOED.id})).socio;socRender();soFecha()}catch(e){b.textContent='erro'}};
 const lnFecha=()=>{$('ln_sh').classList.remove('on');$('ln_sh').setAttribute('aria-hidden','true')};
 $('ln_x').onclick=lnFecha;$('ln_shb').onclick=lnFecha;
 $('ln_novo').onclick=()=>lnSheet(null);
@@ -524,7 +580,7 @@ $('ln_del').onclick=async()=>{const d=$('ln_del'),x=LED,id=x&&(x.novo?x.novo.id:
   if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent=x.novo?'Toque de novo para excluir':'Toque de novo: volta como veio do extrato';return}
   try{LN=(await api({acao:'excluir_lancamento',id})).lancamentos||[];lnRender();lnFecha()}catch(e){$('ln_msg').innerHTML='<span class="neg">erro</span>'}};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')lnFecha()});
-$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag','lan'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='lan')lnAbre()};
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag','lan','soc'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='lan')lnAbre();if(b.dataset.t==='pag')arecAbre();if(b.dataset.t==='soc')socAbre()};
 </script>
 </body>
 </html>

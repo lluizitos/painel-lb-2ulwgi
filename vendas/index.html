@@ -84,6 +84,7 @@ label textarea{min-height:64px;resize:vertical}
 .ptot{display:flex;justify-content:space-between;gap:10px;margin-top:10px;font-size:13px;color:var(--sub)}.ptot b{color:var(--ink)}
 #vw{position:fixed;inset:0;z-index:60;background:rgba(10,9,12,.88);display:none;align-items:center;justify-content:center;padding:16px}#vw.open{display:flex}
 .vwc{max-width:100%;max-height:100%;display:flex;flex-direction:column;gap:10px;align-items:center}.vwc img{max-width:100%;max-height:78vh;border-radius:10px}
+.arh{margin-top:18px}.arr{display:flex;gap:10px;align-items:center;background:var(--card);border-radius:12px;padding:10px 12px;margin-top:6px}.arr .t{flex:1;min-width:0}.arr .t b{display:block;font-size:14px}.arr .t span{font-size:12px;color:var(--muted)}.arr .v{font-weight:700;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -97,6 +98,7 @@ label textarea{min-height:64px;resize:vertical}
   <div class="tabs" id="tabs"><button class="on" data-t="shows">Shows</button><button data-t="num">Números e gráficos</button></div>
   <div id="tshows">
   <div class="grid g4" id="resumo" style="margin-top:16px"></div>
+  <div id="arec"></div>
   <div class="chips" id="fil">
     <button class="chip on" data-f="prox">Próximos</button><button class="chip" data-f="contrato">Sem contrato</button>
     <button class="chip" data-f="nota">NF a definir</button><button class="chip" data-f="receber">Falta receber</button><button class="chip" data-f="hist">Histórico</button><button class="chip" data-f="todos">Todos</button>
@@ -190,6 +192,7 @@ cfg().then(()=>LB.entrar({pagina:'vendas',base:'../',titulo:'Vendas',ok:async r=
 
 function iniciar(){
   document.getElementById('app').style.display='block';
+  setTimeout(()=>{const h=location.hash.match(/ed=([^&]+)/);if(h){const x=SHOWS.find(y=>String(y.id)===decodeURIComponent(h[1]));if(x)abrirEd(x)}},300); // link do Admin: vendas/#ed=<id>
   document.getElementById('links').innerHTML=LB.links(PAG,'vendas','../');
   document.getElementById('modo').innerHTML=RO?`<div class="aviso">Modo consulta: a planilha de vendas ainda não está ligada. Para cadastrar ou mudar um show, avise o Luiz.</div>`:'';
   document.getElementById('novo').style.display=RO?'none':'block';
@@ -218,6 +221,12 @@ function render(){
   const cs=fut.map(calc);
   const vend=cs.reduce((a,c)=>a+c.v,0),fal=cs.reduce((a,c)=>a+c.falta,0),com=cs.some(c=>c.com==null)?null:cs.reduce((a,c)=>a+c.com,0);
   const semc=fut.filter(s=>s.contrato!=='Assinado').length;
+  {// sinais e parcelas programados (combinado de cada show) que ainda não entraram
+   const P=[];SHOWS.filter(s=>s.status!=='Cancelado').forEach(s=>{const pl=jp(s.plano);if(!pl||!pl.parcelas||!pl.parcelas.length)return;
+     stParc(pl,jp(s.recebimentos)).forEach((x,i,a)=>{if(x.st!=='pago'&&+x.v>0)P.push({s,x,i,n:a.length,tp:pl.tipo})})});
+   P.sort((a,b)=>(a.x.venc||'9999').localeCompare(b.x.venc||'9999'));
+   const nm=p=>p.tp==='sinal'?(p.i===0?'Sinal':'Restante'):p.tp==='avista'?'À vista':'Parcela '+(p.i+1)+'/'+p.n;
+   document.getElementById('arec').innerHTML=P.length?`<h3 class="arh">A receber programado <small>${P.length} · ${brl(P.reduce((a,p)=>a+(+p.x.v-p.x.pg),0))}</small></h3><div class="list" id="arecl" data-max="4">${P.map(p=>`<div class="arr"><div class="t"><b>${nm(p)} · ${esc(p.s.evento||p.s.cidade||'')}</b><span>show ${ddmm(p.s.data)} · ${pillParc(p.x)}</span></div><div class="v">${brl(+p.x.v-p.x.pg)}</div><button type="button" class="btn sm" data-ed="${esc(p.s.id)}">abrir</button></div>`).join('')}</div>`:''}
   const k=(l,v,s,c)=>`<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div><div class="s">${s}</div></div>`;
   document.getElementById('resumo').innerHTML=k('Shows marcados',fut.length,'daqui pra frente')+k('Vendido',brl(vend),'soma dos cachês')+k('Falta receber',brl(fal),'dos próximos shows','pk')+k('Sem contrato assinado',semc,com==null?'comissão: % a definir':'comissões '+brl(com),semc?'neg':'');
   document.getElementById('lista').innerHTML=l.length?l.map(s=>{const c=calc(s);
@@ -334,6 +343,7 @@ function prev(){const c=calc(lerForm());
 ef.addEventListener('input',prev);
 document.getElementById('novo').onclick=()=>abrirEd(null);
 document.getElementById('cancel').onclick=()=>ed.classList.remove('open');
+document.getElementById('arec').onclick=e=>{const b=e.target.closest('[data-ed]');if(b)abrirEd(SHOWS.find(s=>String(s.id)===b.dataset.ed))};
 document.getElementById('lista').onclick=e=>{const b=e.target.closest('[data-ed]');if(b)abrirEd(SHOWS.find(s=>String(s.id)===b.dataset.ed));
   const p=e.target.closest('[data-pg]');if(p){abrirEd(SHOWS.find(s=>String(s.id)===p.dataset.pg));RCED={};renderPg();const x=document.getElementById('pgx');x.scrollIntoView({block:'start'});setTimeout(()=>{const v=document.getElementById('r_v');v&&v.focus()},300)}};
 ef.addEventListener('submit',async e=>{e.preventDefault();const m=document.getElementById('msg'),bt=document.getElementById('salvar');
