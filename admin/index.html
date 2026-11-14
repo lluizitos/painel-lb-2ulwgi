@@ -149,13 +149,13 @@ label textarea{min-height:60px;resize:vertical}
 
   <!-- PAGAMENTOS AVULSOS E FIXOS -->
   <div id="t_pag" style="display:none">
-    <p class="note">Pagamentos que não são de show: avulsos (uma vez, numa data) e fixos (todo mês, num dia). Na data, entram no assistente de pagamento do painel até serem marcados como pagos.</p>
+    <p class="note">Pagamentos que não são de show: avulsos (uma vez, numa data) e fixos (todo mês, num dia). Na data, entram no assistente de pagamento do painel até serem marcados como pagos. Gasto pequeno que já foi pago (lanche, compra) marque "Já pago": vai direto para as Movimentações.</p>
     <div class="chips" id="g2_fil"><button class="chip on" data-f="">Tudo</button><button class="chip" data-f="pend">Pendentes</button><button class="chip" data-f="fixo">Fixos</button><button class="chip" data-f="avulso">Avulsos</button></div>
     <div class="list" id="pg_lista"></div>
     <h3 id="pg_h">Novo pagamento</h3>
     <div class="card"><div class="f">
       <label>Tipo<select id="pg_tp"><option value="avulso">Avulso (uma vez)</option><option value="fixo">Fixo mensal</option></select></label>
-      <label>Quem recebe<input id="pg_pes" list="pes_dl" autocomplete="off" placeholder="busque na lista da equipe"></label>
+      <label>Quem recebe<input id="pg_pes" list="pes_dl" autocomplete="off" placeholder="da lista da equipe, ou escreva (ex.: padaria)"></label>
       <label>Meio<select id="pg_meio"><option>Pix</option><option>Transferência bancária</option><option>Dinheiro</option><option>Boleto</option></select></label>
       <label>Chave PIX<input id="pg_pix"></label>
       <label class="w" id="pg_dl" style="display:none">Dados bancários / boleto<input id="pg_dados" placeholder="banco, agência, conta, titular · ou linha do boleto"></label>
@@ -165,6 +165,7 @@ label textarea{min-height:60px;resize:vertical}
       <label class="fx" style="display:none">Dia do mês<input id="pg_dia" inputmode="numeric" placeholder="ex.: 10"></label>
       <label class="fx" style="display:none">A partir de (mês)<input type="month" id="pg_ini"></label>
       <label class="fx" style="display:none">Até (mês, opcional)<input type="month" id="pg_fim"></label>
+      <label class="av">Situação<select id="pg_sit"><option value="">A pagar (entra no assistente)</option><option value="pago">Já pago (ex.: lanche, compra feita)</option></select></label>
       <label>Ativo<select id="pg_at"><option value="sim">Sim</option><option value="não">Não (pausado)</option></select></label>
     </div><div class="acts"><button class="btn pkb" id="pg_ok">Salvar pagamento</button><button class="btn" id="pg_can" style="display:none">Cancelar edição</button><span class="msg" id="pg_msg"></span></div></div>
   </div>
@@ -314,7 +315,7 @@ function tipoPg(){const f=$('pg_tp').value==='fixo';document.querySelectorAll('#
 function meioPg(){$('pg_dl').style.display=$('pg_meio').value==='Pix'?'none':''}
 $('pg_tp').onchange=tipoPg;$('pg_meio').onchange=meioPg;
 $('pg_pes').addEventListener('input',()=>{const x=PESK[$('pg_pes').value];PGID=x?x.id:'';if(x&&x.pix)$('pg_pix').value=x.pix});
-function limpaG(){EDG=null;PGID='';['pg_pes','pg_pix','pg_dados','pg_desc','pg_val','pg_data','pg_dia','pg_fim'].forEach(i=>$(i).value='');$('pg_ini').value=HOJE.slice(0,7);$('pg_tp').value='avulso';$('pg_meio').value='Pix';$('pg_at').value='sim';tipoPg();meioPg();$('pg_can').style.display='none';$('pg_h').textContent='Novo pagamento'}
+function limpaG(){EDG=null;PGID='';['pg_pes','pg_pix','pg_dados','pg_desc','pg_val','pg_data','pg_dia','pg_fim'].forEach(i=>$(i).value='');$('pg_ini').value=HOJE.slice(0,7);$('pg_tp').value='avulso';$('pg_sit').value='';$('pg_meio').value='Pix';$('pg_at').value='sim';tipoPg();meioPg();$('pg_can').style.display='none';$('pg_h').textContent='Novo pagamento'}
 $('pg_can').onclick=()=>{limpaG();$('pg_msg').textContent=''};
 $('g2_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;G2F=b.dataset.f;document.querySelectorAll('#g2_fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderPag()};
 $('pg_ok').onclick=async()=>{const m=$('pg_msg'),nome=$('pg_pes').value.trim(),x=PESK[nome];const er=t=>m.innerHTML='<span class="neg">'+t+'</span>';
@@ -324,7 +325,8 @@ $('pg_ok').onclick=async()=>{const m=$('pg_msg'),nome=$('pg_pes').value.trim(),x
   m.textContent='Salvando…';
   try{const r=await api({acao:'salvar_pagamento',pagamento:{id:EDG||undefined,tipo:tp,pessoa:x?x.id:PGID,nome:x?x.nome:nome,pix:$('pg_pix').value,meio:$('pg_meio').value,dados:$('pg_dados').value,
       descricao:$('pg_desc').value,valor:v,data:$('pg_data').value,dia:$('pg_dia').value,inicio:$('pg_ini').value,fim:$('pg_fim').value,ativo:$('pg_at').value}});
-    PAGS=r.pagamentos;limpaG();m.innerHTML='<span class="pos">Salvo ✓</span>';render()}catch(e){er('Não salvou ('+esc(e.message)+')')}};
+    let nv=r.pagamentos;if(!EDG&&tp==='avulso'&&$('pg_sit').value==='pago'){const g=nv.find(x=>!PAGS.some(o=>o.id===x.id));if(g)nv=(await api({acao:'pagar_pagamento',id:g.id,ref:'unico',data:$('pg_data').value})).pagamentos}
+    PAGS=nv;limpaG();m.innerHTML='<span class="pos">Salvo ✓</span>';render()}catch(e){er('Não salvou ('+esc(e.message)+')')}};
 $('pg_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data-eg]'),pg=e.target.closest('[data-gp]'),un=e.target.closest('[data-gu]'),dx=e.target.closest('[data-gx]');if(!ed&&!pg&&!un&&!dx)return;e.preventDefault();
   if(ed){const g=PAGS.find(y=>y.id===ed.dataset.eg);EDG=g.id;PGID=g.pessoa;$('pg_tp').value=g.tipo;$('pg_pes').value=rotPes(pesDe(g.pessoa))||g.nome;$('pg_pix').value=g.pix;$('pg_meio').value=g.meio;$('pg_dados').value=g.dados;
     $('pg_desc').value=g.descricao;$('pg_val').value=String(g.valor).replace('.',',');$('pg_data').value=g.data;$('pg_dia').value=g.dia;$('pg_ini').value=g.inicio||HOJE.slice(0,7);$('pg_fim').value=g.fim;$('pg_at').value=g.ativo==='não'?'não':'sim';

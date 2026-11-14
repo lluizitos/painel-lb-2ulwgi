@@ -65,6 +65,9 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 .alerta{background:rgba(242,182,107,.1);border:1px solid rgba(242,182,107,.45);border-radius:14px;padding:14px 16px;margin-top:14px}.alerta b.t{display:block;color:var(--amber);font-size:15px;margin-bottom:4px}.alerta p{margin:6px 0 0;font-size:13.5px;color:var(--sub)}.alerta .vv{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px}.alerta .vv div{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.alerta .vv b{display:block;font-size:17px;letter-spacing:0;color:var(--ink)}
 .mt{background:var(--card);border-radius:12px;padding:12px 14px;border-left:4px solid var(--line)}.mt.and{border-left-color:var(--pink)}.mt.ok{border-left-color:var(--pos)}.mt b{display:block}.mt .s{font-size:13px;color:var(--sub);margin-top:2px}.mt .p{font-size:12px;color:var(--muted);margin-top:6px}
 .eq{background:var(--card);border-radius:12px;padding:12px 14px}.eq .n{display:flex;justify-content:space-between;gap:10px;align-items:baseline}.eq .f{font-size:12.5px;color:var(--muted)}.eq .me{font-size:13px;color:var(--sub);margin-top:6px}.eq .nums{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--sub);margin-top:6px}.eq .nums b{color:var(--ink)}.eq ul{margin:6px 0 0;padding-left:18px;font-size:13px;color:var(--sub)}
+.etp{display:flex;flex-direction:column;gap:6px;margin-top:8px}.etp div{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--sub)}.etp i{width:10px;height:10px;border-radius:3px;flex:none}.etp b{margin-left:auto;color:var(--ink)}.etp small{color:var(--muted);width:38px;text-align:right}
+.sxl{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px;color:var(--sub)}.sxl b{color:var(--ink)}
+.mvh{font-size:12.5px;color:var(--muted);margin:6px 0 0}
 </style>
 </head>
 <body>
@@ -85,6 +88,9 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <div class="list" id="ocm"></div>
   <h3>Para onde foi o dinheiro <small id="gsub"></small></h3>
   <div class="gb" id="gastos"></div>
+  <div id="entt"></div>
+  <h3>Movimentações do mês <small id="mvsub"></small></h3>
+  <div class="list" id="mvl"></div>
   <h3>Shows do mês</h3>
   <div class="list" id="smes"></div>
   </div>
@@ -141,6 +147,10 @@ LB.entrar({pagina:'socio',base:'../',titulo:'Prestação de contas',ok:r=>{D=r.d
 const k4=(l,v,s,c)=>`<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`;
 const dia=d=>`<div class="d"><b>${d.slice(8,10)}</b><span>${MES3[+d.slice(5,7)-1]} ${d.slice(2,4)}</span></div>`;
 const ocRow=o=>`<div class="oc">${dia(o.data)}<div class="t"><b>${esc(o.titulo)}</b><span>${esc(o.detalhe||'')}${o.doc?` · <a href="#docs" style="color:var(--pinkl)">ver documento</a>`:''}${o.data>D.atualizado?' · <span class="pill">programado</span>':''}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`;
+function etpHtml(et,sub){const tt=et.sinal+et.cache+et.aporte+et.outros;if(!tt)return '';
+  return `<div class="card k" style="margin-top:10px"><div class="l">De onde veio o dinheiro que entrou</div><div class="etp">${[['Sinais (shows de meses seguintes)',et.sinal,'var(--pinkl)'],['Cachês de shows do mês',et.cache,'var(--pos)'],['Aporte do sócio',et.aporte,'var(--amber)'],['Outras entradas',et.outros,'var(--muted)']].filter(x=>x[1]).map(x=>`<div><i style="background:${x[2]}"></i>${x[0]}<b>${brl(x[1])}</b><small>${Math.round(x[1]/tt*100)}%</small></div>`).join('')}</div><div class="s" style="margin-top:6px">${sub}</div></div>`}
+function sinaisHtml(S){if(!S||!S.total)return '';
+  return `<div class="card k" style="margin-top:10px;border-left:3px solid var(--pinkl)"><div class="l">Do caixa, quanto é sinal</div><div class="v" style="font-size:20px">${brl(S.total)}</div><div class="s">já recebido de shows que ainda vão acontecer · a equipe e os custos desses shows ainda vão sair</div><div class="sxl">${S.shows.map(x=>`<span>${esc(x.show)} <b>${brl(x.valor)}</b></span>`).join('')}</div></div>`}
 function render(){
   document.getElementById('app').style.display='block';
   const hoje=D.atualizado,mk=D.mes,A=D.agora,P=D.proximos,G=D.geral;
@@ -165,6 +175,10 @@ function render(){
   document.getElementById('ocm').innerHTML=A.ocorrencias.length?A.ocorrencias.map(ocRow).join(''):'<div class="oc"><div class="t"><span>Nada fora do normal neste mês.</span></div></div>';
   const tg=A.gastos.reduce((a,g)=>a+g.valor,0)||1,mg=Math.max(...A.gastos.map(g=>g.valor),1);
   document.getElementById('gsub').textContent=`${brl(A.saiu)} até ${A.ate}`;
+  {const T=A.ent_tipos,mv=(A.movs||[]).slice().reverse();
+    document.getElementById('entt').innerHTML=(T?etpHtml(T,'extrato até '+A.ate+' + sinais lançados no app depois disso'):'')+sinaisHtml(A.sinais_caixa);
+    document.getElementById('mvsub').textContent=mv.length?mv.length+' lançamentos (conta, dinheiro e app)':'';
+    document.getElementById('mvl').innerHTML=mv.map(x=>`<div class="row">${dia(x.data)}<div class="t"><b>${esc(x.quem||'—')}</b><span>${x.tipo==='sinal'?'<span class="pill pk">sinal</span> ':x.tipo==='cache'?'<span class="pill ok">cachê</span> ':''}${esc(x.cat||'')}${x.show_nome?' · '+esc(x.show_nome):''}${x.meio==='dinheiro'?' · dinheiro':''}${x.app?' · <span class="pill">ainda não conferido no extrato</span>':''}</span></div><div class="v ${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl(x.valor)}</div></div>`).join('')||'<div class="oc"><div class="t"><span>Nenhuma movimentação neste mês ainda.</span></div></div>'}
   document.getElementById('gastos').innerHTML=A.gastos.map(g=>`<div class="it"><div class="top"><span>${esc(g.grupo)}</span><b>${brl(g.valor)} <span class="mut" style="font-weight:400">· ${Math.round(g.valor/tg*100)}%</span></b></div><div class="tr"><i style="width:${g.valor/mg*100}%"></i></div></div>`).join('')||'<span class="mut">Nenhuma saída no mês ainda.</span>';
   document.getElementById('smes').innerHTML=A.shows.map(s=>`<div class="row">${dia(s.data)}<div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')} · ${s.data<=hoje?'<span class="pill ok">realizado</span>':'<span class="pill pk">confirmado</span>'}</span></div><div class="v">${brl(s.valor)}<small>${s.lucro!=null?'lucro <span class="'+(s.lucro<0?'neg':'pos')+'">'+brl(s.lucro)+'</span>':(s.rec?'já recebido '+brl(s.rec):'nada recebido ainda')}</small></div></div>`).join('')||'<div class="oc"><div class="t"><span>Sem shows confirmados neste mês.</span></div></div>';
   // 2 · próximos meses
