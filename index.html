@@ -620,7 +620,7 @@ function movsDoMes(k){ // extrato + lançados no app depois dele (sinais de Vend
     vivo.push({id,data:q,quem:g.nome,valor:-(+g.valor),cat:g.descricao||(g.tipo==='fixo'?'Fixo mensal':'Pagamento avulso'),meio:g.meio==='Dinheiro'?'dinheiro':'conta',obs:g.tipo==='fixo'?'fixo de '+ref:null,app:true})})});
   return D.movs.concat(snap,vivo).filter(x=>mkey(x.data)===k).sort((a,b)=>b.data.localeCompare(a.data)||b.valor-a.valor)} // mais recentes primeiro
 function movList(ms){
-  let f='t',q='',lim=25;
+  let f='t',q='',lim=6; // começa curto; "Ver mais" abre de 20 em 20
   const draw=()=>{
     let l=ms.filter(x=>(f==='t'||(f==='g'?x.tipo==='sinal':f==='e'?x.valor>0:x.valor<0))&&(!q||(x.quem+' '+(x.show_nome||x.show||'')+' '+(x.cat||'')+' '+(x.obs||'')).toLowerCase().includes(q)));
     const te=l.filter(x=>x.valor>0).reduce((a,x)=>a+x.valor,0),ts=l.filter(x=>x.valor<0).reduce((a,x)=>a+x.valor,0);
@@ -628,11 +628,12 @@ function movList(ms){
     l.forEach(x=>{if(x.data!==dia){dia=x.data;h+=`<div class="day">${ddmm(dia)}</div>`}
       h+=`<div class="row"><div class="t"><b>${esc(x.quem||'—')}</b><span>${x.tipo==='sinal'?`<span class="pill pk">sinal · show ${dtx(x.show_data||'')}</span> `:x.tipo==='cache'?'<span class="pill ok">cachê</span> ':''}${esc(x.cat||'')}${(x.show_nome||x.show)?' · '+esc(x.show_nome||x.show):''}${x.meio==='dinheiro'?' · <span class="pill">dinheiro</span>':''}${x.app?' · <span class="pill am">lançado no app</span>':''}${x.obs?'<br>'+esc(x.obs):''}</span></div><div class="v ${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl2(x.valor)}</div></div>`});
     h=`<div class="list" data-max="0">${h||'<div class="empty">Nada encontrado.</div>'}</div>`;
-    if(n>lim)h+=`<div class="center" style="margin-top:10px"><button class="btn" id="mais">Mostrar todos (${n})</button></div>`;
+    if(n>6)h+=`<div class="center" style="margin-top:10px;display:flex;gap:8px;justify-content:center">${n>lim?`<button class="btn" id="mais">Ver mais (${n-lim})</button>`:''}${lim>6?'<button class="btn" id="menos">Ver menos</button>':''}</div>`;
     const tg=l.length&&ms.filter(x=>x.tipo==='sinal').reduce((a,x)=>a+x.valor,0);
     h+=`<div class="tot"><span>Entrou <b class="pos">${brl2(te)}</b>${tg&&f!=='s'?` · sinais ${brl2(tg)}`:''}</span><span>Saiu <b>${brl2(ts)}</b></span></div>`;
     document.getElementById('ml').innerHTML=h;
-    const b=document.getElementById('mais');if(b)b.onclick=()=>{lim=1e9;draw()};
+    const b=document.getElementById('mais');if(b)b.onclick=()=>{lim+=20;draw()};
+    const bm=document.getElementById('menos');if(bm)bm.onclick=()=>{lim=6;draw();document.getElementById('ml').scrollIntoView({block:'start'})};
   };
   document.getElementById('mf').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;f=b.dataset.f;document.querySelectorAll('#mf .chip').forEach(c=>c.classList.toggle('on',c===b));draw()};
   document.getElementById('ms').oninput=e=>{q=e.target.value.toLowerCase().trim();draw()};
