@@ -179,7 +179,7 @@ const nf=v=>v?String(+(+v).toFixed(2)).replace('.',','):'';
 const MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const ddmm=s=>s.slice(8,10)+'/'+s.slice(5,7);
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
-const GR=['Músicos','Produção','Técnica','Outros','Comissão'];
+const GR=['Artista','Músicos','Produção','Técnica','Outros','Comissão'];
 const store=LB.store;
 let D,API='',BORD={},PES=[],CFG={},LOCAL=false,filtro='prox',ED=null;
 const doc11=d=>{const x=String(d||'').replace(/\D/g,'');return x.length===11?x.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4'):String(d||'')};
@@ -217,7 +217,7 @@ function totais(b){const eq=b.equipe.filter(e=>e.grupo!=='Comissão').reduce((a,
   const it=(b.itens||[]).reduce((a,i)=>a+num(i.valor),0);const dz=b.fonte==='planilha'&&b.totais?num(b.totais.diesel):dieselDe(b.diesel||{}).valor;const g=eq+it+dz+com;
   return {eq,it,dz,com,g,luc:num(b.valor)?num(b.valor)-g:null}}
 function resumo(b){const r={},ok=b.equipe.filter(e=>!e.fora&&e.grupo!=='Comissão');GR.forEach(g=>{const q=new Set(ok.filter(e=>e.grupo===g).map(e=>e.pessoa||e.nome)).size;if(q)r[g]=q});r._n=new Set(ok.map(e=>e.pessoa||e.nome)).size;return r}
-function fmTxt(r){const n=r._n||0;return n?Object.entries(r).filter(([g])=>g!=='_n').map(([g,q])=>q+' '+({'Músicos':q>1?'músicos':'músico','Produção':'produção','Técnica':'técnica','Outros':q>1?'outros':'outro'}[g])).join(' · ')+' · '+n+' na equipe':''}
+function fmTxt(r){const n=r._n||0;return n?Object.entries(r).filter(([g])=>g!=='_n').map(([g,q])=>q+' '+({'Artista':q>1?'artistas':'artista','Músicos':q>1?'músicos':'músico','Produção':'produção','Técnica':'técnica','Outros':q>1?'outros':'outro'}[g])).join(' · ')+' · '+n+' na equipe':''}
 
 /* ---------- lista de shows ---------- */
 function bordDoShow(s){return Object.values(BORD).find(b=>b.show_id===s.id)||Object.values(BORD).find(b=>b.data===s.data&&(!b.show_id))}

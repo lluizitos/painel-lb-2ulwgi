@@ -83,7 +83,24 @@
     if (c && c.u) { f.u.value = c.u; tentar(c.u, c.p, true); }
   }
   function sair() { store.del('lb_cred'); location.reload(); }
-  window.LB = { entrar, links, anexo, sair, norm, store, NOMES };
+  /* pagamento picado: cada parte do borderô (cachê, diária, gasolina, ajuda, estacionamento) é paga separada.
+     e.pagos = {parte: 'AAAA-MM-DD'}; e.status = Pago | Parcial | Pendente (calculado). */
+  const PARTES = [['valor', 'cachê'], ['diaria', 'diária'], ['gasolina', 'gasolina'], ['ajuda', 'ajuda de custo'], ['estacionamento', 'estacionamento']];
+  const nb = v => { const n = parseFloat(String(v ?? '').replace(/\./g, '').replace(',', '.')); return typeof v === 'number' ? v : (isNaN(n) ? 0 : n); };
+  const pg = {
+    PARTES,
+    partes: e => PARTES.filter(([k]) => nb(e[k]) > 0).map(([k, n]) => ({ k, n, v: nb(e[k]), pago: e.status === 'Pago' && !(e.pagos && Object.keys(e.pagos).length) ? true : !!(e.pagos && e.pagos[k]), em: e.pagos && e.pagos[k] })),
+    falta: e => e.fora ? 0 : pg.partes(e).filter(p => !p.pago).reduce((a, p) => a + p.v, 0),
+    marca(e, ks, data, pago = true) {  // ks: lista de partes ou 'tudo'
+      if (e.status === 'Pago' && !(e.pagos && Object.keys(e.pagos).length)) { e.pagos = {}; pg.partes({ ...e, status: '' }).forEach(p => e.pagos[p.k] = e.pago_em || data); }
+      e.pagos = e.pagos || {};
+      (ks === 'tudo' ? PARTES.map(p => p[0]) : ks).forEach(k => { if (nb(e[k]) > 0) { if (pago) e.pagos[k] = e.pagos[k] || data; else delete e.pagos[k]; } });
+      const ps = pg.partes({ ...e, status: '' }), n = ps.filter(p => p.pago).length;
+      e.status = !ps.length ? (pago ? 'Pago' : 'Pendente') : n === ps.length ? 'Pago' : n ? 'Parcial' : 'Pendente';
+      return e;
+    }
+  };
+  window.LB = { entrar, links, anexo, sair, norm, store, NOMES, pg };
 
   /* "Ver mais": toda lista longa (.list) e todo grupo de borderô (.gp) mostra só os primeiros itens.
      Limite: data-max no elemento (padrão 5 em listas, 4 em grupos). data-max="0" desliga. */
