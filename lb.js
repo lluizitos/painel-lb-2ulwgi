@@ -32,8 +32,8 @@
     } catch (e) { throw new Error('senha'); }
   }
   /* Arquivo anexo cifrado com a mesma chave da página (prestação de contas). */
-  async function anexo(nomeArq, iv) {
-    const r = await fetch(LB.base + 'arquivos/' + nomeArq, { cache: 'no-store' });
+  async function anexo(nomeArq, iv, pasta) {
+    const r = await fetch(LB.base + (pasta || 'arquivos') + '/' + nomeArq, { cache: 'no-store' });
     const ct = new Uint8Array(await r.arrayBuffer());
     return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(iv) }, LB.chave, ct);
   }

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#141218">
-<title>Lucas Barros · Resumo</title>
+<title>Lucas Barros · Sócio</title>
 <link rel="icon" href="../icone.png"><link rel="apple-touch-icon" href="../icone.png">
 <style>
 :root{--bg:#141218;--card:#1E1C24;--card2:#26232D;--line:#2E2B36;--ink:#F3F1F6;--sub:#B8B3C3;--muted:#8B8697;--pink:#CF1D51;--pinkl:#F0507E;--neg:#FF8FA8;--pos:#7FDDA9;--sai:#6F697D;--amber:#F2B66B}
@@ -43,6 +43,23 @@ h3 small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)
 .leg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--sub);padding:0 6px 6px}.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .tip{font-size:12.5px;color:var(--sub);min-height:20px;padding:4px 6px 0}
 #app{display:none}
+.blk{margin-top:30px;padding-top:4px}
+.blk>.eyebrow{margin-top:0}
+.oc{display:flex;gap:12px;background:var(--card);border-radius:12px;padding:12px 14px;align-items:flex-start}
+.oc .d{flex:none;width:46px;text-align:center;line-height:1.1}.oc .d b{display:block;font-size:19px;font-weight:800}.oc .d span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.oc .t{flex:1;min-width:0}.oc .t b{display:block;font-size:14.5px}.oc .t span{font-size:12.5px;color:var(--sub)}
+.oc .v{flex:none;text-align:right;font-weight:700;white-space:nowrap}
+.gb{display:flex;flex-direction:column;gap:10px;background:var(--card);border-radius:14px;padding:14px 16px}
+.gb .it .top{display:flex;justify-content:space-between;gap:10px;font-size:13.5px}.gb .it .top b{white-space:nowrap}
+.gb .it .tr{height:8px;background:var(--card2);border-radius:99px;margin-top:5px;overflow:hidden}.gb .it .tr i{display:block;height:100%;background:var(--pink);border-radius:99px}
+table.fe{width:100%;border-collapse:collapse;font-size:13px;background:var(--card);border-radius:14px;overflow:hidden}
+table.fe th{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;text-align:right;padding:10px 8px}
+table.fe th:first-child,table.fe td:first-child{text-align:left;padding-left:14px}table.fe td:last-child,table.fe th:last-child{padding-right:14px}
+table.fe td{padding:9px 8px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
+@media(max-width:480px){table.fe .hs{display:none}}
+.doc{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--card);border-radius:12px;padding:12px 14px}
+.doc b{font-size:14px}.doc button{border:1px solid var(--line);background:var(--card2);border-radius:99px;padding:7px 14px;font:inherit;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;flex:none}
+.mhd{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:12px 2px 6px}
 footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </style>
 </head>
@@ -50,20 +67,51 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 <div id="app">
 <header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div></header>
 <main class="wrap">
-  <p class="eyebrow">Resumo para o sócio</p>
+  <p class="eyebrow">Prestação de contas para o sócio</p>
   <h1>Lucas <em>Barros</em></h1>
   <p class="note" id="upd"></p>
-  <h3>Shows em 2026 <small>realizados até hoje</small></h3>
-  <div class="grid g4" id="kpis"></div>
+
+  <div class="blk" id="b1">
+  <p class="eyebrow">1 · Agora</p>
+  <h1 id="mesnm" style="font-size:24px"></h1>
+  <div class="grid g4" id="kagora" style="margin-top:14px"></div>
+  <h3>O que aconteceu <small>no mês</small></h3>
+  <div class="list" id="ocm"></div>
+  <h3>Para onde foi o dinheiro <small id="gsub"></small></h3>
+  <div class="gb" id="gastos"></div>
+  <h3>Shows do mês</h3>
+  <div class="list" id="smes"></div>
+  </div>
+
+  <div class="blk" id="b2">
+  <p class="eyebrow">2 · Próximos meses</p>
+  <h1 style="font-size:24px">O que já está <em>certo</em></h1>
+  <h3>Shows confirmados <small id="proxs"></small></h3>
+  <div id="prox"></div>
+  <h3>Contas fixas por mês <small id="fixs"></small></h3>
+  <div class="gb" id="fixos"></div>
+  <p class="note" id="apnota"></p>
+  </div>
+
+  <div class="blk" id="b3">
+  <p class="eyebrow">3 · Geral</p>
+  <h1 style="font-size:24px">Temporada <em id="anonm"></em></h1>
+  <div class="grid g4" id="kpis" style="margin-top:14px"></div>
   <h3>Mês a mês <small>cachês dos shows e lucro depois de pagar equipe, itens e diesel</small></h3>
   <div class="chart"><div class="leg"><span><i style="background:var(--pink)"></i>Cachês</span><span><i style="background:var(--pos)"></i>Lucro dos shows</span></div><div id="ch"></div><div class="tip" id="tip">Toque num mês para ver os valores.</div></div>
-  <h3>Caixa e investimento</h3>
-  <div class="grid g2" id="caixa"></div>
-  <h3>Próximos shows <small id="proxs"></small></h3>
-  <div class="list" id="prox"></div>
+  <h3>Meses fechados <small>tudo que entrou e saiu da empresa</small></h3>
+  <table class="fe" id="fech"></table>
+  <h3>Investimento do sócio</h3>
+  <div class="list" id="aportes"></div>
+  <h3>Tudo o que aconteceu</h3>
+  <div class="list" id="ocall"></div>
   <h3>Últimos shows</h3>
   <div class="list" id="ult"></div>
-  <footer>Lucas Barros Ltda · números do extrato bancário e das planilhas de cada show (borderôs)</footer>
+  <h3>Documentos</h3>
+  <div class="list" id="docs"></div>
+  </div>
+  <p class="note" style="margin-top:22px">Aqui entram só valores confirmados: o que já está no extrato, shows confirmados e gastos comprovados. O que ainda depende de confirmação aparece depois de conferido.</p>
+  <footer>Lucas Barros Ltda · números do extrato bancário, do caixa em dinheiro e das planilhas de cada show (borderôs)</footer>
 </main>
 </div>
 <script src="../lb.js"></script>
@@ -75,37 +123,64 @@ const kf=v=>{const a=Math.abs(v);return (v<0?'−':'')+(a>=1000?Math.round(a/100
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ddmm=s=>s.slice(8,10)+'/'+s.slice(5,7);
 let D;
-LB.entrar({pagina:'socio',base:'../',titulo:'Resumo do sócio',ok:r=>{D=r.dados;document.getElementById('links').innerHTML=LB.links(r.paginas,'socio','../');render()}});
+LB.entrar({pagina:'socio',base:'../',titulo:'Prestação de contas',ok:r=>{D=r.dados;document.getElementById('links').innerHTML=LB.links(r.paginas,'socio','../');render()}});
 const k4=(l,v,s,c)=>`<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`;
+const dia=d=>`<div class="d"><b>${d.slice(8,10)}</b><span>${MES3[+d.slice(5,7)-1]} ${d.slice(2,4)}</span></div>`;
+const ocRow=o=>`<div class="oc">${dia(o.data)}<div class="t"><b>${esc(o.titulo)}</b><span>${esc(o.detalhe||'')}${o.doc?` · <a href="#docs" style="color:var(--pinkl)">ver documento</a>`:''}${o.data>D.atualizado?' · <span class="pill">programado</span>':''}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`;
 function render(){
   document.getElementById('app').style.display='block';
-  document.getElementById('upd').textContent='Atualizado em '+D.atualizado.split('-').reverse().join('/');
-  const a=D.ano;
+  const hoje=D.atualizado,mk=D.mes,A=D.agora,P=D.proximos,G=D.geral;
+  document.getElementById('upd').textContent='Atualizado em '+hoje.split('-').reverse().join('/')+' · primeiro o mês atual, depois os próximos meses e por fim o geral.';
+  // 1 · agora
+  document.getElementById('mesnm').innerHTML=`${MESES[+mk.slice(5,7)-1]} <em>${mk.slice(0,4)}</em>`;
+  const cx=A.caixa.conta+A.caixa.maos,feitos=A.shows.filter(s=>s.data<=hoje),mesF=A.shows.reduce((a,s)=>a+(s.valor||0),0);
+  document.getElementById('kagora').innerHTML=k4('Caixa conferido',brl(cx),`conta ${brl(A.caixa.conta)} + dinheiro ${brl(A.caixa.maos)} (${A.caixa.data.slice(0,5)})`)+
+    k4('Entrou no mês',brl(A.entrou),'até '+A.ate,'pos')+k4('Saiu no mês',brl(A.saiu),'até '+A.ate)+
+    k4('Shows do mês',A.shows.length,`${feitos.length} feito${feitos.length===1?'':'s'} · ${brl(mesF)} em cachês`);
+  document.getElementById('ocm').innerHTML=A.ocorrencias.length?A.ocorrencias.map(ocRow).join(''):'<div class="oc"><div class="t"><span>Nada fora do normal neste mês.</span></div></div>';
+  const tg=A.gastos.reduce((a,g)=>a+g.valor,0)||1,mg=Math.max(...A.gastos.map(g=>g.valor),1);
+  document.getElementById('gsub').textContent=`${brl(A.saiu)} até ${A.ate}`;
+  document.getElementById('gastos').innerHTML=A.gastos.map(g=>`<div class="it"><div class="top"><span>${esc(g.grupo)}</span><b>${brl(g.valor)} <span class="mut" style="font-weight:400">· ${Math.round(g.valor/tg*100)}%</span></b></div><div class="tr"><i style="width:${g.valor/mg*100}%"></i></div></div>`).join('')||'<span class="mut">Nenhuma saída no mês ainda.</span>';
+  document.getElementById('smes').innerHTML=A.shows.map(s=>`<div class="row">${dia(s.data)}<div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')} · ${s.data<=hoje?'<span class="pill ok">realizado</span>':'<span class="pill pk">confirmado</span>'}</span></div><div class="v">${brl(s.valor)}<small>${s.lucro!=null?'lucro <span class="'+(s.lucro<0?'neg':'pos')+'">'+brl(s.lucro)+'</span>':(s.rec?'já recebido '+brl(s.rec):'nada recebido ainda')}</small></div></div>`).join('')||'<div class="oc"><div class="t"><span>Sem shows confirmados neste mês.</span></div></div>';
+  // 2 · próximos meses
+  const vend=P.shows.reduce((a,s)=>a+(s.valor||0),0),recA=P.shows.reduce((a,s)=>a+(s.rec||0),0);
+  document.getElementById('proxs').textContent=`${P.shows.length} shows · ${brl(vend)} em cachês · ${brl(recA)} já recebido de sinal`;
+  let pm='',ult='';P.shows.forEach(s=>{const k=s.data.slice(0,7);if(k!==ult){pm+=(ult?'</div>':'')+`<div class="mhd">${MESES[+k.slice(5,7)-1]} ${k.slice(0,4)}</div><div class="list">`;ult=k}
+    pm+=`<div class="row">${dia(s.data)}<div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')}</span></div><div class="v">${brl(s.valor)}<small>${s.rec?'já recebido '+brl(s.rec):'nada recebido ainda'}</small></div></div>`});
+  document.getElementById('prox').innerHTML=pm?pm+'</div>':'<div class="oc"><div class="t"><span>Nenhum show confirmado depois deste mês ainda.</span></div></div>';
+  const mf=Math.max(...P.fixos.map(f=>f.valor),1);
+  document.getElementById('fixs').textContent=`${brl(P.total_fixos)} por mês`;
+  document.getElementById('fixos').innerHTML=P.fixos.map(f=>`<div class="it"><div class="top"><span>${esc(f.desc)}</span><b>${brl(f.valor)}</b></div><div class="tr"><i style="width:${f.valor/mf*100}%;background:var(--sai)"></i></div></div>`).join('');
+  document.getElementById('apnota').textContent=`Fora os fixos, cada show tem o custo da equipe, itens e diesel daquele dia. Investimento do sócio combinado: ${brl(P.aporte_mensal)} por mês.`;
+  // 3 · geral
+  const a=G.ano;document.getElementById('anonm').textContent=hoje.slice(0,4);
   document.getElementById('kpis').innerHTML=k4('Shows',a.shows,'realizados com cachê')+k4('Cachês',brl(a.fat),'soma dos shows')+k4('Lucro dos shows',brl(a.lucro),Math.round(a.lucro/a.fat*100)+'% dos cachês','pos')+k4('Cachê médio',brl(a.media),'por show');
-  const ap=D.aportes.reduce((s,x)=>s+x.valor,0);
-  document.getElementById('caixa').innerHTML=k4('Caixa conferido',brl(D.caixa.valor),'conta + dinheiro em mãos em '+D.caixa.data)+
-    k4('Investimento do sócio',brl(ap),`recebido na conta${D.aportes.length?' ('+[...new Set(D.aportes.map(x=>ddmm(x.data)+'/'+x.data.slice(2,4)))].join(', ')+')':''} · combinado: ${brl(D.aporte_mensal.valor)}/mês em ${D.aporte_mensal.meses.join(' e ')}`);
-  const fut=D.proximos,vend=fut.reduce((s,x)=>s+(x.valor||0),0);
-  document.getElementById('proxs').textContent=`${fut.length} shows · ${brl(vend)} em cachês`;
-  const pill=s=>s.sit==='A confirmar'?'<span class="pill am">a confirmar</span>':'<span class="pill pk">confirmado</span>';
-  document.getElementById('prox').innerHTML=fut.map(s=>`<div class="row"><div class="d"><b>${s.data.slice(8,10)}</b><span>${MES3[+s.data.slice(5,7)-1]} ${s.data.slice(2,4)}</span></div><div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')} · ${pill(s)}</span></div><div class="v">${s.valor?brl(s.valor):'<span class="mut">a definir</span>'}<small>${s.valor?(s.rec?'já recebido '+brl(s.rec):'nada recebido ainda'):''}</small></div></div>`).join('');
-  document.getElementById('ult').innerHTML=D.ultimos.map(s=>`<div class="row"><div class="d"><b>${s.data.slice(8,10)}</b><span>${MES3[+s.data.slice(5,7)-1]}</span></div><div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')}</span></div><div class="v">${brl(s.valor)}<small>lucro <span class="${s.lucro<0?'neg':'pos'}">${brl(s.lucro)}</span></small></div></div>`).join('');
+  const fk=Object.keys(G.fechados).sort();
+  document.getElementById('fech').innerHTML=`<tr><th>Mês</th><th class="hs">Começou</th><th>Entrou</th><th>Saiu</th><th>Resultado</th><th class="hs">Terminou</th></tr>`+fk.map(k=>{const m=G.fechados[k];return `<tr><td style="text-transform:capitalize">${MES3[+k.slice(5,7)-1]}/${k.slice(2,4)}</td><td class="hs">${brl(m.ini)}</td><td>${brl(m.ent)}</td><td>${brl(m.sai)}</td><td class="${m.res<0?'neg':'pos'}">${(m.res>=0?'+':'')+brl(m.res)}</td><td class="hs">${brl(m.fim)}</td></tr>`}).join('');
+  const ap=G.aportes.reduce((s,x)=>s+x.valor,0);
+  document.getElementById('aportes').innerHTML=G.aportes.map(x=>`<div class="row">${dia(x.data)}<div class="t"><b>Aporte recebido na conta</b></div><div class="v">${brl(x.valor)}</div></div>`).join('')+`<div class="row"><div class="t"><b>Total investido</b></div><div class="v">${brl(ap)}</div></div>`;
+  document.getElementById('ocall').innerHTML=G.ocorrencias.slice().sort((x,y)=>y.data.localeCompare(x.data)).map(ocRow).join('');
+  document.getElementById('ult').innerHTML=G.ultimos.map(s=>`<div class="row">${dia(s.data)}<div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')}</span></div><div class="v">${brl(s.valor)}<small>lucro <span class="${s.lucro<0?'neg':'pos'}">${brl(s.lucro)}</span></small></div></div>`).join('');
+  const arqs=D.arquivos||[];
+  document.getElementById('docs').innerHTML=arqs.map((f,i)=>`<div class="doc"><div><b>${esc(f.nome)}</b><div class="note" style="margin:2px 0 0">${esc(f.arq)}</div></div><button data-i="${i}">Baixar</button></div>`).join('')||'<div class="oc"><div class="t"><span>Nenhum documento ainda.</span></div></div>';
+  document.getElementById('docs').onclick=async e=>{const b=e.target.closest('button');if(!b)return;const f=arqs[+b.dataset.i];b.textContent='Abrindo…';
+    try{const buf=await LB.anexo(f.id,f.iv,'arquivos-socio');const u=URL.createObjectURL(new Blob([buf],{type:f.tipo}));const l=document.createElement('a');l.href=u;l.download=f.arq;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);b.textContent='Baixar'}catch(err){b.textContent='Erro, tente de novo'}};
   chart();
 }
 function chart(){
-  const ks=Object.keys(D.meses).sort(),el=document.getElementById('ch');
+  const M=D.geral.meses,ks=Object.keys(M).sort(),el=document.getElementById('ch');
   const W=Math.max(330,Math.min(860,el.clientWidth||640)),H=W<500?220:250,L=42,R=6,T=12,B=28,n=ks.length,bw=(W-L-R)/n;
-  const vals=ks.flatMap(k=>[D.meses[k].fat,D.meses[k].lucro]);const mn=Math.min(0,...vals),mx=Math.max(...vals)*1.05;
+  const vals=ks.flatMap(k=>[M[k].fat,M[k].lucro]);const mn=Math.min(0,...vals),mx=Math.max(...vals)*1.05;
   const y=v=>T+(mx-v)/(mx-mn)*(H-T-B);
   let g='';for(let v=0;v<=mx;v+=25000)g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="${v?'#2E2B36':'#6F697D'}"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#8B8697">${kf(v)}</text>`;
-  ks.forEach((k,i)=>{const m=D.meses[k],x0=L+i*bw,w=bw*.33,gp=bw*.05;
+  ks.forEach((k,i)=>{const m=M[k],x0=L+i*bw,w=bw*.33,gp=bw*.05;
     g+=`<rect x="${x0+bw/2-w-gp/2}" y="${y(m.fat)}" width="${w}" height="${y(0)-y(m.fat)}" rx="2" fill="#CF1D51"/>`;
     const yl=Math.min(y(m.lucro),y(0)),hl=Math.abs(y(m.lucro)-y(0));
     g+=`<rect x="${x0+bw/2+gp/2}" y="${yl}" width="${w}" height="${hl}" rx="2" fill="${m.lucro<0?'#FF8FA8':'#7FDDA9'}"/>`;
     g+=`<text x="${x0+bw/2}" y="${H-10}" text-anchor="middle" font-size="11" fill="#B8B3C3">${MES3[+k.slice(5,7)-1]}</text>`;
     g+=`<rect x="${x0}" y="${T}" width="${bw}" height="${H-T-B}" fill="transparent" class="hm" data-k="${k}"/>`});
   el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cachês e lucro dos shows por mês">${g}</svg>`;
-  el.querySelectorAll('.hm').forEach(r=>{const f=()=>{const k=r.dataset.k,m=D.meses[k];
+  el.querySelectorAll('.hm').forEach(r=>{const f=()=>{const k=r.dataset.k,m=M[k];
     document.getElementById('tip').innerHTML=`<b style="color:var(--ink);text-transform:capitalize">${MESES[+k.slice(5,7)-1]}</b> · ${m.shows} show${m.shows>1?'s':''} · cachês <b>${brl(m.fat)}</b> · lucro <b class="${m.lucro<0?'neg':'pos'}">${brl(m.lucro)}</b>`};r.addEventListener('mouseenter',f);r.addEventListener('click',f)});
 }
 addEventListener('resize',()=>{if(D){clearTimeout(window._r);window._r=setTimeout(chart,200)}});
