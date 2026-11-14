@@ -204,7 +204,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 .cw,.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}.cw span{text-align:center;font-size:10.5px;color:var(--muted);font-weight:700;padding-bottom:4px}
 .cd{aspect-ratio:1/1;min-height:36px;border:0;border-radius:9px;background:none;color:var(--sub);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:0;font:inherit}
 .cd b{font-size:13px;font-weight:600}.cd span{display:flex;gap:2px;height:5px}.cd.sel{background:var(--card2)}.cd.hj b{color:#fff;background:var(--pink);border-radius:99px;padding:1px 6px}.cd.ok b{opacity:.55}
-.cd em,.clg em{display:inline-block;width:5px;height:5px;border-radius:99px}.ds{background:var(--pinkl)}.dc{background:var(--amber)}.dt{background:#7AB8FF}.da{background:var(--neg)}
+.cd em,.clg em{display:inline-block;width:5px;height:5px;border-radius:99px}.pt-s{background:var(--pinkl)}.pt-c{background:var(--amber)}.pt-t{background:#7AB8FF}.pt-a{background:var(--neg)}
 .clg{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:center;margin-top:8px;font-size:11px;color:var(--muted)}.clg em{margin-right:4px;vertical-align:middle}
 #tfsem{display:flex;align-items:center}#tfsem small{margin-left:auto;font-size:18px;letter-spacing:0}
 .atrb{margin-top:12px;border-left:3px solid var(--neg)}.atrb summary{list-style:none;display:flex;align-items:center;cursor:pointer;font-size:14px}.atrb summary::-webkit-details-marker{display:none}.atrb summary small{margin-left:auto;color:var(--muted)}.atrb[open] summary small{visibility:hidden}
@@ -699,8 +699,8 @@ function renderTarefas(){
   if(tfSem==null)tfSem=mkey(HOJE)===tfMes?semDe(+HOJE.slice(8,10)):0;
   let c='<div class="cw">'+['S','T','Q','Q','S','S','D'].map(x=>`<span>${x}</span>`).join('')+'</div><div class="cg">'+'<i></i>'.repeat(off);
   for(let d=1;d<=n;d++){const k=iso(d),l=porDia[k]||[],pend=l.filter(x=>!x.ok);
-    c+=`<button class="cd${k===HOJE?' hj':''}${semDe(d)===tfSem?' sel':''}${l.length&&!pend.length?' ok':''}" data-w="${semDe(d)}"><b>${d}</b><span>${l.some(x=>x.tipo==='Show')?'<em class="ds"></em>':''}${l.some(x=>x.tipo==='Conta'&&!x.atr)?'<em class="dc"></em>':''}${l.some(x=>x.atr)?'<em class="da"></em>':''}${l.some(x=>x.tipo==='Tarefa'&&!x.atr)?'<em class="dt"></em>':''}</span></button>`}
-  c+='</div><div class="clg"><span><em class="ds"></em>show</span><span><em class="dc"></em>conta</span><span><em class="dt"></em>tarefa</span><span><em class="da"></em>atrasado</span></div>';
+    c+=`<button class="cd${k===HOJE?' hj':''}${semDe(d)===tfSem?' sel':''}${l.length&&!pend.length?' ok':''}" data-w="${semDe(d)}"><b>${d}</b><span>${l.some(x=>x.tipo==='Show')?'<em class="pt-s"></em>':''}${l.some(x=>x.tipo==='Conta'&&!x.atr)?'<em class="pt-c"></em>':''}${l.some(x=>x.atr)?'<em class="pt-a"></em>':''}${l.some(x=>x.tipo==='Tarefa'&&!x.atr)?'<em class="pt-t"></em>':''}</span></button>`}
+  c+='</div><div class="clg"><span><em class="pt-s"></em>show</span><span><em class="pt-c"></em>conta</span><span><em class="pt-t"></em>tarefa</span><span><em class="pt-a"></em>atrasado</span></div>';
   const cal=document.getElementById('tfcal');cal.innerHTML=c;
   cal.onclick=e=>{const b=e.target.closest('[data-w]');if(b){tfSem=+b.dataset.w;renderTarefas()}};
   // a semana escolhida, dia por dia (atrasados ficam só no bloco de cima)
