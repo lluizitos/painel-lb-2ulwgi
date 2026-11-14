@@ -83,6 +83,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <div class="blk" id="b1">
   <p class="eyebrow">1 · Agora</p>
   <h1 id="mesnm" style="font-size:24px"></h1>
+  <p class="note" id="mestp" style="margin:4px 0 0"></p>
   <div class="grid g4" id="kagora" style="margin-top:14px"></div>
   <h3>O que aconteceu <small>no mês</small></h3>
   <div class="list" id="ocm"></div>
@@ -161,10 +162,7 @@ function render(){
     if(E){document.getElementById('eqmes').textContent=MESES[+E.mes.slice(5,7)-1]+' '+E.mes.slice(0,4);
     document.getElementById('equipe').innerHTML=E.pessoas.map(p=>`<div class="eq"><div class="n"><b>${esc(p.nome)}</b><span class="f">${p.feito_total} entrega${p.feito_total===1?'':'s'} no mês</span></div><div class="f">${esc(p.funcao)}</div>${p.meta?`<div class="me">Meta: ${esc(p.meta)}</div>`:''}
       <div class="nums"><span>Tarefas concluídas <b>${p.concluidas}</b></span><span>Em aberto <b>${p.abertas}</b></span>${p.atrasadas?`<span>Atrasadas <b style="color:var(--neg)">${p.atrasadas}</b></span>`:''}</div>${p.feito.length?`<ul>${p.feito.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`:''}</div>`).join('')}}}
-  {const a=D.extrato_ate||(D.agora&&D.agora.ate)||'';document.getElementById('infobase').innerHTML=
-  `📌 <b>Extrato conferido até ${a}</b>. Os valores que entraram e saíram vêm do extrato e dos comprovantes até essa data.
-  <br>Aqui <b>não há estimativa</b> de caixa. Os shows futuros mostram o <b>valor combinado</b>, que ainda não foi recebido.
-  O que acontecer depois de ${a} entra quando o próximo extrato for conferido.`}
+  {const a=D.extrato_ate||(D.agora&&D.agora.ate)||'';document.getElementById('infobase').style.display='none';document.getElementById('mestp').textContent='Mês atual · extrato até '+a} // igual ao painel: texto pequeno ao lado do mês, sem quadro
   document.getElementById('upd').textContent='Atualizado em '+hoje.split('-').reverse().join('/')+' · primeiro o mês atual, depois os próximos meses e por fim o geral.';
   // 1 · agora
   document.getElementById('mesnm').innerHTML=`${MESES[+mk.slice(5,7)-1]} <em>${mk.slice(0,4)}</em>`;
