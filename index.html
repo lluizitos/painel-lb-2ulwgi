@@ -442,7 +442,16 @@ document.addEventListener('click',e=>{
 async function pagAoVivo(){ // pagamentos avulsos e fixos da página Admin
   try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;API_URL=API_URL||c.api_url;
     const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'pagamentos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
-    if(r.ok){PAGS=r.pagamentos||[];PAGS_OK=true;renderPagar();renderMes()}}catch(e){}}
+    if(r.ok){PAGS=r.pagamentos||[];PAGS_OK=true;renderPagar();renderMes()}
+    const l=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'lancamentos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json(); // ajustes e lançamentos novos do Admin
+    if(l.ok){LANCS=l.lancamentos||[];LANCS_OK=true;renderMes()}}catch(e){}}
+let LANCS=[],LANCS_OK=false;
+/* aplica ao vivo o que foi editado/criado no Admin (o build também aplica; aqui é para ver na hora) */
+function comLancs(movs,app){if(!LANCS_OK)return movs.concat(app);const aj={};LANCS.forEach(l=>{if(l.ref)aj[l.ref]=l});
+  const ex=movs.map(m=>{const a=m.id&&aj[m.id];return a?Object.assign({},m,{quem:a.quem||m.quem,cat:a.cat||m.cat,show:a.show||m.show,obs:a.obs||m.obs}):m});
+  const vivos=new Set(LANCS.filter(l=>!l.ref).map(l=>'ln-'+l.id)),ids=new Set(app.map(x=>x.id));
+  const nv=LANCS.filter(l=>!l.ref&&l.data&&l.data>D.ext_ate&&!ids.has('ln-'+l.id)).map(l=>({id:'ln-'+l.id,data:l.data,quem:l.quem,valor:+l.valor,cat:l.cat||'Outros (a classificar)',show:l.show||null,meio:l.meio||'conta',obs:l.obs||null,app:true}));
+  return ex.concat(app.filter(x=>!x.id.startsWith('ln-')||vivos.has(x.id)),nv)}
 async function bordAoVivo(){ // com a planilha ligada, os borderôs vêm ao vivo
   try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;API_URL=c.api_url;
     const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'borderos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
@@ -629,7 +638,7 @@ function movsDoMes(k){ // extrato + lançados no app depois dele (sinais de Vend
   const ids=new Set(snap.map(x=>x.id)),vivo=[];
   PAGS.forEach(g=>{let pg={};try{pg=JSON.parse(g.pagos||'{}')||{}}catch(e){}Object.entries(pg).forEach(([ref,q])=>{const id='pg-'+g.id+'-'+ref;if(!q||q<=D.ext_ate||ids.has(id))return;
     vivo.push({id,data:q,quem:g.nome,valor:-(+g.valor),cat:g.descricao||(g.tipo==='fixo'?'Fixo mensal':'Pagamento avulso'),meio:g.meio==='Dinheiro'?'dinheiro':'conta',obs:g.tipo==='fixo'?'fixo de '+ref:null,app:true})})});
-  return D.movs.concat(snap,vivo).filter(x=>mkey(x.data)===k).sort((a,b)=>b.data.localeCompare(a.data)||b.valor-a.valor)} // mais recentes primeiro
+  return comLancs(D.movs,snap.concat(vivo)).filter(x=>mkey(x.data)===k).sort((a,b)=>b.data.localeCompare(a.data)||b.valor-a.valor)} // mais recentes primeiro
 function movList(ms){
   let f='t',q='',lim=6; // começa curto; "Ver mais" abre de 20 em 20
   const draw=()=>{

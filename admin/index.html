@@ -59,6 +59,19 @@ label textarea{min-height:60px;resize:vertical}
 .ck{display:flex;align-items:center;gap:8px;font-size:13.5px;letter-spacing:0;text-transform:none;font-weight:400;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer}.ck input{width:auto;margin:0;accent-color:var(--pink)}
 .cat summary{list-style:none;display:flex;gap:8px;align-items:center;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);margin:14px 2px 8px}
 .cat summary::-webkit-details-marker{display:none}.cat summary small{color:var(--muted);letter-spacing:0}.cat summary::after{content:'▾';color:var(--muted);margin-left:auto}.cat:not([open]) summary::after{content:'▸'}
+.lnm{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:16px 0 0;padding-bottom:2px}.lnm::-webkit-scrollbar{display:none}.lnm .chip{flex:none}
+.lnres{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:13px;color:var(--sub);margin:12px 2px 0}.lnres b{color:var(--ink)}.lnres b.pos{color:var(--pos)}
+.lnf{display:flex;gap:8px;margin-top:12px}.lns{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:9px 14px;font-size:14px;color:var(--ink)}
+.lnd{font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--muted);margin:14px 4px 6px;text-transform:uppercase}
+.lnr{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);border:0;border-left:3px solid transparent;border-radius:12px;padding:11px 14px;margin-bottom:6px;color:var(--ink)}
+.lnr:hover{background:var(--card2)}.lnr.cls{border-left-color:var(--amber)}
+.lnr .t{flex:1;min-width:0}.lnr .t b{display:block;font-weight:600;font-size:14px;overflow-wrap:anywhere}.lnr .t span{display:block;font-size:12px;color:var(--muted);overflow-wrap:anywhere}.lnr .t i{display:block;font-size:12px;color:var(--sub);margin-top:3px}
+.lnr .v{flex:none;text-align:right;font-weight:700;white-space:nowrap;font-size:14px}.lnr .v small{display:block;margin-top:4px;text-align:center}
+.sh{position:fixed;inset:0;z-index:50;display:none}.sh.on{display:block}.shb{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.shc{position:absolute;left:0;right:0;bottom:0;max-height:92vh;overflow:auto;background:var(--card);border-radius:18px 18px 0 0;padding:16px 16px 24px;max-width:640px;margin:0 auto;box-shadow:0 -10px 40px rgba(0,0,0,.4)}
+@media(min-width:700px){.shc{bottom:auto;top:8vh;border-radius:18px}}
+.shh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.shh b{font-size:16px}
+.lnx{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;background:var(--bg);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:var(--sub)}.lnx b{font-size:17px;color:var(--ink)}.lnx b.pos{color:var(--pos)}
 </style>
 </head>
 <body>
@@ -68,7 +81,7 @@ label textarea{min-height:60px;resize:vertical}
   <p class="eyebrow">Administração</p>
   <h1>Ad<em>min</em></h1>
   <p class="note">Logins e equipe, tarefas, metas da empresa e pagamentos fora dos shows. Só a administração vê esta página.</p>
-  <div class="tabs" id="tabs"><button class="on" data-t="equipe">Equipe e logins</button><button data-t="todos">Tarefas para todos</button><button data-t="ind">Individuais</button><button data-t="emp">Empresa</button><button data-t="pag">Pagamentos</button></div>
+  <div class="tabs" id="tabs"><button class="on" data-t="equipe">Equipe e logins</button><button data-t="todos">Tarefas para todos</button><button data-t="ind">Individuais</button><button data-t="emp">Empresa</button><button data-t="pag">Pagamentos</button><button data-t="lan">Lançamentos</button></div>
 
   <!-- PARA TODOS -->
   <div id="t_todos" style="display:none">
@@ -163,6 +176,32 @@ label textarea{min-height:60px;resize:vertical}
   </div>
   <datalist id="pes_dl"></datalist>
 
+  <!-- LANÇAMENTOS: extrato + criados aqui -->
+  <div id="t_lan" style="display:none">
+    <div class="lnm" id="ln_mes"></div>
+    <div class="lnres" id="ln_res"></div>
+    <div class="lnf"><input class="lns" id="ln_q" placeholder="Buscar nome, show, categoria…" aria-label="Buscar"><button class="btn pkb" id="ln_novo">＋ Novo</button></div>
+    <div class="chips" id="ln_fil" style="margin-top:8px"><button class="chip on" data-f="">Tudo</button><button class="chip" data-f="e">Entradas</button><button class="chip" data-f="s">Saídas</button><button class="chip" data-f="c">A classificar</button><button class="chip" data-f="a">Editados</button></div>
+    <div id="ln_lista"></div>
+    <p class="note">Toque num lançamento para editar. Do extrato dá para mudar quem, categoria, show e a justificativa (data, valor e conta são do extrato). Os novos entram no painel; até o último extrato conferido vale o extrato.</p>
+  </div>
+  <div class="sh" id="ln_sh" aria-hidden="true"><div class="shb" id="ln_shb"></div><div class="shc">
+    <div class="shh"><b id="ln_t">Editar lançamento</b><button class="btn sm" id="ln_x" aria-label="Fechar">✕</button></div>
+    <div class="lnx" id="ln_info"></div>
+    <div class="f">
+      <label class="nv">Data<input type="date" id="ln_dt"></label>
+      <label class="nv">Valor (R$)<input id="ln_vl" inputmode="decimal" placeholder="0,00"></label>
+      <label class="nv">Tipo<select id="ln_sg"><option value="-1">Saída</option><option value="1">Entrada</option></select></label>
+      <label class="nv">Meio<select id="ln_me"><option value="conta">Conta</option><option value="dinheiro">Dinheiro</option></select></label>
+      <label class="w">Quem<input id="ln_qm" list="pes_dl" autocomplete="off"></label>
+      <label>Categoria<input id="ln_ct" list="ln_cdl" autocomplete="off"></label>
+      <label>Show<input id="ln_shw" list="ln_sdl" autocomplete="off" placeholder="dd/mm nome do show"></label>
+      <label class="w">Justificativa / observação<textarea id="ln_ob" placeholder="ex.: não é do show; foi adiantamento do Diogo"></textarea></label>
+    </div>
+    <div class="acts"><button class="btn pkb" id="ln_ok">Salvar</button><button class="btn" id="ln_del" style="display:none"></button><span class="msg" id="ln_msg"></span></div>
+  </div></div>
+  <datalist id="ln_cdl"></datalist><datalist id="ln_sdl"></datalist>
+
   <!-- PAGAMENTOS AVULSOS E FIXOS -->
   <div id="t_pag" style="display:none">
     <p class="note">Pagamentos que não são de show: avulsos (uma vez, numa data) e fixos (todo mês, num dia). Na data, entram no assistente de pagamento do painel até serem marcados como pagos. Gasto pequeno que já foi pago (lanche, compra) marque "Já pago": vai direto para as Movimentações.</p>
@@ -198,7 +237,8 @@ let API='',PF=[],TF=[],MT=[],EFIL='',EDE=null,SEL=null,FIL='abertas',EDT=null,ED
 const linkDe=p=>new URL('../tarefas/eu/#k='+p.token,location.href).href;
 async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({usuario:LB.login,senha:LB.senha,nome:LB.usuario},c))})).json();
   if(!r.ok)throw new Error(r.erro||'erro');if(r.perfis){PF=r.perfis;TF=r.tarefas;MT=r.metas||[];RT=r.rotinas||[]}return r}
-LB.entrar({pagina:'admin',base:'../',titulo:'Admin',ok:async r=>{
+let AD={},LN=[],LNOK=false,LMES=HOJE.slice(0,7),LFIL='',LED=null;
+LB.entrar({pagina:'admin',base:'../',titulo:'Admin',ok:async r=>{AD=r.dados||{};
   $('app').style.display='block';$('links').innerHTML=LB.links(r.paginas,'admin','../');
   try{const c=await (await fetch('../config.json',{cache:'no-store'})).json();API=c.api_url||'';PUB=c.chave_pub||''}catch(e){}
   try{await api({acao:'tarefas'})}catch(e){$('g_lista').innerHTML=`<div class="empty">Não consegui carregar as tarefas (${esc(e.message)}).</div>`;return}
@@ -411,7 +451,58 @@ $('e_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data
   if(del.dataset.ok!=='1'){del.dataset.ok='1';del.textContent='toque de novo para excluir';return}
   try{await api({acao:'excluir_meta',id:del.dataset.mdel});render()}catch(err){del.textContent='erro'}});
 
-$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none')};
+/* ---------- LANÇAMENTOS ---------- */
+const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const brl2=v=>(v<0?'−':'')+'R$ '+Math.abs(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+async function lnAbre(){if(!LNOK){$('ln_lista').innerHTML='<div class="empty">Carregando…</div>';try{LN=(await api({acao:'lancamentos'})).lancamentos||[];LNOK=true}catch(e){$('ln_lista').innerHTML=`<div class="empty">Não consegui carregar (${esc(e.message)}).</div>`;return}}
+  $('ln_cdl').innerHTML=(AD.cats||[]).map(c=>`<option value="${esc(c)}">`).join('');
+  $('ln_sdl').innerHTML=(AD.shows||[]).slice().reverse().map(x=>`<option value="${esc(ddmm(x.data)+' '+x.nome)}">`).join('');
+  lnRender()}
+function lnTodos(){const aj={};LN.forEach(l=>{if(l.ref)aj[l.ref]=l});
+  const ex=(AD.movs||[]).map(m=>{const a=aj[m.id];return a?Object.assign({},m,{quem:a.quem||m.quem,cat:a.cat||m.cat,show:a.show||m.show,obs:a.obs||m.obs,aj:a}):m});
+  const nv=LN.filter(l=>!l.ref&&l.data).map(l=>({id:'ln-'+l.id,novo:l,data:l.data,quem:l.quem,valor:+l.valor,cat:l.cat||'Outros (a classificar)',show:l.show,obs:l.obs,meio:l.meio||'conta'}));
+  return ex.concat(nv)}
+function lnRender(){const T=lnTodos(),ms=[...new Set(T.map(x=>x.data.slice(0,7)).concat(HOJE.slice(0,7)))].sort().reverse();
+  $('ln_mes').innerHTML=ms.map(m=>`<button class="chip${m===LMES?' on':''}" data-m="${m}">${MES3[+m.slice(5,7)-1]}${m.slice(0,4)!==HOJE.slice(0,4)?' '+m.slice(2,4):''}</button>`).join('');
+  const q=$('ln_q').value.trim().toLowerCase(),cl=c=>/classificar|identificar/i.test(c||'');
+  let l=T.filter(x=>x.data.slice(0,7)===LMES);const te=l.filter(x=>x.valor>0).reduce((a,x)=>a+x.valor,0),ts=l.filter(x=>x.valor<0).reduce((a,x)=>a+x.valor,0),nc=l.filter(x=>cl(x.cat)).length;
+  $('ln_res').innerHTML=`<span>Entrou <b class="pos">${brl2(te)}</b></span><span>Saiu <b>${brl2(ts)}</b></span>${nc?`<span>${nc} a classificar</span>`:''}`;
+  l=l.filter(x=>(!LFIL||(LFIL==='e'?x.valor>0:LFIL==='s'?x.valor<0:LFIL==='c'?cl(x.cat):(x.aj||x.novo)))&&(!q||[x.quem,x.cat,x.show,x.obs].join(' ').toLowerCase().includes(q)))
+    .sort((a,b)=>b.data.localeCompare(a.data)||a.valor-b.valor);
+  let h='',dia='';
+  l.forEach(x=>{if(x.data!==dia){dia=x.data;h+=`<div class="lnd">${ddmm(dia)}</div>`}
+    h+=`<button class="lnr${cl(x.cat)?' cls':''}" data-id="${esc(x.id)}"><div class="t"><b>${esc(x.quem||'—')}</b><span>${esc(x.cat||'')}${x.show?' · '+esc(x.show):''}${x.meio==='dinheiro'?' · dinheiro':''}</span>${(x.aj&&x.aj.obs)||(x.novo&&x.obs)?`<i>“${esc(x.obs)}”</i>`:''}</div><div class="v ${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl2(x.valor)}${x.aj?'<small class="pill bl">editado</small>':x.novo?'<small class="pill ok">novo</small>':''}</div></button>`});
+  $('ln_lista').innerHTML=h||'<div class="empty">Nada neste mês.</div>'}
+function lnSheet(x){LED=x||null;const ext=x&&!x.novo,nv=!x||x.novo;$('ln_msg').textContent='';
+  $('ln_t').textContent=!x?'Novo lançamento':ext?'Lançamento do extrato':'Lançamento criado no app';
+  document.querySelectorAll('#ln_sh .nv').forEach(e=>e.style.display=nv?'':'none');
+  $('ln_info').innerHTML=ext?`<span>${ddmm(x.data)}/${x.data.slice(2,4)}</span><b class="${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl2(x.valor)}</b><span>${x.meio==='dinheiro'?'caixa em dinheiro':'extrato da conta'}</span>`:'';
+  $('ln_info').style.display=ext?'':'none';
+  $('ln_dt').value=x&&x.novo?x.data:HOJE>AD.ext_ate?HOJE:'';$('ln_vl').value=x&&x.novo?String(Math.abs(x.valor)).replace('.',','):'';$('ln_sg').value=x&&x.valor>0?'1':'-1';$('ln_me').value=x&&x.meio==='dinheiro'?'dinheiro':'conta';
+  $('ln_qm').value=x?x.quem||'':'';$('ln_ct').value=x?x.cat||'':'';$('ln_shw').value=x?x.show||'':'';$('ln_ob').value=x&&(x.aj||x.novo)?x.obs||'':'';
+  const d=$('ln_del');d.dataset.ok='';d.style.display=x&&(x.aj||x.novo)?'':'none';d.textContent=x&&x.novo?'Excluir':'Desfazer ajuste';
+  $('ln_sh').classList.add('on');$('ln_sh').setAttribute('aria-hidden','false');setTimeout(()=>(nv&&!x?$('ln_vl'):$('ln_ct')).focus(),50)}
+const lnFecha=()=>{$('ln_sh').classList.remove('on');$('ln_sh').setAttribute('aria-hidden','true')};
+$('ln_x').onclick=lnFecha;$('ln_shb').onclick=lnFecha;
+$('ln_novo').onclick=()=>lnSheet(null);
+$('ln_q').oninput=lnRender;
+$('ln_mes').onclick=e=>{const b=e.target.closest('[data-m]');if(b){LMES=b.dataset.m;lnRender()}};
+$('ln_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;LFIL=b.dataset.f;document.querySelectorAll('#ln_fil .chip').forEach(c=>c.classList.toggle('on',c===b));lnRender()};
+$('ln_lista').onclick=e=>{const b=e.target.closest('[data-id]');if(b)lnSheet(lnTodos().find(x=>x.id===b.dataset.id))};
+$('ln_ok').onclick=async()=>{const m=$('ln_msg'),x=LED,ext=x&&!x.novo;let o;
+  if(ext)o={id:x.aj&&x.aj.id,ref:x.id,quem:$('ln_qm').value,cat:$('ln_ct').value,show:$('ln_shw').value,obs:$('ln_ob').value};
+  else{const v=+$('ln_vl').value.replace(/\./g,'').replace(',','.'),dt=$('ln_dt').value;
+    if(!dt){m.innerHTML='<span class="neg">Escolha a data.</span>';return}
+    if(dt<=AD.ext_ate){m.innerHTML=`<span class="neg">Até ${ddmm(AD.ext_ate)} vale o extrato: edite o lançamento de lá.</span>`;return}
+    if(!(v>0)){m.innerHTML='<span class="neg">Escreva o valor.</span>';return}
+    if(!$('ln_qm').value.trim()){m.innerHTML='<span class="neg">Quem pagou ou recebeu?</span>';return}
+    o={id:x&&x.novo.id,data:dt,valor:v*+$('ln_sg').value,meio:$('ln_me').value,quem:$('ln_qm').value,cat:$('ln_ct').value,show:$('ln_shw').value,obs:$('ln_ob').value}}
+  m.textContent='Salvando…';try{LN=(await api({acao:'salvar_lancamento',lanc:o})).lancamentos||[];if(!ext)LMES=o.data.slice(0,7);lnRender();lnFecha()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
+$('ln_del').onclick=async()=>{const d=$('ln_del'),x=LED,id=x&&(x.novo?x.novo.id:x.aj&&x.aj.id);if(!id)return;
+  if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent=x.novo?'Toque de novo para excluir':'Toque de novo: volta como veio do extrato';return}
+  try{LN=(await api({acao:'excluir_lancamento',id})).lancamentos||[];lnRender();lnFecha()}catch(e){$('ln_msg').innerHTML='<span class="neg">erro</span>'}};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')lnFecha()});
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag','lan'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='lan')lnAbre()};
 </script>
 </body>
 </html>
