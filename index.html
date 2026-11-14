@@ -22,7 +22,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* topo */
 header{position:sticky;top:0;z-index:20;background:rgba(20,18,24,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 header .wrap{display:flex;align-items:center;justify-content:space-between;height:58px;gap:12px}
-header img{height:26px;display:block}
+header img{height:26px;display:block;flex:none}
+.links{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;min-width:0}.links::-webkit-scrollbar{display:none}
+.links a{flex:none;text-decoration:none;color:var(--sub);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border:1px solid var(--line);border-radius:99px}
+.links a.on{background:var(--card2);color:var(--ink);border-color:var(--sub)}
+@media(max-width:480px){header img{height:19px}}
+.tk{display:flex;gap:12px;align-items:flex-start}.tk input{width:20px;height:20px;margin:2px 0 0;accent-color:#CF1D51;flex:none}.tk.done .t b{text-decoration:line-through;color:var(--muted)}
 header .upd{font-size:11px;color:var(--muted);text-align:right;line-height:1.3}
 nav{display:flex;gap:6px;overflow-x:auto;padding:0 16px 10px;max-width:980px;margin:0 auto;scrollbar-width:none}
 nav::-webkit-scrollbar{display:none}
@@ -132,17 +137,11 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </style>
 </head>
 <body>
-<div id="lock"><form id="lf" autocomplete="on">
-  <img src="logo.png" alt="Lucas Barros">
-  <input id="pw" type="password" placeholder="Senha" autocomplete="current-password" aria-label="Senha">
-  <button type="submit">Entrar</button>
-  <div class="err" id="err"></div>
-</form></div>
 
 <div id="app">
 <header>
-  <div class="wrap"><img src="logo.png" alt="Lucas Barros"><div class="upd" id="upd"></div></div>
-  <nav id="nav"><a href="#mes" class="on">Mês</a><a href="#shows">Shows</a><a href="#estimativa">Estimativa</a><a href="vendas/">Vendas ↗</a><a href="agenda/">Agenda ↗</a></nav>
+  <div class="wrap"><img src="logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
+  <nav id="nav"><a href="#mes" class="on">Mês</a><a href="#tarefas">Agenda do mês</a><a href="#shows">Shows</a><a href="#estimativa">Estimativa</a></nav>
 </header>
 <main class="wrap">
 
@@ -157,6 +156,15 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <div class="center"><button class="btn" id="vermeses">Ver outros meses</button></div>
   <div class="meses" id="meses"></div>
   <div id="mesbody"></div>
+</section>
+
+<section id="tarefas">
+  <p class="eyebrow">O que tem pra fazer</p>
+  <h1>Agenda do <em>mês</em></h1>
+  <p class="note" id="upd"></p>
+  <div class="chips" id="tfm" style="margin-top:14px"></div>
+  <div class="list" id="tflist"></div>
+  <p class="note">Marque o que já foi feito (fica salvo neste aparelho). Shows e contas entram sozinhos; as tarefas vêm da planilha do painel.</p>
 </section>
 
 <section id="shows">
@@ -188,6 +196,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
+<script src="lb.js"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -202,31 +211,18 @@ const cls=v=>v<0?'neg':'pos';
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 let D,HOJE,mesAtual,KEYS;
 
-/* ---------- senha / descriptografia ---------- */
-async function abrir(pw){
-  const r=await fetch('dados.enc.json',{cache:'no-store'});const j=await r.json();
-  const b=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-  const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
-  const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b(j.salt),iterations:j.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
-  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b(j.iv)},key,b(j.ct));
-  return JSON.parse(new TextDecoder().decode(pt));
-}
-async function entrar(pw,auto){
-  const err=document.getElementById('err');err.textContent=auto?'':'Abrindo…';
-  try{D=await abrir(pw);store.set('lb_pw',pw);iniciar()}
-  catch(e){store.del('lb_pw');err.textContent=auto?'':'Senha incorreta.'}
-}
-document.getElementById('lf').addEventListener('submit',e=>{e.preventDefault();entrar(document.getElementById('pw').value.trim())});
-const salva=store.get('lb_pw');if(salva)entrar(salva,true);
+/* ---------- login (lb.js) ---------- */
+LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar()}});
+let PAG=[];
 
 /* ---------- início ---------- */
 function iniciar(){
-  document.getElementById('lock').remove();document.getElementById('app').style.display='block';
+  document.getElementById('app').style.display='block';document.getElementById('links').innerHTML=LB.links(PAG,'painel','./');
   HOJE=D.hoje;
-  document.getElementById('upd').innerHTML='Atualizado em<br><b style="color:var(--ink)">'+ddmm(D.atualizado)+'/'+D.atualizado.slice(0,4)+'</b>';
+  document.getElementById('upd').innerHTML='Olá, '+esc(LB.usuario.split(' ')[0])+' · dados atualizados em '+ddmm(D.atualizado)+'/'+D.atualizado.slice(0,4);
   const ks=new Set(Object.keys(D.meses));D.shows.forEach(s=>{if(s.data<'2027-02')ks.add(mkey(s.data))});D.movs.forEach(m=>ks.add(mkey(m.data)));
   KEYS=[...ks].sort();mesAtual=KEYS.includes(mkey(HOJE))?mkey(HOJE):KEYS[KEYS.length-1];
-  montaMeses();renderMes();renderTL();renderEst();navSpy();
+  montaMeses();renderMes();renderTarefas();renderTL();renderEst();navSpy();
 }
 
 /* ---------- MÊS ---------- */
@@ -324,6 +320,25 @@ function showCard(s,tl){
   <div class="nums"><div>Cachê<b>${s.valor?brl(s.valor):'a definir'}</b></div><div>Recebido<b>${brl(s.rec||0)}</b></div><div>Falta<b class="${s.falta>0?'pk':''}">${s.falta==null?'—':brl(s.falta)}</b></div><div>${fut?'Lucro prev.':'Lucro'}<b>${luc}</b></div></div>
   ${s.valor?`<div class="prog"><i style="width:${pr}%"></i></div>`:''}
   ${s.obs?`<div class="ob">${esc(s.obs)}</div>`:''}</div>`;
+}
+
+/* ---------- AGENDA DO MÊS ---------- */
+let tfMes=null;
+function renderTarefas(){
+  const ks=[...new Set([mkey(HOJE),...D.tarefas.map(t=>t.data?mkey(t.data):t.mes),...D.shows.filter(s=>s.data>=HOJE.slice(0,7)).map(s=>mkey(s.data))])].filter(k=>k>=mkey(HOJE)&&k<='2027-01').sort();
+  if(!tfMes)tfMes=ks[0];
+  const box=document.getElementById('tfm');
+  box.innerHTML=ks.map(k=>`<button class="chip${k===tfMes?' on':''}" data-k="${k}">${MESES[+k.slice(5,7)-1]}</button>`).join('');
+  box.onclick=e=>{const b=e.target.closest('.chip');if(b){tfMes=b.dataset.k;renderTarefas()}};
+  const it=[];
+  D.tarefas.forEach((t,i)=>{if((t.data?mkey(t.data):t.mes)===tfMes)it.push({d:t.data,txt:t.titulo,sub:t.quem?'Responsável: '+t.quem:'',k:'t'+i+'|'+t.titulo,tipo:'Tarefa'})});
+  D.shows.filter(s=>mkey(s.data)===tfMes&&s.sit!=='Cancelado').forEach(s=>it.push({d:s.data,txt:'Show: '+s.nome,sub:(s.local||'')+(s.falta>0?' · receber '+brl(s.falta):''),k:'s|'+s.data+s.nome,tipo:'Show',auto:s.data<HOJE}));
+  D.contas.filter(c=>mkey(c.venc)===tfMes).forEach(c=>it.push({d:c.venc,txt:'Pagar: '+c.desc,sub:brl2(c.valor)+(c.para?' · '+c.para:''),k:'c|'+c.venc+c.desc,tipo:'Conta'}));
+  it.sort((a,b)=>(a.d||'9999').localeCompare(b.d||'9999'));
+  const feito=JSON.parse(LB.store.get('lb_feito')||'{}');
+  document.getElementById('tflist').innerHTML=it.length?it.map(x=>{const ok=feito[x.k]||x.auto;
+    return `<label class="row tk${ok?' done':''}"><input type="checkbox" data-k="${esc(x.k)}"${ok?' checked':''}><div class="d"><b>${x.d?x.d.slice(8,10):'—'}</b><span>${x.d?MES3[+x.d.slice(5,7)-1]:'sem dia'}</span></div><div class="t"><b>${esc(x.txt)}</b><span>${x.tipo==='Tarefa'?'':'<span class="pill'+(x.tipo==='Show'?' pk':'')+'">'+x.tipo+'</span> '}${esc(x.sub)}${x.d&&x.d<HOJE&&!ok?' · <span class="neg">atrasado</span>':''}</span></div></label>`}).join(''):'<div class="empty">Nada marcado neste mês.</div>';
+  document.getElementById('tflist').onchange=e=>{const c=e.target;if(!c.dataset.k)return;const f=JSON.parse(LB.store.get('lb_feito')||'{}');if(c.checked)f[c.dataset.k]=1;else delete f[c.dataset.k];LB.store.set('lb_feito',JSON.stringify(f));renderTarefas()};
 }
 
 /* ---------- LINHA DO TEMPO ---------- */

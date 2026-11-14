@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#141218">
+<title>Lucas Barros · Resumo</title>
+<link rel="icon" href="../icone.png"><link rel="apple-touch-icon" href="../icone.png">
+<style>
+:root{--bg:#141218;--card:#1E1C24;--card2:#26232D;--line:#2E2B36;--ink:#F3F1F6;--sub:#B8B3C3;--muted:#8B8697;--pink:#CF1D51;--pinkl:#F0507E;--neg:#FF8FA8;--pos:#7FDDA9;--sai:#6F697D;--amber:#F2B66B}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:15px;line-height:1.45;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%;padding-bottom:40px}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:20;background:rgba(20,18,24,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:58px;gap:10px}
+header img{height:24px;display:block;flex:none}
+.links{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;min-width:0}.links::-webkit-scrollbar{display:none}
+.links a{flex:none;text-decoration:none;color:var(--sub);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border:1px solid var(--line);border-radius:99px}
+.links a.on{background:var(--card2);color:var(--ink);border-color:var(--sub)}
+@media(max-width:480px){header img{height:19px}}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--pinkl);margin:26px 0 6px}
+h1{font-size:30px;font-weight:900;text-transform:uppercase;margin:0;line-height:1.05}h1 em{font-style:normal;color:var(--pink)}
+h3{font-size:11px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--pinkl);margin:26px 0 10px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+h3 small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted);font-size:12px}
+.note{color:var(--muted);font-size:12.5px;margin:8px 0 0}
+.grid{display:grid;gap:10px}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:720px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.g2{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden}
+.bar::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--pink)}
+.k .l{font-size:10.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--sub)}
+.k .v{font-size:22px;font-weight:800;margin-top:4px;white-space:nowrap}.k .s{font-size:12px;color:var(--muted);margin-top:2px}
+.pos{color:var(--pos)}.neg{color:var(--neg)}.pk{color:var(--pinkl)}.mut{color:var(--muted)}
+.pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:var(--card2);color:var(--sub);white-space:nowrap}
+.pill.pk{background:rgba(207,29,81,.18);color:var(--pinkl)}.pill.am{background:rgba(242,182,107,.14);color:var(--amber)}.pill.ok{background:rgba(127,221,169,.14);color:var(--pos)}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:12px;padding:11px 14px}
+.row .d{flex:none;width:46px;text-align:center;line-height:1.1}.row .d b{display:block;font-size:19px;font-weight:800}
+.row .d span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.row .t{flex:1;min-width:0}.row .t b{display:block;font-weight:600;font-size:14.5px}.row .t span{font-size:12px;color:var(--muted)}
+.row .v{flex:none;text-align:right;font-weight:700;white-space:nowrap}.row .v small{display:block;font-weight:400;font-size:11.5px;color:var(--muted);margin-top:2px}
+.chart{background:var(--card);border-radius:14px;padding:14px 10px 8px}.chart svg{display:block;width:100%;height:auto}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--sub);padding:0 6px 6px}.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.tip{font-size:12.5px;color:var(--sub);min-height:20px;padding:4px 6px 0}
+#app{display:none}
+footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
+</style>
+</head>
+<body>
+<div id="app">
+<header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div></header>
+<main class="wrap">
+  <p class="eyebrow">Resumo para o sócio</p>
+  <h1>Lucas <em>Barros</em></h1>
+  <p class="note" id="upd"></p>
+  <h3>Shows em 2026 <small>realizados até hoje</small></h3>
+  <div class="grid g4" id="kpis"></div>
+  <h3>Mês a mês <small>cachês dos shows e lucro depois de pagar equipe, itens e diesel</small></h3>
+  <div class="chart"><div class="leg"><span><i style="background:var(--pink)"></i>Cachês</span><span><i style="background:var(--pos)"></i>Lucro dos shows</span></div><div id="ch"></div><div class="tip" id="tip">Toque num mês para ver os valores.</div></div>
+  <h3>Caixa e investimento</h3>
+  <div class="grid g2" id="caixa"></div>
+  <h3>Próximos shows <small id="proxs"></small></h3>
+  <div class="list" id="prox"></div>
+  <h3>Últimos shows</h3>
+  <div class="list" id="ult"></div>
+  <footer>Lucas Barros Ltda · números do extrato bancário e das planilhas de cada show (borderôs)</footer>
+</main>
+</div>
+<script src="../lb.js"></script>
+<script>
+const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const brl=v=>v==null?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
+const kf=v=>{const a=Math.abs(v);return (v<0?'−':'')+(a>=1000?Math.round(a/1000)+' mil':a.toFixed(0))};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ddmm=s=>s.slice(8,10)+'/'+s.slice(5,7);
+let D;
+LB.entrar({pagina:'socio',base:'../',titulo:'Resumo do sócio',ok:r=>{D=r.dados;document.getElementById('links').innerHTML=LB.links(r.paginas,'socio','../');render()}});
+const k4=(l,v,s,c)=>`<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`;
+function render(){
+  document.getElementById('app').style.display='block';
+  document.getElementById('upd').textContent='Atualizado em '+D.atualizado.split('-').reverse().join('/');
+  const a=D.ano;
+  document.getElementById('kpis').innerHTML=k4('Shows',a.shows,'realizados com cachê')+k4('Cachês',brl(a.fat),'soma dos shows')+k4('Lucro dos shows',brl(a.lucro),Math.round(a.lucro/a.fat*100)+'% dos cachês','pos')+k4('Cachê médio',brl(a.media),'por show');
+  const ap=D.aportes.reduce((s,x)=>s+x.valor,0);
+  document.getElementById('caixa').innerHTML=k4('Caixa conferido',brl(D.caixa.valor),'conta + dinheiro em mãos em '+D.caixa.data)+
+    k4('Investimento do sócio',brl(ap),`recebido na conta${D.aportes.length?' ('+[...new Set(D.aportes.map(x=>ddmm(x.data)+'/'+x.data.slice(2,4)))].join(', ')+')':''} · combinado: ${brl(D.aporte_mensal.valor)}/mês em ${D.aporte_mensal.meses.join(' e ')}`);
+  const fut=D.proximos,vend=fut.reduce((s,x)=>s+(x.valor||0),0);
+  document.getElementById('proxs').textContent=`${fut.length} shows · ${brl(vend)} em cachês`;
+  const pill=s=>s.sit==='A confirmar'?'<span class="pill am">a confirmar</span>':'<span class="pill pk">confirmado</span>';
+  document.getElementById('prox').innerHTML=fut.map(s=>`<div class="row"><div class="d"><b>${s.data.slice(8,10)}</b><span>${MES3[+s.data.slice(5,7)-1]} ${s.data.slice(2,4)}</span></div><div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')} · ${pill(s)}</span></div><div class="v">${s.valor?brl(s.valor):'<span class="mut">a definir</span>'}<small>${s.valor?(s.rec?'já recebido '+brl(s.rec):'nada recebido ainda'):''}</small></div></div>`).join('');
+  document.getElementById('ult').innerHTML=D.ultimos.map(s=>`<div class="row"><div class="d"><b>${s.data.slice(8,10)}</b><span>${MES3[+s.data.slice(5,7)-1]}</span></div><div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')}</span></div><div class="v">${brl(s.valor)}<small>lucro <span class="${s.lucro<0?'neg':'pos'}">${brl(s.lucro)}</span></small></div></div>`).join('');
+  chart();
+}
+function chart(){
+  const ks=Object.keys(D.meses).sort(),el=document.getElementById('ch');
+  const W=Math.max(330,Math.min(860,el.clientWidth||640)),H=W<500?220:250,L=42,R=6,T=12,B=28,n=ks.length,bw=(W-L-R)/n;
+  const vals=ks.flatMap(k=>[D.meses[k].fat,D.meses[k].lucro]);const mn=Math.min(0,...vals),mx=Math.max(...vals)*1.05;
+  const y=v=>T+(mx-v)/(mx-mn)*(H-T-B);
+  let g='';for(let v=0;v<=mx;v+=25000)g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="${v?'#2E2B36':'#6F697D'}"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#8B8697">${kf(v)}</text>`;
+  ks.forEach((k,i)=>{const m=D.meses[k],x0=L+i*bw,w=bw*.33,gp=bw*.05;
+    g+=`<rect x="${x0+bw/2-w-gp/2}" y="${y(m.fat)}" width="${w}" height="${y(0)-y(m.fat)}" rx="2" fill="#CF1D51"/>`;
+    const yl=Math.min(y(m.lucro),y(0)),hl=Math.abs(y(m.lucro)-y(0));
+    g+=`<rect x="${x0+bw/2+gp/2}" y="${yl}" width="${w}" height="${hl}" rx="2" fill="${m.lucro<0?'#FF8FA8':'#7FDDA9'}"/>`;
+    g+=`<text x="${x0+bw/2}" y="${H-10}" text-anchor="middle" font-size="11" fill="#B8B3C3">${MES3[+k.slice(5,7)-1]}</text>`;
+    g+=`<rect x="${x0}" y="${T}" width="${bw}" height="${H-T-B}" fill="transparent" class="hm" data-k="${k}"/>`});
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cachês e lucro dos shows por mês">${g}</svg>`;
+  el.querySelectorAll('.hm').forEach(r=>{const f=()=>{const k=r.dataset.k,m=D.meses[k];
+    document.getElementById('tip').innerHTML=`<b style="color:var(--ink);text-transform:capitalize">${MESES[+k.slice(5,7)-1]}</b> · ${m.shows} show${m.shows>1?'s':''} · cachês <b>${brl(m.fat)}</b> · lucro <b class="${m.lucro<0?'neg':'pos'}">${brl(m.lucro)}</b>`};r.addEventListener('mouseenter',f);r.addEventListener('click',f)});
+}
+addEventListener('resize',()=>{if(D){clearTimeout(window._r);window._r=setTimeout(chart,200)}});
+</script>
+</body>
+</html>
