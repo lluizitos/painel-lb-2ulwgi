@@ -319,7 +319,7 @@ function iniciar(){
   const ks=new Set(Object.keys(D.meses));D.shows.forEach(s=>{if(s.data<'2027-02')ks.add(mkey(s.data))});D.movs.forEach(m=>ks.add(mkey(m.data)));
   KEYS=[...ks].sort();mesAtual=KEYS.includes(mkey(HOJE))?mkey(HOJE):KEYS[KEYS.length-1];
   D.borderos=D.borderos||{};
-  montaMeses();renderMes();renderPagar();renderTarefas();renderTL();renderEst();navSpy();bordAoVivo();
+  montaMeses();renderMes();renderPagar();renderTarefas();renderTL();renderEst();navSpy();bordAoVivo();tarAoVivo();
   document.getElementById('ocp').innerHTML=(D.ocorrencias||[]).slice().sort((x,y)=>y.data.localeCompare(x.data)).map(o=>`<div class="row"><div class="d"><b>${o.data.slice(8,10)}</b><span>${MES3[+o.data.slice(5,7)-1]}</span></div><div class="t"><b>${esc(o.titulo)} ${o.confirmado?'':'<span class="pill am">sem confirmação</span>'}</b><span>${esc(o.detalhe||'')}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`).join('')||'<div class="empty">Nenhuma.</div>';
   document.getElementById('ptabs').onclick=e=>{const b=e.target.closest('button');if(b)aba(b.dataset.p)};
   const h=location.hash.slice(1);if(h==='vendas'||h==='rendimento')aba(h==='vendas'?'ven':'ren');
@@ -449,7 +449,16 @@ function atv(r,MA){const A=D.atividades||{metas:{},feito:{}},mn=MESES[+MA.slice(
     corpo=`<div class="list" data-max="0">${lin('Postagens',f.postagens,meta.postagens)}${lin('Conteúdos produzidos',f.conteudos,meta.conteudos)}</div>`}
   else{mt=vazio(meta)?'<span class="pk">a definir</span>':esc(meta);
     corpo=Array.isArray(fe)&&fe.length?`<div class="list" data-max="4">${fe.map(t=>`<div class="it"><span>${esc(t)}</span></div>`).join('')}</div>`:'<div class="vend">Nada registrado neste mês.</div>'}
-  return `<div class="atv"><div class="mt"><span>Meta</span><b>${mt}</b></div><h5>O que fez em ${mn}</h5>${corpo}</div>`}
+  const pf=perfilDe(r.nome);if(pf&&!vazio(pf.meta))mt=esc(pf.meta);
+  let tf='';if(pf){const l=TAR.tarefas.filter(t=>t.pessoa===pf.id),fe2=l.filter(t=>(t.concluido_em||'').startsWith(MA)),ab=l.filter(t=>t.status!=='Concluída'),at=ab.filter(t=>t.prazo&&t.prazo<HOJE);
+    tf=`<h5>Tarefas · ${fe2.length} concluída${fe2.length!==1?'s':''} em ${mn}${ab.length?` · ${ab.length} em aberto`:''}${at.length?` · <span class="pk">${at.length} atrasada${at.length>1?'s':''}</span>`:''}</h5>`+
+      (fe2.length||ab.length?`<div class="list" data-max="4">${[...ab.sort((a,b)=>(a.prazo||'9').localeCompare(b.prazo||'9')),...fe2].map(t=>`<div class="it"><span>${t.status==='Concluída'?'✓':t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)}</span><b class="${t.status==='Concluída'?'pos':t.prazo&&t.prazo<HOJE?'pk':''}" style="font-weight:600">${t.status==='Concluída'?'feito '+ddmm(t.concluido_em):t.prazo?'até '+ddmm(t.prazo):t.status.toLowerCase()}</b></div>`).join('')}</div>`:'<div class="vend">Nenhuma tarefa designada.</div>')}
+  return `<div class="atv"><div class="mt"><span>Meta</span><b>${mt}</b></div>${tf}<h5>O que fez em ${mn}</h5>${corpo}</div>`}
+let TAR={perfis:[],tarefas:[]};
+function perfilDe(nome){const n=LB.norm(nome);return TAR.perfis.find(p=>{const q=LB.norm(p.nome);return q===n||n.startsWith(q+' ')||q.startsWith(n+' ')})}
+async function tarAoVivo(){try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;
+  const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'tarefas',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
+  if(r.ok){TAR=r;if(RFEITO)renderRend()}}catch(e){}}
 function renderRend(){
   const R=D.rendimento||[],MA=mkey(HOJE),ANO=HOJE.slice(0,4);
   const ult12=[];for(let i=11;i>=0;i--){const d=new Date(+MA.slice(0,4),+MA.slice(5,7)-1-i,1);ult12.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
@@ -476,10 +485,10 @@ function renderRend(){
     g+='</svg>';
     const vd=r.vendedor&&r.vendedor.length?pv(r.nome.split(' (')[0]):null;
     return `<div class="pess"><div class="hd"><div><b>${esc(r.nome)}</b><span>${esc(r.funcao)}${r.fixo?' · fixo '+brl(r.fixo)+'/mês':''}</span></div></div>
+    ${atv(r,MA)}
     <div class="nums"><div>Este mês<b class="pk">${brl(m.total)}</b></div><div>Média/mês ${ANO}<b>${brl(med)}</b></div><div>Total ${ANO}<b>${brl(ano)}</b></div><div>Desde ${MES3[+desde.slice(5,7)-1]}/${desde.slice(2,4)}<b>${brl(tot)}</b></div></div>
     ${g}<div class="leg" style="padding:4px 0 0"><span><i style="background:#6F697D"></i>Fixo</span><span><i style="background:var(--pink)"></i>Por show</span></div>
     ${vd&&vd.n?`<div class="vend">Vendeu <b style="color:var(--ink)">${vd.n} show${vd.n>1?'s':''}</b> em ${ANO} · ${brl(vd.v)} em cachês</div>`:r.vendedor&&r.vendedor.length&&/Bruno|Bruninho/.test(r.nome)?`<div class="vend">Vendas: nenhum show com o nome dele no campo Vendedor ainda — preencher na página de Vendas.</div>`:''}
-    ${atv(r,MA)}
     <details><summary>Ver pagamentos (${r.pagamentos.length})</summary>${r.pagamentos.slice().reverse().slice(0,40).map(p=>`<div class="pg"><span>${ddmm(p.data)}/${p.data.slice(2,4)} · ${esc(p.cat)}${p.show?' · show '+esc(p.show):''}${p.meio==='dinheiro'?' · dinheiro':''}</span><b>${brl(p.valor)}</b></div>`).join('')}</details></div>`}).join('');
   // perfil dos vendedores (todos os nomes que aparecem no campo Vendedor)
   const pvs={};vs.forEach(s=>{const q=s.vendedor?(ALIAS[LB.norm(s.vendedor)]||s.vendedor):'Sem vendedor';const x=pvs[q]=pvs[q]||{n:0,v:0,fut:0,cid:new Set()};x.n++;x.v+=(+s.valor||0);if(s.data>=HOJE)x.fut++;x.cid.add(s.cidade)});
@@ -499,13 +508,8 @@ function montaMeses(){
 }
 function k4(l,v,s,c){return `<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`}
 function renderInfo(){const a=D.extrato_ate||'';document.getElementById('infobase').innerHTML=
-  `📌 <b>Extrato conferido até ${a}</b> (conta Sicredi e caixa em dinheiro). Tudo até essa data é <b>real</b>.
-  <br>É <b>estimativa</b>:<ul><li>tudo depois de ${a}: entradas e saídas previstas, saldo projetado e a aba Estimativa;</li>
-  <li>meses marcados como <i>parcial</i> (real até ${a} + previsto) ou <i>estimativa</i>;</li>
-  <li>shows futuros (cachê combinado, ainda não recebido) e gastos de equipe previstos;</li>
-  <li>contas e fixos a vencer, e o que estiver marcado "a confirmar";</li>
-  <li>shows bilhetados (Colab/Sem Roteiro): entram com a <b>expectativa de R$ 10 mil</b> de bilheteria.</li></ul>
-  <b>O pró-labore do Lucas (R$ 15 mil/mês) não entra no saldo previsto</b>: aparece só como pendente nas contas a pagar.`}
+  `📌 <b>Real até ${a}</b> (extrato Sicredi + dinheiro). Depois disso é <b>estimativa</b>: shows a receber, contas a vencer e bilheteria a R$ 10 mil.
+  <br>O pró-labore do Lucas fica fora do saldo previsto (só aparece em contas a pagar).`}
 function renderMes(){
   const k=mesAtual,m=D.meses[k],i=KEYS.indexOf(k);
   document.getElementById('prev').disabled=i<=0;document.getElementById('next').disabled=i>=KEYS.length-1;

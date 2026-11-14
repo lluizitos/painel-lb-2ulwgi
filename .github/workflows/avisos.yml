@@ -1,0 +1,27 @@
+# Avisos no celular (app ntfy): a planilha monta a fila; aqui ela é buscada e enviada ao ntfy.sh
+# (o ntfy não aceita conexão direta dos servidores do Google). Segredo AVISOS_URL = endereço da API + ?acao=fila&chave=...
+name: avisos
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+jobs:
+  enviar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Enviar fila ao ntfy
+        env:
+          AVISOS_URL: ${{ secrets.AVISOS_URL }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          if not os.environ.get('AVISOS_URL'):
+              print('segredo AVISOS_URL ainda não configurado'); raise SystemExit(0)
+          d = json.load(urllib.request.urlopen(os.environ['AVISOS_URL'], timeout=60))
+          fila = d.get('fila') or []
+          print('na fila:', len(fila))
+          for m in fila:
+              r = urllib.request.Request('https://ntfy.sh/', data=json.dumps(m).encode(), headers={'Content-Type': 'application/json'})
+              print(urllib.request.urlopen(r, timeout=30).status)
+          PY

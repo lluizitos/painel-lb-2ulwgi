@@ -63,6 +63,8 @@ table.fe td{padding:9px 8px;border-top:1px solid var(--line);text-align:right;wh
 .mhd{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:12px 2px 6px}
 footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 .alerta{background:rgba(242,182,107,.1);border:1px solid rgba(242,182,107,.45);border-radius:14px;padding:14px 16px;margin-top:14px}.alerta b.t{display:block;color:var(--amber);font-size:15px;margin-bottom:4px}.alerta p{margin:6px 0 0;font-size:13.5px;color:var(--sub)}.alerta .vv{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px}.alerta .vv div{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.alerta .vv b{display:block;font-size:17px;letter-spacing:0;color:var(--ink)}
+.mt{background:var(--card);border-radius:12px;padding:12px 14px;border-left:4px solid var(--line)}.mt.and{border-left-color:var(--pink)}.mt.ok{border-left-color:var(--pos)}.mt b{display:block}.mt .s{font-size:13px;color:var(--sub);margin-top:2px}.mt .p{font-size:12px;color:var(--muted);margin-top:6px}
+.eq{background:var(--card);border-radius:12px;padding:12px 14px}.eq .n{display:flex;justify-content:space-between;gap:10px;align-items:baseline}.eq .f{font-size:12.5px;color:var(--muted)}.eq .me{font-size:13px;color:var(--sub);margin-top:6px}.eq .nums{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--sub);margin-top:6px}.eq .nums b{color:var(--ink)}.eq ul{margin:6px 0 0;padding-left:18px;font-size:13px;color:var(--sub)}
 </style>
 </head>
 <body>
@@ -95,6 +97,14 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <h3>Contas fixas por mês <small id="fixs"></small></h3>
   <div class="gb" id="fixos"></div>
   <p class="note" id="apnota"></p>
+  </div>
+
+  <div class="blk" id="b25" style="display:none">
+  <p class="eyebrow">Metas e equipe</p>
+  <h3>Metas da empresa</h3>
+  <div class="list" id="metas"></div>
+  <h3>Equipe no mês <small id="eqmes"></small></h3>
+  <div class="list" id="equipe"></div>
   </div>
 
   <div class="blk" id="b3">
@@ -134,8 +144,13 @@ const ocRow=o=>`<div class="oc">${dia(o.data)}<div class="t"><b>${esc(o.titulo)}
 function render(){
   document.getElementById('app').style.display='block';
   const hoje=D.atualizado,mk=D.mes,A=D.agora,P=D.proximos,G=D.geral;
-  document.getElementById('alertas').innerHTML=(D.alertas||[]).map(x=>`<div class="alerta"><b class="t">⚠️ ${esc(x.titulo)}</b><p>${esc(x.texto)}</p>
-    <div class="vv"><div>Valor provável<b>${brl(x.valor)}</b></div><div>Pode variar de<b>${brl(x.minimo)} a ${brl(x.maximo)}</b></div></div><p style="font-size:12px;color:var(--muted)">${esc(x.rodape)}</p></div>`).join('');
+  document.getElementById('alertas').innerHTML=(D.alertas||[]).map(x=>`<div class="alerta"><b class="t">${x.tipo==='despesa'?'💸 Despesa prevista: ':'⚠️ '}${esc(x.titulo)}</b><p>${esc(x.texto)}</p>
+    <div class="vv">${x.valor!=null?`<div>${x.situacao==='Confirmado'?'Valor':'Valor provável'}<b>${brl(x.valor)}</b></div>`:''}${x.minimo!=null&&x.maximo!=null?`<div>Pode variar de<b>${brl(x.minimo)} a ${brl(x.maximo)}</b></div>`:''}${x.prazo?`<div>Quando<b>${esc(x.prazo)}</b></div>`:''}</div><p style="font-size:12px;color:var(--muted)">${esc(x.rodape||'')}</p></div>`).join('');
+  {const M=D.metas_empresa||[],E=D.equipe_resumo;if(M.length||(E&&E.pessoas.length)){document.getElementById('b25').style.display='';
+    document.getElementById('metas').innerHTML=M.map(m=>`<div class="mt ${['Atingida'].includes(m.situacao)?'ok':m.situacao==='Em andamento'?'and':''}"><b>${esc(m.titulo)}</b>${m.alvo?`<div class="s">${esc(m.alvo)}</div>`:''}<div class="p">${esc(m.situacao.toLowerCase())}${m.prazo?' · até '+esc(m.prazo):''}${m.progresso?' · '+esc(m.progresso):''}</div></div>`).join('')||'<div class="oc"><div class="t"><span>Nenhuma meta publicada.</span></div></div>';
+    if(E){document.getElementById('eqmes').textContent=MESES[+E.mes.slice(5,7)-1]+' '+E.mes.slice(0,4);
+    document.getElementById('equipe').innerHTML=E.pessoas.map(p=>`<div class="eq"><div class="n"><b>${esc(p.nome)}</b><span class="f">${p.feito_total} entrega${p.feito_total===1?'':'s'} no mês</span></div><div class="f">${esc(p.funcao)}</div>${p.meta?`<div class="me">Meta: ${esc(p.meta)}</div>`:''}
+      <div class="nums"><span>Tarefas concluídas <b>${p.concluidas}</b></span><span>Em aberto <b>${p.abertas}</b></span>${p.atrasadas?`<span>Atrasadas <b style="color:var(--neg)">${p.atrasadas}</b></span>`:''}</div>${p.feito.length?`<ul>${p.feito.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`:''}</div>`).join('')}}}
   {const a=D.extrato_ate||(D.agora&&D.agora.ate)||'';document.getElementById('infobase').innerHTML=
   `📌 <b>Extrato conferido até ${a}</b>. Os valores que entraram e saíram vêm do extrato e dos comprovantes até essa data.
   <br>Aqui <b>não há estimativa</b> de caixa. Os shows futuros mostram o <b>valor combinado</b>, que ainda não foi recebido.

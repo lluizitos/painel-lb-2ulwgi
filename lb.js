@@ -3,8 +3,8 @@
    para cada usuário liberado (cifrada com PBKDF2-SHA256(usuário|senha) → AES-GCM). O endereço do "cofre" de cada usuário
    é um hash do nome, então o arquivo público não mostra quem tem acesso. */
 (function () {
-  const NOMES = { painel: 'Painel', vendas: 'Vendas', agenda: 'Agenda', socio: 'Sócio', contador: 'Prestação de contas', bordero: 'Borderôs' };
-  const ROTAS = { painel: '', vendas: 'vendas/', agenda: 'agenda/', socio: 'socio/', contador: 'contador/', bordero: 'borderos/' };
+  const NOMES = { painel: 'Painel', vendas: 'Vendas', agenda: 'Agenda', socio: 'Sócio', contador: 'Prestação de contas', bordero: 'Borderôs', tarefas: 'Tarefas' };
+  const ROTAS = { painel: '', vendas: 'vendas/', agenda: 'agenda/', socio: 'socio/', contador: 'contador/', bordero: 'borderos/', tarefas: 'tarefas/' };
   const norm = u => String(u || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
   const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
   const hex = buf => [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
@@ -38,7 +38,7 @@
     return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(iv) }, LB.chave, ct);
   }
   function links(paginas, atual, base) {
-    const ordem = ['painel', 'bordero', 'vendas', 'socio', 'contador', 'agenda'];
+    const ordem = ['painel', 'tarefas', 'bordero', 'vendas', 'socio', 'contador', 'agenda'];
     return ordem.filter(p => p === 'agenda' || paginas.includes(p)).map(p =>
       `<a href="${base}${ROTAS[p]}" class="${p === atual ? 'on' : ''}">${NOMES[p]}</a>`).join('') +
       `<a href="#" onclick="LB.sair();return false" title="Sair">Sair</a>`;
