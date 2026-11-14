@@ -525,9 +525,9 @@ function montaMeses(){
   document.getElementById('next').onclick=()=>{const i=KEYS.indexOf(mesAtual);if(i<KEYS.length-1){mesAtual=KEYS[i+1];renderMes()}};
 }
 function k4(l,v,s,c){return `<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`}
-function renderSaldo(){const el=document.getElementById('saldoat');if(!el||!D.linha||!D.linha.length)return; // saldo de hoje: extrato + o previsto até hoje
-  const HJ=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),l=D.linha.filter(x=>x.data<=HJ),u=l[l.length-1]||D.linha[0],est=(D.ext_ate||'')<HJ;
-  el.innerHTML=`<div class="card k" style="margin-top:12px"><div class="l">Saldo atual</div><div class="v ${u.saldo<0?'neg':''}">${brl(u.saldo)}${est?' <small style="font-size:13px;font-weight:600;color:var(--muted)">(estimado)</small>':''}</div><div class="s">conta + dinheiro · ${est?'extrato até '+ddmm(D.ext_ate)+' + o previsto até hoje':'conferido no extrato'}</div></div>`}
+function renderSaldo(){const el=document.getElementById('saldoat');if(!el||!D.linha||!D.linha.length)return; // o extrato manda; a estimativa só vem embaixo, pequena
+  const HJ=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),x=D.linha[0],l=D.linha.filter(y=>y.data<=HJ),u=l[l.length-1]||x,est=(D.ext_ate||'')<HJ&&u!==x;
+  el.innerHTML=`<div class="card k" style="margin-top:12px"><div class="l">Saldo no extrato · ${ddmm(D.ext_ate||x.data)}</div><div class="v ${x.saldo<0?'neg':''}">${brl(x.saldo)}</div><div class="s">conta + dinheiro${est?` · hoje, estimado: <b style="color:${u.saldo<0?'var(--neg,#f87171)':'inherit'}">${brl(u.saldo)}</b>`:''}</div></div>`}
 function renderInfo(){const el=document.getElementById('infobase');if(!el||!D)return; // topo: só o essencial + avisos (pendências e os escolhidos no Admin)
   const av=[];
   if(PEND&&PEND.tot>0)av.push(`<a href="#pagar" class="av pk">💸 <b>Falta pagar ${brl(PEND.tot)}</b> · ${PEND.n} pessoa${PEND.n>1?'s':''}</a>`);
