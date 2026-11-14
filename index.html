@@ -375,12 +375,15 @@ function renderPagar(){ // pendências por parte (cachê, diária, gasolina...),
   const P={};
   Object.values(D.borderos||{}).forEach(b=>b.equipe.forEach((e,i)=>{if(e.fora||e.grupo==='Comissão')return;const f=LB.pg.falta(e);if(!f)return;
     const k=e.pessoa||LB.norm(e.nome);const x=P[k]=P[k]||{k,nome:e.nome,pix:e.pix,tot:0,it:[]};x.tot+=f;if(!x.pix)x.pix=e.pix;x.it.push({b,e,i,f,ps:LB.pg.partes(e).filter(p=>!p.pago)})}));
+  Object.values(D.borderos||{}).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!t.para||!(+t.valor>0))return; // itens com "pagar para"
+    const k=t.pessoa||LB.norm(t.para);const x=P[k]=P[k]||{k,nome:t.para,pix:t.pix,tot:0,it:[]};x.tot+=+t.valor;if(!x.pix)x.pix=t.pix;
+    x.it.push({b,e:{funcao:'item: '+(t.desc||'')},item:j,f:+t.valor,ps:[{k:'item',n:t.desc||'item',v:+t.valor}]})}));
   const l=Object.values(P).sort((a,b)=>b.tot-a.tot),tot=l.reduce((a,x)=>a+x.tot,0),nsh=new Set(l.flatMap(x=>x.it.map(i=>i.b.id))).size;
   PAGP=P;const pode=!!API_URL;
   document.getElementById('pgk').innerHTML=k4('Falta pagar',brl(tot),'equipe dos shows','pk')+k4('Pessoas',l.length,'com pagamento pendente')+k4('Shows',nsh,'com alguém a pagar');
   document.getElementById('pgl').innerHTML=l.length?l.map(x=>`<div class="pg2"><div class="hd"><div><b>${esc(x.nome)}</b><span>${x.it.length} pagamento${x.it.length>1?'s':''}${new Set(x.it.map(i=>i.b.id)).size>1?' · '+new Set(x.it.map(i=>i.b.id)).size+' shows somados':''}</span></div><div class="tt">${brl(x.tot)}</div></div>
     ${x.it.map(i=>`<div class="ln"><span>${ddmm(i.b.data)} · ${esc(i.b.show)} · ${esc(i.e.funcao)}${i.e.status==='Parcial'?' · <b class="am2">parte já paga</b>':''}</span><b>${brl(i.f)}</b></div>
-      <div class="pts">${i.ps.map(p=>pode?`<button class="pt" data-pgk="${esc(i.b.id)}|${i.i}|${p.k}" title="Marcar só esta parte como paga">${p.n} ${brl(p.v)} <i>✓ pago</i></button>`:`<span class="pt">${p.n} ${brl(p.v)}</span>`).join('')}</div>`).join('')}
+      <div class="pts">${i.ps.map(p=>pode?`<button class="pt" data-pgk="${esc(i.b.id)}|${i.item!=null?'it'+i.item:i.i}|${p.k}" title="Marcar só esta parte como paga">${p.n} ${brl(p.v)} <i>✓ pago</i></button>`:`<span class="pt">${p.n} ${brl(p.v)}</span>`).join('')}</div>`).join('')}
     <div class="px">${pxBtn(x.pix)}<button class="cp" data-cp="${esc(x.nome+' — '+brl(x.tot)+(x.pix?' — PIX '+x.pix:''))}">copiar resumo</button>${pode?`<button class="cp pgall" data-pgp="${esc(x.k)}">marcar tudo pago</button>`:''}</div></div>`).join('')
     :'<div class="empty">Nenhum pagamento pendente. Os borderôs anteriores já foram conferidos com o extrato; os próximos, feitos na página Borderôs, aparecem aqui até serem marcados como pagos.</div>';
 }
@@ -395,8 +398,8 @@ async function marcarPago(marcas,btn){ // grava na planilha e atualiza a tela
   catch(e){if(btn){btn.disabled=false;btn.innerHTML='não salvou ('+e.message+')'}}
 }
 document.addEventListener('click',e=>{
-  const a=e.target.closest('[data-pgk]');if(a){const[id,i,k]=a.dataset.pgk.split('|');marcarPago([{id,i:+i,partes:[k],data:HOJE}],a);return}
-  const b=e.target.closest('[data-pgp]');if(b){const x=PAGP[b.dataset.pgp];if(x)marcarPago(x.it.map(i=>({id:i.b.id,i:i.i,partes:'tudo',data:HOJE})),b)}});
+  const a=e.target.closest('[data-pgk]');if(a){const[id,i,k]=a.dataset.pgk.split('|');marcarPago([i.startsWith('it')?{id,it:+i.slice(2),data:HOJE}:{id,i:+i,partes:[k],data:HOJE}],a);return}
+  const b=e.target.closest('[data-pgp]');if(b){const x=PAGP[b.dataset.pgp];if(x)marcarPago(x.it.map(i=>i.item!=null?{id:i.b.id,it:i.item,data:HOJE}:{id:i.b.id,i:i.i,partes:'tudo',data:HOJE}),b)}});
 async function bordAoVivo(){ // com a planilha ligada, os borderôs vêm ao vivo
   try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;API_URL=c.api_url;
     const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'borderos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();

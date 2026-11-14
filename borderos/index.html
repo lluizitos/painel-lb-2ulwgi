@@ -88,6 +88,7 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
 .pts{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}.pt{border:1px solid var(--line);background:var(--card2);color:var(--sub);border-radius:999px;padding:5px 10px;font:inherit;font-size:12px;cursor:pointer}.pt.ok{border-color:var(--pos);color:var(--pos)}.st.parc{border-color:var(--amber);color:var(--amber)}
 .massa{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}.massa summary{cursor:pointer;font-weight:700;color:var(--pinkl)}
 .pp.flash{outline:2px solid var(--pinkl);outline-offset:2px;transition:outline .3s}
+.ipara{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;font-size:13px;color:var(--sub)}.ipara b{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -138,6 +139,12 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
       <label>Comissão (R$)<input id="e_com" inputmode="decimal" placeholder="0"></label>
     </div>
     <h3>Equipe <small id="e_fm"></small></h3>
+    <details class="massa" id="e_copia"><summary>Copiar de outro borderô</summary>
+      <div class="f4" style="grid-template-columns:1fr;margin-top:8px"><label>Borderô<select id="cp_de"></select></label></div>
+      <div class="pts"><button type="button" class="pt ok" data-cpk="equipe">✓ equipe (funções e valores)</button><button type="button" class="pt" data-cpk="itens">○ itens</button><button type="button" class="pt" data-cpk="diesel">○ km do diesel</button></div>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap"><button type="button" class="btn sm pkb" id="cp_ok">Copiar</button><span class="note" id="cp_res" style="margin:0"></span></div>
+      <p class="note">Tudo entra como "a pagar". Quem já está na equipe não é duplicado.</p>
+    </details>
     <div class="res"><input class="search" id="e_busca" placeholder="Adicionar pessoa: digite o nome ou apelido" autocomplete="off"><div class="dd" id="e_dd"></div></div>
     <div id="e_eq" style="margin-top:10px"></div>
     <details class="massa"><summary>Pagamento em massa</summary>
@@ -277,7 +284,7 @@ function achar(q){q=LB.norm(q);const qd=q.replace(/\D/g,'');if(!q)return [];
 let hl=0,res=[];
 $('e_busca').addEventListener('input',()=>{res=achar($('e_busca').value);hl=0;ddRender()});
 $('e_busca').addEventListener('keydown',e=>{if(!res.length)return;if(e.key==='ArrowDown'){hl=Math.min(res.length-1,hl+1);ddRender();e.preventDefault()}if(e.key==='ArrowUp'){hl=Math.max(0,hl-1);ddRender();e.preventDefault()}if(e.key==='Enter'){addPessoa(res[hl]);e.preventDefault()}});
-document.addEventListener('click',e=>{if(!e.target.closest('.res'))$('e_dd').classList.remove('open')});
+document.addEventListener('click',e=>{if(!e.target.closest('.res')){$('e_dd').classList.remove('open');document.querySelectorAll('[data-idd].open').forEach(d=>d.classList.remove('open'))}});
 function ddRender(){const q=$('e_busca').value.trim();$('e_dd').innerHTML=res.map((p,i)=>`<button type="button" class="${i===hl?'hl':''}" data-pi="${esc(p.id)}"><b>${esc(p.nome)}</b><small>${p.doc?'CPF/doc '+esc(doc11(p.doc)):'sem documento'}${p.apelido?' · '+esc(p.apelido):''}${p.pix?'':' · sem PIX'}</small></button>`).join('')+(q?`<button type="button" data-nova="1"><b>+ Cadastrar "${esc(q)}"</b><small>pessoa nova no banco da equipe</small></button>`:'');
   $('e_dd').classList.toggle('open',!!q)}
 $('e_dd').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.nova){abrirPes({nome:$('e_busca').value.trim()},p=>addPessoa(p));return}addPessoa(PES.find(p=>p.id===b.dataset.pi))};
@@ -286,7 +293,16 @@ function addPessoa(p){if(!p)return;const u=(D.ultimo||{})[p.id]||{};const f=D.fu
   $('e_busca').value='';res=[];$('e_dd').classList.remove('open');ED._sujo=true;renderEq();calcTot();$('e_busca').focus()}
 
 /* linhas da equipe */
-function renderMassa(){const sel=new Set([...document.querySelectorAll('#m_partes [data-mk].ok')].map(b=>b.dataset.mk));
+function renderCopia(){const sel=$('cp_de'),v=sel.value;sel.innerHTML=Object.values(BORD).filter(b=>b.id!==ED.id&&(b.equipe||[]).length).sort((a,b)=>b.data.localeCompare(a.data)).map(b=>`<option value="${esc(b.id)}"${b.id===v?' selected':''}>${ddmm(b.data)}/${b.data.slice(2,4)} · ${esc(b.show||'')} · ${new Set(b.equipe.filter(e=>!e.fora&&e.grupo!=='Comissão').map(e=>e.pessoa||e.nome)).size} pessoas</option>`).join('')}
+$('e_copia').addEventListener('click',e=>{const b=e.target.closest('[data-cpk]');if(!b)return;b.classList.toggle('ok');b.textContent=(b.classList.contains('ok')?'✓ ':'○ ')+b.textContent.slice(2)});
+$('cp_ok').onclick=()=>{const o=BORD[$('cp_de').value];if(!o)return;const q=k=>!!document.querySelector(`#e_copia [data-cpk="${k}"].ok`);let n=0,m=0;
+  if(q('equipe')){const ja=new Set(ED.equipe.map(e=>e.pessoa||LB.norm(e.nome)));o.equipe.filter(e=>!e.fora&&e.grupo!=='Comissão').forEach(e=>{const k=e.pessoa||LB.norm(e.nome);if(ja.has(k))return;ja.add(k);
+    const p=PES.find(x=>x.id===e.pessoa)||{};const c={pessoa:e.pessoa,nome:e.nome,pix:p.pix||e.pix||'',doc:p.doc||e.doc||'',grupo:e.grupo,funcao:e.funcao,status:'Pendente'};
+    ['valor','diaria','gasolina','ajuda','estacionamento'].forEach(x=>{if(e[x])c[x]=e[x]});ED.equipe.push(c);n++})}
+  if(q('itens')){ED.itens=ED.itens||[];(o.itens||[]).forEach(t=>{ED.itens.push({desc:t.desc,valor:t.valor,status:'Pendente',pessoa:t.pessoa,para:t.para,pix:t.pix});m++})}
+  if(q('diesel')&&o.diesel){['km_ida','km_volta','km_adic'].forEach(k=>{if(o.diesel[k]!=null)ED.diesel[k]=o.diesel[k]});$('d_ida').value=nf(ED.diesel.km_ida);$('d_volta').value=nf(ED.diesel.km_volta);$('d_ad').value=ED.diesel.km_adic===''?'':nf(ED.diesel.km_adic)}
+  ED._sujo=true;renderEq();renderIt();calcTot();$('cp_res').textContent=`Copiado: ${n} pessoa${n!==1?'s':''}${m?`, ${m} ite${m>1?'ns':'m'}`:''}. Salve o borderô.`};
+function renderMassa(){renderCopia();const sel=new Set([...document.querySelectorAll('#m_partes [data-mk].ok')].map(b=>b.dataset.mk));
   $('m_partes').innerHTML=LB.pg.PARTES.filter(([k])=>ED.equipe.some(e=>num(e[k])>0)).map(([k,n])=>`<button type="button" class="pt${sel.has(k)?' ok':''}" data-mk="${k}">${sel.has(k)?'✓':'○'} ${n}</button>`).join('')||'<span class="note">Sem valores na equipe ainda.</span>';
   const g=$('m_grupo').value;$('m_grupo').innerHTML=['Todos',...GR.filter(x=>ED.equipe.some(e=>e.grupo===x))].map(x=>`<option${x===g?' selected':''}>${x}</option>`).join('');if(!$('m_data').value)$('m_data').value=HOJE}
 function massa(pago){const ks=[...document.querySelectorAll('#m_partes [data-mk].ok')].map(b=>b.dataset.mk);if(!ks.length){$('m_res').textContent='Escolha ao menos uma parte.';return}
@@ -334,10 +350,20 @@ function gasCalc(c,p){const box=c.querySelector('[data-gc]');if(box.innerHTML){b
   g('ok').onclick=()=>{const v=cc();if(!v)return;p.gasolina=Math.round(v*100)/100;ED._sujo=true;renderEq();calcTot()}}
 
 /* itens */
-function renderIt(){$('e_it').innerHTML=(ED.itens||[]).map((t,i)=>`<div class="pp" data-ii="${i}"><div class="f4" style="grid-template-columns:2fr 1fr 1fr auto;align-items:end"><label>Item<input data-k="desc" value="${esc(t.desc)}"></label><label>Valor (R$)<input data-k="valor" inputmode="decimal" value="${nf(t.valor)}"></label><label>Situação<select data-k="status"><option${t.status!=='Pago'?' selected':''}>Pendente</option><option${t.status==='Pago'?' selected':''}>Pago</option></select></label><button type="button" class="x" data-rmi>×</button></div></div>`).join('')}
+function renderIt(){$('e_it').innerHTML=(ED.itens||[]).map((t,i)=>`<div class="pp" data-ii="${i}"><div class="f4" style="grid-template-columns:2fr 1fr 1fr auto;align-items:end"><label>Item<input data-k="desc" value="${esc(t.desc)}"></label><label>Valor (R$)<input data-k="valor" inputmode="decimal" value="${nf(t.valor)}"></label><label>Situação<select data-k="status"><option${t.status!=='Pago'?' selected':''}>Pendente</option><option${t.status==='Pago'?' selected':''}>Pago</option></select></label><button type="button" class="x" data-rmi>×</button></div>
+  ${t.para?`<div class="ipara"><span>Pagar para <b>${esc(t.para)}</b>${t.pix?' · PIX '+esc(t.pix):' · <span class="pk">sem PIX</span>'}</span><button type="button" class="x" data-ipx title="Trocar">×</button></div>`
+   :`<div class="res" style="margin-top:8px"><input class="search" data-ib placeholder="Pagar para quem? (busque no banco de pessoas)" autocomplete="off"><div class="dd" data-idd></div></div>`}</div>`).join('')}
 $('e_addit').onclick=()=>{ED.itens=ED.itens||[];ED.itens.push({desc:'',valor:'',status:'Pendente'});renderIt();ED._sujo=true};
-$('e_it').addEventListener('input',e=>{const c=e.target.closest('[data-ii]');if(!c)return;const t=ED.itens[+c.dataset.ii];t[e.target.dataset.k]=e.target.dataset.k==='valor'?num(e.target.value):e.target.value;ED._sujo=true;calcTot()});
-$('e_it').addEventListener('click',e=>{const c=e.target.closest('[data-ii]');if(c&&e.target.closest('[data-rmi]')){ED.itens.splice(+c.dataset.ii,1);renderIt();calcTot();ED._sujo=true}});
+$('e_it').addEventListener('input',e=>{const c=e.target.closest('[data-ii]');if(!c||!e.target.dataset.k)return;const t=ED.itens[+c.dataset.ii];t[e.target.dataset.k]=e.target.dataset.k==='valor'?num(e.target.value):e.target.value;ED._sujo=true;calcTot()});
+$('e_it').addEventListener('click',e=>{const c=e.target.closest('[data-ii]');if(!c)return;const t=ED.itens[+c.dataset.ii];
+  if(e.target.closest('[data-rmi]')){ED.itens.splice(+c.dataset.ii,1);renderIt();calcTot();ED._sujo=true;return}
+  if(e.target.closest('[data-ipx]')){delete t.pessoa;delete t.para;delete t.pix;ED._sujo=true;renderIt();const n=$('e_it').querySelector(`[data-ii="${c.dataset.ii}"] [data-ib]`);if(n)n.focus();return}
+  const b=e.target.closest('[data-idd] button');if(b){const p=b.dataset.nova?null:PES.find(x=>x.id===b.dataset.pi);
+    const usa=p=>{t.pessoa=p.id;t.para=p.nome;t.pix=p.pix||'';ED._sujo=true;renderIt()};
+    if(p)usa(p);else abrirPes({nome:c.querySelector('[data-ib]').value.trim()},usa)}});
+$('e_it').addEventListener('input',e=>{const ib=e.target.closest('[data-ib]');if(!ib)return;const dd=ib.parentElement.querySelector('[data-idd]'),q=ib.value.trim(),r=achar(q);
+  dd.innerHTML=r.map(p=>`<button type="button" data-pi="${esc(p.id)}"><b>${esc(p.nome)}</b><small>${p.doc?'CPF/doc '+esc(doc11(p.doc)):'sem documento'}${p.pix?' · PIX '+esc(p.pix):''}</small></button>`).join('')+(q?`<button type="button" data-nova="1"><b>+ Cadastrar "${esc(q)}"</b><small>nova pessoa no banco</small></button>`:'');
+  dd.classList.toggle('open',!!q)},true);
 
 function calcTot(){const t=totais(ED),d=dieselDe(ED.diesel);
   $('d_ad').placeholder='auto: '+nf(+(num(ED.diesel.km_ida)*num(CFG.adicional_pct)/100).toFixed(1));
