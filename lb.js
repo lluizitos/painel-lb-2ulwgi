@@ -43,7 +43,7 @@
     const ps = ORDEM.filter(p => paginas.includes(p));
     return (ps.length > 1 ? ps.concat('agenda') : []).map(p =>
       `<a href="${base}${ROTAS[p]}" class="${p === atual ? 'on' : ''}">${NOMES[p]}</a>`).join('') +
-      `<a href="#" onclick="LB.sair();return false" title="Sair">Sair</a>`;
+      `<a href="#" onclick="LB.sair();return false" title="Sair"${ps.length > 1 ? '' : ' style="opacity:.55;font-size:11px;border:0;background:none"'}>Sair</a>`;
   }
   /* Monta a tela de login e chama ok({dados, paginas, nome}) quando abrir. */
   function entrar(opc) {
