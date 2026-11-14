@@ -133,6 +133,33 @@ h3 small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)
 #lock button{width:100%;margin-top:10px;padding:14px;border:0;border-radius:12px;background:var(--pink);color:#fff;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px}
 #lock .err{color:var(--neg);font-size:13px;min-height:20px;margin-top:10px}
 #app{display:none}
+.fmc{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.fm{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:99px;background:var(--card2);color:var(--sub);white-space:nowrap}
+.fm b{color:var(--ink)}.fm.mu{background:rgba(207,29,81,.16);color:var(--pinkl)}.fm.mu b{color:#fff}
+.show.clk{cursor:pointer}.show .vb{font-size:12px;color:var(--pinkl);font-weight:700;margin-top:8px}
+#bd{position:fixed;inset:0;z-index:45;background:rgba(10,9,12,.72);display:none;align-items:flex-end;justify-content:center}
+#bd.open{display:flex}
+#bd .sh{background:var(--bg);border:1px solid var(--line);border-radius:18px 18px 0 0;width:100%;max-width:700px;max-height:92vh;overflow:auto;padding:18px 16px 28px}
+@media(min-width:760px){#bd{align-items:center}#bd .sh{border-radius:18px}}
+#bd .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+#bd h2{font-size:21px;font-weight:900;text-transform:uppercase;margin:2px 0 2px;line-height:1.1}
+#bd .x{flex:none;border:1px solid var(--line);background:var(--card2);border-radius:99px;width:36px;height:36px;font-size:18px;color:var(--ink)}
+.bt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.bt div{background:var(--card);border-radius:12px;padding:10px 12px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.bt div b{display:block;font-size:15px;letter-spacing:0;color:var(--ink);margin-top:2px;white-space:nowrap}
+.gp{margin-top:14px}.gp h4{margin:0 0 6px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--pinkl);display:flex;justify-content:space-between}
+.gp h4 span{color:var(--muted);letter-spacing:.04em}
+.pe{display:flex;gap:10px;align-items:center;background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:6px}
+.pe .t{flex:1;min-width:0}.pe .t b{display:block;font-size:14px;overflow-wrap:anywhere}.pe .t span{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.pe .v{flex:none;text-align:right;font-weight:700;white-space:nowrap}.pe .v small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
+.cp{border:1px solid var(--line);background:var(--card2);border-radius:99px;padding:3px 9px;font-size:11.5px;font-weight:600;color:var(--ink);margin-left:4px;cursor:pointer}
+.cp.ok{background:rgba(127,221,169,.18);color:var(--pos);border-color:transparent}
+.dz{background:var(--card);border-radius:12px;padding:12px;font-size:13px;color:var(--sub);line-height:1.6}
+.pg2{background:var(--card);border-radius:14px;padding:12px 14px}
+.pg2 .hd{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.pg2 .hd b{font-size:15px;display:block}.pg2 .hd span{font-size:12px;color:var(--muted)}
+.pg2 .tt{font-size:18px;font-weight:800;white-space:nowrap;text-align:right}
+.pg2 .ln{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--sub);padding:5px 0;border-top:1px solid var(--line)}
+.pg2 .px{margin-top:8px;font-size:13px;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
 .ptabs{display:flex;gap:4px;max-width:980px;margin:0 auto;padding:0 16px 8px}
 .ptabs button{flex:1;background:none;border:0;border-bottom:2px solid var(--line);padding:9px 2px;font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .ptabs button.on{color:var(--ink);border-color:var(--pink)}
@@ -160,7 +187,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 <header>
   <div class="wrap"><img src="logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
   <div class="ptabs" id="ptabs"><button class="on" data-p="fin">Financeiro</button><button data-p="ven">Vendas</button><button data-p="ren">Rendimento</button></div>
-  <nav id="nav"><a href="#mes" class="on">Mês</a><a href="#tarefas">Agenda do mês</a><a href="#shows">Shows</a><a href="#estimativa">Estimativa</a></nav>
+  <nav id="nav"><a href="#mes" class="on">Mês</a><a href="#pagar">Pagamentos</a><a href="#tarefas">Agenda do mês</a><a href="#shows">Shows</a><a href="#estimativa">Estimativa</a></nav>
 </header>
 <main class="wrap">
 <div id="pfin">
@@ -177,6 +204,14 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <div id="mesbody"></div>
   <h3>Ocorrências <small>o que aconteceu de fora do normal · as sem confirmação não aparecem para o sócio</small></h3>
   <div class="list" id="ocp"></div>
+</section>
+
+<section id="pagar">
+  <p class="eyebrow">Assistente de pagamento</p>
+  <h1>Paga<em>mentos</em></h1>
+  <p class="note">O que falta pagar para a equipe, somado por pessoa (se a mesma pessoa tem dois shows pendentes, já vem junto). Toque em "copiar" para levar a chave PIX.</p>
+  <div class="grid g3" id="pgk" style="margin-top:14px"></div>
+  <div class="list" id="pgl" style="margin-top:10px"></div>
 </section>
 
 <section id="tarefas">
@@ -236,6 +271,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <div class="list" id="rvend"></div>
 </div>
 
+<div id="bd"><div class="sh" id="bds"></div></div>
 <footer>Lucas Barros Ltda · dados do extrato Sicredi, borderôs e estimativa de caixa</footer>
 </main>
 </div>
@@ -267,10 +303,65 @@ function iniciar(){
   document.getElementById('upd').innerHTML='Olá, '+esc(LB.usuario.split(' ')[0])+' · dados atualizados em '+ddmm(D.atualizado)+'/'+D.atualizado.slice(0,4);
   const ks=new Set(Object.keys(D.meses));D.shows.forEach(s=>{if(s.data<'2027-02')ks.add(mkey(s.data))});D.movs.forEach(m=>ks.add(mkey(m.data)));
   KEYS=[...ks].sort();mesAtual=KEYS.includes(mkey(HOJE))?mkey(HOJE):KEYS[KEYS.length-1];
-  montaMeses();renderMes();renderTarefas();renderTL();renderEst();navSpy();
+  D.borderos=D.borderos||{};
+  montaMeses();renderMes();renderPagar();renderTarefas();renderTL();renderEst();navSpy();bordAoVivo();
   document.getElementById('ocp').innerHTML=(D.ocorrencias||[]).slice().sort((x,y)=>y.data.localeCompare(x.data)).map(o=>`<div class="row"><div class="d"><b>${o.data.slice(8,10)}</b><span>${MES3[+o.data.slice(5,7)-1]}</span></div><div class="t"><b>${esc(o.titulo)} ${o.confirmado?'':'<span class="pill am">sem confirmação</span>'}</b><span>${esc(o.detalhe||'')}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`).join('')||'<div class="empty">Nenhuma.</div>';
   document.getElementById('ptabs').onclick=e=>{const b=e.target.closest('button');if(b)aba(b.dataset.p)};
   const h=location.hash.slice(1);if(h==='vendas'||h==='rendimento')aba(h==='vendas'?'ven':'ren');
+}
+
+/* ---------- borderôs ---------- */
+const BG=['Músicos','Produção','Técnica','Outros','Comissão'];
+function bordDe(s){const B=D.borderos||{};if(s.cod&&B[s.cod])return B[s.cod];
+  const l=Object.values(B).filter(b=>b.data===s.data);if(l.length<2)return l[0]||null;
+  const w=LB.norm(s.nome).split(' ').filter(x=>x.length>3);return l.find(b=>w.some(x=>LB.norm(b.show).includes(x)))||l[0]}
+function fmChips(b){const ok=b.equipe.filter(e=>!e.fora&&e.grupo!=='Comissão'),r={};BG.forEach(g=>{const q=new Set(ok.filter(e=>e.grupo===g).map(e=>e.pessoa||e.nome)).size;if(q)r[g]=q});const n=new Set(ok.map(e=>e.pessoa||e.nome)).size;if(!n)return '';
+  const nm={'Músicos':['músico','músicos'],'Produção':['produção','produção'],'Técnica':['técnica','técnica'],'Outros':['outro','outros']};
+  return `<div class="fmc">${Object.entries(r).map(([g,q])=>`<span class="fm${g==='Músicos'?' mu':''}"><b>${q}</b> ${nm[g][q>1?1:0]}</span>`).join('')}<span class="fm"><b>${n}</b> na equipe</span></div>`}
+function copiar(t,btn){const ok=()=>{if(btn){const o=btn.textContent;btn.textContent='copiado';btn.classList.add('ok');setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok')},1500)}};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,()=>{fb();ok()});else{fb();ok()}
+  function fb(){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove()}}
+document.addEventListener('click',e=>{const c=e.target.closest('[data-cp]');if(c){e.stopPropagation();copiar(c.dataset.cp,c);return}
+  const k=e.target.closest('[data-bord]');if(k&&!e.target.closest('#bd'))abrirBord(k.dataset.bord)});
+const pxBtn=x=>x?`<span style="overflow-wrap:anywhere">PIX ${esc(x)}</span><button class="cp" data-cp="${esc(x.replace(/\s*\((nubank|picpay|inter|banco c6)\)\s*$/i,'').replace(/\s+(Inter|Banco c6)$/i,''))}">copiar</button>`:'<span class="mut">sem PIX no cadastro</span>';
+function abrirBord(id){const b=(D.borderos||{})[id];if(!b)return;const t=b.totais||{};
+  const extras=e=>[['diaria','diária'],['gasolina','gasolina'],['ajuda','ajuda de custo'],['estacionamento','estacionamento']].filter(([k])=>e[k]).map(([k,n])=>n+' '+brl(e[k])).join(' + ');
+  const gr=BG.map(g=>{const l=b.equipe.filter(e=>e.grupo===g);if(!l.length)return '';const tot=l.reduce((a,e)=>a+(e.fora?0:e.total),0);
+    return `<div class="gp"><h4>${g} <span>${l.length} · ${brl(tot)}</span></h4>${l.map(e=>`<div class="pe"><div class="t"><b>${esc(e.nome)}</b><span>${esc(e.funcao)}${extras(e)?' · '+brl(e.valor)+' + '+extras(e):''}${e.fora?' · fora do custo do show':''}</span><div class="px" style="font-size:12px;color:var(--sub);margin-top:3px">${pxBtn(e.pix)}</div></div><div class="v">${brl(e.fora?e.valor:e.total)}<small><span class="pill ${e.status==='Pago'?'ok':'am'}">${esc(e.status||'—').toLowerCase()}</span></small></div></div>`).join('')}</div>`}).join('');
+  const dz=b.diesel||{};
+  const dzt=dz.km?`Ônibus: ${dz.km_ida} km ida + ${dz.km_volta} km volta + ${dz.km_adic} km adicional = <b>${dz.km} km</b> ÷ ${String(dz.kml).replace('.',',')} km/L = <b>${String(dz.litros).replace('.',',')} L</b> × R$ ${dz.preco.toFixed(2).replace('.',',')} = <b>${brl(dz.litros*dz.preco)}</b>${dz.abastecido?` · abastecido de fato: <b>${brl(dz.abastecido)}</b>`:''}${dz.litros_abast?` · ${dz.litros_abast} L abastecidos`:''}`:(t.diesel?`Diesel: <b>${brl(t.diesel)}</b>`:'Sem diesel neste show (sem ônibus ou sem cálculo na planilha).');
+  const it=(b.itens||[]).map(i=>`<div class="pe"><div class="t"><b>${esc(i.desc)}</b>${i.qtd>1?`<span>${i.qtd} ×</span>`:''}</div><div class="v">${brl(i.valor)}</div></div>`).join('');
+  const d=new Date(b.data+'T12:00');
+  document.getElementById('bds').innerHTML=`<div class="top"><div><p class="eyebrow" style="margin:0">Borderô · ${['dom','seg','ter','qua','qui','sex','sáb'][d.getDay()]} ${ddmm(b.data)}/${b.data.slice(2,4)}</p><h2>${esc(b.show||'')}</h2><span class="mut" style="font-size:13px">${esc(b.local||'')}</span></div><button class="x" onclick="fecharBord()" aria-label="Fechar">×</button></div>
+  ${fmChips(b)}
+  <div class="bt"><div>Cachê<b>${b.valor?brl(b.valor):'—'}</b></div><div>Equipe<b>${brl(t.equipe)}</b></div><div>Itens<b>${brl(t.itens)}</b></div><div>Diesel<b>${brl(t.diesel)}</b></div><div>Gasto total<b>${brl(t.gasto??((t.equipe||0)+(t.itens||0)+(t.diesel||0)))}</b></div><div>Lucro<b class="${(t.lucro??0)<0?'neg':'pos'}">${t.lucro==null?(b.valor?brl(b.valor-(t.equipe||0)-(t.itens||0)-(t.diesel||0)):'—'):brl(t.lucro)}</b></div></div>
+  ${gr}
+  ${it?`<div class="gp"><h4>Itens <span>${brl(t.itens)}</span></h4>${it}</div>`:''}
+  <div class="gp"><h4>Diesel do ônibus</h4><div class="dz">${dzt}</div></div>
+  <p class="note">${b.fonte==='app'?'Borderô do app'+(b.atualizado_por?' · atualizado por '+esc(b.atualizado_por):''):'Borderô da planilha do show ('+esc(b.arquivo||'')+'), já conferido com o extrato.'}</p>`;
+  document.getElementById('bd').classList.add('open');document.body.style.overflow='hidden'}
+function fecharBord(){document.getElementById('bd').classList.remove('open');document.body.style.overflow=''}
+document.getElementById('bd').addEventListener('click',e=>{if(e.target.id==='bd')fecharBord()});
+addEventListener('keydown',e=>{if(e.key==='Escape')fecharBord()});
+
+/* assistente de pagamento: pendentes de todos os borderôs, somados por pessoa */
+function renderPagar(){
+  const P={};
+  Object.values(D.borderos||{}).forEach(b=>b.equipe.forEach(e=>{if(e.status!=='Pendente'||e.fora||e.grupo==='Comissão'||!e.total)return;
+    const k=e.pessoa||LB.norm(e.nome);const x=P[k]=P[k]||{nome:e.nome,pix:e.pix,tot:0,it:[]};x.tot+=e.total;if(!x.pix)x.pix=e.pix;x.it.push({b,e})}));
+  const l=Object.values(P).sort((a,b)=>b.tot-a.tot),tot=l.reduce((a,x)=>a+x.tot,0),nsh=new Set(l.flatMap(x=>x.it.map(i=>i.b.id))).size;
+  document.getElementById('pgk').innerHTML=k4('Falta pagar',brl(tot),'equipe dos shows','pk')+k4('Pessoas',l.length,'com pagamento pendente')+k4('Shows',nsh,'com alguém a pagar');
+  document.getElementById('pgl').innerHTML=l.length?l.map(x=>`<div class="pg2"><div class="hd"><div><b>${esc(x.nome)}</b><span>${x.it.length} pagamento${x.it.length>1?'s':''}${new Set(x.it.map(i=>i.b.id)).size>1?' · '+new Set(x.it.map(i=>i.b.id)).size+' shows somados':''}</span></div><div class="tt">${brl(x.tot)}</div></div>
+    ${x.it.map(i=>`<div class="ln"><span>${ddmm(i.b.data)} · ${esc(i.b.show)} · ${esc(i.e.funcao)}</span><b>${brl(i.e.total)}</b></div>`).join('')}
+    <div class="px">${pxBtn(x.pix)}<button class="cp" data-cp="${esc(x.nome+' — '+brl(x.tot)+(x.pix?' — PIX '+x.pix:''))}">copiar resumo</button></div></div>`).join('')
+    :'<div class="empty">Nenhum pagamento pendente. Os borderôs anteriores já foram conferidos com o extrato; os próximos, feitos na página Borderôs, aparecem aqui até serem marcados como pagos.</div>';
+}
+async function bordAoVivo(){ // com a planilha ligada, os borderôs vêm ao vivo
+  try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;
+    const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'borderos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
+    if(!r.ok)return;const px={};(r.pessoas||[]).forEach(p=>px[p.id]=p.pix);
+    Object.entries(r.borderos).forEach(([k,b])=>{b.equipe.forEach(e=>{if(e.pessoa&&px[e.pessoa])e.pix=px[e.pessoa];delete e.doc});D.borderos[k]=b});
+    renderMes();renderTL();renderPagar()}catch(e){}
 }
 
 /* ---------- abas do painel ---------- */
@@ -422,11 +513,12 @@ function showCard(s,tl){
   const dt=`${['dom','seg','ter','qua','qui','sex','sáb'][d.getDay()]} · ${ddmm(s.data)}/${s.data.slice(2,4)}`;
   const pr=s.valor?Math.min(100,(s.rec||0)/s.valor*100):0;
   const luc=s.lucro==null?'—':`<span class="${cls(s.lucro)}">${brl(s.lucro)}</span>`;
-  return `<div class="show bar${tl&&!fut?' past':''}">${tl?`<div class="dt">${dt}</div>`:''}
+  const b=bordDe(s),fm=b?fmChips(b):'';
+  return `<div class="show bar${tl&&!fut?' past':''}${b?' clk':''}"${b?` data-bord="${esc(b.id)}"`:''}>${tl?`<div class="dt">${dt}</div>`:''}
   <div class="hd"><div><b>${esc(s.nome)}</b><span>${tl?'':dt+' · '}${esc(s.local||'')}</span></div>${stPill(s)}</div>
   <div class="nums"><div>Cachê<b>${s.valor?brl(s.valor):'a definir'}</b></div><div>Recebido<b>${brl(s.rec||0)}</b></div><div>Falta<b class="${s.falta>0?'pk':''}">${s.falta==null?'—':brl(s.falta)}</b></div><div>${fut?'Lucro prev.':'Lucro'}<b>${luc}</b></div></div>
   ${s.valor?`<div class="prog"><i style="width:${pr}%"></i></div>`:''}
-  ${s.obs?`<div class="ob">${esc(s.obs)}</div>`:''}</div>`;
+  ${s.obs?`<div class="ob">${esc(s.obs)}</div>`:''}${fm}${b?'<div class="vb">Ver borderô ›</div>':''}</div>`;
 }
 
 /* ---------- AGENDA DO MÊS ---------- */

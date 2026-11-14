@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#141218">
+<title>Borderôs LB</title>
+<link rel="icon" href="../icone.png"><link rel="apple-touch-icon" href="../icone.png">
+<style>
+:root{--bg:#141218;--card:#1E1C24;--card2:#26232D;--line:#2E2B36;--ink:#F3F1F6;--sub:#B8B3C3;--muted:#8B8697;--pink:#CF1D51;--pinkl:#F0507E;--neg:#FF8FA8;--pos:#7FDDA9;--amber:#F2B66B;--sai:#6F697D}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:15px;line-height:1.45;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%;padding-bottom:90px}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:20;background:rgba(20,18,24,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:58px;gap:10px}
+header img{height:24px;display:block;flex:none}
+.links{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;min-width:0}.links::-webkit-scrollbar{display:none}
+.links a{flex:none;text-decoration:none;color:var(--sub);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border:1px solid var(--line);border-radius:99px}
+.links a.on{background:var(--pink);border-color:var(--pink);color:#fff}
+@media(max-width:480px){header img{height:18px}.links a{font-size:10px;padding:6px 8px;letter-spacing:.06em}}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--pinkl);margin:24px 0 6px}
+h1{font-size:30px;font-weight:900;text-transform:uppercase;margin:0;line-height:1.05}h1 em{font-style:normal;color:var(--pink)}
+h3{font-size:11px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--pinkl);margin:20px 0 8px;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+h3 small{letter-spacing:.04em;text-transform:none;color:var(--muted);font-weight:400;font-size:12px}
+.note{color:var(--muted);font-size:12.5px;margin:8px 0 0}
+.pos{color:var(--pos)}.neg{color:var(--neg)}.pk{color:var(--pinkl)}.mut{color:var(--muted)}
+.aviso{background:rgba(242,182,107,.1);border:1px solid rgba(242,182,107,.35);color:var(--amber);border-radius:12px;padding:10px 14px;font-size:13px;margin-top:14px}
+.tabs{display:flex;gap:6px;margin:16px 0 4px;border-bottom:1px solid var(--line)}
+.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 4px;margin-right:14px;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.tabs button.on{color:var(--ink);border-color:var(--pink)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 10px;align-items:center}
+.chip{border:1px solid var(--line);background:transparent;border-radius:99px;padding:6px 12px;font-size:12.5px;color:var(--sub)}.chip.on{background:var(--card2);color:var(--ink);border-color:var(--sub)}
+.list{display:flex;flex-direction:column;gap:8px}
+.card{background:var(--card);border-radius:14px;padding:12px 14px;position:relative;overflow:hidden}
+.sc{display:flex;gap:12px;align-items:center}
+.sc .d{flex:none;width:44px;text-align:center;line-height:1.1}.sc .d b{display:block;font-size:18px;font-weight:800}.sc .d span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.sc .t{flex:1;min-width:0}.sc .t b{display:block;font-size:14.5px;overflow-wrap:anywhere}.sc .t span{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:var(--card2);color:var(--sub);white-space:nowrap}
+.pill.ok{background:rgba(127,221,169,.14);color:var(--pos)}.pill.am{background:rgba(242,182,107,.14);color:var(--amber)}.pill.pk{background:rgba(207,29,81,.18);color:var(--pinkl)}
+.btn{border:1px solid var(--line);background:var(--card2);border-radius:99px;padding:8px 14px;font-size:13px;font-weight:600;white-space:nowrap}
+.btn.pkb{background:var(--pink);border-color:var(--pink);color:#fff}.btn.sm{padding:5px 10px;font-size:12px}
+.btn.dg{color:var(--neg)}
+.fab{position:fixed;right:16px;bottom:18px;z-index:30;padding:14px 20px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.search{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:15px}
+.empty{color:var(--muted);font-size:13px;padding:14px;background:var(--card);border-radius:12px}
+label{display:block;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub)}
+label input,label select,label textarea{display:block;width:100%;margin-top:4px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:15px;letter-spacing:0;text-transform:none;font-weight:400}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.f3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.f4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media(max-width:520px){.f4{grid-template-columns:1fr 1fr}}
+.w{grid-column:1/-1}
+/* editor */
+#ed{position:fixed;inset:0;z-index:40;background:var(--bg);display:none;overflow:auto}
+#ed.open{display:block}
+#ed .bar{position:sticky;top:0;z-index:5;background:rgba(20,18,24,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+#ed .bar .wrap{display:flex;justify-content:space-between;align-items:center;gap:10px;height:56px}
+#ed .bar b{font-size:14px;letter-spacing:.14em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pp{background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.pp .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.pp .top b{font-size:14.5px;display:block}.pp .top span{font-size:11.5px;color:var(--muted)}
+.pp .ex{margin-top:8px}
+.x{border:0;background:none;color:var(--muted);font-size:20px;line-height:1;padding:2px 6px}
+.st{border:1px solid var(--line);border-radius:99px;padding:4px 10px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(242,182,107,.14);color:var(--amber);white-space:nowrap}
+.st.pago{background:rgba(127,221,169,.14);color:var(--pos)}
+.res{position:relative}
+.dd{position:absolute;left:0;right:0;top:100%;z-index:8;background:var(--card2);border:1px solid var(--line);border-radius:12px;margin-top:4px;max-height:300px;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.5);display:none}
+.dd.open{display:block}
+.dd button{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:9px 12px}
+.dd button:last-child{border:0}.dd button:hover,.dd button.hl{background:rgba(207,29,81,.14)}
+.dd button b{display:block;font-size:14px}.dd button small{font-size:11px;color:var(--muted)}
+.tot{position:sticky;bottom:0;z-index:5;background:rgba(20,18,24,.97);border-top:1px solid var(--line);margin-top:18px}
+.tot .wrap{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding-top:10px;padding-bottom:10px}
+.tot div{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.tot div b{display:block;font-size:14px;letter-spacing:0;color:var(--ink);white-space:nowrap}
+@media(max-width:520px){.tot .wrap{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.calc{background:var(--card2);border-radius:10px;padding:10px;margin-top:8px;font-size:12.5px;color:var(--sub)}
+.dz{background:var(--card);border-radius:12px;padding:12px}
+.dz .r{margin-top:10px;font-size:13px;color:var(--sub)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+#msg{min-height:20px;font-size:13px;margin-top:8px}
+#app{display:none}
+/* pessoa (modal) */
+#pm{position:fixed;inset:0;z-index:50;background:rgba(10,9,12,.72);display:none;align-items:flex-end;justify-content:center}
+#pm.open{display:flex}
+#pm form{background:var(--bg);border:1px solid var(--line);border-radius:18px 18px 0 0;width:100%;max-width:560px;padding:18px 16px 24px;max-height:92vh;overflow:auto}
+@media(min-width:700px){#pm{align-items:center}#pm form{border-radius:18px}}
+#pm h2{font-size:19px;font-weight:900;text-transform:uppercase;margin:0 0 12px}
+</style>
+</head>
+<body>
+<div id="app">
+<header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div></header>
+<main class="wrap">
+  <p class="eyebrow">Custos de cada show</p>
+  <h1>Bor<em>derôs</em></h1>
+  <div id="modo"></div>
+  <div class="tabs" id="tabs"><button class="on" data-t="shows">Shows</button><button data-t="pes">Pessoas</button><button data-t="aj">Ajustes</button></div>
+
+  <div id="tshows">
+    <div class="chips" id="fil"><button class="chip on" data-f="prox">Próximos</button><button class="chip" data-f="pend">Com pendência</button><button class="chip" data-f="hist">Histórico</button></div>
+    <div class="list" id="lshows"></div>
+  </div>
+
+  <div id="tpes" style="display:none">
+    <div style="display:flex;gap:8px;margin-top:14px"><input class="search" id="pbusca" placeholder="Buscar por nome, apelido, CPF ou PIX"><button class="btn pkb" id="pnova">+ Pessoa</button></div>
+    <p class="note" id="pinfo"></p>
+    <div class="list" id="lpes" style="margin-top:10px"></div>
+  </div>
+
+  <div id="taj" style="display:none">
+    <h3>Ônibus (diesel)</h3>
+    <div class="f3"><label>Autonomia (km/L)<input id="cj_kml" inputmode="decimal"></label><label>Preço do diesel (R$/L)<input id="cj_dp" inputmode="decimal"></label><label>Km adicional (% da ida)<input id="cj_ad" inputmode="decimal"></label></div>
+    <p class="note">Mesmo cálculo da planilha do show: (km ida + km volta + km adicional) ÷ km/L × preço. A autonomia do ônibus veio da planilha (último borderô com diesel).</p>
+    <h3>Carros (gasolina)</h3>
+    <label style="max-width:220px">Preço da gasolina (R$/L)<input id="cj_gp" inputmode="decimal" placeholder="ex.: 6,29"></label>
+    <div class="list" id="lveic" style="margin-top:10px"></div>
+    <p class="note">Os carros vêm da coluna Carro da LB Lista de Equipe. Preencha a autonomia (km/L) de cada um; o cálculo de gasolina do borderô usa estes valores.</p>
+    <div class="acts"><button class="btn pkb" id="cj_salvar">Salvar ajustes</button><span id="cj_msg" class="note"></span></div>
+  </div>
+</main>
+<button class="btn pkb fab" id="novo">+ Novo borderô</button>
+</div>
+
+<!-- editor do borderô -->
+<div id="ed">
+  <div class="bar"><div class="wrap"><button class="btn sm" id="ed_x">‹ Voltar</button><b id="ed_t">Borderô</b><button class="btn pkb sm" id="ed_s">Salvar</button></div></div>
+  <div class="wrap">
+    <h3>Show</h3>
+    <div class="f2">
+      <label class="w">Show<select id="e_show"></select></label>
+      <label class="w">Nome no borderô<input id="e_nome"></label>
+      <label>Data<input type="date" id="e_data"></label>
+      <label>Local<input id="e_local"></label>
+      <label>Cachê (R$)<input id="e_valor" inputmode="decimal"></label>
+      <label>Comissão (R$)<input id="e_com" inputmode="decimal" placeholder="0"></label>
+    </div>
+    <h3>Equipe <small id="e_fm"></small></h3>
+    <div class="res"><input class="search" id="e_busca" placeholder="Adicionar pessoa: digite o nome ou apelido" autocomplete="off"><div class="dd" id="e_dd"></div></div>
+    <div id="e_eq" style="margin-top:10px"></div>
+    <datalist id="dl_fun"></datalist>
+    <h3>Itens <small>som, CO2, alimentação, hotel…</small></h3>
+    <div id="e_it"></div>
+    <button class="btn sm" id="e_addit">+ Item</button>
+    <h3>Diesel do ônibus</h3>
+    <div class="dz">
+      <div class="f4"><label>Km ida<input id="d_ida" inputmode="decimal"></label><label>Km volta<input id="d_volta" inputmode="decimal"></label><label>Km adicional<input id="d_ad" inputmode="decimal" placeholder="auto"></label><label>Km/L<input id="d_kml" inputmode="decimal"></label><label>Preço R$/L<input id="d_pr" inputmode="decimal"></label><label>Abastecido (R$)<input id="d_ab" inputmode="decimal" placeholder="real, se houver"></label></div>
+      <div class="r" id="d_res"></div>
+    </div>
+    <h3>Observações</h3>
+    <label><textarea id="e_obs" rows="2"></textarea></label>
+    <div class="acts"><button class="btn" id="cp_pag">Copiar pagamentos</button><button class="btn" id="cp_eq">Copiar lista da equipe</button><button class="btn dg" id="e_del">Excluir borderô</button></div>
+    <div id="msg"></div>
+  </div>
+  <div class="tot"><div class="wrap" id="e_tot"></div></div>
+</div>
+
+<!-- pessoa -->
+<div id="pm"><form id="pf" autocomplete="off">
+  <h2 id="pm_t">Pessoa</h2>
+  <div class="f2">
+    <label class="w">Nome completo<input name="nome" required></label>
+    <label>Apelido (ajuda na busca)<input name="apelido"></label>
+    <label>CPF / documento<input name="doc"></label>
+    <label class="w">Chave PIX<input name="pix"></label>
+    <label>Telefone<input name="telefone" inputmode="tel"></label>
+    <label>Carro (placa e modelo)<input name="carro"></label>
+  </div>
+  <div id="pm_msg" class="note"></div>
+  <div class="acts" style="justify-content:space-between"><button type="button" class="btn dg" id="pm_del">Excluir</button><span style="display:flex;gap:8px"><button type="button" class="btn" id="pm_x">Cancelar</button><button type="submit" class="btn pkb">Salvar</button></span></div>
+</form></div>
+
+<script src="../lb.js"></script>
+<script>
+const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
+const brl2=v=>v==null||isNaN(v)?'—':'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=v=>{if(v==null||v==='')return 0;if(typeof v==='number')return v;const s=String(v).trim();const n=parseFloat(s.includes(',')?s.replace(/\./g,'').replace(',','.'):s);return isNaN(n)?0:n};
+const nf=v=>v?String(+(+v).toFixed(2)).replace('.',','):'';
+const MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const ddmm=s=>s.slice(8,10)+'/'+s.slice(5,7);
+const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
+const GR=['Músicos','Produção','Técnica','Outros','Comissão'];
+const store=LB.store;
+let D,API='',BORD={},PES=[],CFG={},LOCAL=false,filtro='prox',ED=null;
+const doc11=d=>{const x=String(d||'').replace(/\D/g,'');return x.length===11?x.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4'):String(d||'')};
+
+/* ---------- dados: arquivo cifrado + ajustes/alterações locais; com a planilha ligada, tudo ao vivo ---------- */
+function carregaLocal(){let l={};try{l=JSON.parse(store.get('lb_bord_local')||'{}')}catch(e){}return Object.assign({borderos:{},excluidos:[],pessoas:null},l)}
+function salvaLocal(l){store.set('lb_bord_local',JSON.stringify(l))}
+async function api(corpo){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({usuario:LB.login,senha:LB.senha,nome:LB.usuario},corpo))});return r.json()}
+(async()=>{try{API=((await (await fetch('../config.json',{cache:'no-store'})).json()).api_url)||''}catch(e){}
+LB.entrar({pagina:'bordero',base:'../',titulo:'Borderôs',ok:async r=>{
+  D=r.dados;BORD=JSON.parse(JSON.stringify(D.borderos));PES=D.pessoas.slice();
+  try{CFG=Object.assign({},D.config,JSON.parse(store.get('lb_bord_cfg')||'{}'))}catch(e){CFG=Object.assign({},D.config)}
+  LOCAL=!API;
+  if(API){try{const a=await api({acao:'borderos'});if(a.ok){Object.assign(BORD,a.borderos);PES=a.pessoas}else LOCAL=true}catch(e){LOCAL=true}}
+  if(LOCAL){const l=carregaLocal();Object.assign(BORD,l.borderos);l.excluidos.forEach(id=>delete BORD[id]);if(l.pessoas)PES=l.pessoas}
+  document.getElementById('app').style.display='block';
+  document.getElementById('links').innerHTML=LB.links(r.paginas,'bordero','../');
+  document.getElementById('modo').innerHTML=LOCAL?`<div class="aviso">Modo deste aparelho: a planilha ainda não está ligada, então o que você salvar fica guardado só neste celular/PC (e não aparece para o Lucas). Ao ligar a planilha, tudo passa a salvar nela e as pessoas são editadas direto na LB Lista de Equipe. <button class="btn sm" id="exp" style="margin-left:6px">Exportar alterações</button></div>`:'';
+  if(LOCAL)document.getElementById('exp').onclick=exportar;
+  document.getElementById('dl_fun').innerHTML=D.funcoes.map(f=>`<option value="${esc(f.funcao)}">`).join('');
+  renderShows();renderPes();renderAj()}})})();
+function exportar(){const l=carregaLocal();const b=new Blob([JSON.stringify(l,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='borderos-alteracoes-'+HOJE+'.json';a.click()}
+
+/* ---------- abas ---------- */
+document.getElementById('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  ['shows','pes','aj'].forEach(t=>document.getElementById('t'+t).style.display=t===b.dataset.t?'block':'none');
+  document.getElementById('novo').style.display=b.dataset.t==='shows'?'':'none'};
+document.getElementById('fil').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;filtro=b.dataset.f;document.querySelectorAll('#fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderShows()};
+
+/* ---------- cálculos ---------- */
+function totP(e){return e.fora?0:num(e.valor)+num(e.diaria)+num(e.gasolina)+num(e.ajuda)+num(e.estacionamento)}
+function dieselDe(d){const ad=d.km_adic===''||d.km_adic==null?num(d.km_ida)*num(CFG.adicional_pct)/100:num(d.km_adic);const km=num(d.km_ida)+num(d.km_volta)+ad;const kml=num(d.kml)||num(CFG.onibus_kml)||2.8;const pr=num(d.preco)||num(CFG.diesel_preco)||6;const l=km?km/kml:0;
+  return {km,ad,kml,pr,litros:l,calc:l*pr,valor:num(d.abastecido)||l*pr}}
+function totais(b){const eq=b.equipe.filter(e=>e.grupo!=='Comissão').reduce((a,e)=>a+totP(e),0);const com=b.equipe.filter(e=>e.grupo==='Comissão').reduce((a,e)=>a+totP(e),0)+num(b.comissao);
+  const it=(b.itens||[]).reduce((a,i)=>a+num(i.valor),0);const dz=b.fonte==='planilha'&&b.totais?num(b.totais.diesel):dieselDe(b.diesel||{}).valor;const g=eq+it+dz+com;
+  return {eq,it,dz,com,g,luc:num(b.valor)?num(b.valor)-g:null}}
+function resumo(b){const r={},ok=b.equipe.filter(e=>!e.fora&&e.grupo!=='Comissão');GR.forEach(g=>{const q=new Set(ok.filter(e=>e.grupo===g).map(e=>e.pessoa||e.nome)).size;if(q)r[g]=q});r._n=new Set(ok.map(e=>e.pessoa||e.nome)).size;return r}
+function fmTxt(r){const n=r._n||0;return n?Object.entries(r).filter(([g])=>g!=='_n').map(([g,q])=>q+' '+({'Músicos':q>1?'músicos':'músico','Produção':'produção','Técnica':'técnica','Outros':q>1?'outros':'outro'}[g])).join(' · ')+' · '+n+' na equipe':''}
+
+/* ---------- lista de shows ---------- */
+function bordDoShow(s){return Object.values(BORD).find(b=>b.show_id===s.id)||Object.values(BORD).find(b=>b.data===s.data&&(!b.show_id))}
+function renderShows(){
+  const usados=new Set();
+  let it=D.shows.map(s=>{const b=bordDoShow(s);if(b)usados.add(b.id);return {s,b}});
+  Object.values(BORD).filter(b=>!usados.has(b.id)).forEach(b=>it.push({s:{id:null,data:b.data,evento:b.show,cidade:b.local,valor:b.valor,status:''},b}));
+  if(filtro==='prox')it=it.filter(x=>x.s.data>=HOJE).sort((a,b)=>a.s.data.localeCompare(b.s.data));
+  if(filtro==='hist')it=it.filter(x=>x.s.data<HOJE).sort((a,b)=>b.s.data.localeCompare(a.s.data));
+  if(filtro==='pend')it=it.filter(x=>x.b&&x.b.equipe.some(e=>e.status==='Pendente'&&!e.fora)).sort((a,b)=>a.s.data.localeCompare(b.s.data));
+  document.getElementById('lshows').innerHTML=it.length?it.map(({s,b})=>{const t=b?totais(b):null,pend=b?b.equipe.filter(e=>e.status==='Pendente'&&!e.fora):[];
+    return `<div class="card sc"><div class="d"><b>${s.data.slice(8,10)}</b><span>${MES[+s.data.slice(5,7)-1]} ${s.data.slice(2,4)}</span></div>
+    <div class="t"><b>${esc(s.evento||b&&b.show||'Show')}</b><span>${esc(s.cidade||'')}${s.valor?' · cachê '+brl(s.valor):''}${s.status==='A confirmar'?' · a confirmar':''}</span>
+    <span style="display:block;margin-top:3px">${b?`${esc(fmTxt(resumo(b)))} · gasto ${brl(t.g)}${t.luc!=null?' · lucro <b class="'+(t.luc<0?'neg':'pos')+'" style="display:inline;font-size:12px">'+brl(t.luc)+'</b>':''}${pend.length?' · <b class="pk" style="display:inline;font-size:12px">'+pend.length+' a pagar</b>':''}`:'<span class="pill am">sem borderô</span>'}</span></div>
+    <button class="btn sm${b?'':' pkb'}" data-ab="${esc(b?b.id:'')}" data-sid="${esc(s.id||'')}">${b?'Abrir':'Montar'}</button></div>`}).join(''):'<div class="empty">Nada neste filtro.</div>';
+}
+document.getElementById('lshows').onclick=e=>{const b=e.target.closest('[data-ab]');if(!b)return;if(b.dataset.ab)abrir(JSON.parse(JSON.stringify(BORD[b.dataset.ab])));else novo(D.shows.find(s=>s.id===b.dataset.sid))};
+document.getElementById('novo').onclick=()=>novo(null);
+
+/* ---------- editor ---------- */
+const $=id=>document.getElementById(id);
+function novo(s){const b={id:'B'+(s?s.id:HOJE+'-'+Math.random().toString(36).slice(2,6)),show_id:s?s.id:null,data:s?s.data:HOJE,show:s?(s.evento||''):'',local:s?(s.local||s.cidade||''):'',valor:s?s.valor:null,
+  equipe:[],itens:[],diesel:{km_ida:'',km_volta:'',km_adic:'',kml:CFG.onibus_kml,preco:CFG.diesel_preco,abastecido:''},comissao:'',obs:'',fonte:'app'};
+  // sugestão: equipe do último borderô (mesma formação), tudo como pendente
+  const ult=Object.values(BORD).filter(x=>x.data<b.data&&x.equipe.length).sort((a,c)=>c.data.localeCompare(a.data))[0];
+  if(ult&&confirm('Começar com a mesma equipe do último borderô ('+ddmm(ult.data)+' · '+ult.show+')? Dá para tirar e trocar depois.'))
+    b.equipe=ult.equipe.filter(e=>!e.fora&&e.grupo!=='Comissão').map(e=>({pessoa:e.pessoa,nome:e.nome,pix:e.pix,doc:e.doc,grupo:e.grupo,funcao:e.funcao,valor:e.valor,status:'Pendente'}));
+  abrir(b,true)}
+function abrir(b,isNovo){ED=b;ED._novo=!!isNovo;ED.diesel=Object.assign({km_ida:'',km_volta:'',km_adic:'',kml:CFG.onibus_kml,preco:CFG.diesel_preco,abastecido:''},b.diesel||{});
+  if(b.fonte==='planilha'){ED.diesel.km_adic=b.diesel.km_adic;ED.diesel.abastecido=b.totais?b.totais.diesel:''}
+  $('e_show').innerHTML='<option value="">— borderô avulso —</option>'+D.shows.map(s=>`<option value="${esc(s.id)}">${ddmm(s.data)}/${s.data.slice(2,4)} · ${esc(s.evento)} · ${esc(s.cidade)}</option>`).join('');
+  $('e_show').value=b.show_id||'';$('e_nome').value=b.show||'';$('e_data').value=b.data;$('e_local').value=b.local||'';$('e_valor').value=nf(b.valor);$('e_com').value=nf(b.comissao);$('e_obs').value=b.obs||'';
+  $('d_ida').value=nf(ED.diesel.km_ida);$('d_volta').value=nf(ED.diesel.km_volta);$('d_ad').value=ED.diesel.km_adic===''?'':nf(ED.diesel.km_adic);$('d_kml').value=nf(ED.diesel.kml);$('d_pr').value=nf(ED.diesel.preco);$('d_ab').value=nf(ED.diesel.abastecido);
+  $('ed_t').textContent=(b.show||'Novo borderô');$('msg').textContent='';$('e_del').style.display=BORD[b.id]?'':'none';
+  ED.fonte='app';renderEq();renderIt();calcTot();$('ed').classList.add('open');$('ed').scrollTop=0;document.body.style.overflow='hidden'}
+function fechar(){if(ED&&ED._sujo&&!confirm('Sair sem salvar as mudanças?'))return;$('ed').classList.remove('open');document.body.style.overflow='';ED=null}
+$('ed_x').onclick=fechar;
+$('e_show').onchange=()=>{const s=D.shows.find(x=>x.id===$('e_show').value);ED.show_id=s?s.id:null;if(s){$('e_nome').value=s.evento;$('e_data').value=s.data;$('e_local').value=s.local||s.cidade;$('e_valor').value=nf(s.valor)}lerCab();calcTot()};
+['e_nome','e_data','e_local','e_valor','e_com','e_obs'].forEach(id=>$(id).addEventListener('input',()=>{lerCab();calcTot()}));
+function lerCab(){ED.show=$('e_nome').value.trim();ED.data=$('e_data').value;ED.local=$('e_local').value.trim();ED.valor=num($('e_valor').value)||null;ED.comissao=num($('e_com').value)||'';ED.obs=$('e_obs').value;ED._sujo=true;$('ed_t').textContent=ED.show||'Novo borderô'}
+['d_ida','d_volta','d_ad','d_kml','d_pr','d_ab'].forEach(id=>$(id).addEventListener('input',()=>{const d=ED.diesel;d.km_ida=num($('d_ida').value);d.km_volta=num($('d_volta').value);d.km_adic=$('d_ad').value===''?'':num($('d_ad').value);d.kml=num($('d_kml').value);d.preco=num($('d_pr').value);d.abastecido=num($('d_ab').value)||'';ED._sujo=true;calcTot()}));
+
+/* busca de pessoas (banco LB Lista de Equipe) */
+function achar(q){q=LB.norm(q);const qd=q.replace(/\D/g,'');if(!q)return [];
+  return PES.map(p=>{const n=LB.norm(p.nome),a=LB.norm(p.apelido);let sc=0;
+    if(n.startsWith(q)||a.startsWith(q))sc=3;else if(n.split(' ').some(w=>w.startsWith(q))||a.split(' ').some(w=>w.startsWith(q)))sc=2;else if(n.includes(q)||a.includes(q))sc=1;
+    else if(qd.length>=3&&(String(p.doc).replace(/\D/g,'').includes(qd)||String(p.pix).replace(/\D/g,'').includes(qd)))sc=1;return {p,sc}}).filter(x=>x.sc).sort((a,b)=>b.sc-a.sc||a.p.nome.localeCompare(b.p.nome)).slice(0,12).map(x=>x.p)}
+let hl=0,res=[];
+$('e_busca').addEventListener('input',()=>{res=achar($('e_busca').value);hl=0;ddRender()});
+$('e_busca').addEventListener('keydown',e=>{if(!res.length)return;if(e.key==='ArrowDown'){hl=Math.min(res.length-1,hl+1);ddRender();e.preventDefault()}if(e.key==='ArrowUp'){hl=Math.max(0,hl-1);ddRender();e.preventDefault()}if(e.key==='Enter'){addPessoa(res[hl]);e.preventDefault()}});
+document.addEventListener('click',e=>{if(!e.target.closest('.res'))$('e_dd').classList.remove('open')});
+function ddRender(){const q=$('e_busca').value.trim();$('e_dd').innerHTML=res.map((p,i)=>`<button type="button" class="${i===hl?'hl':''}" data-pi="${esc(p.id)}"><b>${esc(p.nome)}</b><small>${p.doc?'CPF/doc '+esc(doc11(p.doc)):'sem documento'}${p.apelido?' · '+esc(p.apelido):''}${p.pix?'':' · sem PIX'}</small></button>`).join('')+(q?`<button type="button" data-nova="1"><b>+ Cadastrar "${esc(q)}"</b><small>pessoa nova no banco da equipe</small></button>`:'');
+  $('e_dd').classList.toggle('open',!!q)}
+$('e_dd').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.nova){abrirPes({nome:$('e_busca').value.trim()},p=>addPessoa(p));return}addPessoa(PES.find(p=>p.id===b.dataset.pi))};
+function addPessoa(p){if(!p)return;const u=(D.ultimo||{})[p.id]||{};const f=D.funcoes.find(x=>x.funcao===u.funcao);
+  ED.equipe.push({pessoa:p.id,nome:p.nome,pix:p.pix,doc:p.doc,grupo:u.grupo||(f&&f.grupo)||'Músicos',funcao:u.funcao||'',valor:u.valor||'',status:'Pendente'});
+  $('e_busca').value='';res=[];$('e_dd').classList.remove('open');ED._sujo=true;renderEq();calcTot();$('e_busca').focus()}
+
+/* linhas da equipe */
+function renderEq(){const r=resumo(ED);$('e_fm').textContent=fmTxt(r);
+  $('e_eq').innerHTML=ED.equipe.length?GR.map(g=>{const l=ED.equipe.map((e,i)=>({e,i})).filter(x=>x.e.grupo===g);if(!l.length)return '';
+    return `<div class="note" style="margin:10px 2px 6px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;font-size:10.5px;color:var(--pinkl)">${g} · ${l.length}</div>`+l.map(({e,i})=>`<div class="pp" data-i="${i}">
+    <div class="top"><div><b>${esc(e.nome)}</b><span>${e.doc?'CPF/doc '+esc(doc11(e.doc))+' · ':''}${e.pix?'PIX '+esc(e.pix):'<span class="pk">sem PIX</span>'}</span></div>
+    <div style="display:flex;gap:4px;align-items:center"><button type="button" class="st${e.status==='Pago'?' pago':''}" data-st>${e.status==='Pago'?'pago':'a pagar'}</button><button type="button" class="x" data-rm title="Tirar">×</button></div></div>
+    <div class="f4 ex"><label>Grupo<select data-k="grupo">${GR.map(x=>`<option${x===e.grupo?' selected':''}>${x}</option>`).join('')}</select></label>
+    <label>Função<input data-k="funcao" list="dl_fun" value="${esc(e.funcao)}"></label><label>Cachê (R$)<input data-k="valor" inputmode="decimal" value="${nf(e.valor)}"></label>
+    <label>Gasolina (R$) <a href="#" data-gas style="color:var(--pinkl);text-transform:none;letter-spacing:0">calcular</a><input data-k="gasolina" inputmode="decimal" value="${nf(e.gasolina)}"></label>
+    <label>Diária (R$)<input data-k="diaria" inputmode="decimal" value="${nf(e.diaria)}"></label><label>Ajuda de custo<input data-k="ajuda" inputmode="decimal" value="${nf(e.ajuda)}"></label><label>Estacionamento<input data-k="estacionamento" inputmode="decimal" value="${nf(e.estacionamento)}"></label>
+    <div style="align-self:end;text-align:right;font-weight:800;padding-bottom:9px">${brl2(totP(e))}</div></div><div data-gc></div></div>`).join('')}).join('')
+    :'<div class="empty">Ninguém ainda. Busque pelo nome acima (ou comece com a equipe do último show ao criar).</div>'}
+$('e_eq').addEventListener('input',e=>{const t=e.target,c=t.closest('[data-i]');if(!c||!t.dataset.k)return;const p=ED.equipe[+c.dataset.i];
+  p[t.dataset.k]=['valor','gasolina','diaria','ajuda','estacionamento'].includes(t.dataset.k)?num(t.value):t.value;
+  if(t.dataset.k==='funcao'){const f=D.funcoes.find(x=>LB.norm(x.funcao)===LB.norm(t.value));if(f&&!p.valor){p.valor=f.valor;c.querySelector('[data-k=valor]').value=nf(f.valor)}if(f&&f.grupo!==p.grupo){p.grupo=f.grupo;ED._sujo=true;renderEq();calcTot();return}}
+  ED._sujo=true;c.querySelector('.ex>div:last-child').textContent=brl2(totP(p));calcTot()});
+$('e_eq').addEventListener('change',e=>{if(e.target.dataset.k==='grupo'){renderEq();calcTot()}});
+$('e_eq').addEventListener('click',e=>{const c=e.target.closest('[data-i]');if(!c)return;const i=+c.dataset.i,p=ED.equipe[i];
+  if(e.target.closest('[data-rm]')){ED.equipe.splice(i,1);ED._sujo=true;renderEq();calcTot()}
+  if(e.target.closest('[data-st]')){p.status=p.status==='Pago'?'Pendente':'Pago';ED._sujo=true;renderEq();calcTot()}
+  if(e.target.closest('[data-gas]')){e.preventDefault();gasCalc(c,p)}});
+/* calculadora de gasolina: km ida e volta ÷ autonomia do carro × preço */
+function gasCalc(c,p){const box=c.querySelector('[data-gc]');if(box.innerHTML){box.innerHTML='';return}
+  const vs=(CFG.veiculos||[]);const meu=vs.find(v=>v.pessoa===p.pessoa);
+  box.innerHTML=`<div class="calc"><div class="f4"><label>Carro<select data-g="v">${vs.map(v=>`<option value="${esc(v.pessoa)}"${meu&&meu.pessoa===v.pessoa?' selected':''}>${esc(v.carro)} (${esc(v.nome.split(' ')[0])})</option>`).join('')}<option value="">outro</option></select></label>
+  <label>Km ida e volta<input data-g="km" inputmode="decimal" value="${nf(num(ED.diesel.km_ida)+num(ED.diesel.km_volta))}"></label><label>Km/L<input data-g="kml" inputmode="decimal" value="${nf((meu||vs[0]||{}).kml)}"></label><label>R$/L<input data-g="pr" inputmode="decimal" value="${nf(CFG.gasolina_preco)}"></label></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px"><span data-g="r"></span><button type="button" class="btn sm pkb" data-g="ok">Usar</button></div></div>`;
+  const g=k=>box.querySelector(`[data-g=${k}]`);
+  const cc=()=>{const km=num(g('km').value),kml=num(g('kml').value),pr=num(g('pr').value);const v=km&&kml&&pr?km/kml*pr:0;
+    g('r').innerHTML=v?`${nf(km)} km ÷ ${nf(kml)} km/L = ${nf(+(km/kml).toFixed(1))} L × R$ ${nf(pr)} = <b>${brl2(v)}</b>`:'<span class="pk">preencha km, autonomia e preço</span>';return v};
+  g('v').onchange=()=>{const v=vs.find(x=>x.pessoa===g('v').value);g('kml').value=nf(v&&v.kml);cc()};
+  box.addEventListener('input',cc);cc();
+  g('ok').onclick=()=>{const v=cc();if(!v)return;p.gasolina=Math.round(v*100)/100;ED._sujo=true;renderEq();calcTot()}}
+
+/* itens */
+function renderIt(){$('e_it').innerHTML=(ED.itens||[]).map((t,i)=>`<div class="pp" data-ii="${i}"><div class="f4" style="grid-template-columns:2fr 1fr 1fr auto;align-items:end"><label>Item<input data-k="desc" value="${esc(t.desc)}"></label><label>Valor (R$)<input data-k="valor" inputmode="decimal" value="${nf(t.valor)}"></label><label>Situação<select data-k="status"><option${t.status!=='Pago'?' selected':''}>Pendente</option><option${t.status==='Pago'?' selected':''}>Pago</option></select></label><button type="button" class="x" data-rmi>×</button></div></div>`).join('')}
+$('e_addit').onclick=()=>{ED.itens=ED.itens||[];ED.itens.push({desc:'',valor:'',status:'Pendente'});renderIt();ED._sujo=true};
+$('e_it').addEventListener('input',e=>{const c=e.target.closest('[data-ii]');if(!c)return;const t=ED.itens[+c.dataset.ii];t[e.target.dataset.k]=e.target.dataset.k==='valor'?num(e.target.value):e.target.value;ED._sujo=true;calcTot()});
+$('e_it').addEventListener('click',e=>{const c=e.target.closest('[data-ii]');if(c&&e.target.closest('[data-rmi]')){ED.itens.splice(+c.dataset.ii,1);renderIt();calcTot();ED._sujo=true}});
+
+function calcTot(){const t=totais(ED),d=dieselDe(ED.diesel);
+  $('d_ad').placeholder='auto: '+nf(+(num(ED.diesel.km_ida)*num(CFG.adicional_pct)/100).toFixed(1));
+  $('d_res').innerHTML=d.km?`${nf(+d.km.toFixed(1))} km (ida + volta + ${nf(+d.ad.toFixed(1))} adicional) ÷ ${nf(d.kml)} km/L = <b>${nf(+d.litros.toFixed(1))} L</b> × R$ ${nf(d.pr)} = <b>${brl2(d.calc)}</b>${num(ED.diesel.abastecido)?` · vale o abastecido: <b>${brl2(num(ED.diesel.abastecido))}</b>`:''}`:'Sem ônibus: deixe os km em branco.';
+  const pend=ED.equipe.filter(e=>e.status==='Pendente'&&!e.fora).reduce((a,e)=>a+totP(e),0);
+  $('e_tot').innerHTML=`<div>Equipe<b>${brl(t.eq)}</b></div><div>Itens<b>${brl(t.it)}</b></div><div>Diesel<b>${brl(t.dz)}</b></div><div>Gasto<b>${brl(t.g)}</b></div><div>Lucro<b class="${t.luc==null?'':t.luc<0?'neg':'pos'}">${t.luc==null?'—':brl(t.luc)}</b></div>${pend?`<div style="grid-column:1/-1;font-size:11px;letter-spacing:.04em;text-transform:none">a pagar para a equipe: <b style="display:inline;color:var(--pinkl);font-size:12px">${brl(pend)}</b></div>`:''}`}
+
+/* salvar / excluir */
+function limpo(b){const o=JSON.parse(JSON.stringify(b));delete o._novo;delete o._sujo;const t=totais(o),d=dieselDe(o.diesel);o.diesel=Object.assign({},o.diesel,{km:+d.km.toFixed(1),km_adic:d.ad,litros:+d.litros.toFixed(1),kml:d.kml,preco:d.pr});
+  o.totais={equipe:t.eq,itens:t.it,diesel:Math.round(t.dz*100)/100,comissao:t.com,gasto:Math.round(t.g*100)/100,lucro:t.luc==null?null:Math.round(t.luc*100)/100};o.resumo=resumo(o);
+  o.equipe.forEach(e=>{e.total=totP(e)});o.fonte='app';o.atualizado_em=new Date().toISOString().slice(0,16).replace('T',' ');o.atualizado_por=LB.usuario;return o}
+$('ed_s').onclick=async()=>{lerCab();if(!ED.data){$('msg').innerHTML='<span class="neg">Informe a data.</span>';return}
+  const o=limpo(ED);$('msg').textContent='Salvando…';
+  try{if(LOCAL){const l=carregaLocal();l.borderos[o.id]=o;l.excluidos=l.excluidos.filter(x=>x!==o.id);salvaLocal(l)}
+    else{const r=await api({acao:'salvar_bordero',bordero:o});if(!r.ok)throw new Error(r.erro)}
+    BORD[o.id]=o;ED._sujo=false;$('msg').innerHTML='<span class="pos">Salvo'+(LOCAL?' neste aparelho':' na planilha')+'.</span>';$('e_del').style.display='';renderShows()}
+  catch(e){$('msg').innerHTML='<span class="neg">Não salvou ('+esc(e.message)+').</span>'}};
+$('e_del').onclick=async()=>{if(!confirm('Excluir este borderô? Não dá para desfazer.'))return;
+  try{if(LOCAL){const l=carregaLocal();delete l.borderos[ED.id];l.excluidos.push(ED.id);salvaLocal(l)}else{const r=await api({acao:'excluir_bordero',id:ED.id});if(!r.ok)throw new Error(r.erro)}
+    delete BORD[ED.id];ED._sujo=false;fechar();renderShows()}catch(e){$('msg').innerHTML='<span class="neg">Não excluiu ('+esc(e.message)+').</span>'}};
+/* textos para o WhatsApp (iguais aos da planilha) */
+function copiar(t,btn){const ok=()=>{const o=btn.textContent;btn.textContent='Copiado!';setTimeout(()=>btn.textContent=o,1500)};if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,ok);else ok()}
+$('cp_pag').onclick=e=>{lerCab();const L=[`💸 Pagamentos – ${ED.show} (${ddmm(ED.data)})`];const P={};
+  ED.equipe.filter(x=>!x.fora).forEach(x=>{const k=x.pessoa||x.nome;(P[k]=P[k]||{n:x.nome,pix:x.pix,st:x.status,l:[]}).l.push(x);if(x.status!=='Pago')P[k].st='Pendente'});
+  Object.values(P).forEach(p=>{const tot=p.l.reduce((a,x)=>a+totP(x),0);const parts=p.l.map(x=>`${x.funcao} (${brl2(num(x.valor))})`+[['gasolina','Gasolina'],['diaria','Diária'],['ajuda','Ajuda de custo'],['estacionamento','Estacionamento']].filter(([k])=>num(x[k])).map(([k,n])=>`; ${n}: ${brl2(num(x[k]))}`).join(''));
+    L.push(`${p.st==='Pago'?'✅':'⏳'} ${p.n}: ${parts.join('; ')}\nTOTAL: ${brl2(tot)}${p.pix?'\nPix: '+p.pix:''}`)});copiar(L.join('\n\n'),e.target)};
+$('cp_eq').onclick=e=>{lerCab();const n=ED.equipe.filter(x=>!x.fora&&x.grupo!=='Comissão');copiar(`*${ED.show}* · ${ddmm(ED.data)}/${ED.data.slice(0,4)}${ED.local?' · '+ED.local:''}\nEquipe de ${new Set(n.map(x=>x.pessoa||x.nome)).size} pessoas\n\n`+n.map(x=>{const p=PES.find(y=>y.id===x.pessoa)||{};return `*${x.nome}* - ${x.funcao}${x.doc?' _'+x.doc+'_':''}${p.carro?' _'+p.carro+'_':''}`}).join('\n'),e.target)};
+
+/* ---------- pessoas (banco LB Lista de Equipe) ---------- */
+function renderPes(){const q=$('pbusca').value.trim();const l=q?achar(q):PES.slice().sort((a,b)=>a.nome.localeCompare(b.nome));
+  $('pinfo').textContent=`${PES.length} pessoas${LOCAL?' · alterações ficam neste aparelho até ligar a planilha':' · editando direto a LB Lista de Equipe'}`;
+  $('lpes').innerHTML=l.map(p=>`<div class="card sc" data-pe="${esc(p.id)}" style="cursor:pointer"><div class="t"><b>${esc(p.nome)}</b><span>${p.apelido?esc(p.apelido)+' · ':''}${p.doc?'CPF/doc '+esc(doc11(p.doc)):'sem documento'}</span><span style="display:block">${p.pix?'PIX '+esc(p.pix):'<span class="pk">sem PIX</span>'}${p.carro?' · 🚗 '+esc(p.carro):''}${p.telefone?' · '+esc(p.telefone):''}</span></div><span class="btn sm">Editar</span></div>`).join('')||'<div class="empty">Ninguém com esse nome. Use "+ Pessoa".</div>'}
+$('pbusca').addEventListener('input',renderPes);
+$('lpes').onclick=e=>{const c=e.target.closest('[data-pe]');if(c)abrirPes(PES.find(p=>p.id===c.dataset.pe))};
+$('pnova').onclick=()=>abrirPes({});
+let pesCb=null,pesAt=null;const pf=$('pf');
+function abrirPes(p,cb){pesAt=p&&p.id?p:null;pesCb=cb||null;pf.reset();['nome','apelido','doc','pix','telefone','carro'].forEach(k=>pf[k].value=(p&&p[k])||'');
+  $('pm_t').textContent=pesAt?'Editar pessoa':'Nova pessoa';$('pm_del').style.display=pesAt?'':'none';$('pm_msg').textContent='';$('pm').classList.add('open');setTimeout(()=>pf.nome.focus(),50)}
+$('pm_x').onclick=()=>$('pm').classList.remove('open');
+pf.addEventListener('submit',async e=>{e.preventDefault();const x={};['nome','apelido','doc','pix','telefone','carro'].forEach(k=>x[k]=pf[k].value.trim());if(pesAt)x.id=pesAt.id;
+  if(!x.nome){$('pm_msg').innerHTML='<span class="neg">Informe o nome.</span>';return}
+  const dup=!pesAt&&x.doc&&PES.find(p=>p.doc&&p.doc.replace(/\D/g,'')===x.doc.replace(/\D/g,''));if(dup&&!confirm('Já existe '+dup.nome+' com esse documento. Cadastrar mesmo assim?'))return;
+  $('pm_msg').textContent='Salvando…';
+  try{if(LOCAL){if(pesAt)Object.assign(pesAt,x);else{x.id='n-'+Date.now().toString(36);PES.push(x)}const l=carregaLocal();l.pessoas=PES;salvaLocal(l)}
+    else{const r=await api({acao:'salvar_pessoa',pessoa:x});if(!r.ok)throw new Error(r.erro);PES=r.pessoas}
+    const salvo=pesAt?PES.find(p=>p.id===pesAt.id):PES.find(p=>p.nome===x.nome&&(p.doc||'')===x.doc)||PES[PES.length-1];
+    // atualiza PIX/nome no borderô aberto
+    if(ED&&salvo)ED.equipe.forEach(e=>{if(e.pessoa===salvo.id){e.pix=salvo.pix;e.nome=salvo.nome;e.doc=salvo.doc}});
+    $('pm').classList.remove('open');renderPes();if(ED)renderEq();if(pesCb&&salvo)pesCb(salvo)}
+  catch(err){$('pm_msg').innerHTML='<span class="neg">Não salvou ('+esc(err.message)+').</span>'}});
+$('pm_del').onclick=async()=>{if(!pesAt||!confirm('Excluir '+pesAt.nome+' da lista da equipe?'))return;
+  try{if(LOCAL){PES=PES.filter(p=>p.id!==pesAt.id);const l=carregaLocal();l.pessoas=PES;salvaLocal(l)}else{const r=await api({acao:'excluir_pessoa',id:pesAt.id});if(!r.ok)throw new Error(r.erro);PES=r.pessoas}
+    $('pm').classList.remove('open');renderPes()}catch(err){$('pm_msg').innerHTML='<span class="neg">Não excluiu ('+esc(err.message)+').</span>'}};
+
+/* ---------- ajustes (autonomias e preços) ---------- */
+function renderAj(){$('cj_kml').value=nf(CFG.onibus_kml);$('cj_dp').value=nf(CFG.diesel_preco);$('cj_ad').value=nf(CFG.adicional_pct);$('cj_gp').value=nf(CFG.gasolina_preco);
+  $('lveic').innerHTML=(CFG.veiculos||[]).map((v,i)=>`<div class="card sc"><div class="t"><b>${esc(v.carro)}</b><span>${esc(v.nome)}</span></div><label style="width:110px">Km/L<input data-vi="${i}" inputmode="decimal" value="${nf(v.kml)}" placeholder="informar"></label></div>`).join('')}
+$('cj_salvar').onclick=()=>{CFG.onibus_kml=num($('cj_kml').value)||2.8;CFG.diesel_preco=num($('cj_dp').value)||6;CFG.adicional_pct=num($('cj_ad').value);CFG.gasolina_preco=num($('cj_gp').value)||null;
+  document.querySelectorAll('[data-vi]').forEach(i=>CFG.veiculos[+i.dataset.vi].kml=num(i.value)||null);
+  store.set('lb_bord_cfg',JSON.stringify({onibus_kml:CFG.onibus_kml,diesel_preco:CFG.diesel_preco,adicional_pct:CFG.adicional_pct,gasolina_preco:CFG.gasolina_preco,veiculos:CFG.veiculos}));
+  $('cj_msg').textContent='Salvo neste aparelho.';setTimeout(()=>$('cj_msg').textContent='',2500)};
+</script>
+</body>
+</html>
