@@ -190,6 +190,8 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 .ntfy{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin:14px 0}.ntfy summary{cursor:pointer;font-weight:700;color:var(--ink)}.ntfy ol{margin:10px 0 0;padding-left:20px;font-size:13.5px;color:var(--sub)}.ntfy li{margin:6px 0}.ntfy a{color:var(--pinkl)}.ntfy code{background:var(--card2,#26232D);border-radius:6px;padding:2px 6px;color:var(--ink)}.ntfy .cpn{border:1px solid var(--line);background:transparent;color:var(--sub);border-radius:99px;padding:2px 10px;font-size:12px;margin-left:6px;cursor:pointer}.ntfy p{font-size:12.5px;color:var(--muted);margin:8px 0 0}
 .etp{display:flex;flex-direction:column;gap:6px;margin-top:8px}.etp div{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--sub)}.etp i{width:10px;height:10px;border-radius:3px;flex:none}.etp b{margin-left:auto;color:var(--ink)}.etp small{color:var(--muted);width:38px;text-align:right}
 .sxl{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px;color:var(--sub)}.sxl b{color:var(--ink)}
+.avh{display:flex;justify-content:space-between;gap:8px 12px;align-items:center;flex-wrap:wrap}.avt{background:none;border:1px solid var(--line);border-radius:99px;padding:3px 10px;font-size:12px;color:var(--sub);flex:none}
+.avl{display:flex;flex-direction:column;gap:5px;margin-top:8px}.av{display:block;font-size:13px;color:var(--sub);text-decoration:none;padding:6px 10px;background:var(--card2);border-radius:8px}.av b{color:var(--ink)}.av.pk{border-left:3px solid var(--pinkl)}
 </style>
 </head>
 <body>
@@ -390,7 +392,7 @@ function renderPagar(){const tp=document.getElementById('tpag');if(tp&&D.avisos)
   PAGS.filter(g=>g.ativo!=='não').forEach(g=>LB.pgx.ocorr(g,HJ).filter(o=>!o.pago).forEach(o=>{const k=g.pessoa||LB.norm(g.nome);const x=P[k]=P[k]||{k,nome:g.nome,pix:g.pix,tot:0,it:[]};x.tot+=+g.valor;if(!x.pix)x.pix=g.pix;
     x.it.push({b:{id:'pg-'+g.id,data:o.data,show:g.descricao||(g.tipo==='fixo'?'fixo mensal':'pagamento avulso')},e:{funcao:g.tipo==='fixo'?'fixo de '+MES3P[+o.ref.slice(5,7)-1]:'avulso'},g,o,f:+g.valor,ps:[{k:'pg',n:g.meio==='Pix'?'pagamento':g.meio.toLowerCase(),v:+g.valor}]})}));
   const l=Object.values(P).sort((a,b)=>b.tot-a.tot),tot=l.reduce((a,x)=>a+x.tot,0),nsh=new Set(l.flatMap(x=>x.it.filter(i=>!i.g).map(i=>i.b.id))).size;
-  PAGP=P;const pode=!!API_URL;
+  PAGP=P;const pode=!!API_URL;PEND={tot,n:l.length};try{renderInfo()}catch(e){}
   document.getElementById('pgk').innerHTML=k4('Falta pagar',brl(tot),'shows que já aconteceram e avulsos','pk')+k4('Pessoas',l.length,'com pagamento pendente')+k4('Shows',nsh,'com alguém a pagar');
   document.getElementById('pgl').innerHTML=l.length?l.map(x=>`<div class="pg2"><div class="hd"><div><b>${esc(x.nome)}</b><span>${x.it.length} pagamento${x.it.length>1?'s':''}${new Set(x.it.map(i=>i.b.id)).size>1?' · '+new Set(x.it.map(i=>i.b.id)).size+' shows somados':''}</span></div><div class="tt">${brl(x.tot)}</div></div>
     ${x.it.map(i=>`<div class="ln"><span>${ddmm(i.b.data)} · ${esc(i.b.show)} · ${esc(i.e.funcao)}${i.e.status==='Parcial'?' · <b class="am2">parte já paga</b>':''}${i.g&&i.g.meio!=='Pix'?' · '+esc(i.g.meio)+(i.g.dados?': '+esc(i.g.dados):''):''}</span><b>${brl(i.f)}</b></div>
@@ -471,7 +473,7 @@ let TAR={perfis:[],tarefas:[]};
 function perfilDe(nome){const n=LB.norm(nome);return TAR.perfis.find(p=>{const q=LB.norm(p.nome);return q===n||n.startsWith(q+' ')||q.startsWith(n+' ')})}
 async function tarAoVivo(){try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;
   const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'tarefas',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
-  if(r.ok){TAR=r;if(RFEITO)renderRend()}}catch(e){}}
+  if(r.ok){TAR=r;if(RFEITO)renderRend();renderInfo()}}catch(e){}}
 function renderRend(){
   const R=D.rendimento||[],MA=mkey(HOJE),ANO=HOJE.slice(0,4);
   const ult12=[];for(let i=11;i>=0;i--){const d=new Date(+MA.slice(0,4),+MA.slice(5,7)-1-i,1);ult12.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
@@ -520,9 +522,15 @@ function montaMeses(){
   document.getElementById('next').onclick=()=>{const i=KEYS.indexOf(mesAtual);if(i<KEYS.length-1){mesAtual=KEYS[i+1];renderMes()}};
 }
 function k4(l,v,s,c){return `<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`}
-function renderInfo(){const a=D.extrato_ate||'';document.getElementById('infobase').innerHTML=
-  `📌 <b>Real até ${a}</b> (extrato Sicredi + dinheiro). Depois disso é <b>estimativa</b>: shows a receber, contas a vencer e bilheteria a R$ 10 mil.
-  <br>O pró-labore do Lucas fica fora do saldo previsto (só aparece em contas a pagar).`}
+function renderInfo(){const el=document.getElementById('infobase');if(!el||!D)return; // topo: só o essencial + avisos (pendências e os escolhidos no Admin)
+  const av=[];
+  if(PEND&&PEND.tot>0)av.push(`<a href="#pagar" class="av pk">💸 <b>Falta pagar ${brl(PEND.tot)}</b> · ${PEND.n} pessoa${PEND.n>1?'s':''}</a>`);
+  ((TAR&&TAR.metas)||[]).filter(x=>x.painel==='sim'&&!['Atingida','Não atingida','Pago','Resolvido'].includes(x.situacao)).forEach(x=>
+    av.push(`<div class="av">${x.tipo==='alerta'?'⚠️':x.tipo==='despesa'?'💸':'🎯'} <b>${esc(x.titulo)}</b>${x.valor?' · '+brl(+x.valor):''}${x.prazo?' · '+esc(x.prazo):''}</div>`));
+  const min=LB.store.get('lb_av_min')==='1';
+  el.innerHTML=`<div class="avh"><span>📌 Último extrato: <b>${D.ext_ate?ddmm(D.ext_ate):'—'}</b> · depois disso, estimativa.</span>${av.length?`<button class="avt" id="avt">${min?'🔔 '+av.length+' aviso'+(av.length>1?'s':'')+' ▾':'minimizar ▴'}</button>`:''}</div>${av.length&&!min?`<div class="avl">${av.join('')}</div>`:''}`;
+  const b=document.getElementById('avt');if(b)b.onclick=()=>{LB.store.set('lb_av_min',min?'0':'1');renderInfo()}}
+let PEND=null;
 function etpHtml(et,sub){const tt=et.sinal+et.cache+et.aporte+et.outros;if(!tt)return '';
   return `<div class="card k" style="margin-top:10px"><div class="l">De onde veio o dinheiro que entrou</div><div class="etp">${[['Sinais (shows de meses seguintes)',et.sinal,'var(--pinkl)'],['Cachês de shows do mês',et.cache,'var(--pos)'],['Aporte do sócio',et.aporte,'var(--amber)'],['Outras entradas',et.outros,'var(--muted)']].filter(x=>x[1]).map(x=>`<div><i style="background:${x[2]}"></i>${x[0]}<b>${brl(x[1])}</b><small>${Math.round(x[1]/tt*100)}%</small></div>`).join('')}</div><div class="s" style="margin-top:6px">${sub}</div></div>`}
 function sinaisHtml(S){if(!S||!S.total)return '';
