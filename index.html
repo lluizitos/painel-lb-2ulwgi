@@ -187,6 +187,7 @@ h3 small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)
 .hist .r .t{flex:1;min-width:0}.hist .r .t b{display:block;font-size:14px;overflow-wrap:anywhere}.hist .r .t span{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
 .hist .r .v{text-align:right;white-space:nowrap;font-weight:700}.hist .r .v small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
 footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
+.ntfy{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin:14px 0}.ntfy summary{cursor:pointer;font-weight:700;color:var(--ink)}.ntfy ol{margin:10px 0 0;padding-left:20px;font-size:13.5px;color:var(--sub)}.ntfy li{margin:6px 0}.ntfy a{color:var(--pinkl)}.ntfy code{background:var(--card2,#26232D);border-radius:6px;padding:2px 6px;color:var(--ink)}.ntfy .cpn{border:1px solid var(--line);background:transparent;color:var(--sub);border-radius:99px;padding:2px 10px;font-size:12px;margin-left:6px;cursor:pointer}.ntfy p{font-size:12.5px;color:var(--muted);margin:8px 0 0}
 </style>
 </head>
 <body>
@@ -219,6 +220,11 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <p class="eyebrow">Assistente de pagamento</p>
   <h1>Paga<em>mentos</em></h1>
   <p class="note">O que falta pagar para a equipe, somado por pessoa (se a mesma pessoa tem dois shows pendentes, já vem junto). Toque em "copiar" para levar a chave PIX.</p>
+<details class="ntfy"><summary>🔔 Aviso de pagamento atrasado no celular</summary>
+<ol><li>Instale o app <b>ntfy</b> (grátis): <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">Android</a> · <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">iPhone</a></li>
+<li>Abra o app, toque em <b>+</b> e digite o canal <code id="tpag">…</code><button type="button" class="cpn" onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('tpag').textContent);this.textContent='copiado ✓'">copiar</button></li>
+<li>Pronto. Deixe as notificações do ntfy ligadas no celular.</li></ol>
+<p>Todo dia às 9h, se algum pagamento de show estiver atrasado (parcela vencida, ou show que já aconteceu sem receber tudo), chega um aviso com o show e o valor. Canal só da administração: não passe para a equipe.</p></details>
   <div class="grid g3" id="pgk" style="margin-top:14px"></div>
   <div class="list" id="pgl" data-max="3" style="margin-top:10px"></div>
 </section>
@@ -371,7 +377,7 @@ document.getElementById('bd').addEventListener('click',e=>{if(e.target.id==='bd'
 addEventListener('keydown',e=>{if(e.key==='Escape')fecharBord()});
 
 /* assistente de pagamento: pendentes de todos os borderôs, somados por pessoa */
-function renderPagar(){ // pendências por parte (cachê, diária, gasolina...), somadas por pessoa
+function renderPagar(){const tp=document.getElementById('tpag');if(tp&&D.avisos)tp.textContent=D.avisos.pag; // pendências por parte (cachê, diária, gasolina...), somadas por pessoa
   const P={};
   Object.values(D.borderos||{}).forEach(b=>b.equipe.forEach((e,i)=>{if(e.fora||e.grupo==='Comissão')return;const f=LB.pg.falta(e);if(!f)return;
     const k=e.pessoa||LB.norm(e.nome);const x=P[k]=P[k]||{k,nome:e.nome,pix:e.pix,tot:0,it:[]};x.tot+=f;if(!x.pix)x.pix=e.pix;x.it.push({b,e,i,f,ps:LB.pg.partes(e).filter(p=>!p.pago)})}));
