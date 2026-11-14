@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#141218">
+<title>Metas · LB</title>
+<link rel="icon" href="../icone.png"><link rel="apple-touch-icon" href="../icone.png">
+<style>
+:root{--bg:#141218;--card:#1E1C24;--card2:#26232D;--line:#2E2B36;--ink:#F3F1F6;--sub:#B8B3C3;--muted:#8B8697;--pink:#CF1D51;--pinkl:#F0507E;--neg:#FF8FA8;--pos:#7FDDA9;--blue:#8EC5FF}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%;padding-bottom:50px}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:20;background:rgba(20,18,24,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .hw{max-width:900px;margin:0 auto;padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:58px;gap:10px}header img{height:24px;display:block}
+.links{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;min-width:0}.links::-webkit-scrollbar{display:none}.links a{flex:none;text-decoration:none;color:var(--sub);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:7px 11px;border:1px solid var(--line);border-radius:99px}.links a.on{background:var(--pink);border-color:var(--pink);color:#fff}
+@media(max-width:480px){header img{height:18px}.links{gap:4px}.links a{font-size:10px;letter-spacing:.08em;padding:6px 8px}}
+#pg{display:none}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--pinkl);margin:18px 0 4px;text-align:center}
+h1{font-size:32px;font-weight:900;text-transform:uppercase;margin:0;text-align:center;line-height:1.05}h1 em{font-style:normal;color:var(--pink)}
+.fn{text-align:center;color:var(--sub);font-size:13.5px;margin-top:6px}
+.meta{margin-top:16px;background:var(--card);border-radius:14px;padding:12px 16px;border-left:4px solid var(--pink)}
+.meta span{display:block;font-size:10.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.res{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.res div{background:var(--card);border-radius:12px;padding:10px;text-align:center;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.res b{display:block;font-size:22px;letter-spacing:0;color:var(--ink)}
+h3{font-size:11px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--pinkl);margin:24px 2px 10px}
+.list{display:flex;flex-direction:column;gap:8px}
+.tf{background:var(--card);border-radius:14px;padding:14px;border-left:4px solid var(--line)}
+.tf.and{border-left-color:var(--blue)}.tf.atr{border-left-color:var(--neg)}.tf.ok{border-left-color:var(--pos);opacity:.7}
+.tf b{display:block;font-size:16px}.tf .ds{font-size:13.5px;color:var(--sub);margin-top:4px;white-space:pre-wrap}
+.tf .pz{font-size:12.5px;color:var(--muted);margin-top:6px}.tf .pz .neg{color:var(--neg);font-weight:700}
+.bts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.bt{border:1px solid var(--line);background:var(--card2);border-radius:99px;padding:8px 14px;font-size:13px;font-weight:600}
+.bt.on{background:var(--blue);border-color:var(--blue);color:#141218}.bt.done{background:var(--pos);border-color:var(--pos);color:#141218}
+.empty{color:var(--muted);font-size:13.5px;text-align:center;padding:22px;background:var(--card);border-radius:14px}
+.err{color:var(--neg);text-align:center;margin-top:40px}
+details summary{cursor:pointer;color:var(--sub);font-size:13px;margin:20px 2px 8px}
+</style>
+</head>
+<body>
+<div id="pg">
+<header><div class="hw"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div></header>
+<div class="wrap">
+<p class="eyebrow">Minhas metas e tarefas</p>
+<div id="app"><p class="fn">Carregando…</p></div>
+</div>
+</div>
+<script src="../lb.js"></script>
+<script>
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),MES=HOJE.slice(0,7);
+const ddmm=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
+let API='',P=null,T=[];
+async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({usuario:LB.login,senha:LB.senha,nome:LB.usuario},c))})).json();if(!r.ok)throw new Error(r.erro||'erro');P=r.perfil;T=r.tarefas;return r}
+function card(t){const atr=t.status!=='Concluída'&&t.prazo&&t.prazo<HOJE,c=t.status==='Concluída'?'ok':atr?'atr':t.status==='Em andamento'?'and':'';
+  return `<div class="tf ${c}"><b>${esc(t.titulo)}</b>${t.descricao?`<div class="ds">${esc(t.descricao)}</div>`:''}
+    <div class="pz">${t.status==='Concluída'?'Concluída em '+ddmm(t.concluido_em):t.prazo?(atr?'<span class="neg">Atrasada · era até '+ddmm(t.prazo)+'</span>':'Entregar até '+ddmm(t.prazo)):'Sem prazo'}</div>
+    <div class="bts">${t.status==='Concluída'?`<button class="bt" data-id="${esc(t.id)}" data-s="A fazer">Reabrir</button>`
+      :`<button class="bt${t.status==='Em andamento'?' on':''}" data-id="${esc(t.id)}" data-s="${t.status==='Em andamento'?'A fazer':'Em andamento'}">${t.status==='Em andamento'?'◐ Em andamento':'Comecei'}</button><button class="bt done" data-id="${esc(t.id)}" data-s="Concluída">✓ Concluí</button>`}</div></div>`}
+function render(){const ab=T.filter(t=>t.status!=='Concluída').sort((a,b)=>(a.prazo||'9').localeCompare(b.prazo||'9')),ok=T.filter(t=>t.status==='Concluída').sort((a,b)=>(b.concluido_em||'').localeCompare(a.concluido_em||'')),okm=ok.filter(t=>(t.concluido_em||'').startsWith(MES));
+  document.title=P.nome+' · metas LB';
+  document.getElementById('app').innerHTML=`<h1>${esc(P.nome)}</h1><p class="fn">${esc(P.funcao||'')}</p>
+    ${P.meta?`<div class="meta"><span>Minha meta</span>${esc(P.meta)}</div>`:''}
+    <div class="res"><div>A fazer<b>${ab.length}</b></div><div>Atrasadas<b style="${ab.some(t=>t.prazo&&t.prazo<HOJE)?'color:var(--neg)':''}">${ab.filter(t=>t.prazo&&t.prazo<HOJE).length}</b></div><div>Feitas no mês<b style="color:var(--pos)">${okm.length}</b></div></div>
+    <h3>Em aberto</h3><div class="list">${ab.map(card).join('')||'<div class="empty">Nada pendente. 👏</div>'}</div>
+    ${ok.length?`<details${ok.length<=3?' open':''}><summary>Concluídas (${ok.length})</summary><div class="list">${ok.slice(0,30).map(card).join('')}</div></details>`:''}`}
+document.getElementById('app').addEventListener('click',async e=>{const b=e.target.closest('[data-id]');if(!b)return;b.disabled=true;b.textContent='salvando…';
+  try{await api({acao:'marcar_tarefa',id:b.dataset.id,status:b.dataset.s});render()}catch(err){b.textContent='não salvou, tente de novo';b.disabled=false}});
+LB.entrar({pagina:'metas',base:'../',titulo:'Metas',ok:async r=>{document.getElementById('pg').style.display='block';document.getElementById('links').innerHTML=LB.links(r.paginas,'metas','../');
+  const app=document.getElementById('app');
+  try{API=(await (await fetch('../config.json',{cache:'no-store'})).json()).api_url;await api({acao:'minhas_tarefas'});render()}
+  catch(e){app.innerHTML=`<p class="err">${e.message==='sem_perfil'?'Seu login ainda não está ligado a uma pessoa da equipe. Peça ao Luiz.':'Não consegui abrir agora. Tente de novo em instantes.'}</p>`}}});
+</script>
+</body>
+</html>

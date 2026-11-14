@@ -3,8 +3,9 @@
    para cada usuário liberado (cifrada com PBKDF2-SHA256(usuário|senha) → AES-GCM). O endereço do "cofre" de cada usuário
    é um hash do nome, então o arquivo público não mostra quem tem acesso. */
 (function () {
-  const NOMES = { painel: 'Painel', vendas: 'Vendas', agenda: 'Agenda', socio: 'Sócio', contador: 'Prestação de contas', bordero: 'Borderôs', tarefas: 'Tarefas' };
-  const ROTAS = { painel: '', vendas: 'vendas/', agenda: 'agenda/', socio: 'socio/', contador: 'contador/', bordero: 'borderos/', tarefas: 'tarefas/' };
+  const NOMES = { painel: 'Painel', vendas: 'Vendas', agenda: 'Agenda', socio: 'Sócio', contador: 'Prestação de contas', bordero: 'Borderôs', admin: 'Admin', metas: 'Metas' };
+  const ROTAS = { painel: '', vendas: 'vendas/', agenda: 'agenda/', socio: 'socio/', contador: 'contador/', bordero: 'borderos/', admin: 'admin/', metas: 'metas/' };
+  const ORDEM = ['painel', 'admin', 'bordero', 'vendas', 'metas', 'socio', 'contador'];
   const norm = u => String(u || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
   const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
   const hex = buf => [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
@@ -38,8 +39,9 @@
     return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(iv) }, LB.chave, ct);
   }
   function links(paginas, atual, base) {
-    const ordem = ['painel', 'tarefas', 'bordero', 'vendas', 'socio', 'contador', 'agenda'];
-    return ordem.filter(p => p === 'agenda' || paginas.includes(p)).map(p =>
+    // menu só com as páginas do login; quem tem uma página só (ex.: artista) não vê menu, só o Sair
+    const ps = ORDEM.filter(p => paginas.includes(p));
+    return (ps.length > 1 ? ps.concat('agenda') : []).map(p =>
       `<a href="${base}${ROTAS[p]}" class="${p === atual ? 'on' : ''}">${NOMES[p]}</a>`).join('') +
       `<a href="#" onclick="LB.sair();return false" title="Sair">Sair</a>`;
   }
@@ -73,6 +75,11 @@
         lock.remove();
         ok(r);
       } catch (e) {
+        if (e.message === 'acesso') { // link único: manda para a primeira página que esse login abre
+          for (const pg of ORDEM.filter(x => x !== pagina)) {
+            try { await abrir(base, pg, u, p); store.set('lb_cred', JSON.stringify({ u, p })); location.replace(base + ROTAS[pg]); return; } catch (e2) { if (e2.message === 'senha') break; }
+          }
+        }
         if (auto) { err.textContent = e.message === 'acesso' ? 'Seu usuário não tem acesso a esta página.' : ''; return; }
         err.textContent = e.message === 'acesso' ? 'Usuário sem acesso a esta página (ou nome digitado diferente).' :
           e.message === 'senha' ? 'Senha incorreta.' : 'Não consegui abrir agora. Tente de novo.';
@@ -100,7 +107,27 @@
       return e;
     }
   };
-  window.LB = { entrar, links, anexo, sair, norm, store, NOMES, pg };
+  /* pagamentos avulsos e fixos (página Admin): ocorrências até a data "ate"; ref = 'unico' ou 'AAAA-MM' */
+  const pgx = {
+    ocorr(g, ate) {
+      let pago = {}; try { pago = JSON.parse(g.pagos || '{}') || {}; } catch (e) { }
+      if (g.tipo !== 'fixo') return g.data && g.data <= ate ? [{ ref: 'unico', data: g.data, pago: pago.unico || '' }] : [];
+      if (!/^\d{4}-\d{2}$/.test(g.inicio || '')) return [];
+      const out = []; let [y, m] = g.inicio.split('-').map(Number); const lim = g.fim || '9999-99';
+      for (let n = 0; n < 240; n++) {
+        const k = y + '-' + String(m).padStart(2, '0'); if (k > lim) break;
+        const d = k + '-' + String(Math.min(+g.dia || 1, new Date(y, m, 0).getDate())).padStart(2, '0'); if (d > ate) break;
+        out.push({ ref: k, data: d, pago: pago[k] || '' }); if (++m > 12) { m = 1; y++; }
+      }
+      return out;
+    },
+    prox(g, hoje) { // próxima data depois de hoje
+      if (g.ativo === 'não') return null;
+      if (g.tipo !== 'fixo') return g.data > hoje ? { ref: 'unico', data: g.data } : null;
+      const t = pgx.ocorr(g, (+hoje.slice(0, 4) + 1) + hoje.slice(4)).find(o => o.data > hoje); return t || null;
+    }
+  };
+  window.LB = { entrar, links, anexo, sair, norm, store, NOMES, pg, pgx };
 
   /* "Ver mais": toda lista longa (.list) e todo grupo de borderô (.gp) mostra só os primeiros itens.
      Limite: data-max no elemento (padrão 5 em listas, 4 em grupos). data-max="0" desliga. */

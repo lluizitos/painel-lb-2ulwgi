@@ -219,7 +219,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 <section id="pagar">
   <p class="eyebrow">Assistente de pagamento</p>
   <h1>Paga<em>mentos</em></h1>
-  <p class="note">O que falta pagar para a equipe, somado por pessoa (se a mesma pessoa tem dois shows pendentes, já vem junto). Toque em "copiar" para levar a chave PIX.</p>
+  <p class="note">O que falta pagar, somado por pessoa. Show só entra depois que acontece; pagamentos avulsos e fixos (página Admin) entram na data marcada. Toque em "copiar" para levar a chave PIX.</p>
 <details class="ntfy"><summary>🔔 Aviso de pagamento atrasado no celular</summary>
 <ol><li>Instale o app <b>ntfy</b> (grátis): <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">Android</a> · <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">iPhone</a></li>
 <li>Abra o app, toque em <b>+</b> e digite o canal <code id="tpag">…</code><button type="button" class="cpn" onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('tpag').textContent);this.textContent='copiado ✓'">copiar</button></li>
@@ -319,7 +319,7 @@ function iniciar(){
   const ks=new Set(Object.keys(D.meses));D.shows.forEach(s=>{if(s.data<'2027-02')ks.add(mkey(s.data))});D.movs.forEach(m=>ks.add(mkey(m.data)));
   KEYS=[...ks].sort();mesAtual=KEYS.includes(mkey(HOJE))?mkey(HOJE):KEYS[KEYS.length-1];
   D.borderos=D.borderos||{};
-  montaMeses();renderMes();renderPagar();renderTarefas();renderTL();renderEst();navSpy();bordAoVivo();tarAoVivo();
+  montaMeses();renderMes();renderPagar();renderTarefas();renderTL();renderEst();navSpy();bordAoVivo();tarAoVivo();pagAoVivo();
   document.getElementById('ocp').innerHTML=(D.ocorrencias||[]).slice().sort((x,y)=>y.data.localeCompare(x.data)).map(o=>`<div class="row"><div class="d"><b>${o.data.slice(8,10)}</b><span>${MES3[+o.data.slice(5,7)-1]}</span></div><div class="t"><b>${esc(o.titulo)} ${o.confirmado?'':'<span class="pill am">sem confirmação</span>'}</b><span>${esc(o.detalhe||'')}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`).join('')||'<div class="empty">Nenhuma.</div>';
   document.getElementById('ptabs').onclick=e=>{const b=e.target.closest('button');if(b)aba(b.dataset.p)};
   const h=location.hash.slice(1);if(h==='vendas'||h==='rendimento')aba(h==='vendas'?'ven':'ren');
@@ -378,34 +378,45 @@ addEventListener('keydown',e=>{if(e.key==='Escape')fecharBord()});
 
 /* assistente de pagamento: pendentes de todos os borderôs, somados por pessoa */
 function renderPagar(){const tp=document.getElementById('tpag');if(tp&&D.avisos)tp.textContent=D.avisos.pag; // pendências por parte (cachê, diária, gasolina...), somadas por pessoa
-  const P={};
-  Object.values(D.borderos||{}).forEach(b=>b.equipe.forEach((e,i)=>{if(e.fora||e.grupo==='Comissão')return;const f=LB.pg.falta(e);if(!f)return;
+  const P={},HJ=new Date(Date.now()-3*3600e3).toISOString().slice(0,10); // data real (Brasília): show só entra depois que acontece
+  Object.values(D.borderos||{}).filter(b=>b.data<=HJ).forEach(b=>b.equipe.forEach((e,i)=>{if(e.fora||e.grupo==='Comissão')return;const f=LB.pg.falta(e);if(!f)return;
     const k=e.pessoa||LB.norm(e.nome);const x=P[k]=P[k]||{k,nome:e.nome,pix:e.pix,tot:0,it:[]};x.tot+=f;if(!x.pix)x.pix=e.pix;x.it.push({b,e,i,f,ps:LB.pg.partes(e).filter(p=>!p.pago)})}));
-  Object.values(D.borderos||{}).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!t.para||!(+t.valor>0))return; // itens com "pagar para"
+  Object.values(D.borderos||{}).filter(b=>b.data<=HJ).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!t.para||!(+t.valor>0))return; // itens com "pagar para"
     const k=t.pessoa||LB.norm(t.para);const x=P[k]=P[k]||{k,nome:t.para,pix:t.pix,tot:0,it:[]};x.tot+=+t.valor;if(!x.pix)x.pix=t.pix;
     x.it.push({b,e:{funcao:'item: '+(t.desc||'')},item:j,f:+t.valor,ps:[{k:'item',n:t.desc||'item',v:+t.valor}]})}));
-  const l=Object.values(P).sort((a,b)=>b.tot-a.tot),tot=l.reduce((a,x)=>a+x.tot,0),nsh=new Set(l.flatMap(x=>x.it.map(i=>i.b.id))).size;
+  // pagamentos avulsos e fixos (página Admin): entram na data, até marcar pago
+  PAGS.filter(g=>g.ativo!=='não').forEach(g=>LB.pgx.ocorr(g,HJ).filter(o=>!o.pago).forEach(o=>{const k=g.pessoa||LB.norm(g.nome);const x=P[k]=P[k]||{k,nome:g.nome,pix:g.pix,tot:0,it:[]};x.tot+=+g.valor;if(!x.pix)x.pix=g.pix;
+    x.it.push({b:{id:'pg-'+g.id,data:o.data,show:g.descricao||(g.tipo==='fixo'?'fixo mensal':'pagamento avulso')},e:{funcao:g.tipo==='fixo'?'fixo de '+MES3P[+o.ref.slice(5,7)-1]:'avulso'},g,o,f:+g.valor,ps:[{k:'pg',n:g.meio==='Pix'?'pagamento':g.meio.toLowerCase(),v:+g.valor}]})}));
+  const l=Object.values(P).sort((a,b)=>b.tot-a.tot),tot=l.reduce((a,x)=>a+x.tot,0),nsh=new Set(l.flatMap(x=>x.it.filter(i=>!i.g).map(i=>i.b.id))).size;
   PAGP=P;const pode=!!API_URL;
-  document.getElementById('pgk').innerHTML=k4('Falta pagar',brl(tot),'equipe dos shows','pk')+k4('Pessoas',l.length,'com pagamento pendente')+k4('Shows',nsh,'com alguém a pagar');
+  document.getElementById('pgk').innerHTML=k4('Falta pagar',brl(tot),'shows que já aconteceram e avulsos','pk')+k4('Pessoas',l.length,'com pagamento pendente')+k4('Shows',nsh,'com alguém a pagar');
   document.getElementById('pgl').innerHTML=l.length?l.map(x=>`<div class="pg2"><div class="hd"><div><b>${esc(x.nome)}</b><span>${x.it.length} pagamento${x.it.length>1?'s':''}${new Set(x.it.map(i=>i.b.id)).size>1?' · '+new Set(x.it.map(i=>i.b.id)).size+' shows somados':''}</span></div><div class="tt">${brl(x.tot)}</div></div>
-    ${x.it.map(i=>`<div class="ln"><span>${ddmm(i.b.data)} · ${esc(i.b.show)} · ${esc(i.e.funcao)}${i.e.status==='Parcial'?' · <b class="am2">parte já paga</b>':''}</span><b>${brl(i.f)}</b></div>
-      <div class="pts">${i.ps.map(p=>pode?`<button class="pt" data-pgk="${esc(i.b.id)}|${i.item!=null?'it'+i.item:i.i}|${p.k}" title="Marcar só esta parte como paga">${p.n} ${brl(p.v)} <i>✓ pago</i></button>`:`<span class="pt">${p.n} ${brl(p.v)}</span>`).join('')}</div>`).join('')}
+    ${x.it.map(i=>`<div class="ln"><span>${ddmm(i.b.data)} · ${esc(i.b.show)} · ${esc(i.e.funcao)}${i.e.status==='Parcial'?' · <b class="am2">parte já paga</b>':''}${i.g&&i.g.meio!=='Pix'?' · '+esc(i.g.meio)+(i.g.dados?': '+esc(i.g.dados):''):''}</span><b>${brl(i.f)}</b></div>
+      <div class="pts">${i.ps.map(p=>pode&&i.g?`<button class="pt" data-pga="${esc(i.g.id+'|'+i.o.ref)}" title="Marcar como pago">${p.n} ${brl(p.v)} <i>✓ pago</i></button>`:pode?`<button class="pt" data-pgk="${esc(i.b.id)}|${i.item!=null?'it'+i.item:i.i}|${p.k}" title="Marcar só esta parte como paga">${p.n} ${brl(p.v)} <i>✓ pago</i></button>`:`<span class="pt">${p.n} ${brl(p.v)}</span>`).join('')}</div>`).join('')}
     <div class="px">${pxBtn(x.pix)}<button class="cp" data-cp="${esc(x.nome+' — '+brl(x.tot)+(x.pix?' — PIX '+x.pix:''))}">copiar resumo</button>${pode?`<button class="cp pgall" data-pgp="${esc(x.k)}">marcar tudo pago</button>`:''}</div></div>`).join('')
-    :'<div class="empty">Nenhum pagamento pendente. Os borderôs anteriores já foram conferidos com o extrato; os próximos, feitos na página Borderôs, aparecem aqui até serem marcados como pagos.</div>';
+    :'<div class="empty">Nenhum pagamento pendente. Show só entra aqui depois que acontece; pagamentos avulsos e fixos (página Admin) entram na data.</div>';
 }
-let PAGP={},API_URL='';
-async function marcarPago(marcas,btn){ // grava na planilha e atualiza a tela
+let PAGP={},API_URL='',PAGS=[];const MES3P=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+async function marcarPago(marcas,btn,gms=[]){ // grava na planilha e atualiza a tela
   if(btn){if(btn.dataset.ok!=='1'){btn.dataset.ok='1';const o=btn.innerHTML;btn.innerHTML='toque de novo p/ confirmar';btn.classList.add('cf');setTimeout(()=>{if(btn.isConnected){btn.dataset.ok='';btn.innerHTML=o;btn.classList.remove('cf')}},3500);return}
     btn.disabled=true;btn.innerHTML='salvando…'}
-  try{const r=await (await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'marcar_pago',marcas,usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
+  try{if(marcas.length){const r=await (await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'marcar_pago',marcas,usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
     if(!r.ok)throw new Error(r.erro||'erro');
-    Object.entries(r.borderos||{}).forEach(([k,b])=>{b.equipe.forEach(e=>delete e.doc);D.borderos[k]=b});
+    Object.entries(r.borderos||{}).forEach(([k,b])=>{b.equipe.forEach(e=>delete e.doc);D.borderos[k]=b})}
+    const porId={};gms.forEach(g=>(porId[g.id]=porId[g.id]||[]).push(g.ref));
+    for(const [id,ref] of Object.entries(porId)){const r=await (await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'pagar_pagamento',id,ref,data:HOJE,usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
+      if(!r.ok)throw new Error(r.erro||'erro');PAGS=r.pagamentos}
     renderPagar();renderMes();renderTL()}
   catch(e){if(btn){btn.disabled=false;btn.innerHTML='não salvou ('+e.message+')'}}
 }
 document.addEventListener('click',e=>{
   const a=e.target.closest('[data-pgk]');if(a){const[id,i,k]=a.dataset.pgk.split('|');marcarPago([i.startsWith('it')?{id,it:+i.slice(2),data:HOJE}:{id,i:+i,partes:[k],data:HOJE}],a);return}
-  const b=e.target.closest('[data-pgp]');if(b){const x=PAGP[b.dataset.pgp];if(x)marcarPago(x.it.map(i=>i.item!=null?{id:i.b.id,it:i.item,data:HOJE}:{id:i.b.id,i:i.i,partes:'tudo',data:HOJE}),b)}});
+  const g=e.target.closest('[data-pga]');if(g){const[id,ref]=g.dataset.pga.split('|');marcarPago([],g,[{id,ref}]);return}
+  const b=e.target.closest('[data-pgp]');if(b){const x=PAGP[b.dataset.pgp];if(x)marcarPago(x.it.filter(i=>!i.g).map(i=>i.item!=null?{id:i.b.id,it:i.item,data:HOJE}:{id:i.b.id,i:i.i,partes:'tudo',data:HOJE}),b,x.it.filter(i=>i.g).map(i=>({id:i.g.id,ref:i.o.ref})))}});
+async function pagAoVivo(){ // pagamentos avulsos e fixos da página Admin
+  try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;API_URL=API_URL||c.api_url;
+    const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'pagamentos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
+    if(r.ok){PAGS=r.pagamentos||[];renderPagar()}}catch(e){}}
 async function bordAoVivo(){ // com a planilha ligada, os borderôs vêm ao vivo
   try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;API_URL=c.api_url;
     const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'borderos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
