@@ -187,6 +187,7 @@ label textarea{min-height:60px;resize:vertical}
       <label>Nome (como aparece)<input id="p_nome" placeholder="ex.: Lau"></label>
       <label>Ativo<select id="p_at"><option value="sim">Sim</option><option value="não">Não (some das listas)</option></select></label>
       <label class="w">Cargo / função<input id="p_fn" placeholder="o que essa pessoa faz na equipe"></label>
+      <label class="w">Senha do link (mín. 4) <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)">· sem senha o link não abre; em branco mantém a atual</span><input id="p_sn" type="text" autocomplete="off" placeholder="ex.: lau2026"></label>
       <label class="w">Meta<textarea id="p_meta" placeholder="ex.: 1 postagem por dia"></textarea></label>
       <label class="w">Cadastro de pagamento (mesma lista dos borderôs)<input id="p_pes" list="pes_dl" autocomplete="off" placeholder="busque pelo nome, ou deixe vazio e preencha abaixo para criar"></label>
       <label>Nome completo<input id="p_nc"></label>
@@ -293,8 +294,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwigyktj"></script>
-<script src="../lbmetas.js?v=mwigyktj"></script>
+<script src="../lb.js?v=mwih45nk"></script>
+<script src="../lbmetas.js?v=mwih45nk"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -399,7 +400,7 @@ $('i_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data
   if(ed){const t=TF.find(x=>x.id===ed.dataset.ed);EDT=t.id;$('i_tit').value=t.titulo;$('i_cat').value=t.categoria||'';$('i_des').value=t.descricao;$('i_pz').value=t.prazo;$('i_st').value=t.status;$('i_rec').value=t.recorrencia||'';$('i_cd').value=t.concluido_em||'';$('i_cdl').style.display=t.status==='Concluída'?'':'none';$('i_can').style.display='';$('i_h').textContent='Editar tarefa';$('i_tit').focus();return}
   if(del.dataset.ok!=='1'){del.dataset.ok='1';del.textContent='toque de novo para excluir';return}
   try{await api({acao:'excluir_tarefa',id:del.dataset.del});render()}catch(err){del.textContent='erro'}});
-document.addEventListener('click',e=>{const b=e.target.closest('[data-cp]');if(!b)return;try{navigator.clipboard.writeText(b.dataset.cp)}catch(x){}b.textContent='copiado ✓';setTimeout(()=>b.textContent=b.dataset.lb||'copiar link',1800)});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-cp]');if(!b)return;e.preventDefault();if(!b.dataset.lb)b.dataset.lb=b.textContent;try{navigator.clipboard.writeText(b.dataset.cp)}catch(x){}b.textContent='copiado ✓';setTimeout(()=>b.textContent=b.dataset.lb||'copiar link',1800)});
 
 /* equipe e logins */
 let US=[],PAPS=[],PES=[],PAGS=[],PUB='',EDL=null,PESID='',PESK={};
@@ -416,7 +417,7 @@ const fixosDe=pid=>PAGS.filter(g=>g.tipo==='fixo'&&g.ativo!=='não'&&pid&&g.pess
 function renderLogins(){const pfN=id=>(PF.find(p=>p.id===id)||{}).nome;
   $('l_lista').innerHTML=US.length?US.map(u=>`<div class="pf" style="${u.ativo==='não'?'opacity:.55':''}"><div class="hd"><div><b style="font-size:16px">${esc(u.usuario)}</b>${u.ativo==='não'?' <span class="pill neg">bloqueado</span>':''}${eu(u.usuario)?' <span class="pill">você</span>':''}
       <div class="resumo" style="margin-top:6px">${u.papeis.map(x=>`<span class="pill ${x==='admin'?'neg':'bl'}">${PAPC[x]||x}</span>`).join('')}${u.perfil?`<span>pessoa: <b>${esc(pfN(u.perfil)||u.perfil)}</b></span>`:''}</div></div><button class="btn sm" data-el="${esc(u.usuario)}">editar</button></div>
-    <div class="mt">${u.site?'senha guardada':'<span class="neg">sem senha guardada para o site: defina uma nova</span>'}${u.atualizado_em?' · alterado em '+u.atualizado_em.slice(0,10).split('-').reverse().join('/'):''}${eu(u.usuario)?'':` · <a href="#" data-xl="${esc(u.usuario)}" style="color:var(--muted)">excluir</a>`}</div></div>`).join(''):'<div class="empty">Nenhum login.</div>';
+    <div class="mt">${u.site?'senha guardada':'<span class="neg">sem senha guardada para o site: defina uma nova</span>'}${u.atualizado_em?' · alterado em '+u.atualizado_em.slice(0,10).split('-').reverse().join('/'):''}${u.ativo==='não'?'':` · <a href="#" data-cp="${esc(new URL('../#u='+encodeURIComponent(u.usuario),location.href).href)}" style="color:var(--pinkl)">copiar link de login</a>`}${eu(u.usuario)?'':` · <a href="#" data-xl="${esc(u.usuario)}" style="color:var(--muted)">excluir</a>`}</div></div>`).join(''):'<div class="empty">Nenhum login.</div>';
   if(!$('l_pp').children.length)$('l_pp').innerHTML=PAPS.map(x=>`<label class="ck"><input type="checkbox" value="${x}"> ${PAPN[x]||x}</label>`).join('');
   const cur=$('l_pf').value;$('l_pf').innerHTML='<option value="">— nenhuma —</option>'+PF.map(p=>`<option value="${esc(p.id)}">${esc(p.nome)}</option>`).join('');$('l_pf').value=cur}
 function limpaL(){EDL=null;$('l_u').value=$('l_s').value='';$('l_pf').value='';$('l_at').value='sim';document.querySelectorAll('#l_pp input').forEach(c=>c.checked=false);$('l_can').style.display='none';$('l_h').textContent='Novo login';$('l_s').placeholder='mín. 6 caracteres'}
@@ -441,23 +442,24 @@ $('l_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data
 
 /* pessoas da equipe (perfil de tarefas + cadastro de pagamento da lista dos borderôs) */
 function renderPerfis(){$('p_lista').innerHTML=PF.length?PF.map(p=>{const ps=pesDe(p.pessoa),fx=fixosDe(p.pessoa),lg=US.filter(u=>u.perfil===p.id);
-  return `<div class="pf" style="${p.ativo==='não'?'opacity:.55':''}"><div class="hd"><div><b style="font-size:16px">${esc(p.nome)}</b>${p.ativo==='não'?' <span class="pill">inativo</span>':''}<div class="fn">${esc(p.funcao||'cargo a definir')}</div></div><button class="btn sm" data-ep="${esc(p.id)}">editar</button></div>
+  return `<div class="pf" style="${p.ativo==='não'?'opacity:.55':''}"><div class="hd"><div><b style="font-size:16px">${esc(p.nome)}</b>${p.ativo==='não'?' <span class="pill">inativo</span>':''}${p.tem_senha==='sim'?' <span class="pill">🔒 com senha</span>':' <span class="pill neg">sem senha: o link não abre</span>'}<div class="fn">${esc(p.funcao||'cargo a definir')}</div></div><button class="btn sm" data-ep="${esc(p.id)}">editar</button></div>
     <div class="me">Meta: ${esc(p.meta||'a definir')}</div>
     <div class="resumo">${ps?`<span>${esc(ps.nome)}</span><span>CPF <b>${esc(ps.doc||'—')}</b></span><span>PIX <b>${esc(ps.pix||'—')}</b></span>`:'<span class="neg">sem cadastro de pagamento</span>'}<span>Fixo <b>${fx.length?fx.map(g=>brl(g.valor)+' todo dia '+g.dia).join(' + '):'não'}</b></span><span>Login <b>${lg.length?lg.map(u=>esc(u.usuario)).join(', '):'—'}</b></span></div>
-    <div class="lk"><code>${esc(linkDe(p))}</code><button class="btn sm" data-cp="${esc(linkDe(p))}">copiar link</button><button class="btn sm" data-nl="${esc(p.id)}">gerar link novo</button></div></div>`}).join(''):'<div class="empty">Nenhuma pessoa ainda.</div>'}
+    <div class="lk"><code>${esc(linkDe(p))}</code><button class="btn sm" data-cp="${esc(linkDe(p))}">copiar link de login</button><button class="btn sm" data-nl="${esc(p.id)}">gerar link novo</button></div></div>`}).join(''):'<div class="empty">Nenhuma pessoa ainda.</div>'}
 function enchePes(x){PESID=x?x.id:'';$('p_nc').value=x?x.nome:'';$('p_doc').value=x?x.doc:'';$('p_pix').value=x?x.pix:'';$('p_tel').value=x?x.telefone:''}
 $('p_pes').addEventListener('input',()=>{const x=PESK[$('p_pes').value];if(x)enchePes(x);else if(!$('p_pes').value)PESID=''});
-function limpaP(){EDP=null;['p_nome','p_fn','p_meta','p_pes'].forEach(i=>$(i).value='');enchePes(null);$('p_at').value='sim';$('p_can').style.display='none';$('p_h').textContent='Nova pessoa'}
+function limpaP(){EDP=null;['p_nome','p_fn','p_meta','p_pes','p_sn'].forEach(i=>$(i).value='');enchePes(null);$('p_at').value='sim';$('p_can').style.display='none';$('p_h').textContent='Nova pessoa'}
 $('p_can').onclick=()=>{limpaP();$('p_msg').textContent=''};
 $('p_ok').onclick=async()=>{const m=$('p_msg'),n=$('p_nome').value.trim();if(!n){m.innerHTML='<span class="neg">Escreva o nome.</span>';return}
+  const sn=$('p_sn').value.trim();if(sn&&sn.length<4){m.innerHTML='<span class="neg">Senha do link com pelo menos 4 caracteres.</span>';return}
   const nc=$('p_nc').value.trim(),doc=$('p_doc').value.trim(),pix=$('p_pix').value.trim(),tel=$('p_tel').value.trim();let pid=PESID;
   m.textContent='Salvando…';
   try{if(nc||doc||pix||tel){const at=pid?pesDe(pid):null;
       if(!at||at.nome!==(nc||n)||at.doc!==doc||at.pix!==pix||at.telefone!==tel){
         const r=await api({acao:'salvar_pessoa',pessoa:{id:pid||undefined,apelido:at?at.apelido:n,nome:nc||n,pix,doc,telefone:tel,carro:at?at.carro:''}});
         PES=r.pessoas||PES;if(!pid){const nv=PES.filter(x=>x.nome===(nc||n));pid=(nv[nv.length-1]||{}).id||''}montaPes()}}
-    await api({acao:'salvar_perfil',perfil:{id:EDP||undefined,nome:n,funcao:$('p_fn').value,meta:$('p_meta').value,ativo:$('p_at').value,pessoa:pid}});
-    limpaP();m.innerHTML='<span class="pos">Salvo ✓</span>';render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
+    await api({acao:'salvar_perfil',perfil:{id:EDP||undefined,nome:n,funcao:$('p_fn').value,meta:$('p_meta').value,ativo:$('p_at').value,pessoa:pid,senha:sn||undefined}});
+    limpaP();m.innerHTML='<span class="pos">Salvo ✓</span>'+(sn?` <span>· senha do link de <b>${esc(n)}</b>: <b>${esc(sn)}</b> (anote e mande junto com o link; vale na hora)</span>`:'');render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
 $('p_lista').addEventListener('click',async e=>{const ep=e.target.closest('[data-ep]'),nl=e.target.closest('[data-nl]');
   if(ep){const p=PF.find(x=>x.id===ep.dataset.ep);EDP=p.id;$('p_nome').value=p.nome;$('p_fn').value=p.funcao;$('p_meta').value=p.meta;$('p_at').value=p.ativo==='não'?'não':'sim';
     const x=pesDe(p.pessoa);$('p_pes').value=rotPes(x);enchePes(x);$('p_can').style.display='';$('p_h').textContent='Editar '+p.nome;$('p_msg').textContent='';$('p_nome').scrollIntoView({block:'center'});return}
@@ -749,7 +751,7 @@ $('duv_f').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;DUVF=b.
 $('duv_l').addEventListener('click',async e=>{const b=e.target.closest('[data-ds]');if(!b)return;const r=document.querySelector(`[data-dr="${b.dataset.ds}"]`).value.trim();if(!r){b.textContent='escreva a resposta';return}
   b.disabled=true;b.textContent='enviando…';try{DUV=(await api({acao:'responder_duvida',id:b.dataset.ds,resposta:r})).duvidas||DUV;duvRender()}catch(err){b.disabled=false;b.textContent='não enviou: '+err.message}});
 </script>
-<script src="../lbchat.js?v=mwigyktj"></script>
+<script src="../lbchat.js?v=mwih45nk"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

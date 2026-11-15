@@ -17,7 +17,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwigyktj';
+  const BUILD = 'mwih45nk';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -75,6 +75,7 @@
 #lock p{color:#B8B3C3;font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin:0 0 22px}
 #lock input{display:block;width:100%;box-sizing:border-box;background:#1E1C24;border:1px solid #2E2B36;border-radius:12px;padding:14px 16px;color:#F3F1F6;font:inherit;font-size:16px;text-align:center;margin-top:8px}
 #lock button{width:100%;margin-top:12px;padding:14px;border:0;border-radius:12px;background:#CF1D51;color:#fff;font:inherit;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px;cursor:pointer}
+#lock .pw{position:relative}#lock .pw input{padding-right:50px;padding-left:50px}#lock .olho{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:auto;margin:4px 0 0;padding:8px 10px;background:transparent;border:0;color:#B8B3C3;font-size:19px;letter-spacing:0;line-height:1}
 #lock .err{color:#FF8FA8;font-size:13px;min-height:20px;margin-top:10px}`;
       document.head.appendChild(st);
     }
@@ -82,10 +83,12 @@
     lock.id = 'lock';
     lock.innerHTML = `<form autocomplete="on"><img src="${base}logo.png" alt="Lucas Barros"><p>${titulo}</p>
       <input name="u" placeholder="Usuário" autocomplete="username" autocapitalize="words" aria-label="Usuário">
-      <input name="p" type="password" placeholder="Senha" autocomplete="current-password" aria-label="Senha">
+      <div class="pw"><input name="p" type="password" placeholder="Senha" autocomplete="current-password" aria-label="Senha"><button type="button" class="olho" aria-label="Mostrar senha" title="Mostrar senha">👁</button></div>
       <button type="submit">Entrar</button><div class="err"></div></form>`;
     document.body.appendChild(lock);
-    const f = lock.querySelector('form'), err = lock.querySelector('.err');
+    const f = lock.querySelector('form'), err = lock.querySelector('.err'), olho = lock.querySelector('.olho');
+    olho.onclick = () => { const v = f.p.type === 'password'; f.p.type = v ? 'text' : 'password'; olho.textContent = v ? '🙈' : '👁'; olho.setAttribute('aria-label', v ? 'Esconder senha' : 'Mostrar senha'); f.p.focus(); };
+    const lu = new URLSearchParams(location.hash.slice(1)).get('u'); if (lu) { f.u.value = lu; setTimeout(() => f.p.focus(), 50); } // link de login: já vem com o usuário
     const tentar = async (u, p, auto) => {
       if (!auto) err.textContent = 'Abrindo…';
       try {
@@ -107,7 +110,7 @@
     };
     f.addEventListener('submit', e => { e.preventDefault(); tentar(f.u.value, f.p.value.trim()); });
     let c = null; try { c = JSON.parse(store.get('lb_cred') || 'null'); } catch (e) { }
-    if (c && c.u) { f.u.value = c.u; tentar(c.u, c.p, true); }
+    if (c && c.u && (!lu || norm(c.u) === norm(lu))) { f.u.value = c.u; tentar(c.u, c.p, true); }
   }
   function sair() { store.del('lb_cred'); store.del('lb_pf'); try { Object.keys(localStorage).filter(x => x.startsWith('lbk_')).forEach(x => localStorage.removeItem(x)); } catch (e) { } location.reload(); }
   /* ---------- Meu perfil: foto, WhatsApp, e-mail e troca de senha ---------- */

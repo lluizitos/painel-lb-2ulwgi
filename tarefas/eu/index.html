@@ -32,6 +32,11 @@ h3{font-size:11px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;
 .bt.on{background:var(--blue);border-color:var(--blue);color:#141218}.bt.done{background:var(--pos);border-color:var(--pos);color:#141218}
 .empty{color:var(--muted);font-size:13.5px;text-align:center;padding:22px;background:var(--card);border-radius:14px}
 .err{color:var(--neg);text-align:center;margin-top:40px}
+.lg{max-width:340px;margin:36px auto 0;text-align:center}.lg p{color:var(--sub);font-size:14px;margin:0 0 14px}
+.pw{position:relative}.pw input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 52px 14px 16px;color:var(--ink);font:inherit;font-size:16px;text-align:center}
+.olho{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:transparent;border:0;color:var(--sub);font-size:19px;padding:8px 10px;line-height:1}
+.lg .ent{width:100%;margin-top:12px;padding:14px;border:0;border-radius:12px;background:var(--pink);color:#fff;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px}
+.lg .em{color:var(--neg);font-size:13px;min-height:20px;margin-top:10px}.sair{display:block;margin:30px auto 0;background:transparent;border:0;color:var(--muted);font-size:12.5px;text-decoration:underline}
 details summary{cursor:pointer;color:var(--sub);font-size:13px;margin:20px 2px 8px}
 </style>
 </head>
@@ -40,21 +45,38 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px;margin:20px 2px 8
 <header><img src="../../logo.png" alt="Lucas Barros"></header>
 <p class="eyebrow">Minhas tarefas</p>
 <div id="app"><p class="fn">Carregando…</p></div>
+<button type="button" class="sair" id="sair" hidden>Sair deste aparelho</button>
 </div>
-<script src="../../lbmetas.js?v=mwigyktj"></script>
+<script src="../../lbmetas.js?v=mwih45nk"></script>
+<script src="../../lbchat.js?v=mwih45nk"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),MES=HOJE.slice(0,7);
 const ddmm=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
 const K=new URLSearchParams(location.hash.slice(1)).get('k')||'';
-let API='',P=null,T=[];
-async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({k:K},c))})).json();if(!r.ok)throw new Error(r.erro||'erro');P=r.perfil;T=r.tarefas;return r}
+/* o link só identifica a pessoa: sem a senha não abre nada. A senha fica guardada neste aparelho até tocar em "Sair". */
+const SK='lb_tk_'+K.slice(0,24),lerS=()=>{try{return localStorage.getItem(SK)||''}catch(e){return''}},
+  limpa=()=>{try{localStorage.removeItem(SK);Object.keys(localStorage).filter(x=>x.startsWith('lbrot_')||x.startsWith('lbq_Minhas')).forEach(x=>localStorage.removeItem(x))}catch(e){}};
+let API='',P=null,T=[],KS=lerS(),CHAT=false;
+const MSG={senha:'Senha incorreta.',sem_senha:'Seu acesso ainda não tem senha. Peça ao Luiz.',bloqueado:'Muitas tentativas. Espere 15 minutos e tente de novo.',link:'Este link não vale mais. Peça o novo ao Luiz.'};
+async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({k:K,ks:KS},c))})).json();
+  if(!r.ok){if(MSG[r.erro]&&KS){limpa();KS='';login(MSG[r.erro])}throw new Error(r.erro||'erro')}if(r.perfil){P=r.perfil;T=r.tarefas}return r}
+function login(m){const app=document.getElementById('app');
+  app.innerHTML=`<form class="lg" autocomplete="on"><p>Digite sua senha para abrir suas tarefas.</p>    <div class="pw"><input type="password" id="ks" placeholder="Senha" autocomplete="current-password" aria-label="Senha"><button type="button" class="olho" aria-label="Mostrar senha" title="Mostrar senha">👁</button></div>
+    <button type="submit" class="ent">Entrar</button><div class="em">${esc(m||'')}</div></form>`;
+  const f=app.querySelector('form'),i=f.querySelector('#ks'),o=f.querySelector('.olho');i.focus();
+  o.onclick=()=>{const v=i.type==='password';i.type=v?'text':'password';o.textContent=v?'🙈':'👁';o.setAttribute('aria-label',v?'Esconder senha':'Mostrar senha');i.focus()};
+  f.onsubmit=async e=>{e.preventDefault();const v=i.value.trim();if(!v)return;f.querySelector('.em').textContent='Abrindo…';KS=v;limpa();
+    try{await abre();try{localStorage.setItem(SK,v)}catch(e2){}}catch(er){KS='';f.querySelector('.em').textContent=MSG[er.message]||'Não consegui abrir agora. Tente de novo.'}}}
+async function abre(){const app=document.getElementById('app');
+  app.innerHTML='<p class="fn">Carregando…</p>';await LBROT.pagina(app,api,'tarefas LB');
+  const b=document.getElementById('sair');b.hidden=false;b.onclick=()=>{limpa();location.reload()};
+  if(!CHAT&&window.LBCHAT){CHAT=true;LBCHAT.auto(app,{base:'../../',pagina:'Minhas tarefas',exemplo:'o que está atrasado?',auth:()=>({k:K,ks:KS})})}}
 (async()=>{const app=document.getElementById('app');
   if(!K){app.innerHTML='<p class="err">Link incompleto. Peça o seu link ao Luiz.</p>';return}
-  try{API=(await (await fetch('../../config.json',{cache:'no-store'})).json()).api_url;await LBROT.pagina(app,api,'tarefas LB')}
-  catch(e){app.innerHTML=`<p class="err">${e.message==='link'?'Este link não vale mais. Peça o novo ao Luiz.':'Não consegui abrir agora. Tente de novo em instantes.'}</p>`}})();
+  try{API=(await (await fetch('../../config.json',{cache:'no-store'})).json()).api_url}catch(e){app.innerHTML='<p class="err">Não consegui abrir agora. Tente de novo em instantes.</p>';return}
+  if(!KS)return login('');
+  try{await abre()}catch(e){if(!MSG[e.message])app.innerHTML='<p class="err">Não consegui abrir agora. Tente de novo em instantes.</p>'}})();
 </script>
-<script src="../../lbchat.js?v=mwigyktj"></script>
-<script>if(K)LBCHAT.auto(document.getElementById('app'),{base:'../../',pagina:'Minhas tarefas',exemplo:'o que está atrasado?',auth:()=>({k:K})})</script>
 </body>
 </html>
