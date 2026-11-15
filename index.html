@@ -194,7 +194,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 .etp{display:flex;flex-direction:column;gap:6px;margin-top:8px}.etp div{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--sub)}.etp i{width:10px;height:10px;border-radius:3px;flex:none}.etp b{margin-left:auto;color:var(--ink)}.etp small{color:var(--muted);width:38px;text-align:right}
 .sxl{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px;color:var(--sub)}.sxl b{color:var(--ink)}
 .avh{display:flex;justify-content:space-between;gap:8px 12px;align-items:center;flex-wrap:wrap}.avt{background:none;border:1px solid var(--line);border-radius:99px;padding:3px 10px;font-size:12px;color:var(--sub);flex:none}
-.avl{display:flex;flex-direction:column;gap:5px;margin-top:8px}.av{display:block;font-size:13px;color:var(--sub);text-decoration:none;padding:6px 10px;background:var(--card2);border-radius:8px}.av b{color:var(--ink)}.av.pk{border-left:3px solid var(--pinkl)}
+.avl{display:flex;flex-direction:column;gap:5px;margin-top:8px}.av{display:block;font-size:13px;color:var(--sub);text-decoration:none;padding:6px 10px;background:var(--card2);border-radius:8px}.av b{color:var(--ink)}.av.pk{border-left:3px solid var(--pinkl)}.avd{padding:9px 12px}.avd.al{border-left:3px solid var(--amber)}.avt1{font-size:14px}.avt2{font-size:13px;color:var(--sub);margin-top:3px;line-height:1.45}.avt3{font-size:12px;color:var(--amber);margin-top:4px}.avt4{color:var(--muted);font-size:12.5px}
 .dnt{display:flex;align-items:center;gap:16px;margin-top:8px}.dnt svg{flex:none;transform:rotate(0)}.dnt .etp{flex:1;margin:0;min-width:0}
 .cmb{flex:none;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--muted);font-size:15px;cursor:pointer;padding:0}
 .row.cmin{padding:8px 14px;opacity:.75}.row.cmin .t b{font-size:13px;font-weight:500}
@@ -362,7 +362,7 @@ function iniciar(){
   KEYS=[...ks].sort();mesAtual=KEYS.includes(mkey(HOJE))?mkey(HOJE):KEYS[KEYS.length-1];
   D.borderos=D.borderos||{};
   montaMeses();renderMes();renderPagar();renderTarefas();renderTL();renderEst();navSpy();bordAoVivo();tarAoVivo();pagAoVivo();
-  document.getElementById('ocp').innerHTML=(D.ocorrencias||[]).slice().sort((x,y)=>y.data.localeCompare(x.data)).map(o=>`<div class="row"><div class="d"><b>${o.data.slice(8,10)}</b><span>${MES3[+o.data.slice(5,7)-1]}${o.data.slice(0,4)!==ANO_AT?' '+o.data.slice(2,4):''}</span></div><div class="t"><b>${esc(o.titulo)} ${o.confirmado?'':'<span class="pill am">sem confirmação</span>'}</b><span>${esc(o.detalhe||'')}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`).join('')||'<div class="empty">Nenhuma.</div>';
+  renderOc();
   document.getElementById('ptabs').onclick=e=>{const b=e.target.closest('button');if(b)aba(b.dataset.p)};
   const h=location.hash.slice(1);if(h==='vendas'||h==='rendimento')aba(h==='vendas'?'ven':'ren');
 }
@@ -530,7 +530,7 @@ let TAR={perfis:[],tarefas:[]};
 function perfilDe(nome){const n=LB.norm(nome);return TAR.perfis.find(p=>{const q=LB.norm(p.nome);return q===n||n.startsWith(q+' ')||q.startsWith(n+' ')})}
 async function tarAoVivo(){try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;
   const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'tarefas',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
-  if(r.ok){TAR=r;if(RFEITO)renderRend();renderInfo()}}catch(e){}}
+  if(r.ok){TAR=r;if(RFEITO)renderRend();renderInfo();try{renderOc()}catch(e){}}}catch(e){}}
 /* vendas por mês pela DATA DA VENDA (quando fechou), não pela data do show — Rendimento e aba Vendas */
 function renderVV(gid,mid){if(!document.getElementById(gid))return;const MA=mkey(HOJE),ult12=[];for(let i=11;i>=0;i--){const d=new Date(+MA.slice(0,4),+MA.slice(5,7)-1-i,1);ult12.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
   {const VV=VSH().filter(s=>s.status!=='Cancelado'),cv=VV.filter(s=>/^\d{4}-\d{2}-\d{2}$/.test(s.data_venda||'')),sem=VV.length-cv.length;
@@ -613,12 +613,21 @@ function renderInfo(){const el=document.getElementById('infobase');if(!el||!D)re
   const av=[];
   if(PEND&&PEND.tot>0)av.push(`<a href="#pagar" class="av pk">💸 <b>Falta pagar ${brl(PEND.tot)}</b> · ${PEND.n} pessoa${PEND.n>1?'s':''}</a>`);
   ((TAR&&TAR.metas)||[]).filter(x=>x.painel==='sim'&&!['Atingida','Não atingida','Pago','Resolvido'].includes(x.situacao)).forEach(x=>
-    av.push(`<div class="av">${x.tipo==='alerta'?'⚠️':x.tipo==='despesa'?'💸':'🎯'} <b>${esc(x.titulo)}</b>${x.valor?' · '+brl(+x.valor):''}${x.prazo?' · '+esc(x.prazo):''}</div>`));
+    av.push(avDet(x)));
   const min=LB.store.get('lb_av_min')==='1';
   el.style.display=av.length?'':'none';if(!av.length){el.innerHTML='';return}
   el.innerHTML=`<div class="avh"><span>🔔 <b>${av.length} aviso${av.length>1?'s':''}</b></span><button class="avt" id="avt">${min?'ver ▾':'minimizar ▴'}</button></div>${!min?`<div class="avl">${av.join('')}</div>`:''}`;
   const b=document.getElementById('avt');if(b)b.onclick=()=>{LB.store.set('lb_av_min',min?'0':'1');renderInfo()}}
 let PEND=null;
+/* aviso/alerta com tudo que foi preenchido no Admin: título, o que é, prazo, valor, situação e detalhes */
+function avDet(x){const ic=x.tipo==='alerta'?'⚠️':x.tipo==='despesa'?'💸':'🎯';
+  const meta=[x.prazo?'⏰ '+esc(x.prazo):'',x.valor?'💰 '+brl(+x.valor):'',x.situacao?esc(x.situacao):''].filter(Boolean).join(' · ');
+  return `<div class="av avd${x.tipo==='alerta'?' al':''}"><div class="avt1">${ic} <b>${esc(x.titulo)}</b></div>${x.alvo&&x.alvo!==x.titulo?`<div class="avt2">${esc(x.alvo)}</div>`:''}${meta?`<div class="avt3">${meta}</div>`:''}${x.progresso?`<div class="avt2 avt4">${esc(x.progresso)}</div>`:''}</div>`}
+const ALERTA_ABERTO=x=>(x.tipo==='alerta'||x.tipo==='despesa')&&!['Atingida','Não atingida','Pago','Resolvido'].includes(x.situacao);
+/* ocorrências: alertas em aberto do Admin (ao vivo) em cima + o que aconteceu (Admin → Sócio) */
+function renderOc(){const el=document.getElementById('ocp');if(!el)return;
+  const al=((TAR&&TAR.metas)||[]).filter(ALERTA_ABERTO).map(x=>`<div class="row"><div class="d"><b>⚠️</b><span>${x.tipo==='despesa'?'despesa':'alerta'}</span></div><div class="t"><b>${esc(x.titulo)} <span class="pill am">em aberto${x.prazo?' · '+esc(x.prazo):''}</span>${x.socio==='sim'?'':' <span class="pill">só interno</span>'}</b><span>${esc([x.alvo!==x.titulo?x.alvo:'',x.progresso].filter(Boolean).join(' — '))}</span></div><div class="v">${x.valor?brl(+x.valor):''}</div></div>`).join('');
+  el.innerHTML=al+((D.ocorrencias||[]).slice().sort((x,y)=>y.data.localeCompare(x.data)).map(o=>`<div class="row"><div class="d"><b>${o.data.slice(8,10)}</b><span>${MES3[+o.data.slice(5,7)-1]}${o.data.slice(0,4)!==ANO_AT?' '+o.data.slice(2,4):''}</span></div><div class="t"><b>${esc(o.titulo)} ${o.confirmado?'':'<span class="pill am">sem confirmação</span>'}</b><span>${esc(o.detalhe||'')}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`).join('')||(al?'':'<div class="empty">Nenhuma.</div>'))}
 /* resumo curto dos dados do painel para o assistente (texto enxuto = poucos tokens) */
 function ctxPainel(){const R=v=>v==null?'?':Math.round(v),L=[],HJ=HOJE,dd=d=>d?d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(2,4):'';
   const ln=(D.linha||[]).filter(y=>y.data<=HJ),u=ln[ln.length-1];if(u)L.push(`Saldo atual (conta+dinheiro): ${R(u.saldo)} · extrato conferido até ${dd(D.ext_ate)}`);
