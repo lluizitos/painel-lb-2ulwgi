@@ -100,6 +100,7 @@ label textarea{min-height:60px;resize:vertical}
       <label class="w">Detalhes (opcional)<textarea id="g_des"></textarea></label>
       <label>Categoria<input id="g_cat" list="cat_dl" placeholder="ex.: redes sociais"></label>
       <label>Entregar até<input type="date" id="g_pz"></label>
+      <label>Repetir<select id="g_rec"><option value="">Não repete</option><option value="semanal">Toda semana</option><option value="mensal">Todo mês</option></select></label>
       <div style="align-self:end"><span class="note" id="g_quem" style="margin:0"></span></div>
     </div><div class="acts"><button class="btn pkb" id="g_ok">Mandar para todos</button><span class="msg" id="g_msg"></span></div></div>
     <h3>Mandadas para todos</h3>
@@ -128,6 +129,8 @@ label textarea{min-height:60px;resize:vertical}
       <label>Categoria<input id="i_cat" list="cat_dl" placeholder="ex.: redes sociais"></label>
       <label>Entregar até<input type="date" id="i_pz"></label>
       <label>Situação<select id="i_st"><option>A fazer</option><option>Em andamento</option><option>Concluída</option></select></label>
+      <label>Repetir<select id="i_rec"><option value="">Não repete</option><option value="semanal">Toda semana</option><option value="mensal">Todo mês</option></select></label>
+      <label id="i_cdl" style="display:none">Concluída em<input type="date" id="i_cd"></label>
     </div><div class="acts"><button class="btn pkb" id="i_ok">Salvar tarefa</button><button class="btn" id="i_can" style="display:none">Cancelar edição</button><span class="msg" id="i_msg"></span></div></div>
     <div class="chips" id="i_fil"><button class="chip on" data-f="abertas">Em aberto</button><button class="chip" data-f="concl">Concluídas</button><button class="chip" data-f="tudo">Todas</button></div>
     <div class="list" id="i_lista"></div>
@@ -279,8 +282,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwhvrw7h"></script>
-<script src="../lbmetas.js?v=mwhvrw7h"></script>
+<script src="../lb.js?v=mwhwn14d"></script>
+<script src="../lbmetas.js?v=mwhwn14d"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -305,6 +308,7 @@ LB.entrar({pagina:'admin',base:'../',titulo:'Admin',ok:async r=>{AD=r.dados||{};
 const ativos=()=>PF.filter(p=>p.ativo!=='não');
 const nomeDe=id=>(PF.find(p=>p.id===id)||{}).nome||id;
 const atrasada=t=>t.status!=='Concluída'&&t.prazo&&t.prazo<HOJE;
+document.addEventListener('change',e=>{if(e.target.id==='i_st'){$('i_cdl').style.display=e.target.value==='Concluída'?'':'none';if(e.target.value==='Concluída'&&!$('i_cd').value)$('i_cd').value=HOJE}});
 function stPill(t){return t.status==='Concluída'?`<span class="pill ok">concluída${t.concluido_em?' '+ddmm(t.concluido_em):''}</span>`:atrasada(t)?'<span class="pill neg">atrasada</span>':t.status==='Em andamento'?'<span class="pill bl">em andamento</span>':'<span class="pill">a fazer</span>'}
 function cls(t){return t.status==='Concluída'?'s-concluida':atrasada(t)?'s-atrasada':t.status==='Em andamento'?'s-andamento':''}
 const ordem=(a,b)=>(a.status==='Concluída')-(b.status==='Concluída')||(a.prazo||'9999').localeCompare(b.prazo||'9999')||b.criado_em.localeCompare(a.criado_em);
@@ -324,7 +328,7 @@ function renderTodos(){$('g_quem').textContent=ativos().length?'Vai para: '+ativ
       <div class="mt">${t.prazo?'Entregar até '+ddmm(t.prazo)+' · ':''}${ok} de ${g.length} concluíram</div>
       <div class="resumo">${g.map(x=>`<span>${esc(nomeDe(x.pessoa))} ${stPill(x)}</span>`).join('')}</div></div>`}):'<div class="empty">Nenhuma tarefa mandada para todos ainda.</div>'}
 $('g_ok').onclick=async()=>{const m=$('g_msg'),t=$('g_tit').value.trim();if(!t){m.innerHTML='<span class="neg">Escreva a tarefa.</span>';return}
-  m.textContent='Mandando…';try{await api({acao:'salvar_tarefa',tarefa:{pessoa:'todos',titulo:t,categoria:$('g_cat').value,descricao:$('g_des').value,prazo:$('g_pz').value}});$('g_tit').value=$('g_des').value=$('g_pz').value='';m.innerHTML='<span class="pos">Mandada ✓</span>';render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
+  m.textContent='Mandando…';try{await api({acao:'salvar_tarefa',tarefa:{pessoa:'todos',titulo:t,categoria:$('g_cat').value,descricao:$('g_des').value,prazo:$('g_pz').value,recorrencia:$('g_rec').value}});$('g_tit').value=$('g_des').value=$('g_pz').value=$('g_rec').value='';m.innerHTML='<span class="pos">Mandada ✓</span>';render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
 $('g_lista').onclick=async e=>{const b=e.target.closest('[data-gdel]');if(!b)return;if(b.dataset.ok!=='1'){b.dataset.ok='1';b.textContent='toque de novo';return}
   b.disabled=true;try{await api({acao:'excluir_tarefa',grupo:b.dataset.gdel});render()}catch(err){b.textContent='erro'}};
 
@@ -340,7 +344,7 @@ function renderInd(){const A=ativos();if(SEL&&!PF.some(p=>p.id===SEL))SEL=null;i
   const l=mt.filter(t=>FIL==='tudo'||(FIL==='concl'?t.status==='Concluída':t.status!=='Concluída')).sort(ordem);
   $('i_lista').innerHTML=l.length?agrupa(l,t=>t.categoria,t=>`<div class="tf ${cls(t)}"><div class="hd"><div><b>${esc(t.titulo)}</b>${t.descricao?`<div class="ds">${esc(t.descricao)}</div>`:''}</div>
       <select data-st="${esc(t.id)}">${['A fazer','Em andamento','Concluída'].map(s=>`<option${s===t.status?' selected':''}>${s}</option>`).join('')}</select></div>
-    ${t.justificativa?`<div class="mt" style="color:#F5C451">Justificativa${t.justificado_em?' '+ddmm(t.justificado_em):''}: ${esc(t.justificativa)}</div>`:''}<div class="mt">${stPill(t)} ${t.prazo?'· entregar até '+ddmm(t.prazo):''}${t.grupo?' · mandada para todos':''} · <a href="#" data-ed="${esc(t.id)}" style="color:var(--pinkl)">editar</a> · <a href="#" data-del="${esc(t.id)}" style="color:var(--muted)">excluir</a></div></div>`)
+    ${t.justificativa?`<div class="mt" style="color:#F5C451">Justificativa${t.justificado_em?' '+ddmm(t.justificado_em):''}: ${esc(t.justificativa)}</div>`:''}<div class="mt">${stPill(t)} ${t.prazo?'· entregar até '+ddmm(t.prazo):''}${t.status==='Concluída'&&t.prazo&&t.concluido_em>t.prazo?' · <span class="neg">entregue depois do prazo</span>':''}${t.recorrencia?' · 🔁 '+(t.recorrencia==='mensal'?'todo mês':'toda semana'):''}${t.grupo?' · mandada para todos':''} · <a href="#" data-ed="${esc(t.id)}" style="color:var(--pinkl)">editar</a> · <a href="#" data-del="${esc(t.id)}" style="color:var(--muted)">excluir</a></div></div>`)
     :`<div class="empty">${FIL==='concl'?'Nada concluído ainda.':'Nenhuma tarefa em aberto.'}</div>`}
 $('i_chips').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;SEL=b.dataset.p;limpaI();limpaR();renderInd();renderRot()};
 /* metas com check (Rotinas) da pessoa escolhida */
@@ -373,14 +377,14 @@ $('r_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data
   if(del.dataset.ok!=='1'){del.dataset.ok='1';del.textContent='toque de novo para excluir (apaga os checks)';return}
   try{await api({acao:'excluir_rotina',id:del.dataset.rdel});renderRot()}catch(err){del.textContent='erro'}});
 $('i_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;FIL=b.dataset.f;document.querySelectorAll('#i_fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderInd()};
-function limpaI(){EDT=null;$('i_tit').value=$('i_des').value=$('i_pz').value=$('i_cat').value='';$('i_st').value='A fazer';$('i_can').style.display='none';$('i_msg').textContent=''}
+function limpaI(){EDT=null;$('i_tit').value=$('i_des').value=$('i_pz').value=$('i_cat').value=$('i_rec').value=$('i_cd').value='';$('i_cdl').style.display='none';$('i_st').value='A fazer';$('i_can').style.display='none';$('i_msg').textContent=''}
 $('i_can').onclick=()=>{limpaI();renderInd()};
 $('i_ok').onclick=async()=>{const m=$('i_msg'),t=$('i_tit').value.trim();if(!t){m.innerHTML='<span class="neg">Escreva a tarefa.</span>';return}
-  m.textContent='Salvando…';try{await api({acao:'salvar_tarefa',tarefa:{id:EDT||undefined,pessoa:SEL,titulo:t,categoria:$('i_cat').value,descricao:$('i_des').value,prazo:$('i_pz').value,status:$('i_st').value}});limpaI();m.innerHTML='<span class="pos">Salva ✓</span>';render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
+  m.textContent='Salvando…';try{await api({acao:'salvar_tarefa',tarefa:{id:EDT||undefined,pessoa:SEL,titulo:t,categoria:$('i_cat').value,descricao:$('i_des').value,prazo:$('i_pz').value,status:$('i_st').value,recorrencia:$('i_rec').value,concluido_em:$('i_st').value==='Concluída'?$('i_cd').value:''}});limpaI();m.innerHTML='<span class="pos">Salva ✓</span>';render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
 $('i_lista').addEventListener('change',async e=>{const s=e.target.closest('[data-st]');if(!s)return;const t=TF.find(x=>x.id===s.dataset.st);s.disabled=true;
   try{await api({acao:'salvar_tarefa',tarefa:{id:t.id,titulo:t.titulo,categoria:t.categoria||'',descricao:t.descricao,prazo:t.prazo,status:s.value}});render()}catch(err){s.disabled=false;alert('Não salvou: '+err.message)}});
 $('i_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data-ed]'),del=e.target.closest('[data-del]');if(!ed&&!del)return;e.preventDefault();
-  if(ed){const t=TF.find(x=>x.id===ed.dataset.ed);EDT=t.id;$('i_tit').value=t.titulo;$('i_cat').value=t.categoria||'';$('i_des').value=t.descricao;$('i_pz').value=t.prazo;$('i_st').value=t.status;$('i_can').style.display='';$('i_h').textContent='Editar tarefa';$('i_tit').focus();return}
+  if(ed){const t=TF.find(x=>x.id===ed.dataset.ed);EDT=t.id;$('i_tit').value=t.titulo;$('i_cat').value=t.categoria||'';$('i_des').value=t.descricao;$('i_pz').value=t.prazo;$('i_st').value=t.status;$('i_rec').value=t.recorrencia||'';$('i_cd').value=t.concluido_em||'';$('i_cdl').style.display=t.status==='Concluída'?'':'none';$('i_can').style.display='';$('i_h').textContent='Editar tarefa';$('i_tit').focus();return}
   if(del.dataset.ok!=='1'){del.dataset.ok='1';del.textContent='toque de novo para excluir';return}
   try{await api({acao:'excluir_tarefa',id:del.dataset.del});render()}catch(err){del.textContent='erro'}});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-cp]');if(!b)return;try{navigator.clipboard.writeText(b.dataset.cp)}catch(x){}b.textContent='copiado ✓';setTimeout(()=>b.textContent=b.dataset.lb||'copiar link',1800)});
@@ -659,7 +663,7 @@ $('ln_del').onclick=async()=>{const d=$('ln_del'),x=LED,id=x&&(x.novo?x.novo.id:
 document.addEventListener('keydown',e=>{if(e.key==='Escape')lnFecha()});
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag','lan','soc','cfg'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='cfg')cfgAbre();if(b.dataset.t==='lan')lnAbre();if(b.dataset.t==='pag')arecAbre();if(b.dataset.t==='soc')socAbre()};
 </script>
-<script src="../lbchat.js?v=mwhvrw7h"></script>
+<script src="../lbchat.js?v=mwhwn14d"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

@@ -78,6 +78,29 @@
 .nvf input,.nvf select,.nvf textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;background:var(--bg,#141218);color:inherit;font:inherit;font-size:15px;padding:9px}.nvf textarea{min-height:60px}
 .nvf .rkb{display:flex;gap:8px;margin-top:12px}.nvf .rkb button{flex:1;border:1px solid var(--line);background:transparent;color:inherit;border-radius:10px;padding:10px;font-weight:700;cursor:pointer}.nvf .rkb .ok{background:var(--pos);border-color:var(--pos);color:#141218}.nvf .msg{font-size:13px;color:var(--neg);margin-top:8px}
 .pso{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-left:6px}.bt.del{color:var(--neg);border-color:rgba(255,143,168,.4)}
+.hj0{background:linear-gradient(135deg,rgba(207,29,81,.16),rgba(207,29,81,.04));border:1px solid rgba(240,80,126,.35);border-radius:16px;padding:16px;margin:16px 0}
+.hj0 h2{margin:0 0 4px;font-size:19px;line-height:1.3}.hj0 p{margin:12px 0 4px;font-size:15.5px;line-height:1.5}.hj0 ul{margin:0;padding-left:20px}.hj0 li{margin:5px 0;font-size:15px;line-height:1.45}.hj0 li small{color:var(--muted);font-size:13px}
+.hj0 .neg,.lbpc .neg{color:var(--neg);font-weight:700}.lbpc .pos{color:var(--pos);font-weight:700}.alr.alrin{background:none;border:0;padding:0;margin:4px 0 0}.pso.rec{color:#F5C451}
+.gch{background:var(--card);border-radius:14px;padding:14px;margin-top:10px}.gch>b{font-size:13.5px;color:var(--sub)}.gn{font-size:11.5px;color:var(--muted);margin:6px 0 0}
+.gb{display:flex;gap:8px;height:150px;margin-top:10px}.gb>div{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px}.gb span{font-size:11.5px;font-weight:700;color:var(--sub);min-height:15px}.gb small{font-size:11px;color:var(--muted)}
+.gbw{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}.gbw i{display:flex;flex-direction:column;width:100%;max-width:36px;border-radius:6px 6px 2px 2px;overflow:hidden}.gbw i u{display:block;min-height:0}
+.ghl{display:flex;align-items:center;gap:8px;margin-top:9px;font-size:13.5px}.ghl span{flex:0 0 40%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ghl i{flex:1;height:8px;background:var(--card2);border-radius:99px;overflow:hidden}.ghl i u{display:block;height:100%;border-radius:99px}.ghl b{width:42px;text-align:right;font-size:13px}
+.lbc{background:var(--card);border-radius:14px;padding:10px}.lbch{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.lbch b{font-size:15px;text-transform:capitalize}.lbch button{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:10px;width:40px;height:36px;font-size:18px;cursor:pointer}
+.lbc .cw,.lbc .cg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}.lbc .cw span{text-align:center;font-size:10.5px;color:var(--muted);font-weight:700;padding-bottom:4px}
+.lbc .cd{min-height:70px;min-width:0;border:0;border-top:1px solid var(--line);border-radius:6px;background:none;color:var(--sub);display:flex;flex-direction:column;align-items:stretch;gap:2px;cursor:pointer;padding:4px 2px 3px;font:inherit;overflow:hidden}.lbc .cd>b{align-self:center;font-size:13px;font-weight:600}.lbc .cd:hover{background:var(--card2)}
+.lbc .cd.hj>b{color:#fff;background:var(--pink);border-radius:99px;padding:1px 6px}
+.lbc .ce{display:block;font-style:normal;font-size:9.5px;line-height:1.3;font-weight:700;padding:1px 4px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;color:#141218}.lbc .ce.fe{opacity:.5;text-decoration:line-through}.lbc .cm{font-style:normal;font-size:9.5px;color:var(--muted);text-align:left;padding-left:4px}
+.lbc .dts{display:flex;gap:4px;justify-content:center;margin-top:auto}.lbc .dts em{font-style:normal;font-size:10px;font-weight:700}.dk{color:var(--pos)}.dx{color:var(--neg)}
+.pt-t{background:#7AB8FF}.pt-a{background:var(--neg)}.pt-ok{background:var(--pos)}
+.lbc .clg,.gch .clg{display:flex;flex-wrap:wrap;gap:10px;font-size:11.5px;color:var(--muted);margin-top:8px}.clg em{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:4px}.clt{font-size:12px;color:var(--muted);margin:6px 0 0}
+@media(min-width:700px){.lbc .cd{min-height:92px}.lbc .ce{font-size:11px;padding:2px 6px}}
+.lbpop{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.lbpc{background:var(--bg,#141218);color:var(--ink,#F3F1F6);border:1px solid var(--line);border-radius:18px 18px 0 0;width:100%;max-width:520px;max-height:82vh;overflow:auto;padding:16px 16px 26px;box-sizing:border-box}
+@media(min-width:600px){.lbpop{align-items:center}.lbpc{border-radius:18px}}
+.lbph{display:flex;justify-content:space-between;align-items:center;gap:10px}.lbph b{font-size:17px}.lbph button{border:0;background:var(--card2);color:var(--ink,#fff);border-radius:99px;width:36px;height:36px;font-size:15px;cursor:pointer;flex:none}
+.lbpc h4{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--pinkl);margin:16px 0 6px}
+.pdl{background:var(--card);border-radius:12px;padding:10px 12px;margin-top:6px}.pdl b{display:block;font-size:15px}.pdl small{display:block;font-size:13px;color:var(--sub);margin-top:2px}.pdl .bt{margin-top:8px}
+.tf .pz a{color:var(--pinkl)}.cdf{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.cdf input{border:1px solid var(--line);border-radius:10px;background:var(--bg,#141218);color:inherit;font:inherit;padding:7px}
 .cat summary::-webkit-details-marker{display:none}.cat summary small{color:var(--muted);letter-spacing:0}.cat summary::after{content:'▾';color:var(--muted);margin-left:auto}.cat:not([open]) summary::after{content:'▸'}`;
   function css() { if (!document.getElementById('lbmcss')) { const st = document.createElement('style'); st.id = 'lbmcss'; st.textContent = CSS; document.head.appendChild(st); } }
 
@@ -144,18 +167,104 @@
   /* página da pessoa: app = elemento, chamar(corpo) -> resposta da API ({perfil, tarefas, rotinas}) */
   async function pagina(app, chamar, titulo) {
     css();
-    let r = await chamar({ acao: 'minhas_tarefas' });
+    const CK = 'lbrot_' + titulo + '_' + ((window.LB && LB.login) || location.hash.slice(0, 30));
+    const guarda = x => { try { localStorage.setItem(CK, JSON.stringify({ perfil: x.perfil, tarefas: x.tarefas, rotinas: x.rotinas })); } catch (e) { } };
+    let r = null; try { const c = JSON.parse(localStorage.getItem(CK) || 'null'); if (c && c.perfil) r = c; } catch (e) { }
+    const fresco = chamar({ acao: 'minhas_tarefas' }), doCache = !!r;
+    if (!r) { r = await fresco; guarda(r); }
     const ST = { P: r.perfil, T: r.tarefas || [], R: r.rotinas || [] };
     app._rot = () => ST.R;
+    const REC = { semanal: 'toda semana', mensal: 'todo mês' }, DSN = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+    const dias = (a, b) => Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 864e5);
     function card(t, HJ) {
       const atr = t.status !== 'Concluída' && t.prazo && t.prazo < HJ, c = t.status === 'Concluída' ? 'ok' : atr ? 'atr' : t.status === 'Em andamento' ? 'and' : '';
       const meu = t.criado_por === 'próprio', del = meu ? `<button class="bt del" data-del="${esc(t.id)}" data-dt="tarefa">Apagar</button>` : '';
-      return `<div class="tf ${c}"><b>${esc(t.titulo)}${meu ? '<span class="pso">minha</span>' : ''}</b>${t.descricao ? `<div class="ds">${esc(t.descricao)}</div>` : ''}
-    <div class="pz">${t.status === 'Concluída' ? 'Concluída em ' + ddmm(t.concluido_em) : t.prazo ? (atr ? '<span class="neg">Atrasada · era até ' + ddmm(t.prazo) + '</span>' : 'Entregar até ' + ddmm(t.prazo)) : 'Sem prazo'}</div>
+      const dA = t.status === 'Concluída' && t.prazo && t.concluido_em && t.concluido_em > t.prazo ? dias(t.prazo, t.concluido_em) : 0;
+      const pz = t.status === 'Concluída' ? `Concluída em ${ddmm(t.concluido_em)}${dA ? ` <span class="neg">· ${dA} dia${dA > 1 ? 's' : ''} depois do prazo</span>` : t.prazo ? ' · no prazo' : ''} · <a href="#" data-cd="${esc(t.id)}">corrigir data</a>`
+        : t.prazo ? (atr ? '<span class="neg">Atrasada · era até ' + ddmm(t.prazo) + '</span>' : 'Entregar até ' + ddmm(t.prazo)) : 'Sem prazo';
+      return `<div class="tf ${c}"><b>${esc(t.titulo)}${meu ? '<span class="pso">minha</span>' : ''}${REC[t.recorrencia] ? `<span class="pso rec">🔁 ${REC[t.recorrencia]}</span>` : ''}</b>${t.descricao ? `<div class="ds">${esc(t.descricao)}</div>` : ''}
+    <div class="pz">${pz}</div>
     ${t.justificativa ? `<div class="tj"><em class="jtx">Justificativa${t.justificado_em ? ' · ' + ddmm(t.justificado_em) : ''}:</em> ${esc(t.justificativa)}</div>` : ''}
     <div class="tjf" data-tjf="${esc(t.id)}"></div>
     <div class="bts">${t.status === 'Concluída' ? `<button class="bt" data-id="${esc(t.id)}" data-s="A fazer">Reabrir</button>${del}`
         : `<button class="bt${t.status === 'Em andamento' ? ' on' : ''}" data-id="${esc(t.id)}" data-s="${t.status === 'Em andamento' ? 'A fazer' : 'Em andamento'}">${t.status === 'Em andamento' ? '◐ Em andamento' : 'Comecei'}</button><button class="bt done" data-id="${esc(t.id)}" data-s="Concluída">✓ Concluí</button><button class="bt jbt" data-tj="${esc(t.id)}">${t.justificativa ? 'Editar justificativa' : atr ? 'Justificar atraso' : 'Não vou conseguir'}</button>${del}`}</div></div>`;
+    }
+    /* "o que temos pra hoje": atrasadas, hoje, metas para marcar, em andamento e próximos 7 dias */
+    function hojeBox(HJ) {
+      const T = ST.T.filter(t => t.status !== 'Concluída'), nome = String(ST.P.nome || '').split(' ')[0];
+      const h = +new Date(Date.now() - 3 * 3600e3).toISOString().slice(11, 13), oi = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+      const pz = (a, b) => (a.prazo || '').localeCompare(b.prazo || '');
+      const atr = T.filter(t => t.prazo && t.prazo < HJ).sort(pz), hj = T.filter(t => t.prazo === HJ), prox = T.filter(t => t.prazo > HJ && t.prazo <= soma(HJ, 7)).sort(pz),
+        and = T.filter(t => t.status === 'Em andamento' && !t.prazo), PD = ST.R.map(x => [x, pend(x, HJ)]).filter(y => y[1]);
+      const li = (t, s) => `<li>${esc(t.titulo)}${s ? ` <small>· ${s}</small>` : ''}</li>`;
+      let c = '';
+      if (atr.length) c += `<p><span class="neg">⚠️ ${atr.length} tarefa${atr.length > 1 ? 's' : ''} atrasada${atr.length > 1 ? 's' : ''}</span>, vale resolver primeiro:</p><ul>${atr.map(t => li(t, 'era até ' + ddmm(t.prazo) + ' (' + dias(t.prazo, HJ) + ' dia' + (dias(t.prazo, HJ) > 1 ? 's' : '') + ')' + (t.justificativa ? ' · justificada' : ''))).join('')}</ul>`;
+      if (hj.length) c += `<p>📌 <b>Para entregar hoje</b></p><ul>${hj.map(t => li(t, t.status === 'Em andamento' ? 'em andamento' : '')).join('')}</ul>`;
+      if (PD.length) c += `<p>✅ <b>Metas para marcar</b></p><div class="alr alrin">${PD.map(([x, q]) => `<button data-alr="${esc(x.id)}">${esc(x.titulo)}<small>${esc(q)} →</small></button>`).join('')}</div>`;
+      if (and.length) c += `<p>◐ <b>Em andamento</b></p><ul>${and.map(t => li(t, '')).join('')}</ul>`;
+      if (prox.length) c += `<p>🗓️ <b>Nos próximos 7 dias</b></p><ul>${prox.map(t => li(t, DSN[new Date(t.prazo + 'T12:00:00').getDay()] + ' ' + ddmm(t.prazo))).join('')}</ul>`;
+      if (!c) c = '<p>Nada pendente para hoje. Tudo em dia! 👏</p>';
+      return `<div class="hj0"><h2>${oi}, ${esc(nome)}! O que temos pra hoje</h2>${c}</div>`;
+    }
+    /* tudo de um dia: tarefas com prazo, tarefas concluídas, metas (feito / justificado / não marcado) */
+    function itensDia(d, HJ) {
+      const prazo = ST.T.filter(t => t.prazo === d), feitas = ST.T.filter(t => t.status === 'Concluída' && t.concluido_em === d && t.prazo !== d);
+      const metas = ST.R.map(r => { const n = checks(r).filter(x => x === d).length, nt = notas(r)[d] || '', js = !n && ehJ(nt), diaria = r.freq === 'dia' || r.freq === 'util';
+        return { r, n, nt, js, falta: !n && !js && diaria && valeNoDia(r, d) && d < HJ, marcar: !n && !js && d === HJ && !!pend(r, HJ) }; }).filter(x => x.n || x.js || x.falta || x.marcar);
+      return { prazo, feitas, metas };
+    }
+    let CM = '';
+    function calendario(HJ) {
+      if (!CM) CM = HJ.slice(0, 7);
+      const y = +CM.slice(0, 4), mo = +CM.slice(5, 7) - 1, n = new Date(y, mo + 1, 0).getDate(), off = (new Date(y, mo, 1).getDay() + 6) % 7;
+      let c = `<div class="lbc"><div class="lbch"><button data-cm="-1" aria-label="mês anterior">‹</button><b>${MESES[mo]} ${y}</b><button data-cm="1" aria-label="próximo mês">›</button></div><div class="cw">${['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map(x => `<span>${x}</span>`).join('')}</div><div class="cg">` + '<i></i>'.repeat(off);
+      for (let d = 1; d <= n; d++) {
+        const k = CM + '-' + String(d).padStart(2, '0'), it = itensDia(k, HJ), ch = [];
+        it.prazo.forEach(t => ch.push(`<i class="ce ${t.status === 'Concluída' ? 'pt-ok fe' : t.prazo < HJ ? 'pt-a' : 'pt-t'}">${esc(t.titulo)}</i>`));
+        if (it.feitas.length) ch.push(`<i class="ce pt-ok">✓${it.feitas.length}</i>`);
+        const mk = it.metas.filter(x => x.n).length, mf = it.metas.filter(x => x.falta).length, MX = 2;
+        c += `<button class="cd${k === HJ ? ' hj' : ''}" data-dia="${k}" aria-label="${d} de ${MESES[mo]}"><b>${d}</b>${ch.slice(0, ch.length > MX ? MX - 1 : MX).join('')}${ch.length > MX ? `<i class="cm">+${ch.length - MX + 1}</i>` : ''}${mk || mf ? `<span class="dts">${mk ? `<em class="dk">✓${mk}</em>` : ''}${mf ? `<em class="dx">✗${mf}</em>` : ''}</span>` : ''}</button>`;
+      }
+      return c + `</div><div class="clg"><span><em class="pt-t"></em>prazo</span><span><em class="pt-a"></em>atrasada</span><span><em class="pt-ok"></em>feita</span><span><b class="dk">✓</b> metas feitas · <b class="dx">✗</b> não feitas</span></div><p class="clt">Toque num dia para ver tudo dele.</p></div>`;
+    }
+    const qs_ = v => String(v).replace(/["\\]/g, '\\$&'); // CSS é o nome do texto de estilos aqui
+    function popDia(d) {
+      const HJ = hoje(), it = itensDia(d, HJ), dt = new Date(d + 'T12:00:00');
+      const st = t => t.status === 'Concluída' ? `<span class="pos">✓ concluída${t.concluido_em && t.concluido_em !== d ? ' em ' + ddmm(t.concluido_em) : ''}</span>` : t.prazo < HJ ? '<span class="neg">atrasada</span>' : t.status === 'Em andamento' ? 'em andamento' : 'a fazer';
+      let h = '';
+      if (it.prazo.length) h += `<h4>Para entregar neste dia</h4>${it.prazo.map(t => `<div class="pdl"><b>${esc(t.titulo)}</b><small>${st(t)}${t.categoria ? ' · ' + esc(t.categoria) : ''}${REC[t.recorrencia] ? ' · 🔁 ' + REC[t.recorrencia] : ''}</small>${t.descricao ? `<small>${esc(t.descricao)}</small>` : ''}${t.justificativa ? `<small class="jtx">Justificativa: ${esc(t.justificativa)}</small>` : ''}</div>`).join('')}`;
+      if (it.feitas.length) h += `<h4>Concluídas neste dia</h4>${it.feitas.map(t => `<div class="pdl"><b>${esc(t.titulo)}</b><small>${t.prazo ? (t.prazo < d ? `<span class="neg">${dias(t.prazo, d)} dia${dias(t.prazo, d) > 1 ? 's' : ''} depois do prazo (${ddmm(t.prazo)})</span>` : 'antes do prazo (' + ddmm(t.prazo) + ')') : 'sem prazo'}</small></div>`).join('')}`;
+      if (it.metas.length) h += `<h4>Metas</h4>${it.metas.map(x => { const pode = !!app.querySelector(`[data-rid="${qs_(x.r.id)}"][data-rf="${d}"]`);
+        return `<div class="pdl"><b>${esc(x.r.titulo)}</b><small>${x.n ? `<span class="pos">✓ feito${x.n > 1 ? ' ' + x.n + '×' : ''}</span>` : x.js ? '<span class="jtx">não feito · justificado</span>' : x.falta ? '<span class="neg">não marcado</span>' : 'falta marcar hoje'}${x.nt ? ' · ' + esc(String(x.nt).replace(/^✗\s*/, '')) : ''}</small>${pode ? `<button class="bt" data-pmk="${esc(x.r.id)}" data-pd="${d}">${x.n || x.js ? 'Corrigir' : 'Marcar'}</button>` : ''}</div>`; }).join('')}`;
+      if (!h) h = '<p class="clt" style="font-size:14px">Nada neste dia.</p>';
+      const box = document.createElement('div'); box.className = 'lbpop';
+      box.innerHTML = `<div class="lbpc" role="dialog" aria-modal="true" aria-label="Dia ${ddmm(d)}"><div class="lbph"><b>${DSN[dt.getDay()][0].toUpperCase() + DSN[dt.getDay()].slice(1)}, ${+d.slice(8)} de ${MESES[+d.slice(5, 7) - 1]}${d === HJ ? ' · hoje' : ''}</b><button data-px aria-label="fechar">✕</button></div>${h}</div>`;
+      const fecha = () => { box.remove(); document.removeEventListener('keydown', esc_); }, esc_ = e => { if (e.key === 'Escape') fecha(); };
+      document.addEventListener('keydown', esc_);
+      box.addEventListener('click', e => {
+        if (e.target === box || e.target.closest('[data-px]')) { fecha(); return; }
+        const mk = e.target.closest('[data-pmk]'); if (!mk) return; fecha();
+        const b = app.querySelector(`[data-rid="${qs_(mk.dataset.pmk)}"][data-rf="${mk.dataset.pd}"]`); if (!b) return;
+        const det = b.closest('details'); if (det) det.open = true; b.closest('.rt').scrollIntoView({ block: 'center', behavior: 'smooth' }); b.click();
+      });
+      document.body.appendChild(box); box.querySelector('[data-px]').focus();
+    }
+    /* gráficos de rendimento: metas por mês, tarefas entregues por mês (no prazo × atrasadas), cada meta do mês */
+    function graficos(HJ) {
+      const T = ST.T, R = ST.R, MA = HJ.slice(0, 7), ms = [];
+      for (let i = 5; i >= 0; i--) { const x = new Date(+HJ.slice(0, 4), +HJ.slice(5, 7) - 1 - i, 1); ms.push(x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0')); }
+      const MC = m => MESES[+m.slice(5, 7) - 1].slice(0, 3);
+      const med = ms.map(m => { const at = R.filter(r => r.ativo !== 'não' && (!ini(r) || ini(r) <= m + '-31') && (!r.fim || r.fim >= m + '-01'));
+        const vs = at.map(r => { const x = pct(r, m, HJ); return m === MA ? x.ritmo : x.pct; }).filter(v => v != null); return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : null; });
+      const tm = ms.map(m => { const f = T.filter(t => t.status === 'Concluída' && (t.concluido_em || '').startsWith(m)), at = f.filter(t => t.prazo && t.concluido_em > t.prazo).length; return { np: f.length - at, at }; }),
+        mx = Math.max(1, ...tm.map(x => x.np + x.at));
+      const d90 = soma(HJ, -90), f90 = T.filter(t => t.status === 'Concluída' && t.prazo && (t.concluido_em || '') >= d90), npz = f90.filter(t => t.concluido_em <= t.prazo).length,
+        atrs = f90.filter(t => t.concluido_em > t.prazo).map(t => dias(t.prazo, t.concluido_em)), tx = f90.length ? npz / f90.length : null;
+      let h = `<div class="res"><div>No prazo<small style="display:block;letter-spacing:0;text-transform:none">últimos 90 dias</small><b style="color:${cor(tx)}">${P100(tx)}</b></div><div>Atraso médio<small style="display:block;letter-spacing:0;text-transform:none">quando atrasa</small><b>${atrs.length ? (x => x + (x === 1 ? ' dia' : ' dias'))(Math.round(atrs.reduce((a, b) => a + b, 0) / atrs.length)) : '—'}</b></div><div>Metas<small style="display:block;letter-spacing:0;text-transform:none">ritmo do mês</small><b style="color:${cor(med[5])}">${P100(med[5])}</b></div></div>`;
+      if (med.some(v => v != null)) h += `<div class="gch"><b>Metas cumpridas por mês</b><div class="gb">${ms.map((m, i) => `<div><span style="color:${cor(med[i])}">${med[i] == null ? '' : P100(med[i])}</span><div class="gbw"><i style="height:${med[i] == null ? 0 : Math.max(3, Math.round(med[i] * 100))}%;background:${cor(med[i])}"></i></div><small>${MC(m)}</small></div>`).join('')}</div><p class="gn">${MC(MA)}: ritmo até hoje.</p></div>`;
+      h += `<div class="gch"><b>Tarefas entregues por mês</b><div class="gb">${tm.map((x, i) => `<div><span>${x.np + x.at || ''}</span><div class="gbw"><i style="height:${Math.round((x.np + x.at) / mx * 100)}%">${x.at ? `<u style="flex:${x.at};background:var(--neg)"></u>` : ''}${x.np ? `<u style="flex:${x.np};background:var(--pos)"></u>` : ''}</i></div><small>${MC(ms[i])}</small></div>`).join('')}</div><div class="clg"><span><em style="background:var(--pos)"></em>no prazo ou sem prazo</span><span><em style="background:var(--neg)"></em>depois do prazo</span></div></div>`;
+      if (R.length) h += `<div class="gch"><b>Cada meta em ${MESES[+MA.slice(5, 7) - 1]}</b>${R.map(r => { const x = pct(r, MA, HJ), v = x.ritmo == null ? x.pct : x.ritmo; return `<div class="ghl"><span>${esc(r.titulo)}</span><i><u style="width:${Math.round((v || 0) * 100)}%;background:${cor(v)}"></u></i><b style="color:${cor(v)}">${P100(v)}</b></div>`; }).join('')}<p class="gn">Ritmo até hoje (dias já passados).</p></div>`;
+      return h;
     }
     function render() {
       const HJ = hoje(), MES = HJ.slice(0, 7), P = ST.P, T = ST.T, R = ST.R;
@@ -164,11 +273,9 @@
       const ant = new Date(+MES.slice(0, 4), +MES.slice(5, 7) - 2, 1), MA = ant.getFullYear() + '-' + String(ant.getMonth() + 1).padStart(2, '0');
       const rAnt = R.filter(x => (!x.inicio || x.inicio < MES + '-01'));
       const grupos = porCat(ab), comCat = grupos.some(g => g[0]);
-      const PD = R.map(x => [x, pend(x, HJ)]).filter(y => y[1]);
       document.title = P.nome + ' · ' + titulo;
       app.innerHTML = `<h1>${esc(P.nome)}</h1><p class="fn">${esc(P.funcao || '')}</p>
-    ${PD.length ? `<div class="alr"><b>⏰ Falta marcar</b>${PD.map(([x, q]) => `<button data-alr="${esc(x.id)}">${esc(x.titulo)}<small>${esc(q)} →</small></button>`).join('')}</div>`
-          : R.length ? '<div class="alrok">✓ Tudo marcado por hoje.</div>' : ''}
+    ${hojeBox(HJ)}
     ${P.meta ? `<div class="meta"><span>Minha meta</span>${esc(P.meta)}</div>` : ''}
     <div class="nv"><button data-nv="tarefa"${NV === 'tarefa' ? ' class="on"' : ''}>＋ Nova tarefa</button><button data-nv="meta"${NV === 'meta' ? ' class="on"' : ''}>＋ Nova meta</button></div><div id="nvbox">${form()}</div>
     ${R.length ? `<h3>Metas de ${MESES[+MES.slice(5, 7) - 1]}</h3><div class="list" data-max="0">${R.map(x => cardRot(x, HJ)).join('')}</div>` : ''}
@@ -177,6 +284,8 @@
     <h3>Tarefas em aberto</h3>${!ab.length ? '<div class="empty">Nada pendente. 👏</div>' : comCat
           ? grupos.map(([c, l]) => `<details class="cat" open><summary>${esc(c || 'Outras')} <small>${l.length}</small></summary><div class="list">${l.map(t => card(t, HJ)).join('')}</div></details>`).join('')
           : `<div class="list">${ab.map(t => card(t, HJ)).join('')}</div>`}
+    <h3>Calendário</h3><div id="lbcal">${calendario(HJ)}</div>
+    <h3>Meu rendimento</h3>${graficos(HJ)}
     ${ok.length ? `<details${ok.length <= 3 ? ' open' : ''}><summary>Concluídas (${ok.length})</summary><div class="list">${ok.slice(0, 30).map(t => card(t, HJ)).join('')}</div></details>` : ''}`;
     }
     let NV = '';
@@ -184,6 +293,7 @@
       if (NV === 'tarefa') return `<div class="nvf"><label>Tarefa</label><input id="nv_t" maxlength="200" placeholder="ex.: mandar o orçamento do figurino">
         <label>Detalhes (opcional)</label><textarea id="nv_d" maxlength="2000"></textarea>
         <label>Prazo (opcional)</label><input id="nv_p" type="date">
+        <label>Repetir</label><select id="nv_r"><option value="">Não repete</option><option value="semanal">Toda semana</option><option value="mensal">Todo mês</option></select>
         <label>Categoria (opcional)</label><input id="nv_c" maxlength="40" placeholder="Pessoal">
         <div class="msg" id="nv_m"></div><div class="rkb"><button class="ok" data-nvs="tarefa">Criar tarefa</button><button data-nv="">Cancelar</button></div></div>`;
       if (NV === 'meta') return `<div class="nvf"><label>Meta</label><input id="nv_t" maxlength="120" placeholder="ex.: estudar inglês">
@@ -202,7 +312,7 @@
       if (s) { e.preventDefault(); const v = id => ((app.querySelector('#' + id) || {}).value || '').trim(), m = app.querySelector('#nv_m');
         if (!v('nv_t')) { m.textContent = 'Escreva o nome.'; app.querySelector('#nv_t').focus(); return; }
         s.disabled = true; s.textContent = 'salvando…';
-        try { const r = await chamar(s.dataset.nvs === 'tarefa' ? { acao: 'nova_tarefa', tarefa: { titulo: v('nv_t'), descricao: v('nv_d'), prazo: v('nv_p'), categoria: v('nv_c') } }
+        try { const r = await chamar(s.dataset.nvs === 'tarefa' ? { acao: 'nova_tarefa', tarefa: { titulo: v('nv_t'), descricao: v('nv_d'), prazo: v('nv_p'), categoria: v('nv_c'), recorrencia: v('nv_r') } }
             : { acao: 'nova_meta', rotina: { titulo: v('nv_t'), freq: v('nv_f'), alvo: v('nv_a'), fim: v('nv_fim') } });
           NV = ''; aplica(r); } catch (err) { s.disabled = false; s.textContent = 'Tentar de novo'; m.textContent = 'Não salvou. Confira a internet e tente de novo.'; } return; }
       const d = e.target.closest('[data-del]');
@@ -210,7 +320,7 @@
         d.disabled = true; d.textContent = 'apagando…';
         try { aplica(await chamar({ acao: 'excluir_minha', tipo: d.dataset.dt, id: d.dataset.del })); } catch (err) { d.disabled = false; d.textContent = 'não apagou, tente de novo'; } }
     });
-    const aplica = x => { ST.P = x.perfil; ST.T = x.tarefas || []; ST.R = x.rotinas || []; render(); };
+    const aplica = x => { guarda(x); ST.P = x.perfil; ST.T = x.tarefas || []; ST.R = x.rotinas || []; render(); };
     // alerta: leva até o cartão da meta e abre o formulário de marcar
     app.addEventListener('click', e => { const b = e.target.closest('[data-alr]'); if (!b) return; const c = document.getElementById('rt-' + b.dataset.alr); if (!c) return;
       const k = c.querySelector('.rk[data-novo]') || c.querySelector('[data-rf]'); c.scrollIntoView({ block: 'center', behavior: 'smooth' }); if (k) k.click(); });
@@ -230,7 +340,20 @@
       try { aplica(await chamar({ acao: 'marcar_tarefa', id: b.dataset.id, status: b.dataset.s })); }
       catch (err) { b.textContent = 'não salvou, tente de novo'; b.disabled = false; }
     });
+    // calendário (mudar de mês, abrir o dia) e corrigir a data de conclusão
+    app.addEventListener('click', async e => {
+      const m = e.target.closest('[data-cm]');
+      if (m) { e.preventDefault(); const x = new Date(+CM.slice(0, 4), +CM.slice(5, 7) - 1 + (+m.dataset.cm), 1); CM = x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0'); app.querySelector('#lbcal').innerHTML = calendario(hoje()); return; }
+      const d = e.target.closest('[data-dia]'); if (d) { e.preventDefault(); popDia(d.dataset.dia); return; }
+      const cd = e.target.closest('[data-cd]');
+      if (cd) { e.preventDefault(); const t = ST.T.find(x => x.id === cd.dataset.cd), box = app.querySelector(`[data-tjf="${cd.dataset.cd}"]`); if (!t || !box) return;
+        box.innerHTML = `<div class="rkf"><b>Em que dia foi entregue?</b><div class="cdf"><input type="date" value="${esc(t.concluido_em || hoje())}" max="${hoje()}"><div class="rkb" style="margin:0;flex:1"><button class="ok" data-cds="${esc(t.id)}">Salvar data</button><button data-tjc="1">Cancelar</button></div></div></div>`; return; }
+      const cs = e.target.closest('[data-cds]');
+      if (cs) { e.preventDefault(); const v = cs.closest('.rkf').querySelector('input').value; if (!v || v > hoje()) return; cs.disabled = true; cs.textContent = 'salvando…';
+        try { aplica(await chamar({ acao: 'marcar_tarefa', id: cs.dataset.cds, concluido_em: v })); } catch (err) { cs.disabled = false; cs.textContent = 'não salvou, tente de novo'; } }
+    });
     render();
+    if (doCache) fresco.then(aplica).catch(() => { });
   }
   window.LBROT = { pct, pend, checks, notas, diasMes, porCat, FREQ, MESES, pagina, P100, cor, card: cardRot, css, liga };
 })();
