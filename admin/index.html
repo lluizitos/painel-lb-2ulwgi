@@ -90,7 +90,7 @@ label textarea{min-height:60px;resize:vertical}
   <p class="eyebrow">Administração</p>
   <h1>Ad<em>min</em></h1>
   <p class="note">Logins e equipe, tarefas, metas da empresa e pagamentos fora dos shows. Só a administração vê esta página.</p>
-  <div class="tabs" id="tabs"><button class="on" data-t="equipe">Equipe e logins</button><button data-t="todos">Tarefas para todos</button><button data-t="ind">Individuais</button><button data-t="emp">Empresa</button><button data-t="pag">Pagamentos</button><button data-t="lan">Lançamentos</button><button data-t="soc">Sócio</button><button data-t="cfg">Parâmetros</button></div>
+  <div class="tabs" id="tabs"><button class="on" data-t="equipe">Equipe e logins</button><button data-t="todos">Tarefas para todos</button><button data-t="ind">Individuais</button><button data-t="emp">Empresa</button><button data-t="pag">Pagamentos</button><button data-t="lan">Lançamentos</button><button data-t="soc">Sócio</button><button data-t="duv">Dúvidas <span id="duv_n"></span></button><button data-t="cfg">Parâmetros</button></div>
 
   <!-- PARA TODOS -->
   <div id="t_todos" style="display:none">
@@ -225,6 +225,12 @@ label textarea{min-height:60px;resize:vertical}
   <datalist id="ln_cdl"></datalist><datalist id="ln_sdl"></datalist>
 
   <!-- PÁGINA DO SÓCIO -->
+  <!-- DÚVIDAS que a IA não soube responder -->
+  <div id="t_duv" style="display:none">
+    <p class="note">Perguntas que o assistente não soube responder (sócio, contador, painel…). Quem perguntou vê a resposta na própria página até tocar em "Vi a resposta". A sessão na nuvem também responde por aqui.</p>
+    <div class="chips" id="duv_f" style="margin-top:10px"><button class="chip on" data-f="aberta">Abertas</button><button class="chip" data-f="">Todas</button></div>
+    <div class="list" id="duv_l" style="margin-top:10px"></div>
+  </div>
   <div id="t_cfg" style="display:none">
     <p class="note">Números usados nas contas do site (estimativa de saldo, lucro previsto dos shows e página de Vendas). Mudou aqui, vale na próxima atualização do site.</p>
     <div class="card" style="margin-top:10px"><div class="f">
@@ -284,8 +290,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwhx9spq"></script>
-<script src="../lbmetas.js?v=mwhx9spq"></script>
+<script src="../lb.js?v=mwhxw96p"></script>
+<script src="../lbmetas.js?v=mwhxw96p"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -310,7 +316,7 @@ LB.entrar({pagina:'admin',base:'../',titulo:'Admin',ok:async r=>{AD=r.dados||{};
 const ativos=()=>PF.filter(p=>p.ativo!=='não');
 const nomeDe=id=>(PF.find(p=>p.id===id)||{}).nome||id;
 const atrasada=t=>t.status!=='Concluída'&&t.prazo&&t.prazo<HOJE;
-document.addEventListener('change',e=>{if(e.target.id==='i_st'){$('i_cdl').style.display=e.target.value==='Concluída'?'':'none';if(e.target.value==='Concluída'&&!$('i_cd').value)$('i_cd').value=HOJE}});
+document.addEventListener('change',e=>{if(e.target.id==='i_st'){$('i_cdl').style.display=e.target.value==='Concluída'?'':'none';if(e.target.value==='Concluída'&&!$('i_cd').value)$('i_cd').value=$('i_pz').value&&$('i_pz').value<HOJE?$('i_pz').value:HOJE}});
 function stPill(t){return t.status==='Concluída'?`<span class="pill ok">concluída${t.concluido_em?' '+ddmm(t.concluido_em):''}</span>`:atrasada(t)?'<span class="pill neg">atrasada</span>':t.status==='Em andamento'?'<span class="pill bl">em andamento</span>':'<span class="pill">a fazer</span>'}
 function cls(t){return t.status==='Concluída'?'s-concluida':atrasada(t)?'s-atrasada':t.status==='Em andamento'?'s-andamento':''}
 const ordem=(a,b)=>(a.status==='Concluída')-(b.status==='Concluída')||(a.prazo||'9999').localeCompare(b.prazo||'9999')||b.criado_em.localeCompare(a.criado_em);
@@ -346,7 +352,7 @@ function renderInd(){const A=ativos();if(SEL&&!PF.some(p=>p.id===SEL))SEL=null;i
   const l=mt.filter(t=>FIL==='tudo'||(FIL==='concl'?t.status==='Concluída':t.status!=='Concluída')).sort(ordem);
   $('i_lista').innerHTML=l.length?agrupa(l,t=>t.categoria,t=>`<div class="tf ${cls(t)}"><div class="hd"><div><b>${esc(t.titulo)}</b>${t.descricao?`<div class="ds">${esc(t.descricao)}</div>`:''}</div>
       <select data-st="${esc(t.id)}">${['A fazer','Em andamento','Concluída'].map(s=>`<option${s===t.status?' selected':''}>${s}</option>`).join('')}</select></div>
-    ${t.justificativa?`<div class="mt" style="color:#F5C451">Justificativa${t.justificado_em?' '+ddmm(t.justificado_em):''}: ${esc(t.justificativa)}</div>`:''}<div class="mt">${stPill(t)} ${t.prazo?'· entregar até '+ddmm(t.prazo):''}${t.status==='Concluída'&&t.prazo&&t.concluido_em>t.prazo?' · <span class="neg">entregue depois do prazo</span>':''}${t.recorrencia?' · 🔁 '+(t.recorrencia==='mensal'?'todo mês':'toda semana'):''}${t.grupo?' · mandada para todos':''} · <a href="#" data-ed="${esc(t.id)}" style="color:var(--pinkl)">editar</a> · <a href="#" data-del="${esc(t.id)}" style="color:var(--muted)">excluir</a></div></div>`)
+    ${window.LBROT&&LBROT.andL(t).length&&t.status!=='Concluída'?`<div class="mt" style="color:var(--sub)">${esc(LBROT.andTxt(t))} <small style="color:var(--muted)">· ${esc(String(LBROT.andL(t).slice(-1)[0].d).slice(8,10)+'/'+String(LBROT.andL(t).slice(-1)[0].d).slice(5,7))}</small></div>`:''}${t.justificativa?`<div class="mt" style="color:#F5C451">Justificativa${t.justificado_em?' '+ddmm(t.justificado_em):''}: ${esc(t.justificativa)}</div>`:''}<div class="mt">${stPill(t)} ${t.prazo?'· entregar até '+ddmm(t.prazo):''}${t.status==='Concluída'&&t.prazo&&t.concluido_em>t.prazo?' · <span class="neg">entregue depois do prazo</span>':''}${t.recorrencia?' · 🔁 '+(t.recorrencia==='mensal'?'todo mês':'toda semana'):''}${t.grupo?' · mandada para todos':''} · <a href="#" data-ed="${esc(t.id)}" style="color:var(--pinkl)">editar</a> · <a href="#" data-del="${esc(t.id)}" style="color:var(--muted)">excluir</a></div></div>`)
     :`<div class="empty">${FIL==='concl'?'Nada concluído ainda.':'Nenhuma tarefa em aberto.'}</div>`}
 $('i_chips').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;SEL=b.dataset.p;limpaI();limpaR();renderInd();renderRot()};
 /* metas com check (Rotinas) da pessoa escolhida */
@@ -708,9 +714,19 @@ $('ln_del').onclick=async()=>{const d=$('ln_del'),x=LED,id=x&&(x.novo?x.novo.id:
   if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent=x.novo?'Toque de novo para excluir':'Toque de novo: volta como veio do extrato';return}
   try{LN=(await api({acao:'excluir_lancamento',id})).lancamentos||[];lnRender();lnFecha()}catch(e){$('ln_msg').innerHTML='<span class="neg">erro</span>'}};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')lnFecha()});
-$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag','lan','soc','cfg'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='cfg')cfgAbre();if(b.dataset.t==='lan')lnAbre();if(b.dataset.t==='pag')arecAbre();if(b.dataset.t==='soc')socAbre()};
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag','lan','soc','duv','cfg'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='cfg')cfgAbre();if(b.dataset.t==='lan')lnAbre();if(b.dataset.t==='pag')arecAbre();if(b.dataset.t==='soc')socAbre();if(b.dataset.t==='duv')duvAbre()};
+/* ---------- DÚVIDAS ---------- */
+let DUV=[],DUVF='aberta';
+async function duvAbre(){$('duv_l').innerHTML='<div class="empty">Carregando…</div>';try{DUV=(await api({acao:'duvidas'})).duvidas||[];duvRender()}catch(e){$('duv_l').innerHTML=`<div class="empty">Não consegui carregar (${esc(e.message)}).</div>`}}
+function duvRender(){const ab=DUV.filter(d=>d.status==='aberta').length;$('duv_n').textContent=ab?'('+ab+')':'';const l=DUV.filter(d=>!DUVF||d.status===DUVF);
+  $('duv_l').innerHTML=l.length?l.map(d=>`<div class="tf ${d.status==='aberta'?'s-atrasada':'s-concluida'}"><div class="mt">${esc(d.nome||d.usuario)} · ${esc(d.papel)} · ${esc(String(d.criado_em).slice(8,10)+'/'+String(d.criado_em).slice(5,7)+' '+String(d.criado_em).slice(11,16))} · <b style="display:inline">${d.status==='aberta'?'aguardando resposta':d.status==='respondida'?'respondida (ainda não viu)':'respondida e vista'}</b></div>
+    <b>${esc(d.pergunta)}</b>${d.nota_ia?`<div class="ds" style="color:var(--muted)">IA: ${esc(d.nota_ia)}</div>`:''}${d.resposta?`<div class="ds" style="white-space:pre-line">↳ ${esc(d.resposta)} <small style="color:var(--muted)">— ${esc(d.respondido_por)}</small></div>`:''}
+    <div class="f" style="margin-top:8px"><label class="w">${d.resposta?'Corrigir resposta':'Responder'}<textarea data-dr="${esc(d.id)}">${esc(d.resposta||'')}</textarea></label></div><div class="acts"><button class="btn sm pkb" data-ds="${esc(d.id)}">Enviar resposta</button></div></div>`).join(''):'<div class="empty">Nenhuma dúvida aqui.</div>'}
+$('duv_f').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;DUVF=b.dataset.f;document.querySelectorAll('#duv_f .chip').forEach(c=>c.classList.toggle('on',c===b));duvRender()};
+$('duv_l').addEventListener('click',async e=>{const b=e.target.closest('[data-ds]');if(!b)return;const r=document.querySelector(`[data-dr="${b.dataset.ds}"]`).value.trim();if(!r){b.textContent='escreva a resposta';return}
+  b.disabled=true;b.textContent='enviando…';try{DUV=(await api({acao:'responder_duvida',id:b.dataset.ds,resposta:r})).duvidas||DUV;duvRender()}catch(err){b.disabled=false;b.textContent='não enviou: '+err.message}});
 </script>
-<script src="../lbchat.js?v=mwhx9spq"></script>
+<script src="../lbchat.js?v=mwhxw96p"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

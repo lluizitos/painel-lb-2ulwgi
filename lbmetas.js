@@ -12,6 +12,22 @@
   const soma = (d, n) => { const x = new Date(d + 'T12:00:00'); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
   const seg = d => soma(d, -((dow(d) + 6) % 7)); // segunda-feira da semana
   function diasMes(m) { const n = new Date(+m.slice(0, 4), +m.slice(5, 7), 0).getDate(); return Array.from({ length: n }, (_, i) => m + '-' + String(i + 1).padStart(2, '0')); }
+  /* andamento de uma tarefa: [{d, tp, tx, q, ag, por}] */
+  const ANDT = { executando: ['▶', 'Executando', 'ex', 'ex.: comecei a ligar para as oficinas'], aguardando: ['⏳', 'Aguardando', 'ag', 'ex.: falei com ele, vai ver a agenda e me retorna'],
+    agendado: ['📅', 'Agendado', 'gd', 'ex.: levar o ônibus na oficina às 8h'], travado: ['🧱', 'Travou', 'tv', 'ex.: a oficina não tem a peça; preciso de ajuda'] };
+  function andL(t) { try { return JSON.parse((t && t.andamento) || '[]') || []; } catch (e) { return []; } }
+  const dm2 = d => String(d || '').slice(8, 10) + '/' + String(d || '').slice(5, 7);
+  function andTit(a) { return a.tp === 'aguardando' ? 'Aguardando' + (a.q ? ' ' + a.q : '') : a.tp === 'agendado' ? 'Agendado para ' + dm2(a.ag) : (ANDT[a.tp] || ANDT.executando)[1]; }
+  function andTxt(t) { const L = andL(t); if (!L.length) return ''; const a = L[L.length - 1]; return (ANDT[a.tp] || ANDT.executando)[0] + ' ' + andTit(a) + (a.tx ? ': ' + a.tx : ''); }
+  const agendaDe = (t, d) => t.status !== 'Concluída' && andL(t).some(a => a.tp === 'agendado' && a.ag === d);
+  /* popup de baixo (celular) / centro (computador) */
+  function popup(titulo, html) {
+    css(); const box = document.createElement('div'); box.className = 'lbpop';
+    box.innerHTML = `<div class="lbpc" role="dialog" aria-modal="true" aria-label="${String(titulo).replace(/"/g, '')}"><div class="lbph"><b>${titulo}</b><button data-px aria-label="fechar">✕</button></div>${html}</div>`;
+    const fecha = () => { box.remove(); document.removeEventListener('keydown', k); }, k = e => { if (e.key === 'Escape') fecha(); };
+    document.addEventListener('keydown', k); box.addEventListener('click', e => { if (e.target === box || e.target.closest('[data-px]')) fecha(); });
+    document.body.appendChild(box); box.querySelector('[data-px]').focus(); box.fecha = fecha; return box;
+  }
   function checks(r) { try { return JSON.parse(r.checks || '[]') || []; } catch (e) { return []; } }
   function notas(r) { try { return JSON.parse(r.notas || '{}') || {}; } catch (e) { return {}; } }
   const ini = r => { const c = checks(r).slice().sort()[0]; return r.inicio && c && c < r.inicio ? c : (r.inicio || ''); };
@@ -95,7 +111,17 @@
 .lbc .cd.hj>b{color:#fff;background:var(--pink);border-radius:99px;padding:1px 6px}
 .lbc .ce{display:block;font-style:normal;font-size:9.5px;line-height:1.3;font-weight:700;padding:1px 4px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;color:#141218}.lbc .ce.fe{opacity:.5;text-decoration:line-through}.lbc .cm{font-style:normal;font-size:9.5px;color:var(--muted);text-align:left;padding-left:4px}
 .lbc .dts{display:flex;gap:4px;justify-content:center;margin-top:auto}.lbc .dts em{font-style:normal;font-size:10px;font-weight:700}.dk{color:var(--pos)}.dx{color:var(--neg)}
-.pt-t{background:#7AB8FF}.pt-a{background:var(--neg)}.pt-ok{background:var(--pos)}
+.pt-g{background:#F5C451}.pt-t{background:#7AB8FF}
+.an{margin-top:10px;border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}.an-ex{--ac:var(--pinkl)}.an-ag{--ac:#F5C451}.an-gd{--ac:#7AB8FF}.an-tv{--ac:var(--neg)}
+.an{border-left:3px solid var(--ac)}.anh{display:flex;gap:10px;align-items:flex-start}.ani{width:30px;height:30px;flex:none;border-radius:99px;display:grid;place-items:center;background:color-mix(in srgb,var(--ac) 18%,transparent);font-size:15px}
+.anh b{display:block;font-size:14px;color:var(--ac)}.anh span{display:block;font-size:13.5px;color:var(--ink);margin-top:2px;overflow-wrap:anywhere}.anh small{display:block;font-size:11.5px;color:var(--muted);margin-top:3px}
+.ans{display:flex;align-items:center;margin:10px 0 2px;padding-left:2px}.ans i{font-style:normal;width:22px;height:22px;flex:none;border-radius:99px;display:grid;place-items:center;font-size:11px;background:var(--card2);opacity:.55}.ans i.on{opacity:1;box-shadow:0 0 0 2px var(--ac)}.ans u{flex:1;height:2px;background:var(--line);min-width:6px;max-width:34px}
+.anl{margin-top:8px}.anl summary{cursor:pointer;font-size:12.5px;color:var(--sub);list-style:none}.anl summary::-webkit-details-marker{display:none}.anl summary:before{content:'▸ '}.anl[open] summary:before{content:'▾ '}
+.anl ol{list-style:none;margin:8px 0 0;padding:0 0 0 14px;border-left:2px solid var(--line)}.anl li{position:relative;padding:0 0 10px 10px}.anl li>i{position:absolute;left:-26px;top:0;font-style:normal;width:22px;height:22px;border-radius:99px;display:grid;place-items:center;font-size:11px;background:var(--card2)}
+.anl li b{display:block;font-size:13px;color:var(--ac)}.anl li span{display:block;font-size:13px;overflow-wrap:anywhere}.anl li small{font-size:11px;color:var(--muted)}.anl li small a{color:var(--muted)}
+.ant{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.ant button{border:1px solid var(--line);background:transparent;color:var(--sub);border-radius:99px;padding:7px 11px;font:inherit;font-size:13px;cursor:pointer}.ant button.on{border-color:var(--pinkl);color:var(--ink);background:rgba(240,80,126,.14);font-weight:700}
+.anf input{width:100%;box-sizing:border-box;margin-top:6px;border:1px solid var(--line);border-radius:10px;background:var(--bg,#141218);color:inherit;font:inherit;font-size:14px;padding:9px 10px}.anf label{display:block;font-size:12.5px;color:var(--sub);margin-top:6px}
+.bt.anb{color:#7AB8FF;border-color:rgba(122,184,255,.45)}.hjc.g{background:rgba(245,196,81,.16);color:#F5C451}.pt-a{background:var(--neg)}.pt-ok{background:var(--pos)}
 .lbc .clg,.gch .clg{display:flex;flex-wrap:wrap;gap:10px;font-size:11.5px;color:var(--muted);margin-top:8px}.clg em{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:4px}.clt{font-size:12px;color:var(--muted);margin:6px 0 0}
 @media(min-width:700px){.lbc .cd{min-height:92px}.lbc .ce{font-size:11px;padding:2px 6px}}
 .lbpop{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:60;display:flex;align-items:flex-end;justify-content:center}
@@ -180,6 +206,24 @@
     app._rot = () => ST.R;
     const REC = { semanal: 'toda semana', mensal: 'todo mês' }, DSN = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
     const dias = (a, b) => Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 864e5);
+    function andBox(t, HJ) {
+      const L = andL(t); if (!L.length || t.status === 'Concluída' && !L.length) return ''; const a = L[L.length - 1], T = ANDT[a.tp] || ANDT.executando, dd0 = dias(String(a.d).slice(0, 10), HJ);
+      const qd = a.tp === 'agendado' ? (a.ag === HJ ? ' · é hoje' : a.ag > HJ ? ' · em ' + dias(HJ, a.ag) + ' dia' + (dias(HJ, a.ag) > 1 ? 's' : '') : ' · já passou, atualize') : a.tp === 'aguardando' && dd0 > 0 ? ' · há ' + dd0 + ' dia' + (dd0 > 1 ? 's' : '') : '';
+      const seq = L.slice(-5);
+      return `<div class="an an-${T[2]}"><div class="anh"><span class="ani">${T[0]}</span><div><b>${esc(andTit(a))}${qd}</b>${a.tx ? `<span>${esc(a.tx)}</span>` : ''}<small>atualizado ${ddmm(String(a.d).slice(0, 10))} ${String(a.d).slice(11, 16)}${a.por ? ' · ' + esc(a.por) : ''}</small></div></div>
+        ${L.length > 1 ? `<div class="ans">${seq.map((x, i) => `${i ? '<u></u>' : ''}<i class="an-${(ANDT[x.tp] || ANDT.executando)[2]}${i === seq.length - 1 ? ' on' : ''}" title="${esc(andTit(x))}">${(ANDT[x.tp] || ANDT.executando)[0]}</i>`).join('')}<u></u><i title="concluir">✓</i></div>
+        <details class="anl"><summary>Histórico do processo (${L.length})</summary><ol>${L.map((x, i) => [x, i]).reverse().map(([x, i]) => `<li class="an-${(ANDT[x.tp] || ANDT.executando)[2]}"><i>${(ANDT[x.tp] || ANDT.executando)[0]}</i><b>${esc(andTit(x))}</b>${x.tx ? `<span>${esc(x.tx)}</span>` : ''}<small>${ddmm(String(x.d).slice(0, 10))} ${String(x.d).slice(11, 16)}${x.por ? ' · ' + esc(x.por) : ''}${i === L.length - 1 ? ` · <a href="#" data-andel="${esc(t.id)}" data-i="${i}">apagar</a>` : ''}</small></li>`).join('')}</ol></details>`
+        : `<small style="display:block;margin-top:6px;font-size:11.5px"><a href="#" data-andel="${esc(t.id)}" data-i="0" style="color:var(--muted)">apagar</a></small>`}</div>`;
+    }
+    function andForm(t, ini) {
+      const sel = ini ? 'executando' : ((andL(t).slice(-1)[0] || {}).tp || 'executando');
+      return `<div class="rkf anf" data-anf="${esc(t.id)}" data-tp="${sel}"><b>${ini ? 'Comecei! Como está o processo?' : 'Como está o processo agora?'}</b>
+        <div class="ant">${Object.entries(ANDT).map(([k, v]) => `<button data-ant="${k}" class="${k === sel ? 'on' : ''}">${v[0]} ${k === 'aguardando' ? 'Aguardando alguém' : k === 'agendado' ? 'Agendei uma data' : v[1]}</button>`).join('')}</div>
+        <input class="anq" maxlength="80" placeholder="Aguardando quem ou o quê? (ex.: agenda do motorista)" style="${sel === 'aguardando' ? '' : 'display:none'}">
+        <label class="anag" style="${sel === 'agendado' ? '' : 'display:none'}">Para quando?<input type="date" min="${hoje()}"></label>
+        <textarea maxlength="400" placeholder="${esc(ANDT[sel][3])}"></textarea>
+        <div class="rkb"><button class="ok" data-ans="${esc(t.id)}">Salvar andamento</button>${ini ? `<button data-id="${esc(t.id)}" data-s="Em andamento">Só marcar que comecei</button>` : ''}<button data-tjc="1">Cancelar</button></div><div class="anm" style="font-size:12.5px;color:var(--neg);margin-top:6px"></div></div>`;
+    }
     function card(t, HJ) {
       const atr = t.status !== 'Concluída' && t.prazo && t.prazo < HJ, c = t.status === 'Concluída' ? 'ok' : atr ? 'atr' : t.status === 'Em andamento' ? 'and' : '';
       const meu = t.criado_por === 'próprio', del = meu ? `<button class="bt del" data-del="${esc(t.id)}" data-dt="tarefa">Apagar</button>` : '';
@@ -188,10 +232,11 @@
         : t.prazo ? (atr ? '<span class="neg">Atrasada · era até ' + ddmm(t.prazo) + '</span>' : 'Entregar até ' + ddmm(t.prazo)) : 'Sem prazo';
       return `<div class="tf ${c}"><b>${esc(t.titulo)}${meu ? '<span class="pso">minha</span>' : ''}${REC[t.recorrencia] ? `<span class="pso rec">🔁 ${REC[t.recorrencia]}</span>` : ''}</b>${t.descricao ? `<div class="ds">${esc(t.descricao)}</div>` : ''}
     <div class="pz">${pz}</div>
+    ${t.status !== 'Concluída' ? andBox(t, HJ) : ''}
     ${t.justificativa ? `<div class="tj"><em class="jtx">Justificativa${t.justificado_em ? ' · ' + ddmm(t.justificado_em) : ''}:</em> ${esc(t.justificativa)}</div>` : ''}
     <div class="tjf" data-tjf="${esc(t.id)}"></div>
     <div class="bts">${t.status === 'Concluída' ? `<button class="bt" data-id="${esc(t.id)}" data-s="A fazer">Reabrir</button>${del}`
-        : `<button class="bt${t.status === 'Em andamento' ? ' on' : ''}" data-id="${esc(t.id)}" data-s="${t.status === 'Em andamento' ? 'A fazer' : 'Em andamento'}">${t.status === 'Em andamento' ? '◐ Em andamento' : 'Comecei'}</button><button class="bt done" data-id="${esc(t.id)}" data-s="Concluída">✓ Concluí</button><button class="bt jbt" data-tj="${esc(t.id)}">${t.justificativa ? 'Editar justificativa' : atr ? 'Justificar atraso' : 'Não vou conseguir'}</button>${del}`}</div></div>`;
+        : `${t.status === 'Em andamento' ? `<button class="bt on" data-id="${esc(t.id)}" data-s="A fazer">◐ Em andamento</button>` : `<button class="bt" data-and="${esc(t.id)}" data-ini="1">Comecei</button>`}<button class="bt anb" data-and="${esc(t.id)}">📝 Andamento</button><button class="bt done" data-id="${esc(t.id)}" data-s="Concluída">✓ Concluí</button><button class="bt jbt" data-tj="${esc(t.id)}">${t.justificativa ? 'Editar justificativa' : atr ? 'Justificar atraso' : 'Não vou conseguir'}</button>${del}`}</div></div>`;
     }
     /* "o que temos pra hoje": atrasadas, hoje, metas para marcar, em andamento e próximos 7 dias */
     function hojeBox(HJ) {
@@ -207,11 +252,11 @@
       const corP = p => p >= .8 ? 'var(--pos)' : p >= .5 ? '#F5C451' : 'var(--neg)';
       const anel = (p, rot, sub) => p == null ? '' : `<div class="hja"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="7"/><circle cx="32" cy="32" r="26" fill="none" stroke="${corP(p)}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(163.4 * Math.min(1, p)).toFixed(1)} 163.4" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle">${Math.round(p * 100)}%</text></svg><b>${rot}</b><small>${sub}</small></div>`;
       const num = (n, rot, cor) => `<div class="hjn${n ? '' : ' z'}"><b style="${n && cor ? 'color:' + cor : ''}">${n}</b><small>${rot}</small></div>`;
-      const sem = Array.from({ length: 7 }, (_, i) => soma(HJ, i)), qn = d => T.filter(t => t.prazo === d).length + (d === HJ ? atr.length : 0), mx = Math.max(1, ...sem.map(qn));
+      const agh = T.filter(t => agendaDe(t, HJ)), sem = Array.from({ length: 7 }, (_, i) => soma(HJ, i)), qn = d => T.filter(t => t.prazo === d || agendaDe(t, d)).length + (d === HJ ? atr.length : 0), mx = Math.max(1, ...sem.map(qn));
       const chip = (t, cls) => `<span class="hjc ${cls}">${esc(t.titulo)}</span>`;
       let c = `<div class="hjr">${anel(med('pct'), 'Metas', 'do mês')}${anel(med('ritmo'), 'Ritmo', 'até hoje')}${fm + am ? anel(fm / (fm + am), 'Tarefas', fm + ' de ' + (fm + am)) : ''}</div>`;
-      c += `<div class="hjg">${num(atr.length, 'atrasada' + (atr.length === 1 ? '' : 's'), 'var(--neg)')}${num(hj.length, 'pra hoje', 'var(--pinkl)')}${num(PD.length, 'meta' + (PD.length === 1 ? '' : 's') + ' p/ marcar', '#F5C451')}${num(prox.length, 'em 7 dias', '')}</div>`;
-      if (atr.length || hj.length) c += `<div class="hjcs">${atr.map(t => chip(t, 'a')).join('')}${hj.map(t => chip(t, 'h')).join('')}</div>`;
+      c += `<div class="hjg">${num(atr.length, 'atrasada' + (atr.length === 1 ? '' : 's'), 'var(--neg)')}${num(hj.length + agh.length, 'pra hoje', 'var(--pinkl)')}${num(PD.length, 'meta' + (PD.length === 1 ? '' : 's') + ' p/ marcar', '#F5C451')}${num(prox.length, 'em 7 dias', '')}</div>`;
+      if (atr.length || hj.length || agh.length) c += `<div class="hjcs">${atr.map(t => chip(t, 'a')).join('')}${hj.map(t => chip(t, 'h')).join('')}${agh.map(t => `<span class="hjc g">📅 ${esc(t.titulo)}</span>`).join('')}</div>`;
       if (PD.length) c += `<div class="alr alrin">${PD.map(([x, q]) => `<button data-alr="${esc(x.id)}">${esc(x.titulo)}<small>${esc(q)} →</small></button>`).join('')}</div>`;
       c += `<div class="hjw">${sem.map((d, i) => { const n = qn(d); return `<div${i ? '' : ' class="h"'}><i style="height:${n ? 8 + 40 * n / mx : 3}px;${i === 0 && atr.length ? 'background:var(--neg)' : ''}"></i><b>${n || ''}</b><small>${i ? DSN[new Date(d + 'T12:00:00').getDay()] : 'hoje'}</small></div>`; }).join('')}</div>`;
       if (!T.length && !PD.length) c += '<p style="text-align:center;margin:10px 0 0">Tudo em dia! 👏</p>';
@@ -219,10 +264,10 @@
     }
     /* tudo de um dia: tarefas com prazo, tarefas concluídas, metas (feito / justificado / não marcado) */
     function itensDia(d, HJ) {
-      const prazo = ST.T.filter(t => t.prazo === d), feitas = ST.T.filter(t => t.status === 'Concluída' && t.concluido_em === d && t.prazo !== d);
+      const agend = ST.T.filter(t => agendaDe(t, d) && t.prazo !== d), prazo = ST.T.filter(t => t.prazo === d), feitas = ST.T.filter(t => t.status === 'Concluída' && t.concluido_em === d && t.prazo !== d);
       const metas = ST.R.map(r => { const n = checks(r).filter(x => x === d).length, nt = notas(r)[d] || '', js = !n && ehJ(nt), diaria = r.freq === 'dia' || r.freq === 'util';
         return { r, n, nt, js, falta: !n && !js && diaria && valeNoDia(r, d) && d < HJ, marcar: !n && !js && d === HJ && !!pend(r, HJ) }; }).filter(x => x.n || x.js || x.falta || x.marcar);
-      return { prazo, feitas, metas };
+      return { prazo, feitas, metas, agend };
     }
     let CM = '';
     function calendario(HJ) {
@@ -232,18 +277,20 @@
       for (let d = 1; d <= n; d++) {
         const k = CM + '-' + String(d).padStart(2, '0'), it = itensDia(k, HJ), ch = [];
         it.prazo.forEach(t => ch.push(`<i class="ce ${t.status === 'Concluída' ? 'pt-ok fe' : t.prazo < HJ ? 'pt-a' : 'pt-t'}">${esc(t.titulo)}</i>`));
+        it.agend.forEach(t => ch.push(`<i class="ce pt-g">📅 ${esc(t.titulo)}</i>`));
         if (it.feitas.length) ch.push(`<i class="ce pt-ok">✓${it.feitas.length}</i>`);
         const mk = it.metas.filter(x => x.n).length, mf = it.metas.filter(x => x.falta).length, MX = 2;
         c += `<button class="cd${k === HJ ? ' hj' : ''}" data-dia="${k}" aria-label="${d} de ${MESES[mo]}"><b>${d}</b>${ch.slice(0, ch.length > MX ? MX - 1 : MX).join('')}${ch.length > MX ? `<i class="cm">+${ch.length - MX + 1}</i>` : ''}${mk || mf ? `<span class="dts">${mk ? `<em class="dk">✓${mk}</em>` : ''}${mf ? `<em class="dx">✗${mf}</em>` : ''}</span>` : ''}</button>`;
       }
-      return c + `</div><div class="clg"><span><em class="pt-t"></em>prazo</span><span><em class="pt-a"></em>atrasada</span><span><em class="pt-ok"></em>feita</span><span><b class="dk">✓</b> metas feitas · <b class="dx">✗</b> não feitas</span></div><p class="clt">Toque num dia para ver tudo dele.</p></div>`;
+      return c + `</div><div class="clg"><span><em class="pt-t"></em>prazo</span><span><em class="pt-a"></em>atrasada</span><span><em class="pt-ok"></em>feita</span><span><em class="pt-g"></em>agendado</span><span><b class="dk">✓</b> metas feitas · <b class="dx">✗</b> não feitas</span></div><p class="clt">Toque num dia para ver tudo dele.</p></div>`;
     }
     const qs_ = v => String(v).replace(/["\\]/g, '\\$&'); // CSS é o nome do texto de estilos aqui
     function popDia(d) {
       const HJ = hoje(), it = itensDia(d, HJ), dt = new Date(d + 'T12:00:00');
       const st = t => t.status === 'Concluída' ? `<span class="pos">✓ concluída${t.concluido_em && t.concluido_em !== d ? ' em ' + ddmm(t.concluido_em) : ''}</span>` : t.prazo < HJ ? '<span class="neg">atrasada</span>' : t.status === 'Em andamento' ? 'em andamento' : 'a fazer';
       let h = '';
-      if (it.prazo.length) h += `<h4>Para entregar neste dia</h4>${it.prazo.map(t => `<div class="pdl"><b>${esc(t.titulo)}</b><small>${st(t)}${t.categoria ? ' · ' + esc(t.categoria) : ''}${REC[t.recorrencia] ? ' · 🔁 ' + REC[t.recorrencia] : ''}</small>${t.descricao ? `<small>${esc(t.descricao)}</small>` : ''}${t.justificativa ? `<small class="jtx">Justificativa: ${esc(t.justificativa)}</small>` : ''}</div>`).join('')}`;
+      if (it.prazo.length) h += `<h4>Para entregar neste dia</h4>${it.prazo.map(t => `<div class="pdl"><b>${esc(t.titulo)}</b><small>${st(t)}${t.categoria ? ' · ' + esc(t.categoria) : ''}${REC[t.recorrencia] ? ' · 🔁 ' + REC[t.recorrencia] : ''}</small>${t.descricao ? `<small>${esc(t.descricao)}</small>` : ''}${andL(t).length && t.status !== 'Concluída' ? `<small>${esc(andTxt(t))}</small>` : ''}${t.justificativa ? `<small class="jtx">Justificativa: ${esc(t.justificativa)}</small>` : ''}</div>`).join('')}`;
+      if (it.agend.length) h += `<h4>Agendado neste dia</h4>${it.agend.map(t => { const a = andL(t).filter(x => x.tp === 'agendado' && x.ag === d).pop(); return `<div class="pdl"><b>📅 ${esc(t.titulo)}</b>${a.tx ? `<small>${esc(a.tx)}</small>` : ''}<small>${t.prazo ? 'entregar até ' + ddmm(t.prazo) : 'sem prazo'}</small></div>`; }).join('')}`;
       if (it.feitas.length) h += `<h4>Concluídas neste dia</h4>${it.feitas.map(t => `<div class="pdl"><b>${esc(t.titulo)}</b><small>${t.prazo ? (t.prazo < d ? `<span class="neg">${dias(t.prazo, d)} dia${dias(t.prazo, d) > 1 ? 's' : ''} depois do prazo (${ddmm(t.prazo)})</span>` : 'antes do prazo (' + ddmm(t.prazo) + ')') : 'sem prazo'}</small></div>`).join('')}`;
       if (it.metas.length) h += `<h4>Metas</h4>${it.metas.map(x => { const pode = !!app.querySelector(`[data-rid="${qs_(x.r.id)}"][data-rf="${d}"]`);
         return `<div class="pdl"><b>${esc(x.r.titulo)}</b><small>${x.n ? `<span class="pos">✓ feito${x.n > 1 ? ' ' + x.n + '×' : ''}</span>` : x.js ? '<span class="jtx">não feito · justificado</span>' : x.falta ? '<span class="neg">não marcado</span>' : 'falta marcar hoje'}${x.nt ? ' · ' + esc(String(x.nt).replace(/^✗\s*/, '')) : ''}</small>${pode ? `<button class="bt" data-pmk="${esc(x.r.id)}" data-pd="${d}">${x.n || x.js ? 'Corrigir' : 'Marcar'}</button>` : ''}</div>`; }).join('')}`;
@@ -342,6 +389,20 @@
         box.innerHTML = `<div class="rkf"><b>Por que não deu para fazer${t.prazo ? ' até ' + ddmm(t.prazo) : ''}?</b><textarea maxlength="400" placeholder="ex.: esperando o material do fornecedor; faço até sexta">${esc(t.justificativa || '')}</textarea><div class="rkb"><button class="ok" data-tjs="${esc(t.id)}">Salvar justificativa</button><button data-tjc="1">Cancelar</button></div></div>`;
         box.querySelector('textarea').focus(); return; }
       if (e.target.closest('[data-tjc]')) { e.target.closest('.tjf').innerHTML = ''; return; }
+      const an = e.target.closest('[data-and]');
+      if (an) { const t = ST.T.find(x => x.id === an.dataset.and), box = app.querySelector(`[data-tjf="${an.dataset.and}"]`); if (!t || !box) return;
+        box.innerHTML = andForm(t, !!an.dataset.ini); box.querySelector('textarea').focus(); return; }
+      const at = e.target.closest('[data-ant]');
+      if (at) { e.preventDefault(); const f = at.closest('.anf'), k = at.dataset.ant; f.dataset.tp = k; f.querySelectorAll('[data-ant]').forEach(b => b.classList.toggle('on', b === at));
+        f.querySelector('.anq').style.display = k === 'aguardando' ? '' : 'none'; f.querySelector('.anag').style.display = k === 'agendado' ? '' : 'none'; f.querySelector('textarea').placeholder = ANDT[k][3]; return; }
+      const as = e.target.closest('[data-ans]');
+      if (as) { const f = as.closest('.anf'), tp = f.dataset.tp, a = { tp, tx: f.querySelector('textarea').value.trim(), q: f.querySelector('.anq').value.trim(), ag: f.querySelector('.anag input').value }, m = f.querySelector('.anm');
+        if (tp === 'agendado' && !a.ag) { m.textContent = 'Escolha a data agendada.'; return; } if (!a.tx && !a.q && !a.ag) { m.textContent = 'Escreva como está.'; return; }
+        as.disabled = true; as.textContent = 'salvando…';
+        try { aplica(await chamar({ acao: 'marcar_tarefa', id: as.dataset.ans, andamento: a })); } catch (err) { as.disabled = false; as.textContent = 'não salvou, tente de novo'; } return; }
+      const ad = e.target.closest('[data-andel]');
+      if (ad) { e.preventDefault(); if (ad.dataset.ok !== '1') { ad.dataset.ok = '1'; ad.textContent = 'toque de novo para apagar'; return; } ad.textContent = 'apagando…';
+        try { aplica(await chamar({ acao: 'marcar_tarefa', id: ad.dataset.andel, andamento_del: +ad.dataset.i })); } catch (err) { ad.textContent = 'erro'; } return; }
       const s = e.target.closest('[data-tjs]');
       if (s) { const tx = s.closest('.rkf').querySelector('textarea').value.trim(); s.disabled = true; s.textContent = 'salvando…';
         try { aplica(await chamar({ acao: 'marcar_tarefa', id: s.dataset.tjs, justificativa: tx })); } catch (err) { s.disabled = false; s.textContent = 'não salvou, tente de novo'; } return; }
@@ -366,5 +427,5 @@
     render();
     if (doCache) fresco.then(aplica).catch(() => { });
   }
-  window.LBROT = { pct, pend, checks, notas, diasMes, porCat, FREQ, MESES, pagina, P100, cor, card: cardRot, css, liga };
+  window.LBROT = { pct, pend, checks, notas, diasMes, porCat, FREQ, MESES, pagina, P100, cor, card: cardRot, css, liga, popup, andL, andTxt, andTit, ANDT, agendaDe };
 })();

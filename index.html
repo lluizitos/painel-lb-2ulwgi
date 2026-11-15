@@ -269,7 +269,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <div class="cal" id="tfcal"></div>
   <h3 id="tfsem"></h3>
   <div class="list" id="tflist" data-max="0"></div>
-  <p class="note">Toque num dia para ver a semana. Marque o que já foi feito (fica salvo neste aparelho).</p>
+  <p class="note">Toque num dia para ver tudo dele (e a semana aqui embaixo). Marque o que já foi feito (fica salvo neste aparelho).</p>
 </section>
 
 <section id="shows">
@@ -331,10 +331,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwhx9spq"></script>
-<script src="lbmetas.js?v=mwhx9spq"></script>
-<script src="lbchat.js?v=mwhx9spq"></script>
-<script src="lbvendas.js?v=mwhx9spq"></script>
+<script src="lb.js?v=mwhxw96p"></script>
+<script src="lbmetas.js?v=mwhxw96p"></script>
+<script src="lbchat.js?v=mwhxw96p"></script>
+<script src="lbvendas.js?v=mwhxw96p"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -570,7 +570,7 @@ function atv(r,MA){const A=D.atividades||{metas:{},feito:{}},mn=MESES[+MA.slice(
   const tl=pf?TAR.tarefas.filter(t=>t.pessoa===pf.id):[],fe2=tl.filter(t=>(t.concluido_em||'').startsWith(MA)),ab=tl.filter(t=>t.status!=='Concluída'),at=ab.filter(t=>t.prazo&&t.prazo<HOJE);
   fe2.forEach(t=>L.push(`<div class="it"><span>✓ ${esc(t.titulo)}</span><b class="pos" style="font-weight:600">feito ${ddmm(t.concluido_em)}</b></div>`));
   if(meta&&typeof meta==='object'&&!rts.length){const f=(A.feito[MA]||{})[r.nome]||{};[['Postagens','postagens'],['Conteúdos produzidos','conteudos']].forEach(([n,k])=>{if(meta[k])L.push(`<div class="it"><span>${n}</span><b>${f[k]==null?'a informar':f[k]} / ${meta[k]}</b></div>`)})}
-  const abH=ab.length?`<h5>Em aberto · ${ab.length}${at.length?` · <span class="pk">${at.length} atrasada${at.length>1?'s':''}</span>`:''}</h5><div class="list" data-max="4">${ab.sort((a,b)=>(a.prazo||'9').localeCompare(b.prazo||'9')).map(t=>`<div class="it"><span>${t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)}${t.justificativa?` <small style="color:#F5C451">· justificou: ${esc(t.justificativa)}</small>`:''}</span><b class="${t.prazo&&t.prazo<HOJE?'pk':''}" style="font-weight:600">${t.prazo?'até '+ddmm(t.prazo):t.status.toLowerCase()}</b></div>`).join('')}</div>`:'';
+  const abH=ab.length?`<h5>Em aberto · ${ab.length}${at.length?` · <span class="pk">${at.length} atrasada${at.length>1?'s':''}</span>`:''}</h5><div class="list" data-max="4">${ab.sort((a,b)=>(a.prazo||'9').localeCompare(b.prazo||'9')).map(t=>`<div class="it"><span>${t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)}${t.justificativa?` <small style="color:#F5C451">· justificou: ${esc(t.justificativa)}</small>`:''}${window.LBROT&&LBROT.andL(t).length?` <small style="display:block;color:var(--sub)">${esc(LBROT.andTxt(t))}</small>`:''}</span><b class="${t.prazo&&t.prazo<HOJE?'pk':''}" style="font-weight:600">${t.prazo?'até '+ddmm(t.prazo):t.status.toLowerCase()}</b></div>`).join('')}</div>`:'';
   return `<div class="atv"><div class="mt"><span>Meta</span><b>${mt}</b></div><h5>O que fez em ${mn}</h5>${L.length?`<div class="list" data-max="6">${L.join('')}</div>`:`<div class="vend">Nada concluído nem marcado ainda em ${mn}.</div>`}${abH}
     <div class="vend" style="font-size:11.5px">Muda sozinho: tarefas concluídas e metas marcadas (Admin → Individuais)${/Bruninho|Bruno/.test(r.nome)?' e shows vendidos no mês (data da venda)':''}.</div></div>`}
 let TAR={perfis:[],tarefas:[]};
@@ -834,7 +834,9 @@ function showCard(s,tl){
 /* ---------- AGENDA DO MÊS ---------- */
 /* tarefas em aberto com prazo: das pessoas (Admin → Individuais) e da empresa (Admin → Empresa, tipo tarefa); concluir é no Admin/Metas */
 function tfApp(){const nm=id=>((TAR.perfis||[]).find(p=>p.id===id)||{}).nome||'';
-  return (TAR.tarefas||[]).filter(t=>t.status!=='Concluída'&&/^\d{4}-\d{2}-\d{2}$/.test(t.prazo||'')).map(t=>({d:t.prazo,txt:t.titulo,sub:'Responsável: '+nm(t.pessoa)+(t.status==='Em andamento'?' · em andamento':''),k:'ta|'+t.id}))
+  const an=t=>window.LBROT&&LBROT.andL(t).length?' · '+LBROT.andTxt(t):'';
+  const ag=[];(TAR.tarefas||[]).filter(t=>t.status!=='Concluída'&&window.LBROT).forEach(t=>LBROT.andL(t).filter(a=>a.tp==='agendado'&&/^\d{4}-\d{2}-\d{2}$/.test(a.ag||'')&&a.ag!==t.prazo).forEach(a=>ag.push({d:a.ag,txt:'📅 '+t.titulo,sub:'Responsável: '+nm(t.pessoa)+(a.tx?' · '+a.tx:''),k:'tg|'+t.id+a.ag})));
+  return (TAR.tarefas||[]).filter(t=>t.status!=='Concluída'&&/^\d{4}-\d{2}-\d{2}$/.test(t.prazo||'')).map(t=>({d:t.prazo,txt:t.titulo,sub:'Responsável: '+nm(t.pessoa)+(t.status==='Em andamento'?' · em andamento':'')+an(t),k:'ta|'+t.id})).concat(ag)
     .concat((TAR.metas||[]).filter(x=>x.tipo==='tarefa'&&x.situacao!=='Concluída'&&/^\d{4}-\d{2}-\d{2}$/.test(x.prazo||'')).map(x=>({d:x.prazo,txt:x.titulo,sub:'Empresa'+(x.alvo?' · '+x.alvo:''),k:'te|'+x.id})))}
 let tfMes=null;
 let tfSem=null;
@@ -865,10 +867,10 @@ function renderTarefas(){
   for(let d=1;d<=n;d++){const k=iso(d),l=porDia[k]||[],pend=l.filter(x=>!x.ok);
     const ord=l.slice().sort((a,b)=>({Show:0,Conta:1,Tarefa:2}[a.tipo])-({Show:0,Conta:1,Tarefa:2}[b.tipo])),MX=3;
     const curto=x=>x.tipo==='Show'?String(x.sub||x.txt).split(' – ')[0].split(' - ')[0]:x.txt;
-    c+=`<button class="cd${k===HOJE?' hj':''}${semDe(d)===tfSem?' sel':''}${l.length&&!pend.length?' ok':''}" data-w="${semDe(d)}"><b>${d}</b>${ord.slice(0,ord.length>MX?MX-1:MX).map(x=>`<i class="ce ${x.atr?'pt-a':x.tipo==='Show'?'pt-s':x.tipo==='Conta'?'pt-c':'pt-t'}${x.ok?' fe':''}" title="${esc(x.txt)}">${esc(curto(x))}</i>`).join('')}${ord.length>MX?`<i class="cm">+${ord.length-MX+1}</i>`:''}</button>`}
+    c+=`<button class="cd${k===HOJE?' hj':''}${semDe(d)===tfSem?' sel':''}${l.length&&!pend.length?' ok':''}" data-w="${semDe(d)}" data-d="${k}"><b>${d}</b>${ord.slice(0,ord.length>MX?MX-1:MX).map(x=>`<i class="ce ${x.atr?'pt-a':x.tipo==='Show'?'pt-s':x.tipo==='Conta'?'pt-c':'pt-t'}${x.ok?' fe':''}" title="${esc(x.txt)}">${esc(curto(x))}</i>`).join('')}${ord.length>MX?`<i class="cm">+${ord.length-MX+1}</i>`:''}</button>`}
   c+='</div><div class="clg"><span><em class="pt-s"></em>show</span><span><em class="pt-c"></em>conta</span><span><em class="pt-t"></em>tarefa</span><span><em class="pt-a"></em>atrasado</span></div>';
   const cal=document.getElementById('tfcal');cal.innerHTML=c;
-  cal.onclick=e=>{const b=e.target.closest('[data-w]');if(b){tfSem=+b.dataset.w;renderTarefas()}};
+  cal.onclick=e=>{const b=e.target.closest('[data-w]');if(b){tfSem=+b.dataset.w;renderTarefas();if(window.LBROT)tfDia(b.dataset.d,porDia[b.dataset.d]||[],linha)}};
   // a semana escolhida, dia por dia (atrasados ficam só no bloco de cima)
   const d0=Math.max(1,tfSem*7-off+1),d1=Math.min(n,tfSem*7-off+7),DS=['dom','seg','ter','qua','qui','sex','sáb'];
   document.getElementById('tfsem').innerHTML=`Semana · ${d0} a ${d1} de ${MESES[mo].toLowerCase()} <small><a href="#" id="tfp" style="color:var(--pinkl)">‹</a> &nbsp; <a href="#" id="tfn" style="color:var(--pinkl)">›</a></small>`;
@@ -882,6 +884,16 @@ function renderTarefas(){
   document.getElementById('tfn').onclick=e=>{e.preventDefault();if(tfSem<ult){tfSem++;renderTarefas()}};
   document.getElementById('tarefas').onchange=e=>{const c=e.target;if(!c.dataset.k)return;const f=JSON.parse(LB.store.get('lb_feito')||'{}');if(c.checked)f[c.dataset.k]=1;else delete f[c.dataset.k];LB.store.set('lb_feito',JSON.stringify(f));const op=document.querySelector('.atrb[open]');renderTarefas();if(op){const a=document.querySelector('.atrb');if(a)a.open=true}};
 }
+
+/* dia do calendário em popup: shows, contas, tarefas (com andamento), agendados, concluídas e metas da equipe nesse dia */
+function tfDia(d,l,linha){const nm=id=>((TAR.perfis||[]).find(p=>p.id===id)||{}).nome||'',DS=['domingo','segunda','terça','quarta','quinta','sexta','sábado'],dt=new Date(d+'T12:00:00');
+  const g=(t,a)=>a.length?`<h4>${t}</h4><div class="list" data-max="0">${a.map(linha).join('')}</div>`:'';
+  const fe=(TAR.tarefas||[]).filter(t=>t.status==='Concluída'&&t.concluido_em===d),rt=(TAR.rotinas||[]).map(r=>[r,LBROT.checks(r).filter(x=>x===d).length]).filter(x=>x[1]);
+  let h=g('🎤 Shows',l.filter(x=>x.tipo==='Show'))+g('💸 Contas',l.filter(x=>x.tipo==='Conta'))+g('Tarefas e agendados',l.filter(x=>x.tipo==='Tarefa'));
+  if(fe.length)h+=`<h4>Concluídas neste dia</h4>${fe.map(t=>`<div class="pdl"><b>✓ ${esc(t.titulo)}</b><small>${esc(nm(t.pessoa))}${t.prazo?(t.prazo<d?' · <span class="neg">'+Math.round((new Date(d)-new Date(t.prazo))/864e5)+' dia(s) depois do prazo</span>':' · no prazo'):''}</small></div>`).join('')}`;
+  if(rt.length)h+=`<h4>Metas da equipe marcadas</h4>${rt.map(([r,n])=>`<div class="pdl"><b>✓ ${esc(r.titulo)}${n>1?' ('+n+'×)':''}</b><small>${esc(nm(r.pessoa))}</small></div>`).join('')}`;
+  const box=LBROT.popup(`${DS[dt.getDay()][0].toUpperCase()+DS[dt.getDay()].slice(1)}, ${+d.slice(8)} de ${MESES[+d.slice(5,7)-1].toLowerCase()}${d===HOJE?' · hoje':''}`,h||'<p class="clt" style="font-size:14px">Nada neste dia.</p>');
+  box.addEventListener('change',e=>{const c=e.target;if(!c.dataset.k)return;const f=JSON.parse(LB.store.get('lb_feito')||'{}');if(c.checked)f[c.dataset.k]=1;else delete f[c.dataset.k];LB.store.set('lb_feito',JSON.stringify(f));c.closest('.tk')&&c.closest('.tk').classList.toggle('done',c.checked);renderTarefas()})}
 
 /* ---------- LINHA DO TEMPO ---------- */
 function renderTL(){
