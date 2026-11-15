@@ -30,6 +30,8 @@ h3 small{letter-spacing:.04em;text-transform:none;color:var(--muted);font-weight
 .tabs{display:flex;gap:6px;margin:16px 0 4px;border-bottom:1px solid var(--line)}
 .tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 4px;margin-right:14px;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
 .tabs button.on{color:var(--ink);border-color:var(--pink)}
+.busca{display:flex;gap:8px;margin:14px 0 0}.busca .search{flex:1;min-width:0}.busca select{flex:none;max-width:46%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:15px;color:inherit;font:inherit}
+.bres{font-size:13px;color:var(--sub);margin:0 0 10px}.bres b{color:var(--ink)}.bres a{color:var(--pinkl)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 10px;align-items:center}
 .chip{border:1px solid var(--line);background:transparent;border-radius:99px;padding:6px 12px;font-size:12.5px;color:var(--sub)}.chip.on{background:var(--card2);color:var(--ink);border-color:var(--sub)}
 .list{display:flex;flex-direction:column;gap:8px}
@@ -102,7 +104,9 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
   <div class="tabs" id="tabs"><button class="on" data-t="shows">Shows</button><button data-t="desp">Despesas</button><button data-t="pes">Pessoas</button><button data-t="aj">Ajustes</button></div>
 
   <div id="tshows">
-    <div class="chips" id="fil"><button class="chip on" data-f="prox">Próximos</button><button class="chip" data-f="pend">Com pendência</button><button class="chip" data-f="hist">Histórico</button></div>
+    <div class="busca"><input type="search" class="search" id="bq" placeholder="Buscar show, cidade, pessoa…" aria-label="Buscar show" autocomplete="off"><select id="bm" aria-label="Mês do show"><option value="">Todos os meses</option></select></div>
+    <div class="chips" id="fil"><button class="chip on" data-f="prox">Próximos</button><button class="chip" data-f="pend">Com pendência</button><button class="chip" data-f="hist">Histórico</button><button class="chip" data-f="todos">Todos</button></div>
+    <div class="bres" id="bres"></div>
     <div class="list" id="lshows"></div>
   </div>
 
@@ -223,7 +227,7 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
   <div class="acts" style="justify-content:space-between"><button type="button" class="btn dg" id="pm_del">Excluir</button><span style="display:flex;gap:8px"><button type="button" class="btn" id="pm_x">Cancelar</button><button type="submit" class="btn pkb">Salvar</button></span></div>
 </form></div>
 
-<script src="../lb.js?v=mwigr1zv"></script>
+<script src="../lb.js?v=mwigyktj"></script>
 <script>
 const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
 const brl2=v=>v==null||isNaN(v)?'—':'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -262,6 +266,10 @@ function exportar(){const l=carregaLocal();const b=new Blob([JSON.stringify(l,nu
 document.getElementById('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));
   ['shows','desp','pes','aj'].forEach(t=>document.getElementById('t'+t).style.display=t===b.dataset.t?'block':'none');
   const nv=document.getElementById('novo');nv.style.display=['shows','desp'].includes(b.dataset.t)?'':'none';nv.textContent=b.dataset.t==='desp'?'+ Nova despesa':'+ Novo borderô';nv.dataset.t=b.dataset.t};
+const bFil=f=>{filtro=f;document.querySelectorAll('#fil .chip').forEach(c=>c.classList.toggle('on',c.dataset.f===f))};
+document.getElementById('bq').oninput=()=>renderShows();
+document.getElementById('bm').onchange=()=>{if(document.getElementById('bm').value&&filtro!=='todos')bFil('todos');renderShows()};
+document.getElementById('bres').onclick=e=>{if(e.target.id==='bver'){e.preventDefault();bFil('todos');renderShows()}if(e.target.id==='blimpa'){e.preventDefault();document.getElementById('bq').value='';document.getElementById('bm').value='';renderShows()}};
 document.getElementById('fil').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;filtro=b.dataset.f;document.querySelectorAll('#fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderShows()};
 
 /* ---------- cálculos ---------- */
@@ -282,7 +290,16 @@ function renderShows(){
   Object.values(BORD).filter(b=>!usados.has(b.id)).forEach(b=>it.push({s:{id:null,data:b.data,evento:b.show,cidade:b.local,valor:b.valor,status:''},b}));
   if(filtro==='prox')it=it.filter(x=>x.s.data>=HOJE).sort((a,b)=>a.s.data.localeCompare(b.s.data));
   if(filtro==='hist')it=it.filter(x=>x.s.data<HOJE).sort((a,b)=>b.s.data.localeCompare(a.s.data));
+  const tudo=it.slice();
   if(filtro==='pend')it=it.filter(x=>x.b&&x.b.equipe.some(e=>LB.pg.falta(e)>0)).sort((a,b)=>a.s.data.localeCompare(b.s.data));
+  if(filtro==='todos')it=it.sort((a,b)=>a.s.data.localeCompare(b.s.data));
+  {const bm=$('bm'),cur=bm.value,ms=[...new Set(tudo.map(x=>String(x.s.data||'').slice(0,7)).filter(m=>/^\d{4}-\d{2}$/.test(m)))].sort().reverse();
+   bm.innerHTML='<option value="">Todos os meses</option>'+ms.map(m=>`<option value="${m}"${m===cur?' selected':''}>${MES[+m.slice(5,7)-1]}/${m.slice(0,4)} (${tudo.filter(x=>String(x.s.data||'').startsWith(m)).length})</option>`).join('');
+   const q=LB.norm($('bq').value.trim()),mes=bm.value,casa=({s,b})=>(!mes||String(s.data||'').startsWith(mes))&&(!q||q.split(/\s+/).every(w=>LB.norm([s.evento,s.cidade,s.local,s.contratante,b&&b.show,b&&b.local,b&&b.obs,...(b?b.equipe.map(e=>(e.nome||'')+' '+(e.funcao||'')):[]),s.data?ddmm(s.data):''].filter(Boolean).join(' ')).includes(w)));
+   if(q||mes){it=it.filter(casa);if(mes)it=it.sort((a,b)=>a.s.data.localeCompare(b.s.data));
+     const fora=filtro==='todos'?0:tudo.filter(casa).length-it.length,g=it.reduce((a,x)=>a+(x.b?totais(x.b).g||0:0),0),ap=it.reduce((a,x)=>a+(x.b?x.b.equipe.filter(e=>LB.pg.falta(e)>0).length:0),0);
+     $('bres').innerHTML=`<b>${it.length} show${it.length===1?'':'s'}</b>${it.length?' · gasto '+brl(g)+(ap?' · '+ap+' a pagar':''):''}${fora>0?` · <a href="#" id="bver">+${fora} fora deste filtro (ver em Todos)</a>`:''} · <a href="#" id="blimpa">limpar</a>`}
+   else $('bres').innerHTML=''}
   document.getElementById('lshows').innerHTML=it.length?it.map(({s,b})=>{const t=b?totais(b):null,pend=b?b.equipe.filter(e=>LB.pg.falta(e)>0):[];
     return `<div class="card sc"><div class="d"><b>${s.data.slice(8,10)}</b><span>${MES[+s.data.slice(5,7)-1]} ${s.data.slice(2,4)}</span></div>
     <div class="t"><b>${esc(s.evento||b&&b.show||'Show')}</b><span>${esc(s.cidade||'')}${s.valor?' · cachê '+brl(s.valor):''}${s.status==='A confirmar'?' · a confirmar':''}</span>
@@ -543,7 +560,7 @@ $('cj_salvar').onclick=()=>{CFG.base=$('cj_base').value.trim()||'Divinópolis, M
   store.set('lb_bord_cfg',JSON.stringify({base:CFG.base,onibus_kml:CFG.onibus_kml,diesel_preco:CFG.diesel_preco,adicional_pct:CFG.adicional_pct,gasolina_preco:CFG.gasolina_preco,veiculos:CFG.veiculos}));
   $('cj_msg').textContent='Salvo neste aparelho.';setTimeout(()=>$('cj_msg').textContent='',2500)};
 </script>
-<script src="../lbchat.js?v=mwigr1zv"></script>
+<script src="../lbchat.js?v=mwigyktj"></script>
 <script>LBCHAT.auto(document.querySelector('main.wrap').firstElementChild,{base:'../',pagina:'Borderôs',exemplo:'quanto gastei de diesel em outubro?'})</script>
 </body>
 </html>

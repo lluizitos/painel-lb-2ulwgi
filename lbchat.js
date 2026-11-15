@@ -10,7 +10,7 @@
   const CSS = `.lbq{margin:4px 0 14px}.lbq form{display:flex;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 6px 6px 14px;align-items:center}
 .lbq input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:inherit;font-size:15px;outline:none;padding:8px 0}
 .lbq button{border:0;background:var(--pink);color:#fff;border-radius:10px;padding:10px 14px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap}.lbq button:disabled{opacity:.5}
-.lbq .qr{background:var(--card);border-radius:14px;padding:14px 16px;margin-top:8px;border-left:3px solid var(--pink)}.lbq .qp{font-size:12px;color:var(--muted);margin-bottom:6px}
+.lbq .qr{position:relative;background:var(--card);border-radius:14px;padding:14px 16px;margin-top:8px;border-left:3px solid var(--pink)}.lbq .qp{font-size:12px;color:var(--muted);margin-bottom:6px;padding-right:96px;min-height:22px}.lbq .qxb{position:absolute;top:10px;right:10px;background:var(--card2)!important;border:1px solid var(--line)!important;color:var(--ink)!important;border-radius:99px!important;padding:6px 12px!important;font-size:13px!important;font-weight:700!important;line-height:1.1;cursor:pointer}.lbq .qxb:hover{border-color:var(--sub)!important}
 .lbq .qt{font-size:15px;line-height:1.5;color:var(--ink);white-space:pre-line}.lbq .qn{font-size:11.5px;color:var(--muted);margin-top:10px;display:flex;justify-content:space-between;gap:8px}
 .lbq .qn a{color:var(--muted)}.lbq .qe{color:var(--pinkl)}.lbq .qg{margin-top:12px}.lbq .qg b{display:block;font-size:12px;color:var(--sub);margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase}
 .lbq .qb{display:grid;grid-template-columns:minmax(70px,34%) 1fr auto;gap:5px 8px;align-items:center;font-size:12.5px}.lbq .qb span{color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -152,7 +152,11 @@
       } catch (er) { out.innerHTML = `<div class="qr"><div class="qt qe">Sem conexão. Tente de novo.</div></div>`; }
       finally { setTimeout(() => { bt.disabled = false; }, 3000); }
     };
-    out.addEventListener('click', e => { if (e.target.closest('.qx')) { e.preventDefault(); out.innerHTML = ''; }
+    /* a resposta fica na tela (mesmo recarregando a página) até a pessoa fechar; botão ✕ Fechar bem visível */
+    new MutationObserver(() => { out.querySelectorAll('.qr').forEach(r => { if (!r.querySelector(':scope > .qxb')) r.insertAdjacentHTML('afterbegin', '<button type="button" class="qx qxb" aria-label="Fechar resposta">✕ Fechar</button>'); });
+      if (!out.querySelector('.qr')) gravar('_aberta', null); else if (out.querySelector('.qn .qx')) gravar('_aberta', { html: out.innerHTML, doc: DOC, q: out.dataset.q || '', t: Date.now() }); }).observe(out, { childList: true });
+    { const a = ler('_aberta'); if (a && a.html && Date.now() - a.t < 7 * 864e5 && !out.innerHTML.trim()) { DOC = a.doc || null; out.dataset.q = a.q || ''; out.innerHTML = a.html; } }
+    out.addEventListener('click', e => { if (e.target.closest('.qx')) { e.preventDefault(); out.innerHTML = ''; gravar('_aberta', null); return; }
       const qi = e.target.closest('[data-qi]'); if (qi) { e.preventDefault(); vai(qi.dataset.qi, qi.dataset.qt || ''); return; }
       if (e.target.closest('.qnv')) { e.preventDefault(); inp.value = out.dataset.q || ''; const ev = new Event('submit', { cancelable: true }); ev.lbqNova = true; f.dispatchEvent(ev); return; }
       if (e.target.closest('.qdb') && DOC) { e.preventDefault(); let b = ''; try { b = op.base_dados ? op.base_dados() : ''; } catch (er) { } documento(DOC, b); } });
