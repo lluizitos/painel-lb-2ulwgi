@@ -43,7 +43,7 @@
     const ps = ORDEM.filter(p => paginas.includes(p));
     return (ps.length > 1 ? ps.concat('agenda') : []).map(p =>
       `<a href="${base}${ROTAS[p]}" class="${p === atual ? 'on' : ''}">${NOMES[p]}</a>`).join('') +
-      `<a href="#" onclick="LB.sair();return false" title="Sair"${ps.length > 1 ? '' : ' style="opacity:.55;font-size:11px;border:0;background:none"'}>Sair</a>`;
+      `<a href="#" class="lbav" onclick="LB.perfil();return false" title="Meu perfil" aria-label="Meu perfil"></a>` + (setTimeout(carregar, 0), '');
   }
   /* Monta a tela de login e chama ok({dados, paginas, nome}) quando abrir. */
   function entrar(opc) {
@@ -69,7 +69,7 @@
     const tentar = async (u, p, auto) => {
       if (!auto) err.textContent = 'Abrindo…';
       try {
-        const r = await abrir(base, pagina, u, p);
+        const r = await abrir2(base, pagina, u, p);
         store.set('lb_cred', JSON.stringify({ u, p }));
         LB.usuario = r.nome; LB.senha = p; LB.login = u;
         lock.remove();
@@ -77,7 +77,7 @@
       } catch (e) {
         if (e.message === 'acesso') { // link único: manda para a primeira página que esse login abre
           for (const pg of ORDEM.filter(x => x !== pagina)) {
-            try { await abrir(base, pg, u, p); store.set('lb_cred', JSON.stringify({ u, p })); location.replace(base + ROTAS[pg]); return; } catch (e2) { if (e2.message === 'senha') break; }
+            try { await abrir2(base, pg, u, p); store.set('lb_cred', JSON.stringify({ u, p })); location.replace(base + ROTAS[pg]); return; } catch (e2) { if (e2.message === 'senha') break; }
           }
         }
         if (auto) { err.textContent = e.message === 'acesso' ? 'Seu usuário não tem acesso a esta página.' : ''; return; }
@@ -89,7 +89,114 @@
     let c = null; try { c = JSON.parse(store.get('lb_cred') || 'null'); } catch (e) { }
     if (c && c.u) { f.u.value = c.u; tentar(c.u, c.p, true); }
   }
-  function sair() { store.del('lb_cred'); location.reload(); }
+  function sair() { store.del('lb_cred'); store.del('lb_pf'); location.reload(); }
+  /* ---------- Meu perfil: foto, WhatsApp, e-mail e troca de senha ---------- */
+  let CFG = null;
+  const cfg = async () => CFG || (CFG = await (await fetch((LB.base || '') + 'config.json', { cache: 'no-store' })).json());
+  const api = async o => (await fetch((await cfg()).api_url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(Object.assign({ usuario: LB.login, senha: LB.senha, nome: LB.usuario }, o)) })).json();
+  const enc64 = b => btoa(String.fromCharCode(...new Uint8Array(b)));
+  async function kSenha(u, p, salt, uso) {
+    const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(norm(u) + '|' + p), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 150000, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, false, [uso]);
+  }
+  async function abrir2(base, pagina, u, p) { // abre o arquivo do site; senha trocada há pouco → pega na API a senha antiga cifrada com a nova
+    try { const r = await abrir(base, pagina, u, p); LB.senhaCofre = p; return r; }
+    catch (e) {
+      if (e.message !== 'senha') throw e;
+      let velha = '';
+      try {
+        LB.base = base; const j = await (await fetch((await cfg()).api_url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ acao: 'ponte', usuario: u, senha: p }) })).json();
+        const x = JSON.parse(j.ok && j.ponte || 'null'); if (!x) throw 0;
+        velha = new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(x.i) }, await kSenha(u, p, b64(x.s), 'decrypt'), b64(x.c)));
+      } catch (e2) { throw new Error('senha'); }
+      const r = await abrir(base, pagina, u, velha); LB.senhaCofre = velha; return r;
+    }
+  }
+  const ini = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  const escH = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const PCSS = `a.lbav{flex:none;margin-left:2px;text-decoration:none;font-weight:700;width:32px;height:32px;padding:0!important;border-radius:99px!important;display:flex;align-items:center;justify-content:center;background:#26232D center/cover no-repeat;color:#F3F1F6!important;font-size:11px!important;letter-spacing:0!important;border:1px solid #3a3644!important}
+#lbpf{position:fixed;inset:0;z-index:60;background:rgba(10,9,12,.72);display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto;font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
+#lbpf .pc{width:100%;max-width:420px;background:#1E1C24;border:1px solid #2E2B36;border-radius:18px;padding:20px;color:#F3F1F6;position:relative}
+#lbpf .px{position:absolute;top:10px;right:12px;background:none;border:0;color:#B8B3C3;font-size:26px;cursor:pointer;line-height:1}
+#lbpf .ph{display:flex;gap:14px;align-items:center;margin-bottom:14px}#lbpf .av{width:78px;height:78px;border-radius:99px;background:#26232D center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;flex:none;border:2px solid #CF1D51}
+#lbpf .ph b{display:block;font-size:18px}#lbpf .ph small{color:#8B8697;font-size:12.5px}
+#lbpf .fb{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}#lbpf .fb label,#lbpf .fb a{font-size:13px;color:#F0507E;cursor:pointer;text-decoration:none;border:1px solid #2E2B36;border-radius:99px;padding:6px 12px}
+#lbpf h4{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#F0507E;margin:18px 0 8px}
+#lbpf .lf{display:block;font-size:12px;color:#B8B3C3;margin-top:8px}#lbpf .lf input{display:block;width:100%;box-sizing:border-box;margin-top:4px;background:#141218;border:1px solid #2E2B36;border-radius:10px;padding:11px 12px;color:#F3F1F6;font:inherit;font-size:15px}
+#lbpf .bt{width:100%;margin-top:12px;padding:12px;border:0;border-radius:12px;background:#CF1D51;color:#fff;font:inherit;font-weight:700;font-size:14px;cursor:pointer}#lbpf .bt:disabled{opacity:.5}
+#lbpf .bs{background:#26232D;color:#B8B3C3}#lbpf .ms{font-size:13px;min-height:18px;margin-top:8px}#lbpf .ok{color:#7FDDA9}#lbpf .er{color:#FF8FA8}#lbpf .nt{font-size:11.5px;color:#8B8697;margin-top:6px;line-height:1.45}`;
+  function css() { if (!document.getElementById('lbpcss')) { const s = document.createElement('style'); s.id = 'lbpcss'; s.textContent = PCSS; document.head.appendChild(s); } }
+  let PF = null;
+  function pintar() {
+    let c = null; try { c = JSON.parse(store.get('lb_pf') || 'null'); } catch (e) { }
+    if (c && norm(c.u) === norm(LB.login)) PF = PF || c.pf;
+    document.querySelectorAll('.lbav,#lbpf .av').forEach(a => { a.style.backgroundImage = PF && PF.foto ? `url("${PF.foto}")` : ''; a.textContent = PF && PF.foto ? '' : ini(LB.usuario); });
+  }
+  let buscou = false;
+  async function carregar() {
+    css(); document.querySelectorAll('.links > a.lbav').forEach(a => { const l = a.parentElement; l.style.marginLeft = 'auto'; l.parentElement.querySelectorAll(':scope > a.lbav').forEach(x => x.remove()); l.after(a); }); // fora da rolagem: sempre visível à direita
+    pintar(); if (buscou || !LB.login) return; buscou = true;
+    try { const r = await api({ acao: 'meu_perfil' }); if (r.ok) { PF = r; store.set('lb_pf', JSON.stringify({ u: LB.login, pf: { foto: r.foto } })); pintar(); } } catch (e) { }
+  }
+  function foto(file) { // recorta no centro e reduz para 240×240 (JPEG leve, cabe na planilha)
+    return new Promise((ok, no) => {
+      const im = new Image(); im.onload = () => {
+        const c = document.createElement('canvas'), S = 240, m = Math.min(im.width, im.height); c.width = c.height = S;
+        c.getContext('2d').drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, S, S); URL.revokeObjectURL(im.src);
+        let q = .85, d = c.toDataURL('image/jpeg', q); while (d.length > 40000 && q > .3) { q -= .1; d = c.toDataURL('image/jpeg', q); } ok(d);
+      }; im.onerror = () => no(new Error('img')); im.src = URL.createObjectURL(file);
+    });
+  }
+  async function perfil() {
+    css(); document.getElementById('lbpf')?.remove();
+    const w = document.createElement('div'); w.id = 'lbpf';
+    w.innerHTML = `<div class="pc" role="dialog" aria-label="Meu perfil"><button class="px" aria-label="Fechar">×</button>
+      <div class="ph"><div class="av"></div><div><b>${escH(LB.usuario)}</b><small>login: ${escH(LB.login)}<span class="pp"></span></small></div></div>
+      <div class="fb"><label>📷 Trocar foto<input type="file" accept="image/*" hidden></label><a href="#" class="rf" style="display:none">Tirar foto</a></div>
+      <h4>Contato</h4><label class="lf">WhatsApp<input name="tel" inputmode="tel" placeholder="(00) 00000-0000" maxlength="30"></label>
+      <label class="lf">E-mail<input name="em" type="email" placeholder="voce@email.com" maxlength="80"></label>
+      <button class="bt bc">Salvar contato</button><div class="ms m1"></div>
+      <h4>Trocar senha</h4><form autocomplete="on"><input name="u" autocomplete="username" value="${escH(LB.login)}" hidden>
+      <label class="lf">Senha atual<input name="a" type="password" autocomplete="current-password"></label>
+      <label class="lf">Senha nova (mínimo 6)<input name="n" type="password" autocomplete="new-password" minlength="6"></label>
+      <label class="lf">Repita a senha nova<input name="r" type="password" autocomplete="new-password"></label>
+      <button class="bt">Trocar senha</button><div class="ms m2"></div>
+      <div class="nt">Depois de trocar, use a senha nova em todos os aparelhos.</div></form>
+      <button class="bt bs sa">Sair deste aparelho</button></div>`;
+    document.body.appendChild(w); pintar();
+    const $ = s => w.querySelector(s), m1 = $('.m1'), m2 = $('.m2'), msg = (el, t, ok) => { el.className = 'ms ' + (ok ? 'ok' : 'er') + (el === m1 ? ' m1' : ' m2'); el.textContent = t; };
+    const fechar = () => w.remove();
+    $('.px').onclick = fechar; w.onclick = e => { if (e.target === w) fechar(); }; $('.sa').onclick = sair;
+    const mostra = r => { $('[name=tel]').value = r.telefone || ''; $('[name=em]').value = r.email || ''; $('.rf').style.display = r.foto ? '' : 'none';
+      if (r.papeis) $('.pp').textContent = ' · ' + r.papeis.join(', '); };
+    if (PF) mostra(PF);
+    try { const r = await api({ acao: 'meu_perfil' }); if (r.ok) { PF = r; mostra(r); pintar(); } else if (r.erro === 'senha') msg(m1, 'Sua senha mudou em outro aparelho: saia e entre de novo.'); } catch (e) { msg(m1, 'Sem conexão agora.'); }
+    const salvar = async (o, txt) => {
+      msg(m1, 'Salvando…', true);
+      try { const r = await api({ acao: 'salvar_perfil', perfil: o }); if (!r.ok) return msg(m1, r.erro === 'senha' ? 'Sua senha mudou: saia e entre de novo.' : (r.erro || 'Não salvou.'));
+        PF = r; mostra(r); store.set('lb_pf', JSON.stringify({ u: LB.login, pf: { foto: r.foto } })); pintar(); msg(m1, txt, true); } catch (e) { msg(m1, 'Sem conexão. Tente de novo.'); }
+    };
+    $('input[type=file]').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+      try { await salvar({ foto: await foto(f) }, 'Foto salva ✓'); } catch (er) { msg(m1, 'Não consegui ler essa imagem.'); } };
+    $('.rf').onclick = e => { e.preventDefault(); salvar({ foto: '' }, 'Foto removida.'); };
+    $('.bc').onclick = () => salvar({ telefone: $('[name=tel]').value, email: $('[name=em]').value }, 'Contato salvo ✓');
+    $('form').onsubmit = async e => {
+      e.preventDefault(); const f = e.target, a = f.a.value, n = f.n.value.trim(), b = f.querySelector('.bt');
+      if (!a) return msg(m2, 'Digite a senha atual.'); if (n.length < 6) return msg(m2, 'A senha nova precisa de pelo menos 6 caracteres.');
+      if (n !== f.r.value.trim()) return msg(m2, 'As duas senhas novas estão diferentes.'); if (n === a) return msg(m2, 'A senha nova é igual à atual.');
+      b.disabled = true; msg(m2, 'Trocando…', true);
+      try {
+        const c = await cfg(), pub = await crypto.subtle.importKey('spki', b64(c.chave_pub), { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['encrypt']);
+        const nova_rsa = enc64(await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, pub, new TextEncoder().encode(n)));
+        const s = crypto.getRandomValues(new Uint8Array(16)), i = crypto.getRandomValues(new Uint8Array(12));
+        const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: i }, await kSenha(LB.login, n, s, 'encrypt'), new TextEncoder().encode(LB.senhaCofre || a));
+        const r = await api({ acao: 'trocar_senha', senha: a, nova: n, nova_rsa, ponte: JSON.stringify({ s: enc64(s), i: enc64(i), c: enc64(ct) }) });
+        if (!r.ok) { msg(m2, r.erro === 'senha' ? 'Senha atual incorreta.' : (r.erro || 'Não consegui trocar.')); return; }
+        LB.senha = n; store.set('lb_cred', JSON.stringify({ u: LB.login, p: n })); f.reset(); msg(m2, 'Senha trocada ✓ Use a nova daqui pra frente.', true);
+      } catch (er) { msg(m2, 'Não consegui trocar agora. Tente de novo.'); } finally { b.disabled = false; }
+    };
+  }
   /* pagamento picado: cada parte do borderô (cachê, diária, gasolina, ajuda, estacionamento) é paga separada.
      e.pagos = {parte: 'AAAA-MM-DD'}; e.status = Pago | Parcial | Pendente (calculado). */
   const PARTES = [['valor', 'cachê'], ['diaria', 'diária'], ['gasolina', 'gasolina'], ['ajuda', 'ajuda de custo'], ['estacionamento', 'estacionamento']];
@@ -138,7 +245,7 @@
       const t = pgx.ocorr(g, (+hoje.slice(0, 4) + 1) + hoje.slice(4)).find(o => o.data > hoje); return t || null;
     }
   };
-  window.LB = { entrar, links, anexo, sair, norm, store, NOMES, pg, pgx };
+  window.LB = { entrar, links, anexo, sair, perfil, norm, store, NOMES, pg, pgx };
 
   /* "Ver mais": toda lista longa (.list) e todo grupo de borderô (.gp) mostra só os primeiros itens.
      Limite: data-max no elemento (padrão 5 em listas, 4 em grupos). data-max="0" desliga. */
