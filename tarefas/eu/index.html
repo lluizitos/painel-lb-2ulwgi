@@ -41,7 +41,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px;margin:20px 2px 8
 <p class="eyebrow">Minhas tarefas</p>
 <div id="app"><p class="fn">Carregando…</p></div>
 </div>
-<script src="../../lbmetas.js?v=mwi5xtie"></script>
+<script src="../../lbmetas.js?v=mwi63p9w"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),MES=HOJE.slice(0,7);
@@ -54,7 +54,7 @@ async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Co
   try{API=(await (await fetch('../../config.json',{cache:'no-store'})).json()).api_url;await LBROT.pagina(app,api,'tarefas LB')}
   catch(e){app.innerHTML=`<p class="err">${e.message==='link'?'Este link não vale mais. Peça o novo ao Luiz.':'Não consegui abrir agora. Tente de novo em instantes.'}</p>`}})();
 </script>
-<script src="../../lbchat.js?v=mwi5xtie"></script>
+<script src="../../lbchat.js?v=mwi63p9w"></script>
 <script>if(K)LBCHAT.auto(document.getElementById('app'),{base:'../../',pagina:'Minhas tarefas',exemplo:'o que está atrasado?',auth:()=>({k:K})})</script>
 </body>
 </html>

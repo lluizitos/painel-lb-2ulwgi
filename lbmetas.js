@@ -76,13 +76,13 @@
 .rkf{margin-top:10px;background:var(--card2);border-radius:12px;padding:10px}.rkf b{font-size:13px}.rkf textarea{width:100%;box-sizing:border-box;margin-top:6px;min-height:58px;border:1px solid var(--line);border-radius:10px;background:var(--bg,#141218);color:inherit;font:inherit;font-size:14px;padding:8px}
 .rkf .rkb{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}.rkf .rkb button{flex:1;min-width:90px;border:1px solid var(--line);background:transparent;color:inherit;border-radius:10px;padding:9px;font-weight:700;font-size:13.5px;cursor:pointer}
 .rkf .rkb .ok{background:var(--pos);border-color:var(--pos);color:#141218}.rkf .rkb .x{color:var(--neg)}
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}.cal span{font-size:10px;color:var(--muted);text-align:center}
-.cal button{aspect-ratio:1;border:1px solid var(--line);background:transparent;border-radius:8px;font-size:11px;color:var(--sub);padding:0;position:relative;cursor:pointer}
-.cal button.ok{background:var(--pos);border-color:var(--pos);color:#141218;font-weight:700}.cal button.fx{border-color:rgba(255,143,168,.45);color:var(--neg)}
-.cal button.nt::after{content:'';position:absolute;top:3px;right:3px;width:5px;height:5px;border-radius:9px;background:#141218;opacity:.55}
-.cal button.js{background:rgba(245,196,81,.18);border-color:#F5C451;color:#F5C451;font-weight:700}.jtx{font-style:normal;color:#F5C451;font-weight:700}.tj{margin-top:6px;font-size:13px;color:var(--sub);overflow-wrap:anywhere}.bt.jbt{color:#F5C451;border-color:rgba(245,196,81,.45)}
+.rcal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}.rcal span{font-size:10px;color:var(--muted);text-align:center}
+.rcal button{aspect-ratio:1;border:1px solid var(--line);background:transparent;border-radius:8px;font-size:11px;color:var(--sub);padding:0;position:relative;cursor:pointer}
+.rcal button.ok{background:var(--pos);border-color:var(--pos);color:#141218;font-weight:700}.rcal button.fx{border-color:rgba(255,143,168,.45);color:var(--neg)}
+.rcal button.nt::after{content:'';position:absolute;top:3px;right:3px;width:5px;height:5px;border-radius:9px;background:#141218;opacity:.55}
+.rcal button.js{background:rgba(245,196,81,.18);border-color:#F5C451;color:#F5C451;font-weight:700}.jtx{font-style:normal;color:#F5C451;font-weight:700}.tj{margin-top:6px;font-size:13px;color:var(--sub);overflow-wrap:anywhere}.bt.jbt{color:#F5C451;border-color:rgba(245,196,81,.45)}
 .rkj{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.rkj button{border:1px solid var(--line);background:transparent;color:var(--sub);border-radius:99px;padding:6px 10px;font-size:12.5px;cursor:pointer}.rkj button.on{border-color:#F5C451;color:#F5C451}.rkf .rkb .jb{color:#F5C451;border-color:rgba(245,196,81,.5)}
-.cal button.hj{outline:2px solid var(--pinkl);outline-offset:1px}.cal button:disabled{opacity:.3;cursor:default}.cal button.na{visibility:hidden}
+.rcal button.hj{outline:2px solid var(--pinkl);outline-offset:1px}.rcal button:disabled{opacity:.3;cursor:default}.rcal button.na{visibility:hidden}
 .rlg{margin-top:10px;font-size:12.5px}.rlg div{display:flex;gap:8px;padding:5px 0;border-top:1px solid var(--line)}.rlg div b{flex:none;width:40px;color:var(--sub)}.rlg div span{flex:1;min-width:0;word-break:break-word}
 .alr{background:linear-gradient(135deg,rgba(225,29,72,.18),rgba(225,29,72,.06));border:1px solid rgba(240,80,126,.45);border-radius:14px;padding:12px 14px;margin:14px 0}
 .alr>b{display:block;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--pinkl);margin-bottom:6px}
@@ -112,7 +112,7 @@
 .lbc .ce{display:block;font-style:normal;font-size:9.5px;line-height:1.3;font-weight:700;padding:1px 4px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;color:#141218}.lbc .ce.fe{opacity:.5;text-decoration:line-through}.lbc .cm{font-style:normal;font-size:9.5px;color:var(--muted);text-align:left;padding-left:4px}
 .lbc .dts{display:flex;gap:4px;justify-content:center;margin-top:auto}.lbc .dts em{font-style:normal;font-size:10px;font-weight:700}.dk{color:var(--pos)}.dx{color:var(--neg)}
 .gq{background:var(--card);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:13px;color:var(--sub)}.gq summary{cursor:pointer;color:var(--pinkl,#F0507E);font-weight:600}.gq p{margin:8px 0;line-height:1.5}.gq .pdl{border-top:1px solid var(--line);padding:8px 0}.gq .pdl b{display:block;color:var(--ink)}.gq .pdl small{display:block;color:var(--muted)}
-.pt-g{background:#F5C451}.pt-s{background:#9B8CFF}.ce.pt-s{color:#fff}.pt-t{background:#7AB8FF}
+.pt-g{background:#F5C451}.pt-sh{background:#9B8CFF}.ce.pt-sh{color:#fff}.pt-t{background:#7AB8FF}
 .an{margin-top:10px;border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}.an-ex{--ac:var(--pinkl)}.an-ag{--ac:#F5C451}.an-gd{--ac:#7AB8FF}.an-tv{--ac:var(--neg)}
 .an{border-left:3px solid var(--ac)}.anh{display:flex;gap:10px;align-items:flex-start}.ani{width:30px;height:30px;flex:none;border-radius:99px;display:grid;place-items:center;background:color-mix(in srgb,var(--ac) 18%,transparent);font-size:15px}
 .anh b{display:block;font-size:14px;color:var(--ac)}.anh span{display:block;font-size:13.5px;color:var(--ink);margin-top:2px;overflow-wrap:anywhere}.anh small{display:block;font-size:11.5px;color:var(--muted);margin-top:3px}
@@ -160,7 +160,7 @@
     return `<div class="rt" id="rt-${esc(r.id)}"><div class="rh"><b>${esc(r.titulo)}${r.criado_por === 'próprio' && !op.adm ? '<span class="pso">minha</span>' : ''}</b><span class="rp" style="color:${cor(ehMes ? x.ritmo : x.pct)}">${P100(ehMes ? x.ritmo : x.pct)}</span></div>
       <div class="rs">${sub}${x.just ? ` · ${x.just} justificad${x.just > 1 ? 'os' : 'o'} (não conta contra)` : ''}${ehMes ? ` · ${P100(x.pct)} do mês inteiro` : ''}</div><div class="br"><i style="width:${Math.round(x.pct * 100)}%;background:${cor(ehMes ? x.ritmo : x.pct)}"></i></div>
       ${bt}<div class="rkx"></div>
-      <details${ehMes && !op.adm ? '' : ' open'}><summary style="margin:10px 2px 0;font-size:12px">Calendário de ${MESES[+m.slice(5, 7) - 1]} (toque num dia para marcar ou corrigir)</summary><div class="cal">${cal}</div>
+      <details${ehMes && !op.adm ? '' : ' open'}><summary style="margin:10px 2px 0;font-size:12px">Calendário de ${MESES[+m.slice(5, 7) - 1]} (toque num dia para marcar ou corrigir)</summary><div class="rcal">${cal}</div>
       ${reg.length ? `<div class="rlg">${reg.map(d => `<div><b>${ddmm(d)}</b><span>${ehJ(nt[d]) && !ck.includes(d) ? `<em class="jtx">não feito · justificado</em> ${esc(String(nt[d]).replace(/^✗\s*/, ''))}` : esc(nt[d])}</span></div>`).join('')}</div>` : ''}${r.criado_por === 'próprio' && !op.adm && ehMes ? `<div class="bts"><button class="bt del" data-del="${esc(r.id)}" data-dt="meta">Apagar esta meta</button></div>` : ''}</details></div>`;
   }
 
@@ -281,14 +281,14 @@
       let c = `<div class="lbc"><div class="lbch"><button data-cm="-1" aria-label="mês anterior">‹</button><b>${MESES[mo]} ${y}</b><button data-cm="1" aria-label="próximo mês">›</button></div><div class="cw">${['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map(x => `<span>${x}</span>`).join('')}</div><div class="cg">` + '<i></i>'.repeat(off);
       for (let d = 1; d <= n; d++) {
         const k = CM + '-' + String(d).padStart(2, '0'), it = itensDia(k, HJ), ch = [];
-        it.shows.forEach(s => ch.push(`<i class="ce pt-s">🎤 ${esc(s.local || s.show)}</i>`));
+        it.shows.forEach(s => ch.push(`<i class="ce pt-sh">🎤 ${esc(s.local || s.show)}</i>`));
         it.prazo.forEach(t => ch.push(`<i class="ce ${t.status === 'Concluída' ? 'pt-ok fe' : t.prazo < HJ ? 'pt-a' : 'pt-t'}">${esc(t.titulo)}</i>`));
         it.agend.forEach(t => ch.push(`<i class="ce pt-g">📅 ${esc(t.titulo)}</i>`));
         if (it.feitas.length) ch.push(`<i class="ce pt-ok">✓${it.feitas.length}</i>`);
         const mk = it.metas.filter(x => x.n).length, mf = it.metas.filter(x => x.falta).length, MX = 2;
         c += `<button class="cd${k === HJ ? ' hj' : ''}" data-dia="${k}" aria-label="${d} de ${MESES[mo]}"><b>${d}</b>${ch.slice(0, ch.length > MX ? MX - 1 : MX).join('')}${ch.length > MX ? `<i class="cm">+${ch.length - MX + 1}</i>` : ''}${mk || mf ? `<span class="dts">${mk ? `<em class="dk">✓${mk}</em>` : ''}${mf ? `<em class="dx">✗${mf}</em>` : ''}</span>` : ''}</button>`;
       }
-      return c + `</div><div class="clg"><span><em class="pt-t"></em>prazo</span><span><em class="pt-a"></em>atrasada</span><span><em class="pt-ok"></em>feita</span><span><em class="pt-g"></em>agendado</span>${(ST.S || []).length ? '<span><em class="pt-s"></em>show</span>' : ''}<span><b class="dk">✓</b> metas feitas · <b class="dx">✗</b> não feitas</span></div><p class="clt">Toque num dia para ver tudo dele.</p></div>`;
+      return c + `</div><div class="clg"><span><em class="pt-t"></em>prazo</span><span><em class="pt-a"></em>atrasada</span><span><em class="pt-ok"></em>feita</span><span><em class="pt-g"></em>agendado</span>${(ST.S || []).length ? '<span><em class="pt-sh"></em>show</span>' : ''}<span><b class="dk">✓</b> metas feitas · <b class="dx">✗</b> não feitas</span></div><p class="clt">Toque num dia para ver tudo dele.</p></div>`;
     }
     const qs_ = v => String(v).replace(/["\\]/g, '\\$&'); // CSS é o nome do texto de estilos aqui
     function popDia(d) {
