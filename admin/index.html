@@ -139,7 +139,7 @@ label textarea{min-height:60px;resize:vertical}
   <!-- EMPRESA: metas, alertas e despesas previstas -->
   <div id="t_emp" style="display:none">
     <p class="note">Metas da empresa, alertas (ex.: manutenção do ônibus) e despesas previstas. Cada item escolhe se aparece na página do sócio.</p>
-    <div class="chips" id="e_fil"><button class="chip on" data-f="">Tudo</button><button class="chip" data-f="meta">Metas</button><button class="chip" data-f="alerta">Alertas</button><button class="chip" data-f="despesa">Despesas previstas</button></div>
+    <div class="chips" id="e_fil"><button class="chip on" data-f="">Tudo</button><button class="chip" data-f="meta">Metas</button><button class="chip" data-f="tarefa">Tarefas</button><button class="chip" data-f="alerta">Alertas</button><button class="chip" data-f="despesa">Despesas previstas</button></div>
     <div class="list" id="e_lista"></div>
     <h3 id="e_h">Novo item</h3>
     <div class="card"><div class="f">
@@ -158,7 +158,9 @@ label textarea{min-height:60px;resize:vertical}
         <div style="font-size:12px;color:var(--sub);margin:10px 0 4px">ou ligar a metas individuais <small style="color:var(--muted)">(a barra vira a média delas no mês; ex.: reunião semanal)</small></div>
         <div id="e_rl" class="rlig"></div>
         <div style="font-size:12px;color:var(--sub);margin:12px 0 4px">e/ou ligar a tarefas das pessoas <small style="color:var(--muted)">(trabalho em equipe: cada tarefa concluída avança a barra)</small></div>
-        <input id="e_tf" placeholder="🔎 buscar tarefa ou pessoa" style="margin-bottom:6px;width:100%;box-sizing:border-box;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:9px 12px;font:inherit;font-size:14px"><div id="e_tl" class="rlig"></div></div>
+        <input id="e_tf" placeholder="🔎 buscar tarefa ou pessoa" style="margin-bottom:6px;width:100%;box-sizing:border-box;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:9px 12px;font:inherit;font-size:14px"><div id="e_tl" class="rlig"></div>
+        <div style="font-size:12px;color:var(--sub);margin:14px 0 4px">👥 Designar para <small style="color:var(--muted)">(cria a mesma tarefa, com o mesmo nome, para cada pessoa marcada; completa sozinha quando todos concluírem ou justificarem)</small></div>
+        <div id="e_dg" class="rlig"></div><label style="display:block;margin-top:8px;font-size:12px;color:var(--sub)">Entregar até<input type="date" id="e_dpz" style="display:block;margin-top:4px"></label></div>
     </div><div class="acts"><button class="btn pkb" id="e_ok">Salvar</button><button class="btn" id="e_can" style="display:none">Cancelar edição</button><span class="msg" id="e_msg"></span></div></div>
   </div>
 
@@ -282,8 +284,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwhwn14d"></script>
-<script src="../lbmetas.js?v=mwhwn14d"></script>
+<script src="../lb.js?v=mwhx9spq"></script>
+<script src="../lbmetas.js?v=mwhx9spq"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -527,7 +529,7 @@ $('pg_lista').addEventListener('click',async e=>{const fm=e.target.closest('[dat
     PAGS=r.pagamentos;render()}catch(err){b.textContent='erro: '+err.message}});
 
 /* empresa: metas, alertas, despesas previstas (cada item: mostrar ou não ao sócio) */
-const TIPOS={meta:'Meta',alerta:'Alerta',despesa:'Despesa prevista'};
+const TIPOS={meta:'Meta',tarefa:'Tarefa da empresa',alerta:'Alerta',despesa:'Despesa prevista'};
 const SITS={tarefa:['A fazer','Em andamento','Concluída'],meta:['A iniciar','Em andamento','Atingida','Não atingida'],alerta:['Previsto','Confirmado','Pago','Resolvido'],despesa:['Previsto','Confirmado','Pago']};
 const brl=v=>'R$ '+(+v).toLocaleString('pt-BR',{minimumFractionDigits:+v%1?2:0,maximumFractionDigits:2});
 const fechado=x=>['Atingida','Não atingida','Pago','Resolvido'].includes(x.situacao);
@@ -536,9 +538,9 @@ function sitOpts(tp,v){$('e_sit').innerHTML=SITS[tp].map(s=>`<option${s===v?' se
 function progMeta(x){ // barra: média dos itens ligados (metas individuais no mês + tarefas das pessoas: concluída = 100%); senão feito ÷ alvo
   const rs=String(x.rotinas||'').split(',').filter(Boolean).map(i=>RT.find(r=>r.id===i)).filter(Boolean),M=HOJE.slice(0,7);
   const ts=String(x.tarefas||'').split(',').filter(Boolean).map(i=>TF.find(t=>t.id===i)).filter(Boolean);
-  if(rs.length||ts.length){const ps=rs.map(r=>LBROT.pct(r,M)),ok=ts.filter(t=>t.status==='Concluída').length,n=rs.length+ts.length;
+  if(rs.length||ts.length){const ps=rs.map(r=>LBROT.pct(r,M)),fz=t=>t.status==='Concluída'||!!t.justificativa,ok=ts.filter(fz).length,n=rs.length+ts.length,ag=ts.filter(t=>!fz(t)).map(t=>nomeP(t.pessoa));
     const p=(ps.reduce((a,y)=>a+y.pct,0)+ok)/n,T=[];
-    if(ts.length)T.push(`${ok} de ${ts.length} tarefa${ts.length>1?'s':''} concluída${ok===1?'':'s'}: `+ts.map(t=>`${t.status==='Concluída'?'✓':t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)} <small>(${esc(nomeP(t.pessoa))})</small>`).join(' · '));
+    if(ts.length)T.push(`${ok} de ${ts.length} resolvida${ok===1?'':'s'}: `+ts.map(t=>`${t.status==='Concluída'?'✓':t.justificativa?'✗':t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)} <small>(${esc(nomeP(t.pessoa))}${t.justificativa&&t.status!=='Concluída'?': '+esc(t.justificativa):''})</small>`).join(' · ')+(ag.length?`<br><span style="color:var(--amber)">aguardando: ${esc([...new Set(ag)].join(', '))}</span>`:''));
     if(rs.length)T.push(`metas em ${LBROT.MESES?LBROT.MESES[+M.slice(5,7)-1]:M}: `+rs.map((r,i)=>`${esc(r.titulo)} <small>(${esc(nomeP(r.pessoa))})</small> ${ps[i].feitos}/${ps[i].total}`).join(' · '));
     return {p,t:T.join('<br>')}}
   const a=+x.atual,m=+x.meta_num;if(m>0&&String(x.atual)!=='')return {p:Math.min(1,a/m),t:`${String(a).replace('.',',')} de ${String(m).replace('.',',')}`};
@@ -548,6 +550,9 @@ function tlRender(sel){const s=new Set(String(sel||'').split(',').filter(Boolean
   const l=TF.filter(t=>s.has(t.id)||t.status!=='Concluída'||(t.concluido_em||'')>=lim).filter(t=>s.has(t.id)||!q||LB.norm(t.titulo+' '+nomeP(t.pessoa)).includes(q))
     .sort((a,b)=>s.has(b.id)-s.has(a.id)||nomeP(a.pessoa).localeCompare(nomeP(b.pessoa))||a.titulo.localeCompare(b.titulo));
   $('e_tl').innerHTML=l.map(t=>`<label class="rl"><input type="checkbox" value="${esc(t.id)}"${s.has(t.id)?' checked':''}> ${t.status==='Concluída'?'✓':t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)} <small>${esc(nomeP(t.pessoa))}</small></label>`).join('')||'<span class="note">Nenhuma tarefa encontrada (crie em Admin → Individuais).</span>'}
+function dgRender(x){const ja=new Set(String(x&&x.tarefas||'').split(',').filter(Boolean).map(i=>TF.find(t=>t.id===i)).filter(Boolean).map(t=>t.pessoa));
+  $('e_dg').innerHTML=PF.filter(p=>p.ativo!=='não').map(p=>ja.has(p.id)?`<label class="rl" style="opacity:.6"><input type="checkbox" checked disabled> ${esc(p.nome)} <small>já tem</small></label>`:`<label class="rl"><input type="checkbox" value="${esc(p.id)}"> ${esc(p.nome)}</label>`).join('')||'<span class="note">Nenhuma pessoa ativa.</span>'}
+const dgSel=()=>[...$('e_dg').querySelectorAll('input:checked:not([disabled])')].map(i=>i.value);
 const tlSel=()=>[...$('e_tl').querySelectorAll('input:checked')].map(i=>i.value);
 $('e_tf').oninput=()=>tlRender(tlSel().join(','));
 function rlRender(sel){const s=new Set(String(sel||'').split(',').filter(Boolean));
@@ -555,10 +560,10 @@ function rlRender(sel){const s=new Set(String(sel||'').split(',').filter(Boolean
 function renderEmp(){const l=MT.filter(x=>!EFIL||(x.tipo||'meta')===EFIL).sort((a,b)=>fechado(a)-fechado(b)||(+a.ordem||99)-(+b.ordem||99));
   $('e_lista').innerHTML=l.length?l.map(x=>`<div class="tf ${fechado(x)?'s-concluida':(x.tipo==='alerta'?'s-atrasada':x.situacao==='Em andamento'?'s-andamento':'')}"><div class="hd"><div><span class="pill">${TIPOS[x.tipo||'meta']}</span> <b style="display:inline">${esc(x.titulo)}</b>${x.alvo?`<div class="ds">${esc(x.alvo)}</div>`:''}${x.progresso?`<div class="ds" style="color:var(--muted)">${esc(x.progresso)}</div>`:''}</div>
     <button class="btn sm" data-me="${esc(x.id)}">editar</button></div>${(g=>g?`<div class="mpb${g.p>=1?' ok':''}"><i style="width:${Math.round(g.p*100)}%"></i></div><div class="mpt"><b>${Math.round(g.p*100)}%</b> · ${g.t}</div>`:'')(['meta','tarefa'].includes(x.tipo||'meta')?progMeta(x):null)}
-    <div class="mt">${sitPill(x)}${x.prazo?' · '+esc(x.prazo):''}${x.valor?' · <b style="display:inline;color:var(--ink)">'+brl(x.valor)+'</b>':''} · ${x.socio==='sim'?'<span style="color:var(--pos)">sócio vê</span>':'só administração'} · <a href="#" data-mso="${esc(x.id)}" style="color:var(--pinkl)">${x.socio==='sim'?'esconder do sócio':'mostrar ao sócio'}</a> · ${x.painel==='sim'?'<span style="color:var(--pos)">aviso no painel</span> · ':''}<a href="#" data-mpn="${esc(x.id)}" style="color:var(--pinkl)">${x.painel==='sim'?'tirar do painel':'avisar no painel'}</a> · <a href="#" data-mdel="${esc(x.id)}" style="color:var(--muted)">excluir</a></div></div>`).join('')
+    <div class="mt">${sitPill(x)}${x.auto==='sim'?' <small style="color:var(--pos)">(completou sozinha)</small>':''}${x.prazo?' · '+esc(x.prazo):''}${x.valor?' · <b style="display:inline;color:var(--ink)">'+brl(x.valor)+'</b>':''} · ${x.socio==='sim'?'<span style="color:var(--pos)">sócio vê</span>':'só administração'} · <a href="#" data-mso="${esc(x.id)}" style="color:var(--pinkl)">${x.socio==='sim'?'esconder do sócio':'mostrar ao sócio'}</a> · ${x.painel==='sim'?'<span style="color:var(--pos)">aviso no painel</span> · ':''}<a href="#" data-mpn="${esc(x.id)}" style="color:var(--pinkl)">${x.painel==='sim'?'tirar do painel':'avisar no painel'}</a> · <a href="#" data-mdel="${esc(x.id)}" style="color:var(--muted)">excluir</a></div></div>`).join('')
     :'<div class="empty">Nada aqui ainda.</div>';
-  if(!EDE&&!$('e_sit').options.length)sitOpts($('e_tp').value);if(!EDE&&!$('e_rl').children.length)rlRender('');if(!EDE&&!$('e_tl').children.length)tlRender('');pgVis()}
-function limpaE(){EDE=null;['e_tit','e_alvo','e_pz','e_val','e_ord','e_pro','e_at','e_mn','e_tf'].forEach(i=>$(i).value='');rlRender('');tlRender('');setTimeout(pgVis);$('e_tp').value='meta';$('e_so').value='não';$('e_pn').value='não';sitOpts('meta');$('e_can').style.display='none';$('e_h').textContent='Novo item';$('e_msg').textContent=''}
+  if(!EDE&&!$('e_sit').options.length)sitOpts($('e_tp').value);if(!EDE&&!$('e_rl').children.length)rlRender('');if(!EDE&&!$('e_tl').children.length)tlRender('');if(!EDE&&!$('e_dg').children.length)dgRender(null);pgVis()}
+function limpaE(){EDE=null;dgRender(null);['e_tit','e_alvo','e_pz','e_val','e_ord','e_pro','e_at','e_mn','e_tf','e_dpz'].forEach(i=>$(i).value='');rlRender('');tlRender('');setTimeout(pgVis);$('e_tp').value='meta';$('e_so').value='não';$('e_pn').value='não';sitOpts('meta');$('e_can').style.display='none';$('e_h').textContent='Novo item';$('e_msg').textContent=''}
 const salvaMeta=x=>api({acao:'salvar_meta',meta:x});
 const pgVis=()=>{$('e_pg').style.display=['meta','tarefa'].includes($('e_tp').value)?'':'none'};
 $('e_tp').onchange=()=>{sitOpts($('e_tp').value,$('e_sit').value);pgVis()};
@@ -566,10 +571,10 @@ $('e_can').onclick=limpaE;
 $('e_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;EFIL=b.dataset.f;document.querySelectorAll('#e_fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderEmp()};
 $('e_ok').onclick=async()=>{const m=$('e_msg'),t=$('e_tit').value.trim();if(!t){m.innerHTML='<span class="neg">Escreva o título.</span>';return}
   const v=$('e_val').value.trim().replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');
-  m.textContent='Salvando…';try{await salvaMeta({id:EDE||undefined,tipo:$('e_tp').value,socio:$('e_so').value,painel:$('e_pn').value,titulo:t,alvo:$('e_alvo').value,prazo:$('e_pz').value,valor:v,situacao:$('e_sit').value,ordem:$('e_ord').value,progresso:$('e_pro').value,atual:$('e_at').value.trim().replace(',','.'),meta_num:$('e_mn').value.trim().replace(',','.'),rotinas:[...$('e_rl').querySelectorAll('input:checked')].map(i=>i.value),tarefas:tlSel()});limpaE();m.innerHTML='<span class="pos">Salvo ✓</span>';render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
+  m.textContent='Salvando…';try{await salvaMeta({id:EDE||undefined,tipo:$('e_tp').value,socio:$('e_so').value,painel:$('e_pn').value,titulo:t,alvo:$('e_alvo').value,prazo:$('e_pz').value,valor:v,situacao:$('e_sit').value,ordem:$('e_ord').value,progresso:$('e_pro').value,atual:$('e_at').value.trim().replace(',','.'),meta_num:$('e_mn').value.trim().replace(',','.'),rotinas:[...$('e_rl').querySelectorAll('input:checked')].map(i=>i.value),tarefas:tlSel(),designar:dgSel(),designar_prazo:$('e_dpz').value,designar_desc:$('e_alvo').value});limpaE();m.innerHTML='<span class="pos">Salvo ✓</span>';render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
 $('e_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data-me]'),so=e.target.closest('[data-mso]'),pn=e.target.closest('[data-mpn]'),del=e.target.closest('[data-mdel]');if(!ed&&!so&&!pn&&!del)return;e.preventDefault();
   if(pn){const x=MT.find(y=>y.id===pn.dataset.mpn);pn.textContent='salvando…';try{await salvaMeta(Object.assign({},x,{painel:x.painel==='sim'?'não':'sim'}));render()}catch(err){pn.textContent='erro'}return}
-  if(ed){const x=MT.find(y=>y.id===ed.dataset.me);EDE=x.id;$('e_tp').value=x.tipo||'meta';$('e_so').value=x.socio==='sim'?'sim':'não';$('e_pn').value=x.painel==='sim'?'sim':'não';$('e_tit').value=x.titulo;$('e_alvo').value=x.alvo;$('e_pz').value=x.prazo;$('e_val').value=x.valor?String(x.valor).replace('.',','):'';sitOpts(x.tipo||'meta',x.situacao);$('e_ord').value=x.ordem;$('e_pro').value=x.progresso;$('e_at').value=x.atual?String(x.atual).replace('.',','):'';$('e_mn').value=x.meta_num?String(x.meta_num).replace('.',','):'';rlRender(x.rotinas);$('e_tf').value='';tlRender(x.tarefas);pgVis();$('e_can').style.display='';$('e_h').textContent='Editar item';$('e_tit').scrollIntoView({block:'center'});return}
+  if(ed){const x=MT.find(y=>y.id===ed.dataset.me);EDE=x.id;$('e_tp').value=x.tipo||'meta';$('e_so').value=x.socio==='sim'?'sim':'não';$('e_pn').value=x.painel==='sim'?'sim':'não';$('e_tit').value=x.titulo;$('e_alvo').value=x.alvo;$('e_pz').value=x.prazo;$('e_val').value=x.valor?String(x.valor).replace('.',','):'';sitOpts(x.tipo||'meta',x.situacao);$('e_ord').value=x.ordem;$('e_pro').value=x.progresso;$('e_at').value=x.atual?String(x.atual).replace('.',','):'';$('e_mn').value=x.meta_num?String(x.meta_num).replace('.',','):'';rlRender(x.rotinas);$('e_tf').value='';tlRender(x.tarefas);dgRender(x);$('e_dpz').value='';pgVis();$('e_can').style.display='';$('e_h').textContent='Editar item';$('e_tit').scrollIntoView({block:'center'});return}
   if(so){const x=MT.find(y=>y.id===so.dataset.mso);so.textContent='salvando…';try{await salvaMeta(Object.assign({},x,{socio:x.socio==='sim'?'não':'sim'}));render()}catch(err){so.textContent='erro'}return}
   if(del.dataset.ok!=='1'){del.dataset.ok='1';del.textContent='toque de novo para excluir';return}
   try{await api({acao:'excluir_meta',id:del.dataset.mdel});render()}catch(err){del.textContent='erro'}});
@@ -577,7 +582,7 @@ $('e_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data
 /* ---------- LANÇAMENTOS ---------- */
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const brl2=v=>(v<0?'−':'')+'R$ '+Math.abs(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-async function lnAbre(){if(!LNOK){$('ln_lista').innerHTML='<div class="empty">Carregando…</div>';try{const[a,v]=await Promise.all([api({acao:'lancamentos'}),api({acao:'listar'}).catch(()=>({shows:[]}))]);LN=a.lancamentos||[];VS=v.shows||[];LNOK=true}catch(e){$('ln_lista').innerHTML=`<div class="empty">Não consegui carregar (${esc(e.message)}).</div>`;return}}
+async function lnAbre(){if(!LNOK){$('ln_lista').innerHTML='<div class="empty">Carregando…</div>';try{const[a,v,c]=await Promise.all([api({acao:'lancamentos'}),api({acao:'listar'}).catch(()=>({shows:[]})),api({acao:'conferencia'}).catch(()=>({conferencia:[]}))]);LN=a.lancamentos||[];VS=v.shows||[];CJ=c.conferencia||[];LNOK=true}catch(e){$('ln_lista').innerHTML=`<div class="empty">Não consegui carregar (${esc(e.message)}).</div>`;return}}
   $('ln_cdl').innerHTML=(AD.cats||[]).map(c=>`<option value="${esc(c)}">`).join('');
   $('ln_sdl').innerHTML=(AD.shows||[]).slice().reverse().map(x=>`<option value="${esc(ddmm(x.data)+' '+x.nome)}">`).join('');
   lnRender()}
@@ -588,9 +593,51 @@ function lnTodos(){const aj={};LN.forEach(l=>{if(l.ref)aj[l.ref]=l});
   const pg=[];PAGS.forEach(g=>{LB.pgx.movs(g).forEach(o=>{const ref=o.ref,q=o.data;if(q&&q>AD.ext_ate)pg.push({id:o.id,src:'pg',g,data:q,quem:g.nome,valor:(g.direcao==='entrada'?1:-1)*o.valor,cat:g.direcao==='entrada'?(/aporte/i.test(g.descricao||'')?'Aporte de sócio':'Outras entradas'):g.descricao||(g.tipo==='fixo'?'Fixo mensal':'Pagamento avulso'),meio:g.meio==='Dinheiro'?'dinheiro':'conta',obs:[g.tipo==='fixo'?'fixo de '+mesn(ref):'',o.parte?'parte'+(o.obs?' · '+o.obs:''):''].filter(Boolean).join(' · ')})})});
   const rc=[];VS.forEach(sh=>{let l=[];try{l=JSON.parse(sh.recebimentos||'[]')||[]}catch(e){}l.forEach((r,i)=>{const d=String(r.data||'').slice(0,10);if(d&&d>AD.ext_ate&&+r.valor>0)rc.push({id:'rc-'+sh.id+'-'+i,src:'rc',sh,data:d,quem:r.quem||sh.contratante||sh.evento,valor:+r.valor,cat:sh.data.slice(0,7)>d.slice(0,7)?'Sinal de show':'Cachês de shows',show:ddmm(sh.data)+' '+(sh.evento||sh.cidade||''),meio:/dinheiro/i.test(r.meio||'')?'dinheiro':'conta',obs:[r.obs,r.por?'lançado por '+r.por:''].filter(Boolean).join(' · ')})})});
   return ex.concat(nv,pg,rc)}
-function lnConf(){const C=AD.conf||[];const T={a_mais:['a mais','lançado e não está no extrato'],a_menos:['a menos','no extrato e não lançado'],valor:['valor diferente','']};
-  $('ln_conf').innerHTML=C.length?`<details class="card cfb" open><summary>⚠️ <b>${C.length} diferença${C.length>1?'s':''} com o extrato</b> <small>conferido até ${ddmm(AD.ext_ate)}</small></summary>${C.map(c=>`<div class="cfi"><span class="pill ${c.tipo==='a_menos'?'am':'neg'}">${T[c.tipo][0]}</span><div><b>${ddmm(c.data)} · ${esc(c.quem||'—')} · ${brl2(c.valor)}</b><small>${esc(c.msg)}${c.show?' · '+esc(c.show):''}${c.por?' · lançado por '+esc(c.por):''}</small></div></div>`).join('')}</details>`
-    :`<div class="cfok">✓ O que foi lançado no app bate com o extrato (conferido até ${ddmm(AD.ext_ate)}).</div>`}
+/* diferenças com o extrato: cada uma tem ações prontas (corrige o que for preciso e guarda a justificativa; some no próximo extrato ou fica em "Justificadas") */
+let CJ=[],CJA=null;
+const CJ_ACOES={
+  'rc|valor':c=>[c.extrato<c.valor?['falta','Ainda falta receber o resto']:null,['corrige',c.extrato<c.valor?'Corrigir valor do show (cachê menor)':'Corrigir valor do show (cachê maior)'],c.extrato<c.valor?['din','O resto foi em dinheiro']:null,['taxa','Taxa / desconto do banco'],['outro','Outro motivo']].filter(Boolean),
+  'rc|a_mais':c=>[['din','Foi em dinheiro'],['vai','Ainda vai cair na conta'],['apaga','Lançado por engano (apagar)'],['outro','Outro motivo']],
+  'pg|valor':c=>[['ext','O extrato está certo (diferença em dinheiro/outra conta)'],['juros','Juros, multa ou taxa'],['outro','Outro motivo']],
+  'pg|a_mais':c=>[['din','Pago em dinheiro / outra conta'],['vai','Ainda vai sair'],['desm','Não foi pago (desmarcar)'],['outro','Outro motivo']],
+  'ext|a_menos':c=>[['vendas','Lançar em Vendas'],['nao','Não é cachê de show'],['ja','Já lançado em outro show'],['outro','Outro motivo']]};
+const cjDe=c=>CJ.find(j=>j.chave===c.k);
+function lnConf(){const T={a_mais:['a mais','lançado e não está no extrato'],a_menos:['a menos','no extrato e não lançado'],valor:['valor diferente','']};
+  const A=(AD.conf||[]).filter(c=>!cjDe(c)),J=(AD.conf||[]).filter(c=>cjDe(c)),ix=c=>(AD.conf||[]).indexOf(c);
+  const it=(c,j)=>`<div class="cfi"><span class="pill ${j?'ok':c.tipo==='a_menos'?'am':'neg'}">${T[c.tipo][0]}</span><div style="flex:1;min-width:0"><b>${ddmm(c.data)} · ${esc(c.quem||'—')} · ${brl2(c.valor)}</b><small>${esc(c.msg)}${c.show?' · '+esc(c.show):''}${c.por?' · lançado por '+esc(c.por):''}</small>
+    ${j?`<small style="color:var(--pos)">✓ ${esc(j.acao)}${j.obs?' — '+esc(j.obs):''} <span style="color:var(--muted)">(${esc(j.por||'')} ${esc(String(j.atualizado_em||'').slice(8,10)+'/'+String(j.atualizado_em||'').slice(5,7))})</span> · <a href="#" data-cu="${ix(c)}" style="color:var(--muted)">desfazer</a></small>`
+      :CJA===ix(c)?cjPainel(c):`<button class="btn sm" data-cj="${ix(c)}" style="margin-top:6px">Justificar</button>`}</div></div>`;
+  $('ln_conf').innerHTML=(A.length?`<details class="card cfb" open><summary>⚠️ <b>${A.length} diferença${A.length>1?'s':''} com o extrato</b> <small>conferido até ${ddmm(AD.ext_ate)}</small></summary>${A.map(c=>it(c)).join('')}</details>`
+    :`<div class="cfok">✓ O que foi lançado no app bate com o extrato${J.length?' (ou está justificado)':''} (conferido até ${ddmm(AD.ext_ate)}).</div>`)
+    +(J.length?`<details class="card" style="margin-top:10px"><summary style="cursor:pointer;font-size:13px;color:var(--sub)">✓ Justificadas (${J.length})</summary>${J.map(c=>it(c,cjDe(c))).join('')}</details>`:'')}
+function cjPainel(c){const L=(CJ_ACOES[(c.src||'ext')+'|'+c.tipo]||(()=>[['outro','Outro motivo']]))(c),d0=new Date(c.data+'T12:00:00');
+  const shs=c.tipo==='a_menos'?VS.filter(s=>s.status!=='Cancelado'&&Math.abs(new Date(s.data+'T12:00:00')-d0)<=45*864e5).sort((a,b)=>Math.abs(new Date(a.data+'T12:00:00')-d0)-Math.abs(new Date(b.data+'T12:00:00')-d0)):[];
+  return `<div class="cjp" style="margin-top:8px;background:var(--card2);border-radius:10px;padding:10px">
+    ${c.tipo==='valor'?`<small>Lançado <b style="display:inline">${brl2(c.valor)}</b> · no extrato <b style="display:inline">${brl2(c.extrato)}</b> · diferença <b style="display:inline">${brl2(Math.abs(c.valor)-Math.abs(c.extrato))}</b></small>`:''}
+    ${shs.length?`<label style="display:block;font-size:12px;color:var(--sub);margin:6px 0">Show (para "Lançar em Vendas")<select id="cj_sh" style="display:block;width:100%;margin-top:4px">${shs.map(s=>`<option value="${esc(s.id)}">${ddmm(s.data)} ${esc(s.evento||s.cidade||'')}${s.contratante?' · '+esc(s.contratante):''}</option>`).join('')}</select></label>`:''}
+    <input id="cj_obs" placeholder="observação (opcional; obrigatória em Outro motivo)" style="width:100%;box-sizing:border-box;margin:6px 0;background:var(--card);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:8px 10px;font:inherit;font-size:13px">
+    <div style="display:flex;flex-wrap:wrap;gap:6px">${L.map(([k,t])=>`<button class="btn sm${k==='outro'?'':' pkb'}" data-ca="${k}">${t}</button>`).join('')}<button class="btn sm" data-cx="1">fechar</button></div><span class="msg" id="cj_msg"></span></div>`}
+async function cjShow(sid,fn,extra){const s=VS.find(x=>String(x.id)===String(sid));if(!s)throw new Error('show não achado (abra Vendas)');let l=[];try{l=JSON.parse(s.recebimentos||'[]')||[]}catch(e){}
+  fn(l);const tot=Math.round(l.reduce((a,r)=>a+(+r.valor||0),0)*100)/100,o=Object.assign({id:s.id,data:s.data,recebimentos:l.length?JSON.stringify(l):'',recebido:tot},extra?extra(s):{});
+  const r=await api({acao:'salvar',show:o});if(r&&r.ok===false)throw new Error(r.erro);Object.assign(s,o)}
+const cjRc=(c,l)=>{let i=c.ri;if(!(l[i]&&Math.abs(+l[i].valor-c.valor)<.01&&String(l[i].data||'').slice(0,10)===c.data))i=l.findIndex(r=>Math.abs(+r.valor-c.valor)<.01&&String(r.data||'').slice(0,10)===c.data);if(i<0)throw new Error('recebimento não achado no show');return i};
+async function cjFaz(c,k,rot,obs){const dif=Math.round((Math.abs(c.valor)-Math.abs(c.extrato||0))*100)/100,quem=(LB.usuario||LB.login||'Admin')+' (extrato)';
+  if(c.src==='rc'&&k==='falta')await cjShow(c.sid,l=>{l[cjRc(c,l)].valor=c.extrato});
+  if(c.src==='rc'&&k==='corrige')await cjShow(c.sid,l=>{l[cjRc(c,l)].valor=c.extrato},s=>({valor:Math.round(((+s.valor||0)-dif)*100)/100}));
+  if(c.src==='rc'&&k==='din'&&c.tipo==='valor')await cjShow(c.sid,l=>{const i=cjRc(c,l);l[i].valor=c.extrato;l.push({data:c.data,valor:dif,quem:l[i].quem||c.quem,meio:'Dinheiro',obs:'resto em dinheiro (conferência do extrato)',por:quem})});
+  if(c.src==='rc'&&k==='din'&&c.tipo==='a_mais')await cjShow(c.sid,l=>{l[cjRc(c,l)].meio='Dinheiro'});
+  if(c.src==='rc'&&k==='apaga')await cjShow(c.sid,l=>{l.splice(cjRc(c,l),1)});
+  if(c.src==='pg'&&k==='desm'){const r=await api(c.pi!=null?{acao:'pagar_pagamento',id:c.pid,ref:c.ref,remover_parcial:+c.pi}:{acao:'pagar_pagamento',id:c.pid,ref:c.ref,pago:false});if(r.pagamentos)PAGS=r.pagamentos}
+  if(k==='vendas'){const sid=($('cj_sh')||{}).value;if(!sid)throw new Error('nenhum show perto dessa data');const s=VS.find(x=>String(x.id)===String(sid));
+    await cjShow(sid,l=>{l.push({data:c.data,valor:c.valor,quem:c.quem,meio:'Pix',obs:'lançado pela conferência do extrato',por:quem});l.sort((a,b)=>String(a.data).localeCompare(String(b.data)))});rot+=' → '+ddmm(s.data)+' '+(s.evento||s.cidade||'')}
+  const r=await api({acao:'justificar_conf',chave:c.k,acao_conf:rot,obs});CJ=r.conferencia||CJ}
+$('ln_conf').addEventListener('click',async e=>{const b=e.target.closest('[data-cj],[data-ca],[data-cx],[data-cu]');if(!b)return;e.preventDefault();const C=AD.conf||[];
+  if(b.dataset.cj!=null){CJA=+b.dataset.cj;lnConf();return}
+  if(b.dataset.cx){CJA=null;lnConf();return}
+  if(b.dataset.cu!=null){b.textContent='desfazendo…';try{const r=await api({acao:'justificar_conf',chave:C[+b.dataset.cu].k,desfazer:1});CJ=r.conferencia||[];lnConf()}catch(err){b.textContent='erro: '+err.message}return}
+  const c=C[CJA],k=b.dataset.ca,obs=$('cj_obs').value.trim(),m=$('cj_msg');if(k==='outro'&&!obs){m.innerHTML='<span class="neg">Escreva o motivo na observação.</span>';$('cj_obs').focus();return}
+  document.querySelectorAll('#ln_conf [data-ca]').forEach(x=>x.disabled=true);m.textContent='Salvando…';
+  try{await cjFaz(c,k,b.textContent,obs);CJA=null;lnRender()}catch(err){m.innerHTML='<span class="neg">Não salvou ('+esc(err.message)+')</span>';document.querySelectorAll('#ln_conf [data-ca]').forEach(x=>x.disabled=false)}});
 function lnRender(){lnConf();const T=lnTodos(),ms=[...new Set(T.map(x=>x.data.slice(0,7)).concat(HOJE.slice(0,7)))].sort().reverse();
   $('ln_mes').innerHTML=ms.map(m=>`<button class="chip${m===LMES?' on':''}" data-m="${m}">${MES3[+m.slice(5,7)-1]}${m.slice(0,4)!==HOJE.slice(0,4)?' '+m.slice(2,4):''}</button>`).join('');
   const q=$('ln_q').value.trim().toLowerCase(),cl=c=>/classificar|identificar/i.test(c||'');
@@ -663,7 +710,7 @@ $('ln_del').onclick=async()=>{const d=$('ln_del'),x=LED,id=x&&(x.novo?x.novo.id:
 document.addEventListener('keydown',e=>{if(e.key==='Escape')lnFecha()});
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag','lan','soc','cfg'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='cfg')cfgAbre();if(b.dataset.t==='lan')lnAbre();if(b.dataset.t==='pag')arecAbre();if(b.dataset.t==='soc')socAbre()};
 </script>
-<script src="../lbchat.js?v=mwhwn14d"></script>
+<script src="../lbchat.js?v=mwhx9spq"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

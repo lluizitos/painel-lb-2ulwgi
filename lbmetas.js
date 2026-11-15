@@ -80,6 +80,10 @@
 .pso{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-left:6px}.bt.del{color:var(--neg);border-color:rgba(255,143,168,.4)}
 .hj0{background:linear-gradient(135deg,rgba(207,29,81,.16),rgba(207,29,81,.04));border:1px solid rgba(240,80,126,.35);border-radius:16px;padding:16px;margin:16px 0}
 .hj0 h2{margin:0 0 4px;font-size:19px;line-height:1.3}.hj0 p{margin:12px 0 4px;font-size:15.5px;line-height:1.5}.hj0 ul{margin:0;padding-left:20px}.hj0 li{margin:5px 0;font-size:15px;line-height:1.45}.hj0 li small{color:var(--muted);font-size:13px}
+.hjr{display:flex;justify-content:space-around;gap:6px;margin:12px 0 4px}.hja{text-align:center;flex:1;min-width:0}.hja svg{width:66px;height:66px;display:block;margin:0 auto}.hja text{fill:var(--ink);font-size:14px;font-weight:700}.hja b{display:block;font-size:13px;margin-top:2px}.hja small{display:block;font-size:11px;color:var(--muted)}
+.hjg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0 8px}.hjn{background:rgba(255,255,255,.05);border-radius:12px;padding:8px 4px;text-align:center}.hjn b{display:block;font-size:22px;line-height:1.1}.hjn small{display:block;font-size:11px;color:var(--sub);line-height:1.2;margin-top:2px}.hjn.z{opacity:.45}
+.hjcs{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}.hjc{font-size:12.5px;border-radius:99px;padding:3px 10px;background:rgba(255,255,255,.07);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hjc.a{background:rgba(255,92,92,.16);color:#ffb3b3}.hjc.h{background:rgba(240,80,126,.18)}
+.hjw{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;align-items:end;margin-top:12px;height:78px}.hjw div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}.hjw i{width:60%;max-width:22px;background:var(--pinkl);border-radius:5px 5px 2px 2px;opacity:.8}.hjw .h i{opacity:1}.hjw b{font-size:11px;min-height:13px}.hjw small{font-size:10.5px;color:var(--muted)}.hjw .h small{color:var(--ink);font-weight:700}
 .hj0 .neg,.lbpc .neg{color:var(--neg);font-weight:700}.lbpc .pos{color:var(--pos);font-weight:700}.alr.alrin{background:none;border:0;padding:0;margin:4px 0 0}.pso.rec{color:#F5C451}
 .gch{background:var(--card);border-radius:14px;padding:14px;margin-top:10px}.gch>b{font-size:13.5px;color:var(--sub)}.gn{font-size:11.5px;color:var(--muted);margin:6px 0 0}
 .gb{display:flex;gap:8px;height:150px;margin-top:10px}.gb>div{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px}.gb span{font-size:11.5px;font-weight:700;color:var(--sub);min-height:15px}.gb small{font-size:11px;color:var(--muted)}
@@ -196,15 +200,22 @@
       const pz = (a, b) => (a.prazo || '').localeCompare(b.prazo || '');
       const atr = T.filter(t => t.prazo && t.prazo < HJ).sort(pz), hj = T.filter(t => t.prazo === HJ), prox = T.filter(t => t.prazo > HJ && t.prazo <= soma(HJ, 7)).sort(pz),
         and = T.filter(t => t.status === 'Em andamento' && !t.prazo), PD = ST.R.map(x => [x, pend(x, HJ)]).filter(y => y[1]);
-      const li = (t, s) => `<li>${esc(t.titulo)}${s ? ` <small>· ${s}</small>` : ''}</li>`;
-      let c = '';
-      if (atr.length) c += `<p><span class="neg">⚠️ ${atr.length} tarefa${atr.length > 1 ? 's' : ''} atrasada${atr.length > 1 ? 's' : ''}</span>, vale resolver primeiro:</p><ul>${atr.map(t => li(t, 'era até ' + ddmm(t.prazo) + ' (' + dias(t.prazo, HJ) + ' dia' + (dias(t.prazo, HJ) > 1 ? 's' : '') + ')' + (t.justificativa ? ' · justificada' : ''))).join('')}</ul>`;
-      if (hj.length) c += `<p>📌 <b>Para entregar hoje</b></p><ul>${hj.map(t => li(t, t.status === 'Em andamento' ? 'em andamento' : '')).join('')}</ul>`;
-      if (PD.length) c += `<p>✅ <b>Metas para marcar</b></p><div class="alr alrin">${PD.map(([x, q]) => `<button data-alr="${esc(x.id)}">${esc(x.titulo)}<small>${esc(q)} →</small></button>`).join('')}</div>`;
-      if (and.length) c += `<p>◐ <b>Em andamento</b></p><ul>${and.map(t => li(t, '')).join('')}</ul>`;
-      if (prox.length) c += `<p>🗓️ <b>Nos próximos 7 dias</b></p><ul>${prox.map(t => li(t, DSN[new Date(t.prazo + 'T12:00:00').getDay()] + ' ' + ddmm(t.prazo))).join('')}</ul>`;
-      if (!c) c = '<p>Nada pendente para hoje. Tudo em dia! 👏</p>';
-      return `<div class="hj0"><h2>${oi}, ${esc(nome)}! O que temos pra hoje</h2>${c}</div>`;
+      /* visual: anéis (mês), números do dia, barras da semana; texto só nos nomes das tarefas */
+      const M = HJ.slice(0, 7), RA = ST.R.filter(r => r.ativo !== 'não'), PS = RA.map(r => pct(r, M, HJ));
+      const med = k => PS.length ? PS.reduce((x, y) => x + (y[k] == null ? 1 : y[k]), 0) / PS.length : null;
+      const fm = ST.T.filter(t => t.status === 'Concluída' && (t.concluido_em || '').startsWith(M)).length, am = T.filter(t => (t.prazo || '').startsWith(M) || (t.prazo && t.prazo < HJ)).length;
+      const corP = p => p >= .8 ? 'var(--pos)' : p >= .5 ? '#F5C451' : 'var(--neg)';
+      const anel = (p, rot, sub) => p == null ? '' : `<div class="hja"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="7"/><circle cx="32" cy="32" r="26" fill="none" stroke="${corP(p)}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(163.4 * Math.min(1, p)).toFixed(1)} 163.4" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle">${Math.round(p * 100)}%</text></svg><b>${rot}</b><small>${sub}</small></div>`;
+      const num = (n, rot, cor) => `<div class="hjn${n ? '' : ' z'}"><b style="${n && cor ? 'color:' + cor : ''}">${n}</b><small>${rot}</small></div>`;
+      const sem = Array.from({ length: 7 }, (_, i) => soma(HJ, i)), qn = d => T.filter(t => t.prazo === d).length + (d === HJ ? atr.length : 0), mx = Math.max(1, ...sem.map(qn));
+      const chip = (t, cls) => `<span class="hjc ${cls}">${esc(t.titulo)}</span>`;
+      let c = `<div class="hjr">${anel(med('pct'), 'Metas', 'do mês')}${anel(med('ritmo'), 'Ritmo', 'até hoje')}${fm + am ? anel(fm / (fm + am), 'Tarefas', fm + ' de ' + (fm + am)) : ''}</div>`;
+      c += `<div class="hjg">${num(atr.length, 'atrasada' + (atr.length === 1 ? '' : 's'), 'var(--neg)')}${num(hj.length, 'pra hoje', 'var(--pinkl)')}${num(PD.length, 'meta' + (PD.length === 1 ? '' : 's') + ' p/ marcar', '#F5C451')}${num(prox.length, 'em 7 dias', '')}</div>`;
+      if (atr.length || hj.length) c += `<div class="hjcs">${atr.map(t => chip(t, 'a')).join('')}${hj.map(t => chip(t, 'h')).join('')}</div>`;
+      if (PD.length) c += `<div class="alr alrin">${PD.map(([x, q]) => `<button data-alr="${esc(x.id)}">${esc(x.titulo)}<small>${esc(q)} →</small></button>`).join('')}</div>`;
+      c += `<div class="hjw">${sem.map((d, i) => { const n = qn(d); return `<div${i ? '' : ' class="h"'}><i style="height:${n ? 8 + 40 * n / mx : 3}px;${i === 0 && atr.length ? 'background:var(--neg)' : ''}"></i><b>${n || ''}</b><small>${i ? DSN[new Date(d + 'T12:00:00').getDay()] : 'hoje'}</small></div>`; }).join('')}</div>`;
+      if (!T.length && !PD.length) c += '<p style="text-align:center;margin:10px 0 0">Tudo em dia! 👏</p>';
+      return `<div class="hj0"><h2>${oi}, ${esc(nome)}!</h2>${c}</div>`;
     }
     /* tudo de um dia: tarefas com prazo, tarefas concluídas, metas (feito / justificado / não marcado) */
     function itensDia(d, HJ) {
