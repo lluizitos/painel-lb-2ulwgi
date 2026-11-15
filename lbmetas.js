@@ -111,7 +111,8 @@
 .lbc .cd.hj>b{color:#fff;background:var(--pink);border-radius:99px;padding:1px 6px}
 .lbc .ce{display:block;font-style:normal;font-size:9.5px;line-height:1.3;font-weight:700;padding:1px 4px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;color:#141218}.lbc .ce.fe{opacity:.5;text-decoration:line-through}.lbc .cm{font-style:normal;font-size:9.5px;color:var(--muted);text-align:left;padding-left:4px}
 .lbc .dts{display:flex;gap:4px;justify-content:center;margin-top:auto}.lbc .dts em{font-style:normal;font-size:10px;font-weight:700}.dk{color:var(--pos)}.dx{color:var(--neg)}
-.pt-g{background:#F5C451}.pt-t{background:#7AB8FF}
+.gq{background:var(--card);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:13px;color:var(--sub)}.gq summary{cursor:pointer;color:var(--pinkl,#F0507E);font-weight:600}.gq p{margin:8px 0;line-height:1.5}.gq .pdl{border-top:1px solid var(--line);padding:8px 0}.gq .pdl b{display:block;color:var(--ink)}.gq .pdl small{display:block;color:var(--muted)}
+.pt-g{background:#F5C451}.pt-s{background:#9B8CFF}.ce.pt-s{color:#fff}.pt-t{background:#7AB8FF}
 .an{margin-top:10px;border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}.an-ex{--ac:var(--pinkl)}.an-ag{--ac:#F5C451}.an-gd{--ac:#7AB8FF}.an-tv{--ac:var(--neg)}
 .an{border-left:3px solid var(--ac)}.anh{display:flex;gap:10px;align-items:flex-start}.ani{width:30px;height:30px;flex:none;border-radius:99px;display:grid;place-items:center;background:color-mix(in srgb,var(--ac) 18%,transparent);font-size:15px}
 .anh b{display:block;font-size:14px;color:var(--ac)}.anh span{display:block;font-size:13.5px;color:var(--ink);margin-top:2px;overflow-wrap:anywhere}.anh small{display:block;font-size:11.5px;color:var(--muted);margin-top:3px}
@@ -198,11 +199,14 @@
   async function pagina(app, chamar, titulo) {
     css();
     const CK = 'lbrot_' + titulo + '_' + ((window.LB && LB.login) || location.hash.slice(0, 30));
-    const guarda = x => { try { localStorage.setItem(CK, JSON.stringify({ perfil: x.perfil, tarefas: x.tarefas, rotinas: x.rotinas })); } catch (e) { } };
+    const guarda = x => { try { localStorage.setItem(CK, JSON.stringify({ perfil: x.perfil, tarefas: x.tarefas, rotinas: x.rotinas, shows: x.shows })); } catch (e) { } };
     let r = null; try { const c = JSON.parse(localStorage.getItem(CK) || 'null'); if (c && c.perfil) r = c; } catch (e) { }
     const fresco = chamar({ acao: 'minhas_tarefas' }), doCache = !!r;
     if (!r) { r = await fresco; guarda(r); }
-    const ST = { P: r.perfil, T: r.tarefas || [], R: r.rotinas || [] };
+    const ST = { P: r.perfil, T: r.tarefas || [], R: r.rotinas || [], S: r.shows || [] };
+    let TMAIS = false; const TMAX = 6;
+    /* data que vale no rendimento: tarefa cadastrada já concluída depois do prazo (registro de algo antigo) conta como no prazo */
+    const ent = t => t.prazo && t.concluido_em > t.prazo && String(t.criado_em || '').slice(0, 10) > t.prazo ? t.prazo : t.concluido_em;
     app._rot = () => ST.R;
     const REC = { semanal: 'toda semana', mensal: 'todo mês' }, DSN = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
     const dias = (a, b) => Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 864e5);
@@ -227,7 +231,7 @@
     function card(t, HJ) {
       const atr = t.status !== 'Concluída' && t.prazo && t.prazo < HJ, c = t.status === 'Concluída' ? 'ok' : atr ? 'atr' : t.status === 'Em andamento' ? 'and' : '';
       const meu = t.criado_por === 'próprio', del = meu ? `<button class="bt del" data-del="${esc(t.id)}" data-dt="tarefa">Apagar</button>` : '';
-      const dA = t.status === 'Concluída' && t.prazo && t.concluido_em && t.concluido_em > t.prazo ? dias(t.prazo, t.concluido_em) : 0;
+      const dA = t.status === 'Concluída' && t.prazo && t.concluido_em && ent(t) > t.prazo ? dias(t.prazo, ent(t)) : 0;
       const pz = t.status === 'Concluída' ? `Concluída em ${ddmm(t.concluido_em)}${dA ? ` <span class="neg">· ${dA} dia${dA > 1 ? 's' : ''} depois do prazo</span>` : t.prazo ? ' · no prazo' : ''} · <a href="#" data-cd="${esc(t.id)}">corrigir data</a>`
         : t.prazo ? (atr ? '<span class="neg">Atrasada · era até ' + ddmm(t.prazo) + '</span>' : 'Entregar até ' + ddmm(t.prazo)) : 'Sem prazo';
       return `<div class="tf ${c}"><b>${esc(t.titulo)}${meu ? '<span class="pso">minha</span>' : ''}${REC[t.recorrencia] ? `<span class="pso rec">🔁 ${REC[t.recorrencia]}</span>` : ''}</b>${t.descricao ? `<div class="ds">${esc(t.descricao)}</div>` : ''}
@@ -267,7 +271,8 @@
       const agend = ST.T.filter(t => agendaDe(t, d) && t.prazo !== d), prazo = ST.T.filter(t => t.prazo === d), feitas = ST.T.filter(t => t.status === 'Concluída' && t.concluido_em === d && t.prazo !== d);
       const metas = ST.R.map(r => { const n = checks(r).filter(x => x === d).length, nt = notas(r)[d] || '', js = !n && ehJ(nt), diaria = r.freq === 'dia' || r.freq === 'util';
         return { r, n, nt, js, falta: !n && !js && diaria && valeNoDia(r, d) && d < HJ, marcar: !n && !js && d === HJ && !!pend(r, HJ) }; }).filter(x => x.n || x.js || x.falta || x.marcar);
-      return { prazo, feitas, metas, agend };
+      const shows = (ST.S || []).filter(s => s.data === d);
+      return { prazo, feitas, metas, agend, shows };
     }
     let CM = '';
     function calendario(HJ) {
@@ -276,19 +281,21 @@
       let c = `<div class="lbc"><div class="lbch"><button data-cm="-1" aria-label="mês anterior">‹</button><b>${MESES[mo]} ${y}</b><button data-cm="1" aria-label="próximo mês">›</button></div><div class="cw">${['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map(x => `<span>${x}</span>`).join('')}</div><div class="cg">` + '<i></i>'.repeat(off);
       for (let d = 1; d <= n; d++) {
         const k = CM + '-' + String(d).padStart(2, '0'), it = itensDia(k, HJ), ch = [];
+        it.shows.forEach(s => ch.push(`<i class="ce pt-s">🎤 ${esc(s.local || s.show)}</i>`));
         it.prazo.forEach(t => ch.push(`<i class="ce ${t.status === 'Concluída' ? 'pt-ok fe' : t.prazo < HJ ? 'pt-a' : 'pt-t'}">${esc(t.titulo)}</i>`));
         it.agend.forEach(t => ch.push(`<i class="ce pt-g">📅 ${esc(t.titulo)}</i>`));
         if (it.feitas.length) ch.push(`<i class="ce pt-ok">✓${it.feitas.length}</i>`);
         const mk = it.metas.filter(x => x.n).length, mf = it.metas.filter(x => x.falta).length, MX = 2;
         c += `<button class="cd${k === HJ ? ' hj' : ''}" data-dia="${k}" aria-label="${d} de ${MESES[mo]}"><b>${d}</b>${ch.slice(0, ch.length > MX ? MX - 1 : MX).join('')}${ch.length > MX ? `<i class="cm">+${ch.length - MX + 1}</i>` : ''}${mk || mf ? `<span class="dts">${mk ? `<em class="dk">✓${mk}</em>` : ''}${mf ? `<em class="dx">✗${mf}</em>` : ''}</span>` : ''}</button>`;
       }
-      return c + `</div><div class="clg"><span><em class="pt-t"></em>prazo</span><span><em class="pt-a"></em>atrasada</span><span><em class="pt-ok"></em>feita</span><span><em class="pt-g"></em>agendado</span><span><b class="dk">✓</b> metas feitas · <b class="dx">✗</b> não feitas</span></div><p class="clt">Toque num dia para ver tudo dele.</p></div>`;
+      return c + `</div><div class="clg"><span><em class="pt-t"></em>prazo</span><span><em class="pt-a"></em>atrasada</span><span><em class="pt-ok"></em>feita</span><span><em class="pt-g"></em>agendado</span>${(ST.S || []).length ? '<span><em class="pt-s"></em>show</span>' : ''}<span><b class="dk">✓</b> metas feitas · <b class="dx">✗</b> não feitas</span></div><p class="clt">Toque num dia para ver tudo dele.</p></div>`;
     }
     const qs_ = v => String(v).replace(/["\\]/g, '\\$&'); // CSS é o nome do texto de estilos aqui
     function popDia(d) {
       const HJ = hoje(), it = itensDia(d, HJ), dt = new Date(d + 'T12:00:00');
       const st = t => t.status === 'Concluída' ? `<span class="pos">✓ concluída${t.concluido_em && t.concluido_em !== d ? ' em ' + ddmm(t.concluido_em) : ''}</span>` : t.prazo < HJ ? '<span class="neg">atrasada</span>' : t.status === 'Em andamento' ? 'em andamento' : 'a fazer';
       let h = '';
+      if (it.shows.length) h += `<h4>Show</h4>${it.shows.map(s => `<div class="pdl"><b>🎤 ${esc(s.show || 'Show')}${s.local ? ' · ' + esc(s.local) : ''}</b><small>Você está no borderô${s.funcao ? ' como ' + esc(s.funcao) : ''}</small></div>`).join('')}`;
       if (it.prazo.length) h += `<h4>Para entregar neste dia</h4>${it.prazo.map(t => `<div class="pdl"><b>${esc(t.titulo)}</b><small>${st(t)}${t.categoria ? ' · ' + esc(t.categoria) : ''}${REC[t.recorrencia] ? ' · 🔁 ' + REC[t.recorrencia] : ''}</small>${t.descricao ? `<small>${esc(t.descricao)}</small>` : ''}${andL(t).length && t.status !== 'Concluída' ? `<small>${esc(andTxt(t))}</small>` : ''}${t.justificativa ? `<small class="jtx">Justificativa: ${esc(t.justificativa)}</small>` : ''}</div>`).join('')}`;
       if (it.agend.length) h += `<h4>Agendado neste dia</h4>${it.agend.map(t => { const a = andL(t).filter(x => x.tp === 'agendado' && x.ag === d).pop(); return `<div class="pdl"><b>📅 ${esc(t.titulo)}</b>${a.tx ? `<small>${esc(a.tx)}</small>` : ''}<small>${t.prazo ? 'entregar até ' + ddmm(t.prazo) : 'sem prazo'}</small></div>`; }).join('')}`;
       if (it.feitas.length) h += `<h4>Concluídas neste dia</h4>${it.feitas.map(t => `<div class="pdl"><b>${esc(t.titulo)}</b><small>${t.prazo ? (t.prazo < d ? `<span class="neg">${dias(t.prazo, d)} dia${dias(t.prazo, d) > 1 ? 's' : ''} depois do prazo (${ddmm(t.prazo)})</span>` : 'antes do prazo (' + ddmm(t.prazo) + ')') : 'sem prazo'}</small></div>`).join('')}`;
@@ -314,11 +321,14 @@
       const MC = m => MESES[+m.slice(5, 7) - 1].slice(0, 3);
       const med = ms.map(m => { const at = R.filter(r => r.ativo !== 'não' && (!ini(r) || ini(r) <= m + '-31') && (!r.fim || r.fim >= m + '-01'));
         const vs = at.map(r => { const x = pct(r, m, HJ); return m === MA ? x.ritmo : x.pct; }).filter(v => v != null); return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : null; });
-      const tm = ms.map(m => { const f = T.filter(t => t.status === 'Concluída' && (t.concluido_em || '').startsWith(m)), at = f.filter(t => t.prazo && t.concluido_em > t.prazo).length; return { np: f.length - at, at }; }),
+      const tm = ms.map(m => { const f = T.filter(t => t.status === 'Concluída' && (t.concluido_em || '').startsWith(m)), at = f.filter(t => t.prazo && ent(t) > t.prazo).length; return { np: f.length - at, at }; }),
         mx = Math.max(1, ...tm.map(x => x.np + x.at));
-      const d90 = soma(HJ, -90), f90 = T.filter(t => t.status === 'Concluída' && t.prazo && (t.concluido_em || '') >= d90), npz = f90.filter(t => t.concluido_em <= t.prazo).length,
-        atrs = f90.filter(t => t.concluido_em > t.prazo).map(t => dias(t.prazo, t.concluido_em)), tx = f90.length ? npz / f90.length : null;
+      const d90 = soma(HJ, -90), f90 = T.filter(t => t.status === 'Concluída' && t.prazo && (t.concluido_em || '') >= d90), npz = f90.filter(t => ent(t) <= t.prazo).length,
+        LAT = f90.filter(t => ent(t) > t.prazo).sort((a, b) => b.concluido_em.localeCompare(a.concluido_em)), atrs = LAT.map(t => dias(t.prazo, ent(t))), tx = f90.length ? npz / f90.length : null;
       let h = `<div class="res"><div>No prazo<small style="display:block;letter-spacing:0;text-transform:none">últimos 90 dias</small><b style="color:${cor(tx)}">${P100(tx)}</b></div><div>Atraso médio<small style="display:block;letter-spacing:0;text-transform:none">quando atrasa</small><b>${atrs.length ? (x => x + (x === 1 ? ' dia' : ' dias'))(Math.round(atrs.reduce((a, b) => a + b, 0) / atrs.length)) : '—'}</b></div><div>Metas<small style="display:block;letter-spacing:0;text-transform:none">ritmo do mês</small><b style="color:${cor(med[5])}">${P100(med[5])}</b></div></div>`;
+      h += `<details class="gq"><summary>${LAT.length ? `Por que ${LAT.length} entrega${LAT.length > 1 ? 's' : ''} atrasada${LAT.length > 1 ? 's' : ''}?` : 'Como esse número é calculado?'}</summary>
+        <p>“No prazo” = tarefas com prazo entregues nos últimos 90 dias até o dia do prazo (${npz} de ${f90.length}). “Atraso médio” = quantos dias depois do prazo, só nas que atrasaram. Tarefas em aberto não entram aqui; elas aparecem em “Atrasadas”, lá em cima. Tarefa cadastrada já concluída depois do prazo (registro de algo antigo) conta como no prazo.</p>
+        ${LAT.length ? LAT.map(t => `<div class="pdl"><b>${esc(t.titulo)}</b><small>prazo ${ddmm(t.prazo)} · entregue ${ddmm(t.concluido_em)} · <span class="neg">${dias(t.prazo, ent(t))} dia${dias(t.prazo, ent(t)) > 1 ? 's' : ''} depois</span>${t.justificativa ? ' · ' + esc(t.justificativa) : ''}</small><small>Data errada? Corrija em “corrigir data”, na tarefa concluída.</small></div>`).join('') : '<p>Nenhuma entrega atrasada nos últimos 90 dias. 👏</p>'}</details>`;
       if (med.some(v => v != null)) h += `<div class="gch"><b>Metas cumpridas por mês</b><div class="gb">${ms.map((m, i) => `<div><span style="color:${cor(med[i])}">${med[i] == null ? '' : P100(med[i])}</span><div class="gbw"><i style="height:${med[i] == null ? 0 : Math.max(3, Math.round(med[i] * 100))}%;background:${cor(med[i])}"></i></div><small>${MC(m)}</small></div>`).join('')}</div><p class="gn">${MC(MA)}: ritmo até hoje.</p></div>`;
       h += `<div class="gch"><b>Tarefas entregues por mês</b><div class="gb">${tm.map((x, i) => `<div><span>${x.np + x.at || ''}</span><div class="gbw"><i style="height:${Math.round((x.np + x.at) / mx * 100)}%">${x.at ? `<u style="flex:${x.at};background:var(--neg)"></u>` : ''}${x.np ? `<u style="flex:${x.np};background:var(--pos)"></u>` : ''}</i></div><small>${MC(ms[i])}</small></div>`).join('')}</div><div class="clg"><span><em style="background:var(--pos)"></em>no prazo ou sem prazo</span><span><em style="background:var(--neg)"></em>depois do prazo</span></div></div>`;
       if (R.length) h += `<div class="gch"><b>Cada meta em ${MESES[+MA.slice(5, 7) - 1]}</b>${R.map(r => { const x = pct(r, MA, HJ), v = x.ritmo == null ? x.pct : x.ritmo; return `<div class="ghl"><span>${esc(r.titulo)}</span><i><u style="width:${Math.round((v || 0) * 100)}%;background:${cor(v)}"></u></i><b style="color:${cor(v)}">${P100(v)}</b></div>`; }).join('')}<p class="gn">Ritmo até hoje (dias já passados).</p></div>`;
@@ -330,7 +340,8 @@
         ok = T.filter(t => t.status === 'Concluída').sort((a, b) => (b.concluido_em || '').localeCompare(a.concluido_em || '')), okm = ok.filter(t => (t.concluido_em || '').startsWith(MES));
       const ant = new Date(+MES.slice(0, 4), +MES.slice(5, 7) - 2, 1), MA = ant.getFullYear() + '-' + String(ant.getMonth() + 1).padStart(2, '0');
       const rAnt = R.filter(x => (!x.inicio || x.inicio < MES + '-01'));
-      const grupos = porCat(ab), comCat = grupos.some(g => g[0]);
+      const abV = TMAIS ? ab : ab.slice(0, TMAX), grupos = porCat(abV), comCat = porCat(ab).some(g => g[0]);
+      const tMais = ab.length > TMAX ? `<button class="vmb" type="button" data-tmais>${TMAIS ? 'Mostrar menos' : 'Mostrar mais (' + (ab.length - TMAX) + ')'}</button>` : '';
       document.title = P.nome + ' · ' + titulo;
       app.innerHTML = `<h1>${esc(P.nome)}</h1><p class="fn">${esc(P.funcao || '')}</p>
     ${hojeBox(HJ)}
@@ -340,8 +351,8 @@
     ${rAnt.length ? `<details><summary>Resultado de ${MESES[ant.getMonth()]}</summary><div class="list" data-max="0">${rAnt.map(x => cardRot(x, HJ, MA)).join('')}</div></details>` : ''}
     <div class="res"><div>A fazer<b>${ab.length}</b></div><div>Atrasadas<b style="${ab.some(t => t.prazo && t.prazo < HJ) ? 'color:var(--neg)' : ''}">${ab.filter(t => t.prazo && t.prazo < HJ).length}</b></div><div>Feitas no mês<b style="color:var(--pos)">${okm.length}</b></div></div>
     <h3>Tarefas em aberto</h3>${!ab.length ? '<div class="empty">Nada pendente. 👏</div>' : comCat
-          ? grupos.map(([c, l]) => `<details class="cat" open><summary>${esc(c || 'Outras')} <small>${l.length}</small></summary><div class="list">${l.map(t => card(t, HJ)).join('')}</div></details>`).join('')
-          : `<div class="list">${ab.map(t => card(t, HJ)).join('')}</div>`}
+          ? `<div data-semvm>${grupos.map(([c, l]) => `<details class="cat" open><summary>${esc(c || 'Outras')} <small>${TMAIS ? l.length : ab.filter(t => (t.categoria || '') === (c || '')).length}</small></summary><div class="list">${l.map(t => card(t, HJ)).join('')}</div></details>`).join('')}${tMais}</div>`
+          : `<div data-semvm><div class="list">${abV.map(t => card(t, HJ)).join('')}</div>${tMais}</div>`}
     <h3>Calendário</h3><div id="lbcal">${calendario(HJ)}</div>
     <h3>Meu rendimento</h3>${graficos(HJ)}
     ${ok.length ? `<details${ok.length <= 3 ? ' open' : ''}><summary>Concluídas (${ok.length})</summary><div class="list">${ok.slice(0, 30).map(t => card(t, HJ)).join('')}</div></details>` : ''}`;
@@ -378,7 +389,8 @@
         d.disabled = true; d.textContent = 'apagando…';
         try { aplica(await chamar({ acao: 'excluir_minha', tipo: d.dataset.dt, id: d.dataset.del })); } catch (err) { d.disabled = false; d.textContent = 'não apagou, tente de novo'; } }
     });
-    const aplica = x => { guarda(x); ST.P = x.perfil; ST.T = x.tarefas || []; ST.R = x.rotinas || []; render(); };
+    const aplica = x => { guarda(x); ST.P = x.perfil; ST.T = x.tarefas || []; ST.R = x.rotinas || []; if (x.shows) ST.S = x.shows; render(); };
+    app.addEventListener('click', e => { if (!e.target.closest('[data-tmais]')) return; TMAIS = !TMAIS; render(); if (!TMAIS) { const h = [...app.querySelectorAll('h3')].find(x => /Tarefas em aberto/.test(x.textContent)); if (h) h.scrollIntoView({ block: 'start' }); } });
     // alerta: leva até o cartão da meta e abre o formulário de marcar
     app.addEventListener('click', e => { const b = e.target.closest('[data-alr]'); if (!b) return; const c = document.getElementById('rt-' + b.dataset.alr); if (!c) return;
       const k = c.querySelector('.rk[data-novo]') || c.querySelector('[data-rf]'); c.scrollIntoView({ block: 'center', behavior: 'smooth' }); if (k) k.click(); });
