@@ -82,6 +82,9 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 .mig{background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:12px}.mih{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);margin-bottom:10px}.mih small{text-transform:none;letter-spacing:0;color:var(--muted)}
 .mip{padding:8px 0;border-top:1px solid var(--line)}.mip:first-of-type{border-top:0}.mipn{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:6px}.mipn span{font-size:12.5px;font-weight:700}
 .mib{display:grid;grid-template-columns:minmax(80px,36%) minmax(40px,1fr) auto;gap:8px;align-items:center;font-size:12.5px;padding:3px 0}.mib span{color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mib .tr{height:10px;border-radius:99px;background:var(--card2,#2a2730);overflow:hidden}.mib .tr i{display:block;height:100%;border-radius:99px}.mib b{text-align:right;font-size:12px;white-space:nowrap}
+#bvv .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}#bvv .chip{border:1px solid var(--line);background:transparent;border-radius:99px;padding:6px 12px;font:inherit;font-size:12.5px;color:var(--sub);cursor:pointer}#bvv .chip.on{background:var(--card2);color:var(--ink);border-color:var(--sub)}
+#bvv .hist{display:flex;flex-direction:column;gap:6px}#bvv .hist .r{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:12px;padding:10px 14px}#bvv .hist .r .t{flex:1;min-width:0}#bvv .hist .r .t b{display:block;font-size:14px;overflow-wrap:anywhere}#bvv .hist .r .t span{font-size:12px;color:var(--muted);overflow-wrap:anywhere}#bvv .hist .r .v{text-align:right;white-space:nowrap;font-weight:700}#bvv .hist .r .v small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
+#bvv .pv{background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:8px}#bvv .pv .hd{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}#bvv .pv .hd b{font-size:16px;display:block}#bvv .pv .hd span{font-size:12px;color:var(--muted)}#bvv .pv .cm{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:13px;color:var(--sub)}
 </style>
 </head>
 <body>
@@ -122,9 +125,16 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 
   <div class="blk" id="bvv" style="display:none">
   <p class="eyebrow">Vendas</p>
+  <h3>Shows vendidos <small>mesmos números da página de Vendas · só shows confirmados</small></h3>
+  <div id="vana"></div>
   <h3>Vendido por mês <small>pela data da venda (quando o show foi fechado)</small></h3>
   <div class="chart" id="vvg"></div>
   <div id="vvm"></div>
+  <h3>Shows marcados e histórico</h3>
+  <div class="chips" id="vhf"><button class="chip on" data-h="fut">Marcados</button><button class="chip" data-h="pas">Histórico</button></div>
+  <div class="list hist" id="vhl"></div>
+  <h3>Perfil dos vendedores <small id="pvano"></small></h3>
+  <div class="list" id="rvend"></div>
   </div>
 
   <div class="blk" id="b25" style="display:none">
@@ -155,8 +165,9 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <footer>Lucas Barros Ltda · números do extrato bancário, do caixa em dinheiro e das planilhas de cada show (borderôs)</footer>
 </main>
 </div>
-<script src="../lb.js?v=mwhf6d4g"></script>
-<script src="../lbchat.js?v=mwhf6d4g"></script>
+<script src="../lb.js?v=mwhg6z5e"></script>
+<script src="../lbchat.js?v=mwhg6z5e"></script>
+<script src="../lbvendas.js?v=mwhg6z5e"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -186,21 +197,7 @@ function render(){
   const hoje=D.atualizado,mk=D.mes,A=D.agora,P=D.proximos,G=D.geral;
   document.getElementById('alertas').innerHTML=(D.alertas||[]).map(x=>`<div class="alerta"><b class="t">${x.tipo==='despesa'?'💸 Despesa prevista: ':'⚠️ '}${esc(x.titulo)}</b><p>${esc(x.texto)}</p>
     <div class="vv">${x.valor!=null?`<div>${x.situacao==='Confirmado'?'Valor':'Valor provável'}<b>${brl(x.valor)}</b></div>`:''}${x.minimo!=null&&x.maximo!=null?`<div>Pode variar de<b>${brl(x.minimo)} a ${brl(x.maximo)}</b></div>`:''}${x.prazo?`<div>Quando<b>${esc(x.prazo)}</b></div>`:''}</div><p style="font-size:12px;color:var(--muted)">${esc(x.rodape||'')}</p></div>`).join('');
-  {const V=D.vendas_venda;if(V&&(V.itens.length||V.sem)){document.getElementById('bvv').style.display='';
-    const MA=new Date(Date.now()-3*3600e3).toISOString().slice(0,7),ult=[];for(let i=11;i>=0;i--){const d=new Date(+MA.slice(0,4),+MA.slice(5,7)-1-i,1);ult.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
-    const I=V.itens,tot=n=>I.filter(x=>x.vendedor===n).reduce((a,x)=>a+x.valor,0),nomes=[...new Set(I.map(x=>x.vendedor))].sort((a,b)=>tot(b)-tot(a));
-    const COR=['#F0507E','#6FA8FF','#7FDDA9','#FFBE5A','#B48CFF','#8B8697'],cor=n=>COR[Math.min(nomes.indexOf(n),COR.length-1)];
-    const pm={};I.forEach(x=>{const k=x.dv.slice(0,7),q=((pm[k]=pm[k]||{})[x.vendedor]=pm[k][x.vendedor]||{n:0,v:0});q.n++;q.v+=x.valor});
-    const W=360,H=110,cw=W/12,mx=Math.max(1,...ult.map(k=>Object.values(pm[k]||{}).reduce((a,x)=>a+x.v,0)));
-    let g=`<svg viewBox="0 0 ${W} ${H+16}">`;ult.forEach((k,i)=>{let y=H;const bx=i*cw+cw*.18,bw=cw*.64;nomes.forEach(n=>{const v=((pm[k]||{})[n]||{}).v||0;if(!v)return;const h=H*v/mx;y-=h;g+=`<rect x="${bx}" y="${y}" width="${bw}" height="${h}" fill="${cor(n)}" rx="2"><title>${esc(n)} · ${brl(v)}</title></rect>`});
-      g+=`<text x="${bx+bw/2}" y="${H+12}" text-anchor="middle" font-size="9" fill="${k===MA?'#F0507E':'#8B8697'}">${MES3[+k.slice(5,7)-1]}</text>`});
-    g+=`</svg><div class="leg" style="padding:6px 6px 0">${nomes.map(n=>`<span><i style="background:${cor(n)}"></i>${esc(n)}</span>`).join('')}</div>`;
-    const ms=Object.keys(pm).sort().reverse();
-    g+=ms.map(k=>{const e=Object.entries(pm[k]).sort((a,b)=>b[1].v-a[1].v);return `<div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:6px;border-top:1px solid var(--line);color:var(--sub)"><span>${MES3[+k.slice(5,7)-1]}/${k.slice(2,4)} · ${e.map(([n,x],j)=>`${j?'':'🏆 '}<b style="color:${j?'var(--sub)':'var(--ink)'}">${esc(n)}</b> ${x.n} show${x.n>1?'s':''}`).join(' · ')}</span><b style="color:var(--ink)">${brl(e.reduce((a,[,x])=>a+x.v,0))}</b></div>`}).join('');
-    if(V.sem)g+=`<p class="note" style="padding:6px">${V.sem} show${V.sem>1?'s':''} cadastrado${V.sem>1?'s':''} antes deste campo ainda sem data da venda (não entra${V.sem>1?'m':''} no gráfico).</p>`;
-    document.getElementById('vvg').innerHTML=g;
-    const am=I.filter(x=>x.dv.startsWith(MA)).sort((a,b)=>a.dv.localeCompare(b.dv));
-    document.getElementById('vvm').innerHTML=`<h3>Vendidos em ${MESES[+MA.slice(5,7)-1]}</h3>`+(am.length?`<div class="list">${am.map(x=>`<div class="card" style="display:flex;justify-content:space-between;gap:10px;padding:10px 14px"><span><b style="display:block">${esc(x.cidade)}</b><span style="font-size:12px;color:var(--muted)">vendido ${x.dv.slice(8,10)}/${x.dv.slice(5,7)} por ${esc(x.vendedor)} · show ${dtx(x.d)}</span></span><b style="white-space:nowrap">${brl(x.valor)}</b></div>`).join('')}</div>`:'<p class="note">Nenhum show vendido neste mês ainda.</p>')}}
+  try{renderVendas()}catch(e){console.error(e)}
   {const M=D.metas_empresa||[],E=D.equipe_resumo;if(M.length||(E&&E.pessoas.length)){document.getElementById('b25').style.display='';
     document.getElementById('metas').innerHTML=M.map(m=>`<div class="mt ${['Atingida','Concluída'].includes(m.situacao)?'ok':m.situacao==='Em andamento'?'and':''}"><b>${esc(m.titulo)}</b>${m.alvo?`<div class="s">${esc(m.alvo)}</div>`:''}<div class="p">${esc(m.situacao.toLowerCase())}${m.prazo?' · até '+esc(m.prazo):''}${m.progresso?' · '+esc(m.progresso):''}</div>${m.pct!=null?`<div style="height:7px;border-radius:99px;background:var(--card2,#2a2730);overflow:hidden;margin-top:8px"><i style="display:block;height:100%;width:${Math.round(m.pct*100)}%;background:${m.pct>=1?'var(--pos)':'var(--pink)'}"></i></div><div class="p" style="margin-top:4px"><b>${Math.round(m.pct*100)}%</b>${m.ptxt?' · '+esc(m.ptxt):''}</div>`:''}</div>`).join('')||'<div class="oc"><div class="t"><span>Nenhuma meta publicada.</span></div></div>';
     if(E){document.getElementById('eqmes').textContent=MESES[+E.mes.slice(5,7)-1]+' '+E.mes.slice(0,4);
@@ -271,6 +268,45 @@ function chart(){
     document.getElementById('tip').innerHTML=`<b style="color:var(--ink);text-transform:capitalize">${MESES[+k.slice(5,7)-1]}</b> · ${m.shows} show${m.shows>1?'s':''} · cachês <b>${brl(m.fat)}</b> · lucro <b class="${m.lucro<0?'neg':'pos'}">${brl(m.lucro)}</b>`};r.addEventListener('mouseenter',f);r.addEventListener('click',f)});
 }
 addEventListener('resize',()=>{if(D){clearTimeout(window._r);window._r=setTimeout(chart,200)}});
+
+/* ---------- Vendas: o mesmo da aba Vendas do painel (só shows confirmados) ---------- */
+let VALIAS={};
+const nmV=s=>s.vendedor?(VALIAS[LB.norm(s.vendedor)]||s.vendedor):'Sem vendedor';
+function renderVendas(){const V=D.vendas;if(!V||!V.shows||!V.shows.length)return;document.getElementById('bvv').style.display='';
+  const HJ=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),MA=HJ.slice(0,7),ANO=HJ.slice(0,4);
+  (V.vendedores||[]).forEach(v=>[v.nome,...(v.apelidos||[])].forEach(a=>VALIAS[LB.norm(a)]=v.nome));
+  if(window.LBV)LBV.analise(document.getElementById('vana'),V.shows,{hoje:HJ,conf:V,aliases:VALIAS});
+  const S=V.shows.filter(s=>s.status!=='Cancelado');
+  // vendido por mês pela data da venda
+  const ult=[];for(let i=11;i>=0;i--){const d=new Date(+MA.slice(0,4),+MA.slice(5,7)-1-i,1);ult.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
+  const cv=S.filter(s=>/^\d{4}-\d{2}-\d{2}$/.test(s.data_venda||'')),sem=S.length-cv.length,tv=n=>cv.filter(s=>nmV(s)===n).reduce((a,s)=>a+(+s.valor||0),0);
+  const nomes=[...new Set(cv.map(nmV))].sort((a,b)=>tv(b)-tv(a));
+  const COR=['#F0507E','#6FA8FF','#7FDDA9','#FFBE5A','#B48CFF','#8B8697'],cor=n=>COR[Math.min(nomes.indexOf(n),COR.length-1)];
+  const pm={};cv.forEach(s=>{const k=s.data_venda.slice(0,7),n=nmV(s),x=(pm[k]=pm[k]||{});x[n]=x[n]||{n:0,v:0};x[n].n++;x[n].v+=(+s.valor||0)});
+  const W=360,H=110,cw=W/12,mx=Math.max(1,...ult.map(k=>Object.values(pm[k]||{}).reduce((a,x)=>a+x.v,0)));
+  let g=`<svg viewBox="0 0 ${W} ${H+16}" style="display:block;width:100%;max-width:560px;height:auto">`;
+  ult.forEach((k,i)=>{let y=H;const bx=i*cw+cw*.18,bw=cw*.64;nomes.forEach(n=>{const v=((pm[k]||{})[n]||{}).v||0;if(!v)return;const h=H*v/mx;y-=h;g+=`<rect x="${bx}" y="${y}" width="${bw}" height="${h}" fill="${cor(n)}" rx="2"><title>${esc(n)} · ${brl(v)}</title></rect>`});
+    g+=`<text x="${bx+bw/2}" y="${H+12}" text-anchor="middle" font-size="9" fill="${k===MA?'#F0507E':'#8B8697'}">${MES3[+k.slice(5,7)-1]}</text>`});
+  g+=`</svg><div class="leg" style="padding:6px 6px 0">${nomes.map(n=>`<span><i style="background:${cor(n)}"></i>${esc(n)}</span>`).join('')}</div>`;
+  g+=Object.keys(pm).sort().reverse().map(k=>{const e=Object.entries(pm[k]).sort((a,b)=>b[1].v-a[1].v);return `<div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:6px;border-top:1px solid var(--line);color:var(--sub)"><span>${MES3[+k.slice(5,7)-1]}/${k.slice(2,4)} · ${e.map(([n,x],j)=>`${j?'':'🏆 '}<b style="color:${j?'var(--sub)':'var(--ink)'}">${esc(n)}</b> ${x.n} show${x.n>1?'s':''}`).join(' · ')}</span><b style="color:var(--ink)">${brl(e.reduce((a,[,x])=>a+x.v,0))}</b></div>`}).join('');
+  if(sem)g+=`<p class="note" style="padding:6px">${sem} show${sem>1?'s':''} cadastrado${sem>1?'s':''} antes do campo “data da venda” não entra${sem>1?'m':''} no gráfico.</p>`;
+  document.getElementById('vvg').innerHTML=g;
+  const am=cv.filter(s=>s.data_venda.startsWith(MA)).sort((a,b)=>a.data_venda.localeCompare(b.data_venda));
+  document.getElementById('vvm').innerHTML=`<h3>Vendidos em ${MESES[+MA.slice(5,7)-1]}</h3>`+(am.length?`<div class="hist" style="display:flex;flex-direction:column;gap:6px">${am.map(s=>`<div class="r"><div class="t"><b>${esc(s.evento||'Show')} · ${esc(s.cidade||'')}</b><span>vendido ${ddmm(s.data_venda)} por ${esc(nmV(s))} · show ${dtx(s.data)}</span></div><div class="v">${s.valor?brl(s.valor):'—'}</div></div>`).join('')}</div>`:`<p class="note">Nenhum show vendido ainda neste mês.</p>`);
+  // marcados e histórico
+  const hist=f=>{const l=f==='fut'?S.filter(s=>s.data>=HJ).sort((a,b)=>a.data.localeCompare(b.data)):S.filter(s=>s.data<HJ).sort((a,b)=>b.data.localeCompare(a.data));
+    document.getElementById('vhl').innerHTML=l.map(s=>{const v=+s.valor||0,rec=+s.recebido||0;
+      return `<div class="r"><div style="flex:none;width:44px;text-align:center;line-height:1.1"><b style="display:block;font-size:18px">${s.data.slice(8,10)}</b><span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">${MES3[+s.data.slice(5,7)-1]} ${s.data.slice(2,4)}</span></div>
+      <div class="t"><b>${esc(s.evento||s.tipo)}</b><span>${esc(s.cidade)}${s.contratante?' · '+esc(s.contratante):''}${s.vendedor?' · vendido por '+esc(nmV(s)):''}</span></div>
+      <div class="v">${v?brl(v):'<span class="mut">a definir</span>'}<small>${f==='fut'?(rec?'recebido '+brl(rec):'nada recebido'):(s.lucro!=null?'lucro '+brl(s.lucro):'')}</small></div></div>`}).join('')||'<p class="note">Nada aqui.</p>'};
+  hist('fut');
+  document.getElementById('vhf').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;document.querySelectorAll('#vhf .chip').forEach(c=>c.classList.toggle('on',c===b));hist(b.dataset.h)};
+  // perfil dos vendedores no ano
+  document.getElementById('pvano').textContent='desde jan/'+ANO.slice(2);
+  const vs=S.filter(s=>s.data>=ANO+'-01-01'),pvs={};vs.forEach(s=>{const q=nmV(s),x=pvs[q]=pvs[q]||{n:0,v:0,fut:0,cid:new Set()};x.n++;x.v+=(+s.valor||0);if(s.data>=HJ)x.fut++;x.cid.add(s.cidade)});
+  const com=V.comissao;
+  document.getElementById('rvend').innerHTML=Object.entries(pvs).sort((a,b)=>b[1].v-a[1].v).map(([n,x],i)=>`<div class="pv"><div class="hd"><div><b>${i+1}º · ${esc(n)}</b><span>${x.n} shows · ${x.fut} marcados · ${x.cid.size} cidades</span></div><div style="text-align:right;font-weight:800;white-space:nowrap">${brl(x.v)}<span style="display:block;font-weight:400">ticket médio ${brl(x.v/x.n)}</span></div></div>${n!=='Sem vendedor'?`<div class="cm">Comissão: ${com!=null?'<b class="pos">'+brl(x.v*com/100)+'</b> ('+com+'% padrão)':'<b class="pk">% a definir</b>'}</div>`:''}</div>`).join('')||'<p class="note">Sem vendas no ano.</p>';
+}
 </script>
 </body>
 </html>

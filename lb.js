@@ -17,7 +17,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwhf6d4g';
+  const BUILD = 'mwhg6z5e';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -254,9 +254,10 @@
     /* tudo o que já saiu/entrou de um pagamento: cada parte, ou o valor cheio quando foi pago de uma vez. id = pg-<id>-<ref>[-p<i>] */
     movs(g) {
       let pago = {}; try { pago = JSON.parse(g.pagos || '{}') || {}; } catch (e) { }
+      let mi = {}; try { mi = JSON.parse(g.meios || '{}') || {}; } catch (e) { } // conta | dinheiro, escolhido ao marcar pago
       const pc = pgx.parc(g), out = [];
-      Object.entries(pc).forEach(([ref, l]) => l.forEach((x, i) => out.push({ id: 'pg-' + g.id + '-' + ref + '-p' + i, ref, i, data: x.data, valor: +x.valor || 0, obs: x.obs || '', parte: true })));
-      Object.entries(pago).forEach(([ref, q]) => { if (q && !(pc[ref] || []).length) out.push({ id: 'pg-' + g.id + '-' + ref, ref, data: q, valor: +g.valor || 0 }); });
+      Object.entries(pc).forEach(([ref, l]) => l.forEach((x, i) => out.push({ id: 'pg-' + g.id + '-' + ref + '-p' + i, ref, i, data: x.data, valor: +x.valor || 0, obs: x.obs || '', parte: true, meio: x.meio || '' })));
+      Object.entries(pago).forEach(([ref, q]) => { if (q && !(pc[ref] || []).length) out.push({ id: 'pg-' + g.id + '-' + ref, ref, data: q, valor: +g.valor || 0, meio: mi[ref] || '' }); });
       return out;
     },
     prox(g, hoje) { // próxima data depois de hoje

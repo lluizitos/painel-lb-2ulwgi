@@ -196,6 +196,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 .avh{display:flex;justify-content:space-between;gap:8px 12px;align-items:center;flex-wrap:wrap}.avt{background:none;border:1px solid var(--line);border-radius:99px;padding:3px 10px;font-size:12px;color:var(--sub);flex:none}
 .avl{display:flex;flex-direction:column;gap:5px;margin-top:8px}.av{display:block;font-size:13px;color:var(--sub);text-decoration:none;padding:6px 10px;background:var(--card2);border-radius:8px}.av b{color:var(--ink)}.av.pk{border-left:3px solid var(--pinkl)}.avd{padding:9px 12px}.avd.al{border-left:3px solid var(--amber)}.avt1{font-size:14px}.avt2{font-size:13px;color:var(--sub);margin-top:3px;line-height:1.45}.avt3{font-size:12px;color:var(--amber);margin-top:4px}.avt4{color:var(--muted);font-size:12.5px}
 .dnt{display:flex;align-items:center;gap:16px;margin-top:8px}.dnt svg{flex:none;transform:rotate(0)}.dnt .etp{flex:1;margin:0;min-width:0}
+.mc{display:inline-flex;gap:6px;flex-wrap:wrap;align-items:center}.mc b{font-weight:600;border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--card)}.mc b.on{border-color:var(--pos);color:var(--pos)}button.pt.ad{color:var(--muted);border-style:dashed}.sdiv{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font-size:13px;color:var(--sub)}.sdiv b{color:var(--ink)}
 .cmb{flex:none;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--muted);font-size:15px;cursor:pointer;padding:0}
 .row.cmin{padding:8px 14px;opacity:.75}.row.cmin .t b{font-size:13px;font-weight:500}
 .cat summary{list-style:none;display:flex;gap:8px;align-items:center;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);margin:12px 2px 8px}.cat summary::-webkit-details-marker{display:none}.cat summary small{color:var(--muted);letter-spacing:0;font-weight:500}.cat summary::after{content:'▾';color:var(--muted);margin-left:auto}.cat:not([open]) summary::after{content:'▸'}
@@ -231,7 +232,6 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <p class="eyebrow">Balanço</p>
   <h1>O <em>mês</em></h1>
   <div id="saldoat"></div>
-  <div id="fent"></div>
   <div class="info" id="infobase"></div>
   <div class="mesbar">
     <button class="ib" id="prev" aria-label="Mês anterior">‹</button>
@@ -329,10 +329,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwhf6d4g"></script>
-<script src="lbmetas.js?v=mwhf6d4g"></script>
-<script src="lbchat.js?v=mwhf6d4g"></script>
-<script src="lbvendas.js?v=mwhf6d4g"></script>
+<script src="lb.js?v=mwhg6z5e"></script>
+<script src="lbmetas.js?v=mwhg6z5e"></script>
+<script src="lbchat.js?v=mwhg6z5e"></script>
+<script src="lbvendas.js?v=mwhg6z5e"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -427,38 +427,59 @@ function renderPagar(){const tp=document.getElementById('tpag');if(tp&&D.avisos)
     const k=t.pessoa||LB.norm(t.para);const x=P[k]=P[k]||{k,nome:t.para,pix:t.pix,tot:0,it:[]};x.tot+=+t.valor;if(!x.pix)x.pix=t.pix;
     x.it.push({b,e:{funcao:'item: '+(t.desc||'')},item:j,f:+t.valor,ps:[{k:'item',n:t.desc||'item',v:+t.valor}]})}));
   // pagamentos avulsos e fixos (página Admin): entram na data, até marcar pago
-  PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada').forEach(g=>LB.pgx.ocorr(g,HJ).filter(o=>!o.pago).forEach(o=>{const k=g.pessoa||LB.norm(g.nome);const x=P[k]=P[k]||{k,nome:g.nome,pix:g.pix,tot:0,it:[]};x.tot+=o.falta;if(!x.pix)x.pix=g.pix;
-    x.it.push({b:{id:'pg-'+g.id,data:o.data,show:g.descricao||(g.tipo==='fixo'?'fixo mensal':'pagamento avulso')},e:{funcao:g.tipo==='fixo'?'fixo de '+MES3P[+o.ref.slice(5,7)-1]:'avulso'},g,o,f:o.falta,ps:[{k:'pg',n:(g.meio==='Pix'?'pagamento':g.meio.toLowerCase())+(o.pg?' · falta (já pago '+brl(o.pg)+')':''),v:o.falta}]})}));
+  const FM=HJ.slice(0,8)+String(new Date(+HJ.slice(0,4),+HJ.slice(5,7),0).getDate()).padStart(2,'0');let NAD=0; // até o fim do mês
+  PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada').forEach(g=>LB.pgx.ocorr(g,FM).filter(o=>!o.pago&&o.falta>0.004&&(!pAdiado(g,o.ref)||(NAD++,false))).forEach(o=>{const k=g.pessoa||LB.norm(g.nome);const x=P[k]=P[k]||{k,nome:g.nome,pix:g.pix,tot:0,it:[]};x.tot+=o.falta;if(!x.pix)x.pix=g.pix;
+    x.it.push({b:{id:'pg-'+g.id,data:o.data,show:g.descricao||(g.tipo==='fixo'?'fixo mensal':'pagamento avulso')},e:{funcao:g.tipo==='fixo'?'fixo de '+MES3P[+o.ref.slice(5,7)-1]:'avulso'},g,o,fut:o.data>HJ,f:o.falta,ps:[{k:'pg',n:(g.meio==='Pix'?'pagamento':g.meio.toLowerCase())+(o.pg?' · falta (já pago '+brl(o.pg)+')':''),v:o.falta}]})}));
   const l=Object.values(P).sort((a,b)=>b.tot-a.tot),tot=l.reduce((a,x)=>a+x.tot,0),nsh=new Set(l.flatMap(x=>x.it.filter(i=>!i.g).map(i=>i.b.id))).size;
+  const vtot=l.reduce((a,x)=>a+x.it.filter(i=>!i.fut).reduce((b,i)=>b+i.f,0),0);
   PAGP=P;const pode=!!API_URL;PEND={tot,n:l.length};try{renderInfo()}catch(e){}
-  document.getElementById('pgk').innerHTML=k4('Falta pagar',brl(tot),'shows que já aconteceram e avulsos','pk')+k4('Pessoas',l.length,'com pagamento pendente')+k4('Shows',nsh,'com alguém a pagar');
-  document.getElementById('pgl').innerHTML=l.length?l.map(x=>`<div class="pg2"><div class="hd"><div><b>${esc(x.nome)}</b><span>${x.it.length} pagamento${x.it.length>1?'s':''}${new Set(x.it.map(i=>i.b.id)).size>1?' · '+new Set(x.it.map(i=>i.b.id)).size+' shows somados':''}</span></div><div class="tt">${brl(x.tot)}</div></div>
-    ${x.it.map(i=>`<div class="ln"><span>${ddmm(i.b.data)} · ${esc(i.b.show)} · ${esc(i.e.funcao)}${i.e.status==='Parcial'?' · <b class="am2">parte já paga</b>':''}${i.g&&i.g.meio!=='Pix'?' · '+esc(i.g.meio)+(i.g.dados?': '+esc(i.g.dados):''):''}</span><b>${brl(i.f)}</b></div>
-      <div class="pts">${i.ps.map(p=>pode&&i.g?`<button class="pt" data-pga="${esc(i.g.id+'|'+i.o.ref)}" title="Marcar como pago">${p.n} ${brl(p.v)} <i>✓ pago</i></button>`:pode?`<button class="pt" data-pgk="${esc(i.b.id)}|${i.item!=null?'it'+i.item:i.i}|${p.k}" title="Marcar só esta parte como paga">${p.n} ${brl(p.v)} <i>✓ pago</i></button>`:`<span class="pt">${p.n} ${brl(p.v)}</span>`).join('')}</div>`).join('')}
-    <div class="px">${pxBtn(x.pix)}<button class="cp" data-cp="${esc(x.nome+' — '+brl(x.tot)+(x.pix?' — PIX '+x.pix:''))}">copiar resumo</button>${pode?`<button class="cp pgall" data-pgp="${esc(x.k)}">marcar tudo pago</button>`:''}</div></div>`).join('')
-    :'<div class="empty">Nenhum pagamento pendente. Show só entra aqui depois que acontece; pagamentos avulsos e fixos (página Admin) entram na data.</div>';
+  document.getElementById('pgk').innerHTML=k4('Falta pagar',brl(tot),(vtot<tot-0.5?brl(vtot)+' já venceu · o resto vence até '+ddmm(FM):'shows que já aconteceram e contas vencidas')+(NAD?' · '+NAD+' adiada'+(NAD>1?'s':''):''),'pk')+k4('Pessoas',l.length,'com pagamento pendente')+k4('Shows',nsh,'com alguém a pagar');
+  document.getElementById('pgl').innerHTML=l.length?l.map(x=>`<div class="pg2"><div class="hd"><div><b>${esc(x.nome)}</b><span>${x.it.length} pagamento${x.it.length>1?'s':''}${new Set(x.it.filter(i=>!i.g).map(i=>i.b.id)).size>1?' · '+new Set(x.it.filter(i=>!i.g).map(i=>i.b.id)).size+' shows somados':''}</span></div><div class="tt">${brl(x.tot)}</div></div>
+    ${x.it.map(i=>`<div class="ln"><span>${i.fut?'<b class="am2">vence '+ddmm(i.b.data)+'</b>':ddmm(i.b.data)} · ${esc(i.b.show)} · ${esc(i.e.funcao)}${i.e.status==='Parcial'?' · <b class="am2">parte já paga</b>':''}${i.g&&i.g.meio!=='Pix'?' · '+esc(i.g.meio)+(i.g.dados?': '+esc(i.g.dados):''):''}</span><b>${brl(i.f)}</b></div>
+      <div class="pts">${i.ps.map(p=>pode&&i.g?`<button class="pt" data-pga="${esc(i.g.id+'|'+i.o.ref)}" title="Marcar como pago">${p.n} ${brl(p.v)} <i>✓ pago</i></button><button class="pt ad" data-pgad="${esc(i.g.id+'|'+i.o.ref)}" title="Tira do assistente (a conta continua na lista, em Adiadas)">adiar</button>`:pode?`<button class="pt" data-pgk="${esc(i.b.id)}|${i.item!=null?'it'+i.item:i.i}|${p.k}" title="Marcar só esta parte como paga">${p.n} ${brl(p.v)} <i>✓ pago</i></button>`:`<span class="pt">${p.n} ${brl(p.v)}</span>`).join('')}</div>`).join('')}
+    <div class="px">${pxBtn(x.pix)}<button class="cp" data-cp="${esc(x.nome+' — '+brl(x.tot)+(x.pix?' — PIX '+x.pix:''))}">copiar resumo</button>${pode?`<button class="cp pgall" data-pgp="${esc(x.k)}">marcar tudo pago${x.it.some(i=>i.fut)?' (só o vencido)':''}</button>`:''}</div></div>`).join('')
+    :'<div class="empty">Nenhum pagamento pendente. Show só entra aqui depois que acontece; contas e fixos do mês (página Admin) entram todos, menos os adiados.</div>';
 }
 let PAGP={},API_URL='',PAGS=[],PAGS_OK=false;
+const jso=t=>{try{return JSON.parse(t||'{}')||{}}catch(e){return {}}};
+const pAdiado=(g,ref)=>!!jso(g.adiados)[ref];
+const cAdiada=c=>{if(!c.pg)return false;if(!PAGS_OK)return !!c.adiado;const[id,ref]=c.pg.split('|'),g=PAGS.find(x=>x.id===id);return g?pAdiado(g,ref):!!c.adiado};
+async function adiar(pgk,sim,btn){const[id,ref]=pgk.split('|');if(!API_URL)return;if(btn){btn.disabled=true;btn.textContent='…'}
+  try{const r=await (await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'adiar_pagamento',id,ref,adiar:sim,usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
+    if(!r.ok)throw new Error(r.erro||'erro');PAGS=r.pagamentos;PAGS_OK=true;const y=scrollY;renderPagar();renderMes();scrollTo(0,y)}catch(e){if(btn){btn.disabled=false;btn.textContent='erro'}}}
+async function migraMin(){ // minimizadas antigas (só neste aparelho) viram adiadas na API, uma vez
+  const CM=jso(LB.store.get('lb_contas_min'));const ks=Object.keys(CM);if(!ks.length||!PAGS_OK||!API_URL)return;LB.store.set('lb_contas_min','{}');
+  for(const k of ks){const c=D.contas.find(y=>y.venc+'|'+y.desc===k);if(c&&c.pg&&!cAdiada(c))try{await adiar(c.pg,true)}catch(e){}}}
+const MEIO_TXT={conta:'conta / PIX',dinheiro:'dinheiro'};
+function pedeMeio(btn,padrao,run){ // 1º toque: escolher como foi pago (conta ou dinheiro) = confirmação
+  if(btn.dataset.ok==='1')return false;btn.dataset.ok='1';const o=btn.innerHTML;btn._run=run;
+  btn.innerHTML=`<span class="mc">pago em: ${['conta','dinheiro'].map(m=>`<b data-mc="${m}"${m===padrao?' class="on"':''}>${MEIO_TXT[m]}</b>`).join('')}</span>`;btn.classList.add('cf');
+  setTimeout(()=>{if(btn.isConnected&&!btn.disabled){btn.dataset.ok='';btn.innerHTML=o;btn.classList.remove('cf')}},8000);return true}
 const cParc=c=>{if(!PAGS_OK||!c.pg)return 0;const[id,ref]=c.pg.split('|'),g=PAGS.find(x=>x.id===id);if(!g)return 0;return (LB.pgx.parc(g)[ref]||[]).filter(x=>x.data>D.ext_ate).reduce((a,x)=>a+(+x.valor||0),0)};
-const cPago=c=>{if(c.pago)return true;if(!PAGS_OK||!c.pg)return false;const[id,ref]=c.pg.split('|'),g=PAGS.find(x=>x.id===id);if(!g)return false;try{return !!(JSON.parse(g.pagos||'{}')||{})[ref]}catch(e){return false}}; // conta do Admin marcada paga some da listaconst MES3P=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-async function marcarPago(marcas,btn,gms=[]){ // grava na planilha e atualiza a tela
-  if(btn){if(btn.dataset.ok!=='1'){btn.dataset.ok='1';const o=btn.innerHTML;btn.innerHTML='toque de novo p/ confirmar';btn.classList.add('cf');setTimeout(()=>{if(btn.isConnected){btn.dataset.ok='';btn.innerHTML=o;btn.classList.remove('cf')}},3500);return}
+const cPago=c=>{if(c.pago)return true;if(!PAGS_OK||!c.pg)return false;const[id,ref]=c.pg.split('|'),g=PAGS.find(x=>x.id===id);if(!g)return false;try{return !!(JSON.parse(g.pagos||'{}')||{})[ref]}catch(e){return false}}; // conta do Admin marcada paga some da lista
+const MES3P=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+async function marcarPago(marcas,btn,gms=[],meio){ // grava na planilha e atualiza a tela; meio = conta | dinheiro
+  if(btn){if(!meio){const g0=gms[0]&&PAGS.find(x=>x.id===gms[0].id);pedeMeio(btn,g0&&g0.meio==='Dinheiro'?'dinheiro':'conta',m=>marcarPago(marcas,btn,gms,m));return}
     btn.disabled=true;btn.innerHTML='salvando…'}
+  marcas=marcas.map(x=>Object.assign({},x,meio?{meio}:{}));
   try{if(marcas.length){const r=await (await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'marcar_pago',marcas,usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
     if(!r.ok)throw new Error(r.erro||'erro');
     Object.entries(r.borderos||{}).forEach(([k,b])=>{if(b.tipo==='despesa'||!b.equipe)return;b.equipe.forEach(e=>delete e.doc);D.borderos[k]=b})}
     const porId={},VV={};gms.forEach(g=>{(porId[g.id]=porId[g.id]||[]).push(g.ref);if(g.valor)VV[g.id]=g.valor});
-    for(const [id,ref] of Object.entries(porId)){const r=await (await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'pagar_pagamento',id,ref,data:HOJE,...(VV[id]?{valor:VV[id],quitar:true}:{}),usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
+    for(const [id,ref] of Object.entries(porId)){const r=await (await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'pagar_pagamento',id,ref,data:HOJE,...(meio?{meio}:{}),...(VV[id]?{valor:VV[id],quitar:true}:{}),usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
       if(!r.ok)throw new Error(r.erro||'erro');PAGS=r.pagamentos}
-    renderPagar();renderMes();renderTL()}
+    renderPagar();renderMes();renderTL();try{renderSaldo()}catch(e){}}
   catch(e){if(btn){btn.disabled=false;btn.innerHTML='não salvou ('+e.message+')'}}
 }
 document.addEventListener('click',e=>{
+  const mc=e.target.closest('[data-mc]');if(mc){const bt=mc.closest('button');if(bt&&bt._run){e.preventDefault();e.stopPropagation();bt._run(mc.dataset.mc)}return}
+  const ad=e.target.closest('[data-pgad]');if(ad){adiar(ad.dataset.pgad,true,ad);return}
+  if(e.target.closest('button.cf'))return; // escolhendo conta/dinheiro
   const a=e.target.closest('[data-pgk]');if(a){const[id,i,k]=a.dataset.pgk.split('|');marcarPago([i.startsWith('it')?{id,it:+i.slice(2),data:HOJE}:{id,i:+i,partes:[k],data:HOJE}],a);return}
   const g=e.target.closest('[data-pga]');if(g){const[id,ref]=g.dataset.pga.split('|'),pg=PAGS.find(x=>x.id===id);
-    if(pg&&pg.varia==='sim'){const t=prompt(`${pg.descricao||pg.nome}: valor da conta (média ${brl(+pg.valor)})`);if(t==null)return;const v=+String(t).trim().replace(/\./g,'').replace(',','.');if(!(v>0))return alert('Valor inválido');g.dataset.ok='1';marcarPago([],g,[{id,ref,valor:v}]);return}
+    if(pg&&pg.varia==='sim'){const t=prompt(`${pg.descricao||pg.nome}: valor da conta (média ${brl(+pg.valor)})`);if(t==null)return;const v=+String(t).trim().replace(/\./g,'').replace(',','.');if(!(v>0))return alert('Valor inválido');marcarPago([],g,[{id,ref,valor:v}]);return}
     marcarPago([],g,[{id,ref}]);return}
-  const b=e.target.closest('[data-pgp]');if(b){const x=PAGP[b.dataset.pgp];if(x)marcarPago(x.it.filter(i=>!i.g).map(i=>i.item!=null?{id:i.b.id,it:i.item,data:HOJE}:{id:i.b.id,i:i.i,partes:'tudo',data:HOJE}),b,x.it.filter(i=>i.g).map(i=>({id:i.g.id,ref:i.o.ref})))}});
+  const b=e.target.closest('[data-pgp]');if(b){const x=PAGP[b.dataset.pgp];if(x)marcarPago(x.it.filter(i=>!i.g&&!i.fut).map(i=>i.item!=null?{id:i.b.id,it:i.item,data:HOJE}:{id:i.b.id,i:i.i,partes:'tudo',data:HOJE}),b,x.it.filter(i=>i.g&&!i.fut).map(i=>({id:i.g.id,ref:i.o.ref})))}});
 async function metasAlerta(url){ // metas com check da própria pessoa (Luiz, Lucas): o que falta marcar hoje / nesta semana
   try{const r=await (await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'minhas_tarefas',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
     if(!r.ok||!window.LBROT)return;const PD=(r.rotinas||[]).map(x=>[x,LBROT.pend(x)]).filter(y=>y[1]);
@@ -466,7 +487,7 @@ async function metasAlerta(url){ // metas com check da própria pessoa (Luiz, Lu
 async function pagAoVivo(){ // pagamentos avulsos e fixos da página Admin
   try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;API_URL=API_URL||c.api_url;metasAlerta(c.api_url);
     const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'pagamentos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
-    if(r.ok){PAGS=r.pagamentos||[];PAGS_OK=true;renderPagar();renderMes();try{renderFalta()}catch(e){}}
+    if(r.ok){PAGS=r.pagamentos||[];PAGS_OK=true;renderPagar();renderMes();try{renderFalta()}catch(e){}try{renderSaldo()}catch(e){}migraMin()}
     const l=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'lancamentos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json(); // ajustes e lançamentos novos do Admin
     if(l.ok){LANCS=l.lancamentos||[];LANCS_OK=true;renderMes()}}catch(e){}}
 let LANCS=[],LANCS_OK=false;
@@ -604,9 +625,11 @@ function montaMeses(){
 function k4(l,v,s,c){return `<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`}
 function renderSaldo(){const el=document.getElementById('saldoat');if(!el||!D.linha||!D.linha.length)return; // estimado em destaque; extrato embaixo
   // REGRA: saldo atual = extrato + só o que entrou/saiu de verdade (lançado no app). Atrasado não pago/não recebido fica para o fim do mês.
-  const HJ=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),x=D.linha[0],l=D.linha.filter(y=>y.real&&y.data<=HJ),u=l[l.length-1]||x,est=u!==x;
+  const HJ=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),x=D.linha[0],l=D.linha.filter(y=>y.real&&y.data<=HJ),u0=l[l.length-1]||x;
+  const si=D.saldo_inicial||{conta:0,maos:0},dep=movsTodos().filter(m=>m.data>D.ext_ate&&m.data<=HJ),sm=f=>dep.filter(f).reduce((a,m)=>a+(+m.valor||0),0);
+  const sc=si.conta+sm(m=>m.meio!=='dinheiro'),sd=si.maos+sm(m=>m.meio==='dinheiro'),u={saldo:Math.round((sc+sd)*100)/100},est=dep.length>0;
   const atr=D.linha.filter(y=>!y.real&&/\((atrasad[oa]|a pagar)\)$/.test(y.txt||'')),ap=atr.filter(y=>y.v<0).reduce((a,y)=>a-y.v,0),ar=atr.filter(y=>y.v>0).reduce((a,y)=>a+y.v,0),fm=atr.length?atr[0].data:'';
-  el.innerHTML=`<div class="card k" style="margin-top:12px"><div class="l">Saldo atual</div><div class="v ${u.saldo<0?'neg':''}">${brl(u.saldo)}</div><div class="s">conta + dinheiro · ${est?`extrato ${ddmm(D.ext_ate)} (${brl(x.saldo)}) + o que foi lançado no app depois`:'conferido no extrato '+ddmm(D.ext_ate)}</div>${atr.length?`<div class="s" style="margin-top:6px">Não entra no saldo atual (ainda não foi pago/recebido, conta no fim do mês ${ddmm(fm)}):${ap?` <b class="neg">${brl(ap)}</b> a pagar atrasado`:''}${ap&&ar?' ·':''}${ar?` <b class="pos">${brl(ar)}</b> a receber atrasado`:''}</div>`:''}</div>`+pendShows()}
+  el.innerHTML=`<div class="card k" style="margin-top:12px"><div class="l">Saldo atual</div><div class="v ${u.saldo<0?'neg':''}">${brl(u.saldo)}</div><div class="sdiv"><span>Na conta <b class="${sc<0?'neg':''}">${brl(sc)}</b></span><span>Em dinheiro <b class="${sd<0?'neg':''}">${brl(sd)}</b></span></div><div class="s">${est?`extrato ${ddmm(D.ext_ate)} (${brl(x.saldo)}) + o que foi lançado no app depois`:'conferido no extrato '+ddmm(D.ext_ate)}</div>${atr.length?`<div class="s" style="margin-top:6px">Não entra no saldo atual (ainda não foi pago/recebido, conta no fim do mês ${ddmm(fm)}):${ap?` <b class="neg">${brl(ap)}</b> a pagar atrasado`:''}${ap&&ar?' ·':''}${ar?` <b class="pos">${brl(ar)}</b> a receber atrasado`:''}</div>`:''}</div>`+pendShows()}
 /* shows de meses passados que ainda têm valor a receber */
 function pendShows(){const l=D.pend_shows||[];if(!l.length)return '';
   const t=l.reduce((a,s)=>a+s.falta,0);
@@ -700,18 +723,19 @@ function renderMes(){
       h+=`<p class="note">Sem o aporte do investidor, este mês terminaria em <b class="${cls(sem)}">${brl(sem)}</b>.</p>`}
     if(m.nota)h+=`<p class="note">${esc(m.nota)}</p>`;
     if(m.ent_tipos)h+=etpHtml(m.ent_tipos);
+    h+='<div id="fent"></div>';
     if(m.sai_tipos)h+=saiDonut(m.sai_tipos);
-  }else h+=`<div class="empty" style="margin-top:16px">O balanço mês a mês começa em janeiro de 2026. Abaixo, os shows e as movimentações que existem deste mês.</div>`;
+  }else h+='<div id="fent"></div>'+`<div class="empty" style="margin-top:16px">O balanço mês a mês começa em janeiro de 2026. Abaixo, os shows e as movimentações que existem deste mês.</div>`;
   // contas
   const cs=D.contas.filter(c=>mkey(c.venc)===k&&!cPago(c));
   if(cs.length){
     const tot=cs.reduce((a,c)=>a+(c.fora?0:c.valor),0);
-    const CM=JSON.parse(LB.store.get('lb_contas_min')||'{}'),ck=c=>c.venc+'|'+c.desc,ab=cs.filter(c=>!CM[ck(c)]),mn=cs.filter(c=>CM[ck(c)]);
+    const ck=c=>c.pg,ab=cs.filter(c=>!cAdiada(c)),mn=cs.filter(c=>cAdiada(c));
     const linhaC=(c,min)=>{
       const venc=c.venc<HOJE;const dias=Math.round((new Date(c.venc)-new Date(HOJE))/864e5);
       const st=venc?`<span class="pill pk">venceu ${ddmm(c.venc)}</span>`:dias===0?`<span class="pill am">vence hoje</span>`:`<span class="pill">vence ${ddmm(c.venc)}${dias<=7?` · ${dias} dia${dias>1?'s':''}`:''}</span>`;
-      return `<div class="row${min?' cmin':''}"><div class="t"><b>${esc(c.desc)}</b>${min?'':`<span>${c.para?esc(c.para)+' · ':''}${st}${c.conf?' <span class="pill am">valor a confirmar</span>':''}${c.fora?' <span class="pill">fora da estimativa</span>':''}</span>`}</div><div class="v">${cParc(c)?`${brl2(c.valor-cParc(c))}<small style="display:block;font-size:11px;color:var(--muted);font-weight:500">pago ${brl2(cParc(c))} de ${brl2(c.valor)}</small>`:brl2(c.valor)}</div><button class="cmb" data-cm="${esc(ck(c))}" title="${min?'mostrar':'minimizar'}" aria-label="${min?'mostrar':'minimizar'}">${min?'＋':'–'}</button></div>`};
-    h+=`<h3>Contas a pagar <small>${cs.length} contas · ${brl2(tot)}</small></h3><div class="list" id="clist">`+ab.map(c=>linhaC(c,0)).join('')+`</div>`+(mn.length?`<details class="cat cmins"><summary>Minimizadas <small>${mn.length} · ${brl2(mn.reduce((a,c)=>a+c.valor,0))}</small></summary><div class="list">${mn.map(c=>linhaC(c,1)).join('')}</div></details>`:'');
+      return `<div class="row${min?' cmin':''}"><div class="t"><b>${esc(c.desc)}</b>${min?'':`<span>${c.para?esc(c.para)+' · ':''}${st}${c.conf?' <span class="pill am">valor a confirmar</span>':''}${c.fora?' <span class="pill">fora da estimativa</span>':''}</span>`}</div><div class="v">${cParc(c)?`${brl2(c.valor-cParc(c))}<small style="display:block;font-size:11px;color:var(--muted);font-weight:500">pago ${brl2(cParc(c))} de ${brl2(c.valor)}</small>`:brl2(c.valor)}</div><button class="cmb" data-cm="${esc(ck(c))}" title="${min?'voltar para o assistente de pagamento':'adiar: minimiza e tira do assistente de pagamento'}" aria-label="${min?'voltar':'adiar'}">${min?'＋':'–'}</button></div>`};
+    h+=`<h3>Contas a pagar <small>${cs.length} contas · ${brl2(tot)}</small></h3><div class="list" id="clist">`+ab.map(c=>linhaC(c,0)).join('')+`</div>`+(mn.length?`<details class="cat cmins"><summary>Adiadas (fora do assistente de pagamento) <small>${mn.length} · ${brl2(mn.reduce((a,c)=>a+c.valor,0))}</small></summary><div class="list">${mn.map(c=>linhaC(c,1)).join('')}</div></details>`:'');
     if(cs.some(c=>c.venc<HOJE))h+=`<p class="note">“Venceu” = vencimento já passou e o pagamento ainda não apareceu no extrato conferido (até ${ddmm(D.saldo_inicial.data)}).</p>`;
   }
   // shows do mês
@@ -727,17 +751,18 @@ function renderMes(){
   if(ms.length){
     h+=`<div class="chips" id="mf"><button class="chip on" data-f="t">Todos</button><button class="chip" data-f="e">Entradas</button><button class="chip" data-f="s">Saídas</button><button class="chip" data-f="g">Sinais</button><input class="search" id="ms" placeholder="Buscar nome ou show" aria-label="Buscar"></div><div id="ml"></div>`;
   }else h+=`<div class="empty">${k>mkey(HOJE)?'Mês futuro: os previstos estão em Contas e na Estimativa.':'Sem lançamentos registrados neste mês.'}</div>`;
-  document.getElementById('mesbody').innerHTML=h;
-  document.querySelectorAll('#mesbody [data-cm]').forEach(b=>b.onclick=()=>{const CM=JSON.parse(LB.store.get('lb_contas_min')||'{}'),x=b.dataset.cm;if(CM[x])delete CM[x];else CM[x]=1;LB.store.set('lb_contas_min',JSON.stringify(CM));const y=scrollY;renderMes();scrollTo(0,y)});
+  document.getElementById('mesbody').innerHTML=h;try{renderFalta()}catch(e){}
+  document.querySelectorAll('#mesbody [data-cm]').forEach(b=>b.onclick=()=>{const c=D.contas.find(y=>y.pg===b.dataset.cm);if(c)adiar(c.pg,!cAdiada(c),b)});
   if(ms.length)movList(ms);
 }
-function movsDoMes(k){ // extrato + lançados no app depois dele (sinais de Vendas, avulsos/fixos pagos no Admin; os do Admin vêm ao vivo)
+function movsDoMes(k){return movsTodos().filter(x=>mkey(x.data)===k).sort((a,b)=>b.data.localeCompare(a.data)||b.valor-a.valor)} // mais recentes primeiro
+function movsTodos(){ // extrato + lançados no app depois dele (sinais de Vendas, avulsos/fixos pagos no Admin; os do Admin vêm ao vivo)
   let snap=D.movs_app||[];
   if(PAGS_OK)snap=snap.filter(x=>!x.id.startsWith('pg-')); // os do Admin vêm ao vivo (cada parte paga vira uma movimentação)
   const ids=new Set(snap.map(x=>x.id)),vivo=[];
   PAGS.forEach(g=>LB.pgx.movs(g).forEach(o=>{if(o.data<=D.ext_ate||ids.has(o.id))return;
-    const en=g.direcao==='entrada';vivo.push({id:o.id,data:o.data,quem:g.nome,valor:(en?1:-1)*o.valor,cat:en?(/aporte/i.test(g.descricao||'')?'Aporte de sócio':'Outras entradas'):g.descricao||(g.tipo==='fixo'?'Fixo mensal':'Pagamento avulso'),meio:g.meio==='Dinheiro'?'dinheiro':'conta',obs:[g.tipo==='fixo'?'fixo de '+o.ref:'',o.parte?'parte'+(o.obs?' · '+o.obs:''):''].filter(Boolean).join(' · ')||null,app:true})}));
-  return comLancs(D.movs,snap.concat(vivo)).filter(x=>mkey(x.data)===k).sort((a,b)=>b.data.localeCompare(a.data)||b.valor-a.valor)} // mais recentes primeiro
+    const en=g.direcao==='entrada';vivo.push({id:o.id,data:o.data,quem:g.nome,valor:(en?1:-1)*o.valor,cat:en?(/aporte/i.test(g.descricao||'')?'Aporte de sócio':'Outras entradas'):g.descricao||(g.tipo==='fixo'?'Fixo mensal':'Pagamento avulso'),meio:o.meio||(g.meio==='Dinheiro'?'dinheiro':'conta'),obs:[g.tipo==='fixo'?'fixo de '+o.ref:'',o.parte?'parte'+(o.obs?' · '+o.obs:''):''].filter(Boolean).join(' · ')||null,app:true})}));
+  return comLancs(D.movs,snap.concat(vivo))}
 function movList(ms){
   let f='t',q='',lim=6; // começa curto; "Ver mais" abre de 20 em 20
   const draw=()=>{

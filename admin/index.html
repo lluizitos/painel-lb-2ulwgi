@@ -90,7 +90,7 @@ label textarea{min-height:60px;resize:vertical}
   <p class="eyebrow">Administração</p>
   <h1>Ad<em>min</em></h1>
   <p class="note">Logins e equipe, tarefas, metas da empresa e pagamentos fora dos shows. Só a administração vê esta página.</p>
-  <div class="tabs" id="tabs"><button class="on" data-t="equipe">Equipe e logins</button><button data-t="todos">Tarefas para todos</button><button data-t="ind">Individuais</button><button data-t="emp">Empresa</button><button data-t="pag">Pagamentos</button><button data-t="lan">Lançamentos</button><button data-t="soc">Sócio</button></div>
+  <div class="tabs" id="tabs"><button class="on" data-t="equipe">Equipe e logins</button><button data-t="todos">Tarefas para todos</button><button data-t="ind">Individuais</button><button data-t="emp">Empresa</button><button data-t="pag">Pagamentos</button><button data-t="lan">Lançamentos</button><button data-t="soc">Sócio</button><button data-t="cfg">Parâmetros</button></div>
 
   <!-- PARA TODOS -->
   <div id="t_todos" style="display:none">
@@ -220,6 +220,18 @@ label textarea{min-height:60px;resize:vertical}
   <datalist id="ln_cdl"></datalist><datalist id="ln_sdl"></datalist>
 
   <!-- PÁGINA DO SÓCIO -->
+  <div id="t_cfg" style="display:none">
+    <p class="note">Números usados nas contas do site (estimativa de saldo, lucro previsto dos shows e página de Vendas). Mudou aqui, vale na próxima atualização do site.</p>
+    <div class="card" style="margin-top:10px"><div class="f">
+      <label>Custo padrão de um show (R$)<input id="cf_custo_padrao" inputmode="decimal" placeholder="ex.: 7300"></label>
+      <label>Custo de show próprio / Colab (R$)<input id="cf_custo_colab" inputmode="decimal" placeholder="ex.: 5155"></label>
+      <label>Expectativa de bilheteria do show próprio (R$)<input id="cf_meta_bilheteria" inputmode="decimal" placeholder="ex.: 10000"></label>
+      <label>Alíquota de imposto (%)<input id="cf_aliquota" inputmode="decimal" placeholder="vazio = a definir"></label>
+      <label>Comissão padrão de venda (%)<input id="cf_comissao" inputmode="decimal" placeholder="vazio = a definir"></label>
+    </div>
+    <p class="note">Custo do show: vale quando o show ainda não tem borderô (com borderô, entra o gasto dele). Bilheteria: show próprio sem nada recebido entra com esse valor; se só pagar a banda, o saldo fica menor (aparece em Atenção).</p>
+    <div class="acts"><button class="btn pkb" id="cf_salvar">Salvar parâmetros</button><span class="note" id="cf_msg"></span></div></div>
+  </div>
   <div id="t_soc" style="display:none">
     <p class="note">Tudo o que aparece na página do sócio e não vem do extrato: acontecimentos, documentos e para onde foi cada aporte. "Oculto" fica só aqui. As mudanças aparecem na página do sócio na próxima atualização do site.</p>
     <div class="chips" id="so_fil"><button class="chip on" data-f="ocorrencia">Acontecimentos</button><button class="chip" data-f="doc">Documentos</button><button class="chip" data-f="nota_aporte">Destino dos aportes</button></div>
@@ -267,8 +279,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwhf6d4g"></script>
-<script src="../lbmetas.js?v=mwhf6d4g"></script>
+<script src="../lb.js?v=mwhg6z5e"></script>
+<script src="../lbmetas.js?v=mwhg6z5e"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -276,6 +288,10 @@ const ddmm=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
 const $=id=>document.getElementById(id);
 let API='',PF=[],TF=[],MT=[],EFIL='',EDE=null,SEL=null,FIL='abertas',EDT=null,EDP=null;
 const linkDe=p=>new URL('../tarefas/eu/#k='+p.token,location.href).href;
+const CFGK=['custo_padrao','custo_colab','meta_bilheteria','aliquota','comissao'];
+async function cfgAbre(){$('cf_msg').textContent='carregando…';try{const r=await api({acao:'listar'});CFGK.forEach(k=>{const v=(r.config||{})[k];$('cf_'+k).value=v==null?'':String(v).replace('.',',')});$('cf_msg').textContent=''}catch(e){$('cf_msg').textContent='erro: '+e.message}}
+document.addEventListener('click',async e=>{if(e.target.id!=='cf_salvar')return;const b=e.target,c={};CFGK.forEach(k=>c[k]=$('cf_'+k).value.trim().replace(/\./g,'').replace(',','.'));
+  b.disabled=true;$('cf_msg').textContent='salvando…';try{await api({acao:'salvar_config',config:c});$('cf_msg').textContent='salvo ✓ (vale na próxima atualização do site)'}catch(err){$('cf_msg').textContent='não salvou: '+err.message}b.disabled=false});
 async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({usuario:LB.login,senha:LB.senha,nome:LB.usuario},c))})).json();
   if(!r.ok)throw new Error(r.erro||'erro');if(r.perfis){PF=r.perfis;TF=r.tarefas;MT=r.metas||[];RT=r.rotinas||[]}return r}
 let AD={},LN=[],LNOK=false,VS=[],LMES=HOJE.slice(0,7),LFIL='',LED=null;
@@ -453,12 +469,12 @@ function parcHtml(g){const pc=LB.pgx.parc(g),rs=Object.keys(pc).sort().slice(-3)
   return `<div class="pcl">${rs.map(ref=>`<div><b>${ref==='unico'?'Partes':'Partes de '+mesn(ref)}</b>${pc[ref].map((x,i)=>`<span>${ddmm(x.data)} · ${brl(+x.valor)}${x.obs?' · '+esc(x.obs):''} ${extPg(g,{pago:x.data},(g.direcao==='entrada'?1:-1)*(+x.valor))} <a href="#" data-gpr="${esc(g.id)}|${ref}|${i}" style="color:var(--muted)">desfazer</a></span>`).join('')}</div>`).join('')}</div>`}
 $('pg_lista').addEventListener('click',async e=>{const a=e.target.closest('[data-gpp],[data-gpps],[data-gppc],[data-gpr]');if(!a)return;e.preventDefault();e.stopPropagation();
   if(a.dataset.gpp){const[id,ref,falta,vr]=a.dataset.gpp.split('|'),box=document.querySelector(`[data-ppf="${id}|${ref}"]`);
-    if(vr){box.innerHTML=`<div class="f ppx"><label>Valor da conta (R$)<input id="pp_v" inputmode="decimal" placeholder="média ${brl(+falta)}"></label><label>Data do pagamento<input type="date" id="pp_d" value="${HOJE}"></label><label class="w">Observação (opcional)<input id="pp_o" placeholder="ex.: conta de novembro"></label></div><div class="acts"><button class="btn pkb sm" data-gpps="${id}|${ref}|${falta}|v">Salvar pagamento</button><button class="btn sm" data-gppc="1">Cancelar</button><span class="msg" id="pp_m"></span></div>`;$('pp_v').focus();return}
-    box.innerHTML=`<div class="f ppx"><label>Valor desta parte (R$)<input id="pp_v" inputmode="decimal" placeholder="falta ${brl(+falta)}"></label><label>Data<input type="date" id="pp_d" value="${HOJE}"></label><label class="w">Observação (opcional)<input id="pp_o" placeholder="ex.: parte do pró-labore de outubro"></label></div><div class="acts"><button class="btn pkb sm" data-gpps="${id}|${ref}|${falta}">Salvar parte</button><button class="btn sm" data-gppc="1">Cancelar</button><span class="msg" id="pp_m"></span></div>`;$('pp_v').focus();return}
+    if(vr){box.innerHTML=`<div class="f ppx"><label>Valor da conta (R$)<input id="pp_v" inputmode="decimal" placeholder="média ${brl(+falta)}"></label><label>Data do pagamento<input type="date" id="pp_d" value="${HOJE}"></label><label>Pago em<select id="pp_m"><option value="conta">conta / PIX</option><option value="dinheiro"${(PAGS.find(g=>g.id===id)||{}).meio==='Dinheiro'?' selected':''}>dinheiro</option></select></label><label class="w">Observação (opcional)<input id="pp_o" placeholder="ex.: conta de novembro"></label></div><div class="acts"><button class="btn pkb sm" data-gpps="${id}|${ref}|${falta}|v">Salvar pagamento</button><button class="btn sm" data-gppc="1">Cancelar</button><span class="msg" id="pp_m"></span></div>`;$('pp_v').focus();return}
+    box.innerHTML=`<div class="f ppx"><label>Valor desta parte (R$)<input id="pp_v" inputmode="decimal" placeholder="falta ${brl(+falta)}"></label><label>Data<input type="date" id="pp_d" value="${HOJE}"></label><label>Pago em<select id="pp_m"><option value="conta">conta / PIX</option><option value="dinheiro"${(PAGS.find(g=>g.id===id)||{}).meio==='Dinheiro'?' selected':''}>dinheiro</option></select></label><label class="w">Observação (opcional)<input id="pp_o" placeholder="ex.: parte do pró-labore de outubro"></label></div><div class="acts"><button class="btn pkb sm" data-gpps="${id}|${ref}|${falta}">Salvar parte</button><button class="btn sm" data-gppc="1">Cancelar</button><span class="msg" id="pp_m"></span></div>`;$('pp_v').focus();return}
   if(a.dataset.gppc){a.closest('.ppf').innerHTML='';return}
   if(a.dataset.gpps){const[id,ref,falta,vr]=a.dataset.gpps.split('|'),v=+$('pp_v').value.trim().replace(/\./g,'').replace(',','.');
     if(!(v>0))return $('pp_m').innerHTML='<span class="neg">Valor.</span>';if(!vr&&v>+falta+.005)return $('pp_m').innerHTML=`<span class="neg">Maior que o que falta (${brl(+falta)}).</span>`;
-    a.textContent='salvando…';a.disabled=true;try{const r=await api({acao:'pagar_pagamento',id,ref,valor:v,data:$('pp_d').value,obs:$('pp_o').value,quitar:!!vr});PAGS=r.pagamentos;render()}catch(err){a.disabled=false;a.textContent='não salvou: '+err.message}return}
+    a.textContent='salvando…';a.disabled=true;try{const r=await api({acao:'pagar_pagamento',id,ref,valor:v,data:$('pp_d').value,obs:$('pp_o').value,meio:$('pp_m').value,quitar:!!vr});PAGS=r.pagamentos;render()}catch(err){a.disabled=false;a.textContent='não salvou: '+err.message}return}
   if(a.dataset.gpr){if(a.dataset.ok!=='1'){a.dataset.ok='1';a.textContent='toque de novo para desfazer';return}const[id,ref,i]=a.dataset.gpr.split('|');a.textContent='desfazendo…';
     try{const r=await api({acao:'pagar_pagamento',id,ref,remover_parcial:+i});PAGS=r.pagamentos;render()}catch(err){a.textContent='erro'}}},true);
 function renderPag(){const fe=g=>g.tipo==='fixo'&&g.fim&&g.fim<HOJE.slice(0,7)?1:0;const l=PAGS.filter(g=>!G2F||(G2F==='pend'?pendDe(g).length:G2F==='entrada'?g.direcao==='entrada':g.tipo===G2F)).sort((a,b)=>fe(a)-fe(b)||pendDe(b).length-pendDe(a).length||a.tipo.localeCompare(b.tipo)||a.nome.localeCompare(b.nome));
@@ -634,7 +650,7 @@ $('ln_del').onclick=async()=>{const d=$('ln_del'),x=LED,id=x&&(x.novo?x.novo.id:
   if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent=x.novo?'Toque de novo para excluir':'Toque de novo: volta como veio do extrato';return}
   try{LN=(await api({acao:'excluir_lancamento',id})).lancamentos||[];lnRender();lnFecha()}catch(e){$('ln_msg').innerHTML='<span class="neg">erro</span>'}};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')lnFecha()});
-$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag','lan','soc'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='lan')lnAbre();if(b.dataset.t==='pag')arecAbre();if(b.dataset.t==='soc')socAbre()};
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag','lan','soc','cfg'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='cfg')cfgAbre();if(b.dataset.t==='lan')lnAbre();if(b.dataset.t==='pag')arecAbre();if(b.dataset.t==='soc')socAbre()};
 </script>
 </body>
 </html>
