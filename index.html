@@ -257,6 +257,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 <p>Todo dia às 9h, se algum pagamento de show estiver atrasado (parcela vencida, ou show que já aconteceu sem receber tudo), chega um aviso com o show e o valor. Canal só da administração: não passe para a equipe.</p></details>
   <div class="grid g3" id="pgk" style="margin-top:14px"></div>
   <div class="list" id="pgl" data-max="3" style="margin-top:10px"></div>
+  <div id="pgad" style="margin-top:12px"></div>
 </section>
 
 <section id="tarefas">
@@ -330,10 +331,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwhgqq6c"></script>
-<script src="lbmetas.js?v=mwhgqq6c"></script>
-<script src="lbchat.js?v=mwhgqq6c"></script>
-<script src="lbvendas.js?v=mwhgqq6c"></script>
+<script src="lb.js?v=mwhgvm19"></script>
+<script src="lbmetas.js?v=mwhgvm19"></script>
+<script src="lbchat.js?v=mwhgvm19"></script>
+<script src="lbvendas.js?v=mwhgvm19"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -440,7 +441,17 @@ function renderPagar(){const tp=document.getElementById('tpag');if(tp&&D.avisos)
       <div class="pts">${i.ps.map(p=>pode&&i.g?`<button class="pt" data-pga="${esc(i.g.id+'|'+i.o.ref)}" title="Marcar como pago">${p.n} ${brl(p.v)} <i>✓ pago</i></button><button class="pt ad" data-pgad="${esc(i.g.id+'|'+i.o.ref)}" title="Tira do assistente (a conta continua na lista, em Adiadas)">adiar</button>`:pode?`<button class="pt" data-pgk="${esc(i.b.id)}|${i.item!=null?'it'+i.item:i.i}|${p.k}" title="Marcar só esta parte como paga">${p.n} ${brl(p.v)} <i>✓ pago</i></button>`:`<span class="pt">${p.n} ${brl(p.v)}</span>`).join('')}</div>`).join('')}
     <div class="px">${pxBtn(x.pix)}<button class="cp" data-cp="${esc(x.nome+' — '+brl(x.tot)+(x.pix?' — PIX '+x.pix:''))}">copiar resumo</button>${pode?`<button class="cp pgall" data-pgp="${esc(x.k)}">marcar tudo pago${x.it.some(i=>i.fut)?' (só o vencido)':''}</button>`:''}</div></div>`).join('')
     :'<div class="empty">Nenhum pagamento pendente. Show só entra aqui depois que acontece; contas e fixos do mês (página Admin) entram todos, menos os adiados.</div>';
+  renderAdiados(pode);
 }
+let ADV=false; // lista de adiados aberta?
+function renderAdiados(pode){const el=document.getElementById('pgad');if(!el)return;const A=[],ate=(+HOJE.slice(0,4)+3)+HOJE.slice(4);
+  PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada').forEach(g=>{const ad=jso(g.adiados);if(!Object.keys(ad).length)return;
+    LB.pgx.ocorr(g,ate).filter(o=>ad[o.ref]&&!o.pago&&o.falta>0.004).forEach(o=>A.push({k:g.id+'|'+o.ref,data:o.data,quando:ad[o.ref],desc:g.desc||g.nome,nome:g.nome,v:o.falta}))});
+  A.sort((a,b)=>a.data<b.data?-1:1);
+  if(!A.length){el.innerHTML='';return}
+  el.innerHTML=`<button class="pxb adb" data-advt="1">${ADV?'Esconder adiados':'Ver pagamentos adiados ('+A.length+' · '+brl(A.reduce((s,x)=>s+x.v,0))+')'}</button>`+(ADV?`<div class="list" style="margin-top:8px">${A.map(x=>`<div class="row"><div class="t"><b>${esc(x.desc)}</b><span>${x.nome&&x.nome!==x.desc?esc(x.nome)+' · ':''}vence ${ddmm(x.data)}${x.data.slice(0,4)!==HOJE.slice(0,4)?'/'+x.data.slice(2,4):''}${typeof x.quando==='string'&&/^\d{4}-/.test(x.quando)?' · adiado em '+ddmm(x.quando):''}</span></div><div class="v">${brl2(x.v)}</div>${pode?`<button class="cp" data-pgdes="${esc(x.k)}">desadiar</button>`:''}</div>`).join('')}</div><p class="note">Desadiar volta o pagamento para o assistente acima e para as contas do mês.</p>`:'')}
+document.addEventListener('click',e=>{if(e.target.closest('[data-advt]')){ADV=!ADV;renderAdiados(!!API_URL);return}
+  const d=e.target.closest('[data-pgdes]');if(d)adiar(d.dataset.pgdes,false,d)});
 let PAGP={},API_URL='',PAGS=[],PAGS_OK=false,PESS=[];
 /* conta a pagar: toque no quadro abre a tela com PIX, nome, valor e vencimento para copiar */
 const limpaPix=x=>String(x||'').replace(/\s*\((nubank|picpay|inter|banco c6)\)\s*$/i,'').replace(/\s+(Inter|Banco c6)$/i,'').trim();
@@ -749,7 +760,7 @@ function renderMes(){
     const linhaC=(c,min)=>{
       const venc=c.venc<HOJE;const dias=Math.round((new Date(c.venc)-new Date(HOJE))/864e5);
       const st=venc?`<span class="pill pk">venceu ${ddmm(c.venc)}</span>`:dias===0?`<span class="pill am">vence hoje</span>`:`<span class="pill">vence ${ddmm(c.venc)}${dias<=7?` · ${dias} dia${dias>1?'s':''}`:''}</span>`;
-      return `<div class="row cclk${min?' cmin':''}" data-cx="${esc(c.pg||'')}" role="button" tabindex="0"><div class="t"><b>${esc(c.desc)}</b>${min?'':`<span>${c.para?esc(c.para)+' · ':''}${st}${c.conf?' <span class="pill am">valor a confirmar</span>':''}${c.fora?' <span class="pill">fora da estimativa</span>':''}</span>`}</div><div class="v">${cParc(c)?`${brl2(c.valor-cParc(c))}<small style="display:block;font-size:11px;color:var(--muted);font-weight:500">pago ${brl2(cParc(c))} de ${brl2(c.valor)}</small>`:brl2(c.valor)}</div><button class="cmb" data-cm="${esc(ck(c))}" title="${min?'voltar para o assistente de pagamento':'adiar: minimiza e tira do assistente de pagamento'}" aria-label="${min?'voltar':'adiar'}">${min?'＋':'–'}</button></div>`};
+      return `<div class="row cclk${min?' cmin':''}" data-cx="${esc(c.pg||'')}" role="button" tabindex="0"><div class="t"><b>${esc(c.desc)}</b>${min?'':`<span>${c.para?esc(c.para)+' · ':''}${st}${c.conf?' <span class="pill am">valor a confirmar</span>':''}${c.fora?' <span class="pill">fora da estimativa</span>':''}</span>`}</div><div class="v">${cParc(c)?`${brl2(c.valor-cParc(c))}<small style="display:block;font-size:11px;color:var(--muted);font-weight:500">pago ${brl2(cParc(c))} de ${brl2(c.valor)}</small>`:brl2(c.valor)}</div><button class="cmb" data-cm="${esc(ck(c))}" title="${min?'voltar para o assistente de pagamento':'adiar: minimiza e tira do assistente de pagamento'}" aria-label="${min?'desadiar':'adiar'}"${min?' style="width:auto;padding:0 8px;font-size:12px"':''}>${min?'desadiar':'–'}</button></div>`};
     h+=`<h3>Contas a pagar <small>${cs.length} contas · ${brl2(tot)}</small></h3><div class="list" id="clist">`+ab.map(c=>linhaC(c,0)).join('')+`</div>`+(mn.length?`<details class="cat cmins"><summary>Adiadas (fora do assistente de pagamento) <small>${mn.length} · ${brl2(mn.reduce((a,c)=>a+c.valor,0))}</small></summary><div class="list">${mn.map(c=>linhaC(c,1)).join('')}</div></details>`:'');
     if(cs.some(c=>c.venc<HOJE))h+=`<p class="note">“Venceu” = vencimento já passou e o pagamento ainda não apareceu no extrato conferido (até ${ddmm(D.saldo_inicial.data)}).</p>`;
   }
