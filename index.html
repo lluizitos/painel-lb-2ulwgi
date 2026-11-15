@@ -530,7 +530,7 @@ let TAR={perfis:[],tarefas:[]};
 function perfilDe(nome){const n=LB.norm(nome);return TAR.perfis.find(p=>{const q=LB.norm(p.nome);return q===n||n.startsWith(q+' ')||q.startsWith(n+' ')})}
 async function tarAoVivo(){try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;
   const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'tarefas',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
-  if(r.ok){TAR=r;if(RFEITO)renderRend();renderInfo();try{renderOc()}catch(e){}}}catch(e){}}
+  if(r.ok){TAR=r;if(RFEITO)renderRend();renderInfo();try{renderTarefas();renderRiscos()}catch(e){}try{renderOc()}catch(e){}}}catch(e){}}
 /* vendas por mês pela DATA DA VENDA (quando fechou), não pela data do show — Rendimento e aba Vendas */
 function renderVV(gid,mid){if(!document.getElementById(gid))return;const MA=mkey(HOJE),ult12=[];for(let i=11;i>=0;i--){const d=new Date(+MA.slice(0,4),+MA.slice(5,7)-1-i,1);ult12.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
   {const VV=VSH().filter(s=>s.status!=='Cancelado'),cv=VV.filter(s=>/^\d{4}-\d{2}-\d{2}$/.test(s.data_venda||'')),sem=VV.length-cv.length;
@@ -779,21 +779,26 @@ function showCard(s,tl){
 }
 
 /* ---------- AGENDA DO MÊS ---------- */
+/* tarefas em aberto com prazo: das pessoas (Admin → Individuais) e da empresa (Admin → Empresa, tipo tarefa); concluir é no Admin/Metas */
+function tfApp(){const nm=id=>((TAR.perfis||[]).find(p=>p.id===id)||{}).nome||'';
+  return (TAR.tarefas||[]).filter(t=>t.status!=='Concluída'&&/^\d{4}-\d{2}-\d{2}$/.test(t.prazo||'')).map(t=>({d:t.prazo,txt:t.titulo,sub:'Responsável: '+nm(t.pessoa)+(t.status==='Em andamento'?' · em andamento':''),k:'ta|'+t.id}))
+    .concat((TAR.metas||[]).filter(x=>x.tipo==='tarefa'&&x.situacao!=='Concluída'&&/^\d{4}-\d{2}-\d{2}$/.test(x.prazo||'')).map(x=>({d:x.prazo,txt:x.titulo,sub:'Empresa'+(x.alvo?' · '+x.alvo:''),k:'te|'+x.id})))}
 let tfMes=null;
 let tfSem=null;
 function renderTarefas(){
-  const ks=[...new Set([mkey(HOJE),...D.tarefas.map(t=>t.data?mkey(t.data):t.mes),...D.shows.filter(s=>s.data>=HOJE.slice(0,7)).map(s=>mkey(s.data))])].filter(k=>k>=mkey(HOJE)&&k<='2027-01').sort();
+  const TF=tfApp();
+  const ks=[...new Set([mkey(HOJE),...TF.filter(t=>t.d).map(t=>mkey(t.d)),...D.shows.filter(s=>s.data>=HOJE.slice(0,7)).map(s=>mkey(s.data))])].filter(k=>k>=mkey(HOJE)&&k<='2027-01').sort();
   if(!tfMes)tfMes=ks[0];
   const box=document.getElementById('tfm');
   box.innerHTML=ks.map(k=>`<button class="chip${k===tfMes?' on':''}" data-k="${k}">${MESES[+k.slice(5,7)-1]}</button>`).join('');
   box.onclick=e=>{const b=e.target.closest('.chip');if(b){tfMes=b.dataset.k;tfSem=null;renderTarefas()}};
   const feito=JSON.parse(LB.store.get('lb_feito')||'{}');
   const todos=[];
-  D.tarefas.forEach((t,i)=>todos.push({d:t.data,m:t.data?mkey(t.data):t.mes,txt:t.titulo,sub:t.quem?'Responsável: '+t.quem:'',k:'t'+i+'|'+t.titulo,tipo:'Tarefa'}));
+  TF.forEach(t=>todos.push(Object.assign({m:mkey(t.d),tipo:'Tarefa',ro:true},t)));
   D.shows.filter(s=>s.sit!=='Cancelado').forEach(s=>todos.push({d:s.data,m:mkey(s.data),txt:s.nome,sub:s.local||'',k:'s|'+s.data+s.nome,tipo:'Show',auto:s.data<HOJE}));
   D.contas.filter(c=>!cPago(c)).forEach(c=>todos.push({d:c.venc,m:mkey(c.venc),txt:c.desc,sub:brl2(c.valor)+(c.para?' · '+c.para:''),v:c.valor,k:'c|'+c.venc+c.desc,tipo:'Conta'}));
-  todos.forEach(x=>{x.ok=!!(feito[x.k]||x.auto);x.atr=x.d&&x.d<HOJE&&!x.ok&&x.tipo!=='Show'});
-  const linha=x=>`<label class="row tk${x.ok?' done':''}"><input type="checkbox" data-k="${esc(x.k)}"${x.ok?' checked':''}><div class="t"><b>${x.tipo==='Show'?'🎤 ':x.tipo==='Conta'?'💸 ':''}${esc(x.txt)}</b><span>${esc(x.sub)}</span></div></label>`;
+  todos.forEach(x=>{x.ok=!x.ro&&!!(feito[x.k]||x.auto);x.atr=x.d&&x.d<HOJE&&!x.ok&&x.tipo!=='Show'});
+  const linha=x=>`<label class="row tk${x.ok?' done':''}"><input type="checkbox" data-k="${esc(x.k)}"${x.ok?' checked':''}${x.ro?' disabled title="conclua no Admin ou em Metas"':''}><div class="t"><b>${x.tipo==='Show'?'🎤 ':x.tipo==='Conta'?'💸 ':''}${esc(x.txt)}</b><span>${esc(x.sub)}</span></div></label>`;
   // atrasados: num bloco só, fechado
   const atr=todos.filter(x=>x.atr).sort((a,b)=>a.d.localeCompare(b.d));
   const ta=atr.reduce((a,x)=>a+(x.v||0),0);
@@ -850,6 +855,9 @@ function renderTL(){
 }
 
 /* ---------- ESTIMATIVA ---------- */
+function renderRiscos(){const el=document.getElementById('riscos');if(!el||!D)return; // "Atenção": alertas/despesas da Empresa ao vivo + o que vem dos dados
+  const AL=((TAR&&TAR.metas)||[]).filter(x=>['alerta','despesa'].includes(x.tipo)&&!['Pago','Resolvido'].includes(x.situacao)).map(x=>x.titulo+(x.valor?' ('+brl(+x.valor)+')':'')+(x.alvo?': '+x.alvo:'')+(x.prazo?' · prazo '+x.prazo:''));
+  el.innerHTML=AL.concat(D.riscos).map(r=>`<div class="row"><div class="t"><span style="color:var(--sub);font-size:13.5px">${esc(r)}</span></div></div>`).join('');}
 function renderEst(){
   const ks=['2026-11','2026-12','2027-01'];
   document.getElementById('estcards').innerHTML=ks.map(k=>{const m=D.meses[k];
@@ -866,16 +874,16 @@ function renderEst(){
     +`<div class="center" style="margin-top:4px"><button class="btn" id="todosprox">Ver todos até 31/01</button></div>`;
   document.getElementById('todosprox').onclick=e=>{const all=D.linha.filter(l=>l.data>=HOJE&&l.v);
     e.target.parentNode.outerHTML=all.slice(14).map(l=>`<div class="row"><div class="d"><b>${l.data.slice(8,10)}</b><span>${MES3[+l.data.slice(5,7)-1]}${l.data.slice(0,4)!==ANO_AT?' '+l.data.slice(2,4):''}</span></div><div class="t"><b>${esc(l.txt)}</b><span>saldo depois: <span class="${cls(l.saldo)}">${brl(l.saldo)}</span></span></div><div class="v ${l.v>0?'pos':''}">${l.v>0?'+':''}${brl(l.v)}</div></div>`).join('')};
-  document.getElementById('riscos').innerHTML=D.riscos.map(r=>`<div class="row"><div class="t"><span style="color:var(--sub);font-size:13.5px">${esc(r)}</span></div></div>`).join('');
+  renderRiscos();
 }
 let W=640;const setW=id=>{W=Math.max(330,Math.min(760,document.getElementById(id).clientWidth||640))};
 let AP=1;addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(()=>{if(typeof D==='undefined'||!D||!D.linha)return;chartSaldo(AP);chartMes()},200)});
 function chartSaldo(ap){AP=ap;setW('chsaldo');
-  const t0=new Date('2026-11-09T12:00'),t1=new Date('2027-01-31T12:00');
-  const pts=D.linha.map(l=>{let s=l.saldo;if(!ap){if(l.data>='2026-11-30')s-=11000;if(l.data>='2026-12-01')s-=11000}return {d:new Date(l.data+'T12:00'),s,l}});
+  const t0=new Date(D.linha[0].data+'T12:00'),t1=new Date(D.linha[D.linha.length-1].data.slice(0,7)+'-'+String(new Date(+D.linha[D.linha.length-1].data.slice(0,4),+D.linha[D.linha.length-1].data.slice(5,7),0).getDate())+'T12:00');
+  let ac=0;const pts=D.linha.map(l=>{if(l.ap)ac+=l.v;const s=ap?l.saldo:l.saldo-ac;return {d:new Date(l.data+'T12:00'),s,l}});
   // degraus: um ponto por dia (último saldo do dia)
   const byDay=[];pts.forEach(p=>{const last=byDay[byDay.length-1];if(last&&+last.d===+p.d)byDay[byDay.length-1]=p;else byDay.push(p)});
-  byDay.push({d:t1,s:byDay[byDay.length-1].s,l:{data:'2027-01-31'}});
+  byDay.push({d:t1,s:byDay[byDay.length-1].s,l:{data:t1.toISOString().slice(0,10)}});
   const H=W<500?230:260,L=46,R=8,T=16,B=30;
   const vals=byDay.map(p=>p.s);let mn=Math.min(0,...vals),mx=Math.max(...vals);const pad=(mx-mn)*.08;mn-=pad;mx+=pad;
   const x=d=>L+(d-t0)/(t1-t0)*(W-L-R),y=v=>T+(mx-v)/(mx-mn)*(H-T-B);
@@ -900,7 +908,7 @@ function chartSaldo(ap){AP=ap;setW('chsaldo');
     cp.setAttribute('cx',cx);cp.setAttribute('cy',y(p.s));cp.setAttribute('opacity',1);
     const dd=d.toISOString().slice(0,10);tip.innerHTML=`<b style="color:var(--ink)">${ddmm(dd)}</b> · saldo disponível <b class="${cls(p.s)}">${brl2(p.s)}</b>${p.l.txt?` · último movimento: ${esc(p.l.txt)}`:''}`};
   sv.addEventListener('mousemove',mv);sv.addEventListener('touchstart',mv,{passive:true});sv.addEventListener('touchmove',mv,{passive:true});
-  tip.innerHTML=ap?'Toque no gráfico para ver o saldo do dia.':'<span class="neg">Sem os R$ 11 mil de novembro e de dezembro do investidor.</span> Toque no gráfico para ver o saldo do dia.';
+  tip.innerHTML=ap?'Toque no gráfico para ver o saldo do dia.':`<span class="neg">Sem os aportes previstos (${D.linha.filter(l=>l.ap).map(l=>brl(l.v)+' em '+ddmm(l.data)).join(', ')||'nenhum'}).</span> Toque no gráfico para ver o saldo do dia.`;
 }
 function chartMes(){setW('chmes');
   const ks=Object.keys(D.meses).sort();

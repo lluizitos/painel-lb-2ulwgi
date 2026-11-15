@@ -174,7 +174,7 @@
     try { const r = await api({ acao: 'meu_perfil' }); if (r.ok) { PF = r; mostra(r); pintar(); } else if (r.erro === 'senha') msg(m1, 'Sua senha mudou em outro aparelho: saia e entre de novo.'); } catch (e) { msg(m1, 'Sem conexão agora.'); }
     const salvar = async (o, txt) => {
       msg(m1, 'Salvando…', true);
-      try { const r = await api({ acao: 'salvar_perfil', perfil: o }); if (!r.ok) return msg(m1, r.erro === 'senha' ? 'Sua senha mudou: saia e entre de novo.' : (r.erro || 'Não salvou.'));
+      try { const r = await api({ acao: 'salvar_meu_perfil', perfil: o }); if (!r.ok) return msg(m1, r.erro === 'senha' ? 'Sua senha mudou: saia e entre de novo.' : (r.erro || 'Não salvou.'));
         PF = r; mostra(r); store.set('lb_pf', JSON.stringify({ u: LB.login, pf: { foto: r.foto } })); pintar(); msg(m1, txt, true); } catch (e) { msg(m1, 'Sem conexão. Tente de novo.'); }
     };
     $('input[type=file]').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
