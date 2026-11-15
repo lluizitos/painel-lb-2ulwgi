@@ -17,7 +17,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwhhjrls';
+  const BUILD = 'mwhuopp8';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -220,7 +220,7 @@
   /* pagamento picado: cada parte do borderô (cachê, diária, gasolina, ajuda, estacionamento) é paga separada.
      e.pagos = {parte: 'AAAA-MM-DD'}; e.status = Pago | Parcial | Pendente (calculado). */
   const PARTES = [['valor', 'cachê'], ['diaria', 'diária'], ['gasolina', 'gasolina'], ['ajuda', 'ajuda de custo'], ['estacionamento', 'estacionamento']];
-  const nb = v => { const n = parseFloat(String(v ?? '').replace(/\./g, '').replace(',', '.')); return typeof v === 'number' ? v : (isNaN(n) ? 0 : n); };
+  const nb = v => { const n = parseFloat(String(v ?? '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.')); return typeof v === 'number' ? v : (isNaN(n) ? 0 : n); };
   const pg = {
     PARTES,
     partes: e => PARTES.filter(([k]) => nb(e[k]) > 0).map(([k, n]) => ({ k, n, v: nb(e[k]), pago: e.status === 'Pago' && !(e.pagos && Object.keys(e.pagos).length) ? true : !!(e.pagos && e.pagos[k]), em: e.pagos && e.pagos[k] })),

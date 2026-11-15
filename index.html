@@ -331,10 +331,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwhhjrls"></script>
-<script src="lbmetas.js?v=mwhhjrls"></script>
-<script src="lbchat.js?v=mwhhjrls"></script>
-<script src="lbvendas.js?v=mwhhjrls"></script>
+<script src="lb.js?v=mwhuopp8"></script>
+<script src="lbmetas.js?v=mwhuopp8"></script>
+<script src="lbchat.js?v=mwhuopp8"></script>
+<script src="lbvendas.js?v=mwhuopp8"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -503,7 +503,7 @@ document.addEventListener('click',e=>{
   if(e.target.closest('button.cf'))return; // escolhendo conta/dinheiro
   const a=e.target.closest('[data-pgk]');if(a){const[id,i,k]=a.dataset.pgk.split('|');marcarPago([i.startsWith('it')?{id,it:+i.slice(2),data:HOJE}:{id,i:+i,partes:[k],data:HOJE}],a);return}
   const g=e.target.closest('[data-pga]');if(g){const[id,ref]=g.dataset.pga.split('|'),pg=PAGS.find(x=>x.id===id);
-    if(pg&&pg.varia==='sim'){const t=prompt(`${pg.descricao||pg.nome}: valor da conta (média ${brl(+pg.valor)})`);if(t==null)return;const v=+String(t).trim().replace(/\./g,'').replace(',','.');if(!(v>0))return alert('Valor inválido');marcarPago([],g,[{id,ref,valor:v}]);return}
+    if(pg&&pg.varia==='sim'){const t=prompt(`${pg.descricao||pg.nome}: valor da conta (média ${brl(+pg.valor)})`);if(t==null)return;const v=+String(t).trim().replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');if(!(v>0))return alert('Valor inválido');marcarPago([],g,[{id,ref,valor:v}]);return}
     marcarPago([],g,[{id,ref}]);return}
   const b=e.target.closest('[data-pgp]');if(b){const x=PAGP[b.dataset.pgp];if(x)marcarPago(x.it.filter(i=>!i.g&&!i.fut).map(i=>i.item!=null?{id:i.b.id,it:i.item,data:HOJE}:{id:i.b.id,i:i.i,partes:'tudo',data:HOJE}),b,x.it.filter(i=>i.g&&!i.fut).map(i=>({id:i.g.id,ref:i.o.ref})))}});
 async function metasAlerta(url){ // metas com check da própria pessoa (Luiz, Lucas): o que falta marcar hoje / nesta semana

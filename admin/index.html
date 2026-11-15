@@ -279,8 +279,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwhhjrls"></script>
-<script src="../lbmetas.js?v=mwhhjrls"></script>
+<script src="../lb.js?v=mwhuopp8"></script>
+<script src="../lbmetas.js?v=mwhuopp8"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -290,7 +290,7 @@ let API='',PF=[],TF=[],MT=[],EFIL='',EDE=null,SEL=null,FIL='abertas',EDT=null,ED
 const linkDe=p=>new URL('../tarefas/eu/#k='+p.token,location.href).href;
 const CFGK=['custo_padrao','custo_colab','meta_bilheteria','aliquota','comissao'];
 async function cfgAbre(){$('cf_msg').textContent='carregando…';try{const r=await api({acao:'listar'});CFGK.forEach(k=>{const v=(r.config||{})[k];$('cf_'+k).value=v==null?'':String(v).replace('.',',')});$('cf_msg').textContent=''}catch(e){$('cf_msg').textContent='erro: '+e.message}}
-document.addEventListener('click',async e=>{if(e.target.id!=='cf_salvar')return;const b=e.target,c={};CFGK.forEach(k=>c[k]=$('cf_'+k).value.trim().replace(/\./g,'').replace(',','.'));
+document.addEventListener('click',async e=>{if(e.target.id!=='cf_salvar')return;const b=e.target,c={};CFGK.forEach(k=>c[k]=$('cf_'+k).value.trim().replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'));
   b.disabled=true;$('cf_msg').textContent='salvando…';try{await api({acao:'salvar_config',config:c});$('cf_msg').textContent='salvo ✓ (vale na próxima atualização do site)'}catch(err){$('cf_msg').textContent='não salvou: '+err.message}b.disabled=false});
 async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({usuario:LB.login,senha:LB.senha,nome:LB.usuario},c))})).json();
   if(!r.ok)throw new Error(r.erro||'erro');if(r.perfis){PF=r.perfis;TF=r.tarefas;MT=r.metas||[];RT=r.rotinas||[]}return r}
@@ -472,7 +472,7 @@ $('pg_lista').addEventListener('click',async e=>{const a=e.target.closest('[data
     if(vr){box.innerHTML=`<div class="f ppx"><label>Valor da conta (R$)<input id="pp_v" inputmode="decimal" placeholder="média ${brl(+falta)}"></label><label>Data do pagamento<input type="date" id="pp_d" value="${HOJE}"></label><label>Pago em<select id="pp_m"><option value="conta">conta / PIX</option><option value="dinheiro"${(PAGS.find(g=>g.id===id)||{}).meio==='Dinheiro'?' selected':''}>dinheiro</option></select></label><label class="w">Observação (opcional)<input id="pp_o" placeholder="ex.: conta de novembro"></label></div><div class="acts"><button class="btn pkb sm" data-gpps="${id}|${ref}|${falta}|v">Salvar pagamento</button><button class="btn sm" data-gppc="1">Cancelar</button><span class="msg" id="pp_m"></span></div>`;$('pp_v').focus();return}
     box.innerHTML=`<div class="f ppx"><label>Valor desta parte (R$)<input id="pp_v" inputmode="decimal" placeholder="falta ${brl(+falta)}"></label><label>Data<input type="date" id="pp_d" value="${HOJE}"></label><label>Pago em<select id="pp_m"><option value="conta">conta / PIX</option><option value="dinheiro"${(PAGS.find(g=>g.id===id)||{}).meio==='Dinheiro'?' selected':''}>dinheiro</option></select></label><label class="w">Observação (opcional)<input id="pp_o" placeholder="ex.: parte do pró-labore de outubro"></label></div><div class="acts"><button class="btn pkb sm" data-gpps="${id}|${ref}|${falta}">Salvar parte</button><button class="btn sm" data-gppc="1">Cancelar</button><span class="msg" id="pp_m"></span></div>`;$('pp_v').focus();return}
   if(a.dataset.gppc){a.closest('.ppf').innerHTML='';return}
-  if(a.dataset.gpps){const[id,ref,falta,vr]=a.dataset.gpps.split('|'),v=+$('pp_v').value.trim().replace(/\./g,'').replace(',','.');
+  if(a.dataset.gpps){const[id,ref,falta,vr]=a.dataset.gpps.split('|'),v=+$('pp_v').value.trim().replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');
     if(!(v>0))return $('pp_m').innerHTML='<span class="neg">Valor.</span>';if(!vr&&v>+falta+.005)return $('pp_m').innerHTML=`<span class="neg">Maior que o que falta (${brl(+falta)}).</span>`;
     a.textContent='salvando…';a.disabled=true;try{const r=await api({acao:'pagar_pagamento',id,ref,valor:v,data:$('pp_d').value,obs:$('pp_o').value,meio:$('pp_m').value,quitar:!!vr});PAGS=r.pagamentos;render()}catch(err){a.disabled=false;a.textContent='não salvou: '+err.message}return}
   if(a.dataset.gpr){if(a.dataset.ok!=='1'){a.dataset.ok='1';a.textContent='toque de novo para desfazer';return}const[id,ref,i]=a.dataset.gpr.split('|');a.textContent='desfazendo…';
@@ -502,7 +502,7 @@ function limpaG(){EDG=null;PGID='';PIXAUTO='';$('pg_pixh').textContent='';['pg_p
 $('pg_can').onclick=()=>{limpaG();$('pg_msg').textContent=''};
 $('g2_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;G2F=b.dataset.f;document.querySelectorAll('#g2_fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderPag()};
 $('pg_ok').onclick=async()=>{const m=$('pg_msg'),nome=$('pg_pes').value.trim(),x=acharPes(nome);const er=t=>m.innerHTML='<span class="neg">'+t+'</span>';
-  const v=+$('pg_val').value.trim().replace(/\./g,'').replace(',','.');const tp=$('pg_tp').value;
+  const v=+$('pg_val').value.trim().replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');const tp=$('pg_tp').value;
   if(!nome)return er('Escolha quem recebe.');if(!(v>0))return er('Valor.');if(tp==='avulso'&&!$('pg_data').value)return er('Data do pagamento.');
   if(tp==='fixo'&&!(+$('pg_dia').value>=1&&+$('pg_dia').value<=31&&$('pg_ini').value))return er('Dia do mês e mês de início.');
   m.textContent='Salvando…';
@@ -561,7 +561,7 @@ $('e_tp').onchange=()=>{sitOpts($('e_tp').value,$('e_sit').value);pgVis()};
 $('e_can').onclick=limpaE;
 $('e_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;EFIL=b.dataset.f;document.querySelectorAll('#e_fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderEmp()};
 $('e_ok').onclick=async()=>{const m=$('e_msg'),t=$('e_tit').value.trim();if(!t){m.innerHTML='<span class="neg">Escreva o título.</span>';return}
-  const v=$('e_val').value.trim().replace(/\./g,'').replace(',','.');
+  const v=$('e_val').value.trim().replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');
   m.textContent='Salvando…';try{await salvaMeta({id:EDE||undefined,tipo:$('e_tp').value,socio:$('e_so').value,painel:$('e_pn').value,titulo:t,alvo:$('e_alvo').value,prazo:$('e_pz').value,valor:v,situacao:$('e_sit').value,ordem:$('e_ord').value,progresso:$('e_pro').value,atual:$('e_at').value.trim().replace(',','.'),meta_num:$('e_mn').value.trim().replace(',','.'),rotinas:[...$('e_rl').querySelectorAll('input:checked')].map(i=>i.value),tarefas:tlSel()});limpaE();m.innerHTML='<span class="pos">Salvo ✓</span>';render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
 $('e_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data-me]'),so=e.target.closest('[data-mso]'),pn=e.target.closest('[data-mpn]'),del=e.target.closest('[data-mdel]');if(!ed&&!so&&!pn&&!del)return;e.preventDefault();
   if(pn){const x=MT.find(y=>y.id===pn.dataset.mpn);pn.textContent='salvando…';try{await salvaMeta(Object.assign({},x,{painel:x.painel==='sim'?'não':'sim'}));render()}catch(err){pn.textContent='erro'}return}
@@ -633,7 +633,7 @@ $('so_doc').onchange=()=>{if($('so_doc').value&&!$('so_ti').value)$('so_ti').val
 $('so_ok').onclick=async()=>{const t=SOED?SOED.tipo:SOF,m=$('so_msg');if(t!=='nota_aporte'&&!$('so_ti').value.trim())return m.innerHTML='<span class="neg">Escreva o título.</span>';
   if(t==='nota_aporte'&&!$('so_dt').value)return m.innerHTML='<span class="neg">Data do aporte.</span>';
   if(t==='doc'&&!$('so_doc').value&&!/^https:\/\//.test($('so_lk').value))return m.innerHTML='<span class="neg">Escolha o arquivo ou cole um link https://</span>';
-  m.textContent='Salvando…';try{const r=await api({acao:'salvar_socio',item:{id:SOED?SOED.id:undefined,tipo:t,data:$('so_dt').value,titulo:$('so_ti').value,detalhe:$('so_de').value,valor:$('so_vl').value.trim().replace(/\./g,'').replace(',','.'),doc:t==='doc'?$('so_doc').value:'',link:$('so_lk').value.trim(),visivel:$('so_vi').value}});
+  m.textContent='Salvando…';try{const r=await api({acao:'salvar_socio',item:{id:SOED?SOED.id:undefined,tipo:t,data:$('so_dt').value,titulo:$('so_ti').value,detalhe:$('so_de').value,valor:$('so_vl').value.trim().replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'),doc:t==='doc'?$('so_doc').value:'',link:$('so_lk').value.trim(),visivel:$('so_vi').value}});
     SO=r.socio;socRender();soFecha()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
 $('so_del').onclick=async()=>{const b=$('so_del');if(b.dataset.ok!=='1'){b.dataset.ok='1';b.textContent='toque de novo para excluir';return}b.textContent='excluindo…';
   try{SO=(await api({acao:'excluir_socio',id:SOED.id})).socio;socRender();soFecha()}catch(e){b.textContent='erro'}};
@@ -646,7 +646,7 @@ $('ln_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;LFIL=b
 $('ln_lista').onclick=e=>{const b=e.target.closest('[data-id]');if(b)lnSheet(lnTodos().find(x=>x.id===b.dataset.id))};
 $('ln_ok').onclick=async()=>{const m=$('ln_msg'),x=LED,ext=x&&!x.novo;let o;
   if(ext)o={id:x.aj&&x.aj.id,ref:x.id,quem:$('ln_qm').value,cat:$('ln_ct').value,show:$('ln_shw').value,obs:$('ln_ob').value};
-  else{const v=+$('ln_vl').value.replace(/\./g,'').replace(',','.'),dt=$('ln_dt').value;
+  else{const v=+$('ln_vl').value.replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'),dt=$('ln_dt').value;
     if(!dt){m.innerHTML='<span class="neg">Escolha a data.</span>';return}
     if(dt<=AD.ext_ate){m.innerHTML=`<span class="neg">Até ${ddmm(AD.ext_ate)} vale o extrato: edite o lançamento de lá.</span>`;return}
     if(!(v>0)){m.innerHTML='<span class="neg">Escreva o valor.</span>';return}
@@ -659,7 +659,7 @@ $('ln_del').onclick=async()=>{const d=$('ln_del'),x=LED,id=x&&(x.novo?x.novo.id:
 document.addEventListener('keydown',e=>{if(e.key==='Escape')lnFecha()});
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag','lan','soc','cfg'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='cfg')cfgAbre();if(b.dataset.t==='lan')lnAbre();if(b.dataset.t==='pag')arecAbre();if(b.dataset.t==='soc')socAbre()};
 </script>
-<script src="../lbchat.js?v=mwhhjrls"></script>
+<script src="../lbchat.js?v=mwhuopp8"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>
