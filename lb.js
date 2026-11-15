@@ -112,7 +112,7 @@
     ocorr(g, ate) {
       let pago = {}; try { pago = JSON.parse(g.pagos || '{}') || {}; } catch (e) { }
       const pc = pgx.parc(g), sm = r => (pc[r] || []).reduce((a, x) => a + (+x.valor || 0), 0), V = +g.valor || 0;
-      const oc = (ref, data) => { const p = Math.round(sm(ref) * 100) / 100; return { ref, data, pago: pago[ref] || '', pg: p, falta: Math.round((V - p) * 100) / 100 }; };
+      const oc = (ref, data) => { const p = Math.round(sm(ref) * 100) / 100; return { ref, data, pago: pago[ref] || '', pg: p, falta: pago[ref] ? 0 : Math.round((V - p) * 100) / 100 }; };
       if (g.tipo !== 'fixo') return g.data && g.data <= ate ? [oc('unico', g.data)] : [];
       if (!/^\d{4}-\d{2}$/.test(g.inicio || '')) return [];
       const out = []; let [y, m] = g.inicio.split('-').map(Number); const lim = g.fim || '9999-99';
