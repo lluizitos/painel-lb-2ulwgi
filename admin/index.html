@@ -293,8 +293,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwi5f62w"></script>
-<script src="../lbmetas.js?v=mwi5f62w"></script>
+<script src="../lb.js?v=mwi5xtie"></script>
+<script src="../lbmetas.js?v=mwi5xtie"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -725,8 +725,8 @@ let ENV=[],ENVID=null,ENVT=false;
 async function envCarrega(){try{ENV=(await api({acao:'envios'})).envios||[];envRender()}catch(e){}}
 function envRender(){const pd=ENV.filter(x=>x.status==='pendente');$('env_n').textContent=pd.length?'('+pd.length+')':'';
   const l=ENVT?ENV.slice(0,30):pd;const st={pendente:'aguardando',lançado:'✅ lançado',conferido:'✓ já estava no extrato',descartado:'descartado'};
-  $('env_box').innerHTML=(ENV.length?`<div class="envh"><b>📎 COMPROVANTES ENVIADOS PELO PAINEL${pd.length?' · '+pd.length+' para conferir':''}</b><a href="#" id="env_t">${ENVT?'só os pendentes':'ver todos'}</a></div>`:'')+
-  l.map(x=>{const a=x.ia&&x.ia.e_comprovante!==false?x.ia:null;return `<div class="envc ${x.status==='pendente'?'':'ok'}"><div class="mt">${esc(x.nome||x.usuario)} · ${esc(ddmm(x.criado_em)+' '+String(x.criado_em).slice(11,16))} · ${st[x.status]||x.status}</div>
+  $('env_box').innerHTML=(ENV.length?`<div class="envh"><b>📎 ANEXOS ENVIADOS PELOS CHATS${pd.length?' · '+pd.length+' para conferir':''}</b><a href="#" id="env_t">${ENVT?'só os pendentes':'ver todos'}</a></div>`:'')+
+  l.map(x=>{const a=x.ia&&x.ia.e_comprovante!==false?x.ia:null;return `<div class="envc ${x.status==='pendente'?'':'ok'}"><div class="mt">${esc(x.nome||x.usuario)}${x.pagina?' · '+esc(x.pagina):''} · ${esc(ddmm(x.criado_em)+' '+String(x.criado_em).slice(11,16))} · ${st[x.status]||x.status}</div>
   <div class="rs">${a?esc(a.resumo||''):x.ia?'⚠️ '+esc(x.ia.resumo||'não parece comprovante'):'Comprovante (ainda sem leitura automática)'}</div>${a?`<div class="nt">${[a.tipo==='entrada'?'Entrada':a.tipo==='saida'?'Saída':'',a.valor?brl2(a.valor):'',a.quem,a.data?ddmm(a.data):''].filter(Boolean).map(esc).join(' · ')}</div>`:''}${x.nota?`<div class="nt">“${esc(x.nota)}”</div>`:''}
   <div class="ac"><button class="btn sm" data-ev="ver" data-id="${esc(x.id)}">📄 Ver arquivo</button>${x.status==='pendente'?`<button class="btn sm pkb" data-ev="lan" data-id="${esc(x.id)}">Lançar</button><button class="btn sm" data-ev="conferido" data-id="${esc(x.id)}">Já está no extrato</button><button class="btn sm" data-ev="descartado" data-id="${esc(x.id)}">Descartar</button>`:`<button class="btn sm" data-ev="pendente" data-id="${esc(x.id)}">Voltar para conferir</button>`}<button class="btn sm" data-ev="del" data-id="${esc(x.id)}">Excluir</button></div></div>`}).join('')}
 $('env_box').onclick=async e=>{if(e.target.id==='env_t'){e.preventDefault();ENVT=!ENVT;envRender();return}
@@ -749,7 +749,7 @@ $('duv_f').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;DUVF=b.
 $('duv_l').addEventListener('click',async e=>{const b=e.target.closest('[data-ds]');if(!b)return;const r=document.querySelector(`[data-dr="${b.dataset.ds}"]`).value.trim();if(!r){b.textContent='escreva a resposta';return}
   b.disabled=true;b.textContent='enviando…';try{DUV=(await api({acao:'responder_duvida',id:b.dataset.ds,resposta:r})).duvidas||DUV;duvRender()}catch(err){b.disabled=false;b.textContent='não enviou: '+err.message}});
 </script>
-<script src="../lbchat.js?v=mwi5f62w"></script>
+<script src="../lbchat.js?v=mwi5xtie"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

@@ -45,9 +45,10 @@
   }
   /* el = elemento; op.contexto() = texto curto com os dados; op.base = caminho até config.json; op.exemplos = sugestões no placeholder */
   function montar(el, op) {
-    if (!el) return; if (!document.getElementById('lbqcss')) { const s = document.createElement('style'); s.id = 'lbqcss'; s.textContent = CSS; document.head.appendChild(s); }
+    if (!el) return; if (op.anexo === undefined) op = Object.assign({}, op, { anexo: true }); // 📎 em todos os chats
+    if (!document.getElementById('lbqcss')) { const s = document.createElement('style'); s.id = 'lbqcss'; s.textContent = CSS; document.head.appendChild(s); }
     el.className = 'lbq';
-    el.innerHTML = `<div class="du"></div>${op.anexo ? '<div class="ev" hidden></div><div class="qf" hidden></div>' : ''}<form>${op.anexo ? '<button type="button" class="qan" title="Mandar comprovante (foto ou PDF)" aria-label="Anexar comprovante">📎</button>' : ''}<input maxlength="300" placeholder="💬 Pergunte sua dúvida${op.exemplo ? ' · ex.: ' + esc(op.exemplo) : ''}" aria-label="Pergunte sua dúvida" enterkeyhint="send"><button>Perguntar</button></form>${op.anexo ? '<div class="qm"><button type="button" data-qm="cam">📷 Tirar foto</button><button type="button" data-qm="arq">🖼️ Foto ou PDF do celular</button></div><input type="file" accept="image/*" capture="environment" hidden data-qin="cam"><input type="file" accept="image/*,application/pdf" hidden data-qin="arq">' : ''}<div class="qs"></div><div class="qo"></div>`;
+    el.innerHTML = `<div class="du"></div>${op.anexo ? '<div class="ev" hidden></div><div class="qf" hidden></div>' : ''}<form>${op.anexo ? '<button type="button" class="qan" title="Mandar comprovante ou documento (foto ou PDF)" aria-label="Anexar arquivo">📎</button>' : ''}<input maxlength="300" placeholder="💬 Pergunte sua dúvida${op.exemplo ? ' · ex.: ' + esc(op.exemplo) : ''}" aria-label="Pergunte sua dúvida" enterkeyhint="send"><button>Perguntar</button></form>${op.anexo ? '<div class="qm"><button type="button" data-qm="cam">📷 Tirar foto</button><button type="button" data-qm="arq">🖼️ Foto ou PDF do celular</button></div><input type="file" accept="image/*" capture="environment" hidden data-qin="cam"><input type="file" accept="image/*,application/pdf" hidden data-qin="arq">' : ''}<div class="qs"></div><div class="qo"></div>`;
     const f = el.querySelector('form'), inp = f.querySelector('input'), bt = f.querySelector('button:not(.qan)'), out = el.querySelector('.qo'), du = el.querySelector('.du');
     let api = '', DOC = null;
     const AT = op.atalhos || [], PG = 'lbq_' + (op.pagina || location.pathname.split('/').filter(Boolean).slice(-1)[0] || 'painel');
@@ -101,11 +102,11 @@
     const tiraArq = () => { ARQ = null; if (qf) { qf.hidden = true; qf.innerHTML = ''; } inp.placeholder = PH; bt.textContent = 'Perguntar'; };
     const STV = { pendente: ['⏳ o Luiz vai conferir', ''], 'lançado': ['✅ lançado', 'ok'], conferido: ['✓ conferido', 'ok'], descartado: ['descartado', 'x'] };
     const evRender = l => { if (!ev) return; const v = (l || []).filter(x => x.status === 'pendente' || Date.now() - new Date(String(x.atualizado_em).replace(' ', 'T')).getTime() < 3 * 864e5).slice(0, 5);
-      ev.hidden = !v.length; ev.innerHTML = v.length ? '<b>📎 SEUS COMPROVANTES</b>' + v.map(x => { const s = STV[x.status] || STV.pendente; return `<div><small>${esc(String(x.criado_em).slice(8, 10) + '/' + String(x.criado_em).slice(5, 7))}</small><span>${esc((x.ia && x.ia.e_comprovante !== false && x.ia.resumo) || x.nota || 'Comprovante')}</span><em class="${s[1]}">${s[0]}</em></div>`; }).join('') : ''; };
-    const evCarrega = async () => { if (!ev || op.auth || !window.LB || !LB.senha) return;
+      ev.hidden = !v.length; ev.innerHTML = v.length ? '<b>📎 SEUS ENVIOS</b>' + v.map(x => { const s = STV[x.status] || STV.pendente; return `<div><small>${esc(String(x.criado_em).slice(8, 10) + '/' + String(x.criado_em).slice(5, 7))}</small><span>${esc((x.ia && x.ia.e_comprovante !== false && x.ia.resumo) || x.nota || 'Comprovante')}</span><em class="${s[1]}">${s[0]}</em></div>`; }).join('') : ''; };
+    const evCarrega = async () => { if (!ev || (!op.auth && (!window.LB || !LB.senha))) return;
       try { const r = await (await fetch(await URL_(), { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'meus_envios' }, cred())) })).json(); if (r.ok) evRender(r.envios); } catch (e) { } };
     if (op.anexo) {
-      { let n = 0; const t = setInterval(() => { if ((window.LB && LB.senha) || ++n > 90) { clearInterval(t); evCarrega(); } }, 2000); setInterval(evCarrega, 300000); }
+      { let n = 0; const t = setInterval(() => { if (op.auth || (window.LB && LB.senha) || ++n > 90) { clearInterval(t); evCarrega(); } }, 2000); setInterval(evCarrega, 300000); }
       f.querySelector('.qan').onclick = e => { e.stopPropagation(); qm.classList.toggle('on'); };
       document.addEventListener('click', e => { if (!e.target.closest('.qm')) qm.classList.remove('on'); });
       qm.onclick = e => { const b = e.target.closest('[data-qm]'); if (!b) return; qm.classList.remove('on'); const i = el.querySelector(`[data-qin="${b.dataset.qm}"]`); i.value = ''; i.click(); };
@@ -113,7 +114,7 @@
         if (!/^image\//.test(a.type) && a.type !== 'application/pdf') { out.innerHTML = '<div class="qr"><div class="qt qe">Mande foto ou PDF.</div></div>'; return; }
         ARQ = a; const im = /^image\//.test(a.type) ? URL.createObjectURL(a) : '';
         qf.innerHTML = `${im ? `<img src="${im}" alt="">` : '📄'}<span>${esc(a.name || 'comprovante')}</span><a href="#" class="qfx" aria-label="Tirar anexo">✕</a>`; qf.hidden = false;
-        inp.placeholder = 'O que é? (opcional) · ex.: paguei o som do show de Patos'; bt.textContent = 'Enviar'; inp.focus(); });
+        inp.placeholder = 'O que é? (opcional) · ex.: comprovante do som de Patos'; bt.textContent = 'Enviar'; inp.focus(); });
       qf.onclick = e => { if (e.target.closest('.qfx')) { e.preventDefault(); tiraArq(); } };
     }
     async function enviaArq() {
@@ -121,11 +122,11 @@
       out.innerHTML = `<div class="qr"><div class="qp">📎 ${esc(a.name || 'comprovante')}${nota ? ' · ' + esc(nota) : ''}</div><div class="qt"><span class="ql"></span>Enviando e lendo o comprovante…</div></div>`;
       try {
         const x = await prepArq(a); await URL_();
-        const r = await (await fetch(api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'enviar_comprovante', dados: x.dados, tipo: x.tipo, nota: nota }, cred())) })).json();
+        const r = await (await fetch(api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'enviar_comprovante', dados: x.dados, tipo: x.tipo, nota: nota, pagina: String(op.pagina || document.title || '').slice(0, 30) }, cred())) })).json();
         if (!r.ok) { out.innerHTML = `<div class="qr"><div class="qt qe">${r.erro === 'grande' ? 'Arquivo grande demais (máx. 5 MB).' : r.erro === 'limite' ? 'Muitos envios hoje. Amanhã libera de novo.' : r.erro === 'acesso' ? 'Sem acesso para mandar comprovante.' : 'Não consegui enviar. Tente de novo.'}</div></div>`; return; }
         const L = r.leitura, ok = L && L.e_comprovante !== false;
         const det = ok ? [L.tipo === 'entrada' ? 'Entrada' : L.tipo === 'saida' ? 'Saída' : '', L.valor ? brl(L.valor) : '', L.quem, L.data ? L.data.slice(8, 10) + '/' + L.data.slice(5, 7) : ''].filter(Boolean).join(' · ') : '';
-        out.innerHTML = `<div class="qr"><div class="qp">📎 ${esc(a.name || 'comprovante')}${nota ? ' · ' + esc(nota) : ''}</div><div class="qt">✅ Comprovante enviado. O Luiz confere e lança.${ok && L.resumo ? '\n\nLi aqui: ' + esc(L.resumo) : ''}</div>${det ? `<div class="qc">${esc(det)}</div>` : ''}${L && L.e_comprovante === false ? `<div class="qv">Não parece um comprovante: ${esc(L.resumo || '')}. Se estiver certo, tudo bem: o Luiz vê do mesmo jeito.</div>` : ''}<div class="qn"><span>Fica guardado numa pasta privada do Drive.</span><span><a href="#" class="qx">fechar</a></span></div></div>`;
+        out.innerHTML = `<div class="qr"><div class="qp">📎 ${esc(a.name || 'comprovante')}${nota ? ' · ' + esc(nota) : ''}</div><div class="qt">✅ Enviado para o Luiz conferir.${ok && L.resumo ? '\n\nLi aqui: ' + esc(L.resumo) : ''}</div>${det ? `<div class="qc">${esc(det)}</div>` : ''}${L && L.e_comprovante === false ? `<div class="qv">Não parece um comprovante: ${esc(L.resumo || '')}. Se estiver certo, tudo bem: o Luiz vê do mesmo jeito.</div>` : ''}<div class="qn"><span>Fica guardado numa pasta privada do Drive.</span><span><a href="#" class="qx">fechar</a></span></div></div>`;
         inp.value = ''; tiraArq(); evCarrega();
       } catch (er) { out.innerHTML = `<div class="qr"><div class="qt qe">${esc(er && er.message && /PDF|foto/.test(er.message) ? er.message : 'Sem conexão. Tente de novo.')}</div></div>`; }
       finally { setTimeout(() => { bt.disabled = false; }, 1500); }
