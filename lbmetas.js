@@ -73,6 +73,11 @@
 .alr button{display:flex;justify-content:space-between;gap:10px;width:100%;margin-top:6px;border:0;background:var(--card);color:inherit;border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;font-weight:600;text-align:left;cursor:pointer}.alr button small{color:var(--pinkl);font-weight:700;white-space:nowrap}
 .alrok{font-size:13px;color:var(--pos);background:rgba(127,221,169,.08);border-radius:12px;padding:9px 12px;margin:14px 0}
 .cat summary{list-style:none;display:flex;gap:8px;align-items:center;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);margin:16px 2px 8px}
+.nv{display:flex;gap:8px;margin:18px 0 4px}.nv button{flex:1;border:1px dashed var(--line);background:transparent;color:var(--sub);border-radius:12px;padding:11px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}.nv button.on{border-style:solid;border-color:var(--pinkl);color:var(--pinkl)}
+.nvf{background:var(--card);border-radius:14px;padding:14px;margin-top:8px}.nvf label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}.nvf label:first-child{margin-top:0}
+.nvf input,.nvf select,.nvf textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;background:var(--bg,#141218);color:inherit;font:inherit;font-size:15px;padding:9px}.nvf textarea{min-height:60px}
+.nvf .rkb{display:flex;gap:8px;margin-top:12px}.nvf .rkb button{flex:1;border:1px solid var(--line);background:transparent;color:inherit;border-radius:10px;padding:10px;font-weight:700;cursor:pointer}.nvf .rkb .ok{background:var(--pos);border-color:var(--pos);color:#141218}.nvf .msg{font-size:13px;color:var(--neg);margin-top:8px}
+.pso{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-left:6px}.bt.del{color:var(--neg);border-color:rgba(255,143,168,.4)}
 .cat summary::-webkit-details-marker{display:none}.cat summary small{color:var(--muted);letter-spacing:0}.cat summary::after{content:'▾';color:var(--muted);margin-left:auto}.cat:not([open]) summary::after{content:'▸'}`;
   function css() { if (!document.getElementById('lbmcss')) { const st = document.createElement('style'); st.id = 'lbmcss'; st.textContent = CSS; document.head.appendChild(st); } }
 
@@ -98,11 +103,11 @@
       else bt = valeNoDia(r, hj) ? `<button class="rk ${nHj ? 'on' : 'go'}" data-rf="${hj}" data-rid="${esc(r.id)}"${nHj ? '' : ' data-novo="1"'}>${nHj ? '✓ Feito hoje' : 'Marcar hoje'}</button>` : '<div class="rs" style="margin-top:8px">Hoje não conta para esta meta.</div>';
     }
     const reg = Object.keys(nt).filter(d => d.startsWith(m)).sort().reverse();
-    return `<div class="rt" id="rt-${esc(r.id)}"><div class="rh"><b>${esc(r.titulo)}</b><span class="rp" style="color:${cor(ehMes ? x.ritmo : x.pct)}">${P100(ehMes ? x.ritmo : x.pct)}</span></div>
+    return `<div class="rt" id="rt-${esc(r.id)}"><div class="rh"><b>${esc(r.titulo)}${r.criado_por === 'próprio' && !op.adm ? '<span class="pso">minha</span>' : ''}</b><span class="rp" style="color:${cor(ehMes ? x.ritmo : x.pct)}">${P100(ehMes ? x.ritmo : x.pct)}</span></div>
       <div class="rs">${sub}${x.just ? ` · ${x.just} justificad${x.just > 1 ? 'os' : 'o'} (não conta contra)` : ''}${ehMes ? ` · ${P100(x.pct)} do mês inteiro` : ''}</div><div class="br"><i style="width:${Math.round(x.pct * 100)}%;background:${cor(ehMes ? x.ritmo : x.pct)}"></i></div>
       ${bt}<div class="rkx"></div>
       <details${ehMes && !op.adm ? '' : ' open'}><summary style="margin:10px 2px 0;font-size:12px">Calendário de ${MESES[+m.slice(5, 7) - 1]} (toque num dia para marcar ou corrigir)</summary><div class="cal">${cal}</div>
-      ${reg.length ? `<div class="rlg">${reg.map(d => `<div><b>${ddmm(d)}</b><span>${ehJ(nt[d]) && !ck.includes(d) ? `<em class="jtx">não feito · justificado</em> ${esc(String(nt[d]).replace(/^✗\s*/, ''))}` : esc(nt[d])}</span></div>`).join('')}</div>` : ''}</details></div>`;
+      ${reg.length ? `<div class="rlg">${reg.map(d => `<div><b>${ddmm(d)}</b><span>${ehJ(nt[d]) && !ck.includes(d) ? `<em class="jtx">não feito · justificado</em> ${esc(String(nt[d]).replace(/^✗\s*/, ''))}` : esc(nt[d])}</span></div>`).join('')}</div>` : ''}${r.criado_por === 'próprio' && !op.adm && ehMes ? `<div class="bts"><button class="bt del" data-del="${esc(r.id)}" data-dt="meta">Apagar esta meta</button></div>` : ''}</details></div>`;
   }
 
   /* formulário rápido dentro do cartão: marcar (com justificativa), editar justificativa, desmarcar.
@@ -144,12 +149,13 @@
     app._rot = () => ST.R;
     function card(t, HJ) {
       const atr = t.status !== 'Concluída' && t.prazo && t.prazo < HJ, c = t.status === 'Concluída' ? 'ok' : atr ? 'atr' : t.status === 'Em andamento' ? 'and' : '';
-      return `<div class="tf ${c}"><b>${esc(t.titulo)}</b>${t.descricao ? `<div class="ds">${esc(t.descricao)}</div>` : ''}
+      const meu = t.criado_por === 'próprio', del = meu ? `<button class="bt del" data-del="${esc(t.id)}" data-dt="tarefa">Apagar</button>` : '';
+      return `<div class="tf ${c}"><b>${esc(t.titulo)}${meu ? '<span class="pso">minha</span>' : ''}</b>${t.descricao ? `<div class="ds">${esc(t.descricao)}</div>` : ''}
     <div class="pz">${t.status === 'Concluída' ? 'Concluída em ' + ddmm(t.concluido_em) : t.prazo ? (atr ? '<span class="neg">Atrasada · era até ' + ddmm(t.prazo) + '</span>' : 'Entregar até ' + ddmm(t.prazo)) : 'Sem prazo'}</div>
     ${t.justificativa ? `<div class="tj"><em class="jtx">Justificativa${t.justificado_em ? ' · ' + ddmm(t.justificado_em) : ''}:</em> ${esc(t.justificativa)}</div>` : ''}
     <div class="tjf" data-tjf="${esc(t.id)}"></div>
-    <div class="bts">${t.status === 'Concluída' ? `<button class="bt" data-id="${esc(t.id)}" data-s="A fazer">Reabrir</button>`
-        : `<button class="bt${t.status === 'Em andamento' ? ' on' : ''}" data-id="${esc(t.id)}" data-s="${t.status === 'Em andamento' ? 'A fazer' : 'Em andamento'}">${t.status === 'Em andamento' ? '◐ Em andamento' : 'Comecei'}</button><button class="bt done" data-id="${esc(t.id)}" data-s="Concluída">✓ Concluí</button><button class="bt jbt" data-tj="${esc(t.id)}">${t.justificativa ? 'Editar justificativa' : atr ? 'Justificar atraso' : 'Não vou conseguir'}</button>`}</div></div>`;
+    <div class="bts">${t.status === 'Concluída' ? `<button class="bt" data-id="${esc(t.id)}" data-s="A fazer">Reabrir</button>${del}`
+        : `<button class="bt${t.status === 'Em andamento' ? ' on' : ''}" data-id="${esc(t.id)}" data-s="${t.status === 'Em andamento' ? 'A fazer' : 'Em andamento'}">${t.status === 'Em andamento' ? '◐ Em andamento' : 'Comecei'}</button><button class="bt done" data-id="${esc(t.id)}" data-s="Concluída">✓ Concluí</button><button class="bt jbt" data-tj="${esc(t.id)}">${t.justificativa ? 'Editar justificativa' : atr ? 'Justificar atraso' : 'Não vou conseguir'}</button>${del}`}</div></div>`;
     }
     function render() {
       const HJ = hoje(), MES = HJ.slice(0, 7), P = ST.P, T = ST.T, R = ST.R;
@@ -164,6 +170,7 @@
     ${PD.length ? `<div class="alr"><b>⏰ Falta marcar</b>${PD.map(([x, q]) => `<button data-alr="${esc(x.id)}">${esc(x.titulo)}<small>${esc(q)} →</small></button>`).join('')}</div>`
           : R.length ? '<div class="alrok">✓ Tudo marcado por hoje.</div>' : ''}
     ${P.meta ? `<div class="meta"><span>Minha meta</span>${esc(P.meta)}</div>` : ''}
+    <div class="nv"><button data-nv="tarefa"${NV === 'tarefa' ? ' class="on"' : ''}>＋ Nova tarefa</button><button data-nv="meta"${NV === 'meta' ? ' class="on"' : ''}>＋ Nova meta</button></div><div id="nvbox">${form()}</div>
     ${R.length ? `<h3>Metas de ${MESES[+MES.slice(5, 7) - 1]}</h3><div class="list" data-max="0">${R.map(x => cardRot(x, HJ)).join('')}</div>` : ''}
     ${rAnt.length ? `<details><summary>Resultado de ${MESES[ant.getMonth()]}</summary><div class="list" data-max="0">${rAnt.map(x => cardRot(x, HJ, MA)).join('')}</div></details>` : ''}
     <div class="res"><div>A fazer<b>${ab.length}</b></div><div>Atrasadas<b style="${ab.some(t => t.prazo && t.prazo < HJ) ? 'color:var(--neg)' : ''}">${ab.filter(t => t.prazo && t.prazo < HJ).length}</b></div><div>Feitas no mês<b style="color:var(--pos)">${okm.length}</b></div></div>
@@ -172,6 +179,37 @@
           : `<div class="list">${ab.map(t => card(t, HJ)).join('')}</div>`}
     ${ok.length ? `<details${ok.length <= 3 ? ' open' : ''}><summary>Concluídas (${ok.length})</summary><div class="list">${ok.slice(0, 30).map(t => card(t, HJ)).join('')}</div></details>` : ''}`;
     }
+    let NV = '';
+    function form() {
+      if (NV === 'tarefa') return `<div class="nvf"><label>Tarefa</label><input id="nv_t" maxlength="200" placeholder="ex.: mandar o orçamento do figurino">
+        <label>Detalhes (opcional)</label><textarea id="nv_d" maxlength="2000"></textarea>
+        <label>Prazo (opcional)</label><input id="nv_p" type="date">
+        <label>Categoria (opcional)</label><input id="nv_c" maxlength="40" placeholder="Pessoal">
+        <div class="msg" id="nv_m"></div><div class="rkb"><button class="ok" data-nvs="tarefa">Criar tarefa</button><button data-nv="">Cancelar</button></div></div>`;
+      if (NV === 'meta') return `<div class="nvf"><label>Meta</label><input id="nv_t" maxlength="120" placeholder="ex.: estudar inglês">
+        <label>Quantas vezes</label><select id="nv_f"><option value="dia">Todo dia</option><option value="util">Todo dia útil (seg a sex)</option><option value="semana">Algumas vezes por semana</option><option value="mes">Algumas vezes no mês</option></select>
+        <div id="nv_aw" style="display:none"><label>Quantas vezes</label><input id="nv_a" type="number" min="1" max="99" value="3"></div>
+        <label>Até quando (opcional)</label><input id="nv_fim" type="date">
+        <div class="msg" id="nv_m"></div><div class="rkb"><button class="ok" data-nvs="meta">Criar meta</button><button data-nv="">Cancelar</button></div></div>`;
+      return '';
+    }
+    app.addEventListener('change', e => { if (e.target.id === 'nv_f') document.getElementById('nv_aw').style.display = /semana|mes/.test(e.target.value) ? '' : 'none'; });
+    app.addEventListener('click', async e => {
+      const o = e.target.closest('[data-nv]');
+      if (o) { e.preventDefault(); NV = NV === o.dataset.nv ? '' : o.dataset.nv; app.querySelectorAll('.nv button').forEach(b => b.classList.toggle('on', b.dataset.nv === NV));
+        app.querySelector('#nvbox').innerHTML = form(); const i = app.querySelector('#nv_t'); if (i) i.focus(); return; }
+      const s = e.target.closest('[data-nvs]');
+      if (s) { e.preventDefault(); const v = id => ((app.querySelector('#' + id) || {}).value || '').trim(), m = app.querySelector('#nv_m');
+        if (!v('nv_t')) { m.textContent = 'Escreva o nome.'; app.querySelector('#nv_t').focus(); return; }
+        s.disabled = true; s.textContent = 'salvando…';
+        try { const r = await chamar(s.dataset.nvs === 'tarefa' ? { acao: 'nova_tarefa', tarefa: { titulo: v('nv_t'), descricao: v('nv_d'), prazo: v('nv_p'), categoria: v('nv_c') } }
+            : { acao: 'nova_meta', rotina: { titulo: v('nv_t'), freq: v('nv_f'), alvo: v('nv_a'), fim: v('nv_fim') } });
+          NV = ''; aplica(r); } catch (err) { s.disabled = false; s.textContent = 'Tentar de novo'; m.textContent = 'Não salvou. Confira a internet e tente de novo.'; } return; }
+      const d = e.target.closest('[data-del]');
+      if (d) { e.preventDefault(); if (d.dataset.ok !== '1') { d.dataset.ok = '1'; d.textContent = 'Toque de novo para apagar'; return; }
+        d.disabled = true; d.textContent = 'apagando…';
+        try { aplica(await chamar({ acao: 'excluir_minha', tipo: d.dataset.dt, id: d.dataset.del })); } catch (err) { d.disabled = false; d.textContent = 'não apagou, tente de novo'; } }
+    });
     const aplica = x => { ST.P = x.perfil; ST.T = x.tarefas || []; ST.R = x.rotinas || []; render(); };
     // alerta: leva até o cartão da meta e abre o formulário de marcar
     app.addEventListener('click', e => { const b = e.target.closest('[data-alr]'); if (!b) return; const c = document.getElementById('rt-' + b.dataset.alr); if (!c) return;
