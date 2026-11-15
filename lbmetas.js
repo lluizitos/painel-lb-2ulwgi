@@ -64,7 +64,7 @@
 .cal button{aspect-ratio:1;border:1px solid var(--line);background:transparent;border-radius:8px;font-size:11px;color:var(--sub);padding:0;position:relative;cursor:pointer}
 .cal button.ok{background:var(--pos);border-color:var(--pos);color:#141218;font-weight:700}.cal button.fx{border-color:rgba(255,143,168,.45);color:var(--neg)}
 .cal button.nt::after{content:'';position:absolute;top:3px;right:3px;width:5px;height:5px;border-radius:9px;background:#141218;opacity:.55}
-.cal button.js{background:rgba(245,196,81,.18);border-color:#F5C451;color:#F5C451;font-weight:700}.jtx{font-style:normal;color:#F5C451;font-weight:700}
+.cal button.js{background:rgba(245,196,81,.18);border-color:#F5C451;color:#F5C451;font-weight:700}.jtx{font-style:normal;color:#F5C451;font-weight:700}.tj{margin-top:6px;font-size:13px;color:var(--sub);overflow-wrap:anywhere}.bt.jbt{color:#F5C451;border-color:rgba(245,196,81,.45)}
 .rkj{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.rkj button{border:1px solid var(--line);background:transparent;color:var(--sub);border-radius:99px;padding:6px 10px;font-size:12.5px;cursor:pointer}.rkj button.on{border-color:#F5C451;color:#F5C451}.rkf .rkb .jb{color:#F5C451;border-color:rgba(245,196,81,.5)}
 .cal button.hj{outline:2px solid var(--pinkl);outline-offset:1px}.cal button:disabled{opacity:.3;cursor:default}.cal button.na{visibility:hidden}
 .rlg{margin-top:10px;font-size:12.5px}.rlg div{display:flex;gap:8px;padding:5px 0;border-top:1px solid var(--line)}.rlg div b{flex:none;width:40px;color:var(--sub)}.rlg div span{flex:1;min-width:0;word-break:break-word}
@@ -146,8 +146,10 @@
       const atr = t.status !== 'Concluída' && t.prazo && t.prazo < HJ, c = t.status === 'Concluída' ? 'ok' : atr ? 'atr' : t.status === 'Em andamento' ? 'and' : '';
       return `<div class="tf ${c}"><b>${esc(t.titulo)}</b>${t.descricao ? `<div class="ds">${esc(t.descricao)}</div>` : ''}
     <div class="pz">${t.status === 'Concluída' ? 'Concluída em ' + ddmm(t.concluido_em) : t.prazo ? (atr ? '<span class="neg">Atrasada · era até ' + ddmm(t.prazo) + '</span>' : 'Entregar até ' + ddmm(t.prazo)) : 'Sem prazo'}</div>
+    ${t.justificativa ? `<div class="tj"><em class="jtx">Justificativa${t.justificado_em ? ' · ' + ddmm(t.justificado_em) : ''}:</em> ${esc(t.justificativa)}</div>` : ''}
+    <div class="tjf" data-tjf="${esc(t.id)}"></div>
     <div class="bts">${t.status === 'Concluída' ? `<button class="bt" data-id="${esc(t.id)}" data-s="A fazer">Reabrir</button>`
-        : `<button class="bt${t.status === 'Em andamento' ? ' on' : ''}" data-id="${esc(t.id)}" data-s="${t.status === 'Em andamento' ? 'A fazer' : 'Em andamento'}">${t.status === 'Em andamento' ? '◐ Em andamento' : 'Comecei'}</button><button class="bt done" data-id="${esc(t.id)}" data-s="Concluída">✓ Concluí</button>`}</div></div>`;
+        : `<button class="bt${t.status === 'Em andamento' ? ' on' : ''}" data-id="${esc(t.id)}" data-s="${t.status === 'Em andamento' ? 'A fazer' : 'Em andamento'}">${t.status === 'Em andamento' ? '◐ Em andamento' : 'Comecei'}</button><button class="bt done" data-id="${esc(t.id)}" data-s="Concluída">✓ Concluí</button><button class="bt jbt" data-tj="${esc(t.id)}">${t.justificativa ? 'Editar justificativa' : atr ? 'Justificar atraso' : 'Não vou conseguir'}</button>`}</div></div>`;
     }
     function render() {
       const HJ = hoje(), MES = HJ.slice(0, 7), P = ST.P, T = ST.T, R = ST.R;
@@ -175,6 +177,16 @@
     app.addEventListener('click', e => { const b = e.target.closest('[data-alr]'); if (!b) return; const c = document.getElementById('rt-' + b.dataset.alr); if (!c) return;
       const k = c.querySelector('.rk[data-novo]') || c.querySelector('[data-rf]'); c.scrollIntoView({ block: 'center', behavior: 'smooth' }); if (k) k.click(); });
     liga(app, chamar, aplica);
+    app.addEventListener('click', async e => { // justificativa: abre um campo no cartão; salvar vazio apaga
+      const j = e.target.closest('[data-tj]');
+      if (j) { const t = ST.T.find(x => x.id === j.dataset.tj), box = app.querySelector(`[data-tjf="${j.dataset.tj}"]`); if (!t || !box) return;
+        box.innerHTML = `<div class="rkf"><b>Por que não deu para fazer${t.prazo ? ' até ' + ddmm(t.prazo) : ''}?</b><textarea maxlength="400" placeholder="ex.: esperando o material do fornecedor; faço até sexta">${esc(t.justificativa || '')}</textarea><div class="rkb"><button class="ok" data-tjs="${esc(t.id)}">Salvar justificativa</button><button data-tjc="1">Cancelar</button></div></div>`;
+        box.querySelector('textarea').focus(); return; }
+      if (e.target.closest('[data-tjc]')) { e.target.closest('.tjf').innerHTML = ''; return; }
+      const s = e.target.closest('[data-tjs]');
+      if (s) { const tx = s.closest('.rkf').querySelector('textarea').value.trim(); s.disabled = true; s.textContent = 'salvando…';
+        try { aplica(await chamar({ acao: 'marcar_tarefa', id: s.dataset.tjs, justificativa: tx })); } catch (err) { s.disabled = false; s.textContent = 'não salvou, tente de novo'; } return; }
+    });
     app.addEventListener('click', async e => {
       const b = e.target.closest('[data-id]'); if (!b) return; b.disabled = true; b.textContent = 'salvando…';
       try { aplica(await chamar({ acao: 'marcar_tarefa', id: b.dataset.id, status: b.dataset.s })); }

@@ -329,10 +329,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwhg6z5e"></script>
-<script src="lbmetas.js?v=mwhg6z5e"></script>
-<script src="lbchat.js?v=mwhg6z5e"></script>
-<script src="lbvendas.js?v=mwhg6z5e"></script>
+<script src="lb.js?v=mwhgfjd2"></script>
+<script src="lbmetas.js?v=mwhgfjd2"></script>
+<script src="lbchat.js?v=mwhgfjd2"></script>
+<script src="lbvendas.js?v=mwhgfjd2"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -544,7 +544,7 @@ function atv(r,MA){const A=D.atividades||{metas:{},feito:{}},mn=MESES[+MA.slice(
   const tl=pf?TAR.tarefas.filter(t=>t.pessoa===pf.id):[],fe2=tl.filter(t=>(t.concluido_em||'').startsWith(MA)),ab=tl.filter(t=>t.status!=='Concluída'),at=ab.filter(t=>t.prazo&&t.prazo<HOJE);
   fe2.forEach(t=>L.push(`<div class="it"><span>✓ ${esc(t.titulo)}</span><b class="pos" style="font-weight:600">feito ${ddmm(t.concluido_em)}</b></div>`));
   if(meta&&typeof meta==='object'&&!rts.length){const f=(A.feito[MA]||{})[r.nome]||{};[['Postagens','postagens'],['Conteúdos produzidos','conteudos']].forEach(([n,k])=>{if(meta[k])L.push(`<div class="it"><span>${n}</span><b>${f[k]==null?'a informar':f[k]} / ${meta[k]}</b></div>`)})}
-  const abH=ab.length?`<h5>Em aberto · ${ab.length}${at.length?` · <span class="pk">${at.length} atrasada${at.length>1?'s':''}</span>`:''}</h5><div class="list" data-max="4">${ab.sort((a,b)=>(a.prazo||'9').localeCompare(b.prazo||'9')).map(t=>`<div class="it"><span>${t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)}</span><b class="${t.prazo&&t.prazo<HOJE?'pk':''}" style="font-weight:600">${t.prazo?'até '+ddmm(t.prazo):t.status.toLowerCase()}</b></div>`).join('')}</div>`:'';
+  const abH=ab.length?`<h5>Em aberto · ${ab.length}${at.length?` · <span class="pk">${at.length} atrasada${at.length>1?'s':''}</span>`:''}</h5><div class="list" data-max="4">${ab.sort((a,b)=>(a.prazo||'9').localeCompare(b.prazo||'9')).map(t=>`<div class="it"><span>${t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)}${t.justificativa?` <small style="color:#F5C451">· justificou: ${esc(t.justificativa)}</small>`:''}</span><b class="${t.prazo&&t.prazo<HOJE?'pk':''}" style="font-weight:600">${t.prazo?'até '+ddmm(t.prazo):t.status.toLowerCase()}</b></div>`).join('')}</div>`:'';
   return `<div class="atv"><div class="mt"><span>Meta</span><b>${mt}</b></div><h5>O que fez em ${mn}</h5>${L.length?`<div class="list" data-max="6">${L.join('')}</div>`:`<div class="vend">Nada concluído nem marcado ainda em ${mn}.</div>`}${abH}
     <div class="vend" style="font-size:11.5px">Muda sozinho: tarefas concluídas e metas marcadas (Admin → Individuais)${/Bruninho|Bruno/.test(r.nome)?' e shows vendidos no mês (data da venda)':''}.</div></div>`}
 let TAR={perfis:[],tarefas:[]};
