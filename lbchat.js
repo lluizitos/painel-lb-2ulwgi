@@ -26,6 +26,11 @@
 .lbq .qa button b{color:var(--pinkl);margin-right:4px}.lbq .qa button small{color:var(--muted);font-weight:500}.lbq .qs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}.lbq .qs span{font-size:11.5px;color:var(--muted);margin-right:2px}
 .lbq .qs button{padding:6px 11px;font-size:12.5px}.lbq .qc{font-size:11.5px;color:var(--muted);margin-top:8px}.lbq .qc a{color:var(--pinkl)}
 @keyframes lbqf{0%,100%{box-shadow:0 0 0 0 transparent}25%,70%{box-shadow:0 0 0 3px var(--pink,#CF1D51)}}.lbqflash{animation:lbqf 1.4s ease 2;border-radius:10px;scroll-margin-top:90px}
+.lbq [hidden]{display:none!important}.lbq .qan{background:transparent!important;color:var(--ink)!important;font-size:19px!important;padding:6px 8px!important;line-height:1}.lbq{position:relative}.lbq .qm{display:none;position:absolute;z-index:30;left:0;margin-top:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.4);min-width:210px}
+.lbq .qm.on{display:grid}.lbq .qm button{background:transparent;color:var(--ink);text-align:left;padding:11px 12px;font-weight:600}.lbq .qm button:hover{background:var(--card2)}
+.lbq .qf{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:6px;font-size:13px}.lbq .qf img{width:38px;height:38px;object-fit:cover;border-radius:8px}.lbq .qf span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lbq .qf a{color:var(--muted);text-decoration:none;font-size:16px;padding:0 4px}
+.lbq .ev{background:var(--card);border-radius:14px;padding:10px 14px;margin-bottom:10px;font-size:13px}.lbq .ev b{display:block;font-size:12px;letter-spacing:.04em;color:var(--sub);margin-bottom:4px}.lbq .ev div{display:flex;gap:8px;align-items:baseline;padding:4px 0;border-top:1px solid var(--line)}.lbq .ev div:first-of-type{border-top:0}
+.lbq .ev span{flex:1;min-width:0;color:var(--ink)}.lbq .ev small{color:var(--muted);white-space:nowrap}.lbq .ev em{font-style:normal;font-size:11.5px;white-space:nowrap;border-radius:99px;padding:2px 8px;background:rgba(245,196,81,.12);color:#F5C451}.lbq .ev em.ok{background:rgba(127,221,169,.12);color:var(--pos)}.lbq .ev em.x{background:var(--card2);color:var(--muted)}
 .lbq .dui small{display:block;color:var(--muted);font-size:11.5px;margin-top:6px}.lbq .dui button{margin-top:10px;border:0;background:var(--pos);color:#141218;border-radius:10px;padding:9px 14px;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer}`;
   const fmt = (v, it) => it.some(x => Math.abs(x.valor) >= 100) ? brl(v) : String(Math.round(v * 10) / 10).replace('.', ',');
   function grafico(g) {
@@ -42,8 +47,8 @@
   function montar(el, op) {
     if (!el) return; if (!document.getElementById('lbqcss')) { const s = document.createElement('style'); s.id = 'lbqcss'; s.textContent = CSS; document.head.appendChild(s); }
     el.className = 'lbq';
-    el.innerHTML = `<div class="du"></div><form><input maxlength="300" placeholder="💬 Pergunte sua dúvida${op.exemplo ? ' · ex.: ' + esc(op.exemplo) : ''}" aria-label="Pergunte sua dúvida" enterkeyhint="send"><button>Perguntar</button></form><div class="qs"></div><div class="qo"></div>`;
-    const f = el.querySelector('form'), inp = f.querySelector('input'), bt = f.querySelector('button'), out = el.querySelector('.qo'), du = el.querySelector('.du');
+    el.innerHTML = `<div class="du"></div>${op.anexo ? '<div class="ev" hidden></div><div class="qf" hidden></div>' : ''}<form>${op.anexo ? '<button type="button" class="qan" title="Mandar comprovante (foto ou PDF)" aria-label="Anexar comprovante">📎</button>' : ''}<input maxlength="300" placeholder="💬 Pergunte sua dúvida${op.exemplo ? ' · ex.: ' + esc(op.exemplo) : ''}" aria-label="Pergunte sua dúvida" enterkeyhint="send"><button>Perguntar</button></form>${op.anexo ? '<div class="qm"><button type="button" data-qm="cam">📷 Tirar foto</button><button type="button" data-qm="arq">🖼️ Foto ou PDF do celular</button></div><input type="file" accept="image/*" capture="environment" hidden data-qin="cam"><input type="file" accept="image/*,application/pdf" hidden data-qin="arq">' : ''}<div class="qs"></div><div class="qo"></div>`;
+    const f = el.querySelector('form'), inp = f.querySelector('input'), bt = f.querySelector('button:not(.qan)'), out = el.querySelector('.qo'), du = el.querySelector('.du');
     let api = '', DOC = null;
     const AT = op.atalhos || [], PG = 'lbq_' + (op.pagina || location.pathname.split('/').filter(Boolean).slice(-1)[0] || 'painel');
     const ler = k => { try { return JSON.parse(localStorage.getItem(PG + k) || 'null'); } catch (e) { return null; } }, gravar = (k, v) => { try { localStorage.setItem(PG + k, JSON.stringify(v)); } catch (e) { } };
@@ -87,8 +92,46 @@
     du.addEventListener('click', async e => { const b = e.target.closest('[data-dv]'); if (!b) return; b.disabled = true; b.textContent = 'salvando…';
       try { const r = await (await fetch(await URL_(), { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'vi_duvida', id: b.dataset.dv }, cred())) })).json(); if (r.ok) dRender(r.duvidas); else b.textContent = 'tente de novo'; }
       catch (er) { b.disabled = false; b.textContent = 'tente de novo'; } });
+    /* comprovante (foto da câmera, galeria ou PDF): vai para o Luiz conferir e lançar no Admin */
+    let ARQ = null; const PH = inp.placeholder, ev = el.querySelector('.ev'), qf = el.querySelector('.qf'), qm = el.querySelector('.qm');
+    const prepArq = async a => {
+      if (/^image\//.test(a.type)) { const img = await createImageBitmap(a), k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); return { tipo: 'image/jpeg', dados: c.toDataURL('image/jpeg', .82).split(',')[1] }; }
+      if (a.type === 'application/pdf') { if (a.size > 5e6) throw new Error('PDF maior que 5 MB'); const u = await new Promise((ok, er) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = er; fr.readAsDataURL(a); }); return { tipo: 'application/pdf', dados: u.split(',')[1] }; }
+      throw new Error('use foto ou PDF'); };
+    const tiraArq = () => { ARQ = null; if (qf) { qf.hidden = true; qf.innerHTML = ''; } inp.placeholder = PH; bt.textContent = 'Perguntar'; };
+    const STV = { pendente: ['⏳ o Luiz vai conferir', ''], 'lançado': ['✅ lançado', 'ok'], conferido: ['✓ conferido', 'ok'], descartado: ['descartado', 'x'] };
+    const evRender = l => { if (!ev) return; const v = (l || []).filter(x => x.status === 'pendente' || Date.now() - new Date(String(x.atualizado_em).replace(' ', 'T')).getTime() < 3 * 864e5).slice(0, 5);
+      ev.hidden = !v.length; ev.innerHTML = v.length ? '<b>📎 SEUS COMPROVANTES</b>' + v.map(x => { const s = STV[x.status] || STV.pendente; return `<div><small>${esc(String(x.criado_em).slice(8, 10) + '/' + String(x.criado_em).slice(5, 7))}</small><span>${esc((x.ia && x.ia.e_comprovante !== false && x.ia.resumo) || x.nota || 'Comprovante')}</span><em class="${s[1]}">${s[0]}</em></div>`; }).join('') : ''; };
+    const evCarrega = async () => { if (!ev || op.auth || !window.LB || !LB.senha) return;
+      try { const r = await (await fetch(await URL_(), { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'meus_envios' }, cred())) })).json(); if (r.ok) evRender(r.envios); } catch (e) { } };
+    if (op.anexo) {
+      { let n = 0; const t = setInterval(() => { if ((window.LB && LB.senha) || ++n > 90) { clearInterval(t); evCarrega(); } }, 2000); setInterval(evCarrega, 300000); }
+      f.querySelector('.qan').onclick = e => { e.stopPropagation(); qm.classList.toggle('on'); };
+      document.addEventListener('click', e => { if (!e.target.closest('.qm')) qm.classList.remove('on'); });
+      qm.onclick = e => { const b = e.target.closest('[data-qm]'); if (!b) return; qm.classList.remove('on'); const i = el.querySelector(`[data-qin="${b.dataset.qm}"]`); i.value = ''; i.click(); };
+      el.querySelectorAll('[data-qin]').forEach(i => i.onchange = () => { const a = i.files && i.files[0]; if (!a) return;
+        if (!/^image\//.test(a.type) && a.type !== 'application/pdf') { out.innerHTML = '<div class="qr"><div class="qt qe">Mande foto ou PDF.</div></div>'; return; }
+        ARQ = a; const im = /^image\//.test(a.type) ? URL.createObjectURL(a) : '';
+        qf.innerHTML = `${im ? `<img src="${im}" alt="">` : '📄'}<span>${esc(a.name || 'comprovante')}</span><a href="#" class="qfx" aria-label="Tirar anexo">✕</a>`; qf.hidden = false;
+        inp.placeholder = 'O que é? (opcional) · ex.: paguei o som do show de Patos'; bt.textContent = 'Enviar'; inp.focus(); });
+      qf.onclick = e => { if (e.target.closest('.qfx')) { e.preventDefault(); tiraArq(); } };
+    }
+    async function enviaArq() {
+      const nota = inp.value.trim(), a = ARQ; bt.disabled = true;
+      out.innerHTML = `<div class="qr"><div class="qp">📎 ${esc(a.name || 'comprovante')}${nota ? ' · ' + esc(nota) : ''}</div><div class="qt"><span class="ql"></span>Enviando e lendo o comprovante…</div></div>`;
+      try {
+        const x = await prepArq(a); await URL_();
+        const r = await (await fetch(api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'enviar_comprovante', dados: x.dados, tipo: x.tipo, nota: nota }, cred())) })).json();
+        if (!r.ok) { out.innerHTML = `<div class="qr"><div class="qt qe">${r.erro === 'grande' ? 'Arquivo grande demais (máx. 5 MB).' : r.erro === 'limite' ? 'Muitos envios hoje. Amanhã libera de novo.' : r.erro === 'acesso' ? 'Sem acesso para mandar comprovante.' : 'Não consegui enviar. Tente de novo.'}</div></div>`; return; }
+        const L = r.leitura, ok = L && L.e_comprovante !== false;
+        const det = ok ? [L.tipo === 'entrada' ? 'Entrada' : L.tipo === 'saida' ? 'Saída' : '', L.valor ? brl(L.valor) : '', L.quem, L.data ? L.data.slice(8, 10) + '/' + L.data.slice(5, 7) : ''].filter(Boolean).join(' · ') : '';
+        out.innerHTML = `<div class="qr"><div class="qp">📎 ${esc(a.name || 'comprovante')}${nota ? ' · ' + esc(nota) : ''}</div><div class="qt">✅ Comprovante enviado. O Luiz confere e lança.${ok && L.resumo ? '\n\nLi aqui: ' + esc(L.resumo) : ''}</div>${det ? `<div class="qc">${esc(det)}</div>` : ''}${L && L.e_comprovante === false ? `<div class="qv">Não parece um comprovante: ${esc(L.resumo || '')}. Se estiver certo, tudo bem: o Luiz vê do mesmo jeito.</div>` : ''}<div class="qn"><span>Fica guardado numa pasta privada do Drive.</span><span><a href="#" class="qx">fechar</a></span></div></div>`;
+        inp.value = ''; tiraArq(); evCarrega();
+      } catch (er) { out.innerHTML = `<div class="qr"><div class="qt qe">${esc(er && er.message && /PDF|foto/.test(er.message) ? er.message : 'Sem conexão. Tente de novo.')}</div></div>`; }
+      finally { setTimeout(() => { bt.disabled = false; }, 1500); }
+    }
     f.onsubmit = async e => {
-      e.preventDefault(); const q = inp.value.trim(); if (q.length < 3 || bt.disabled) return;
+      e.preventDefault(); if (ARQ) { if (!bt.disabled) enviaArq(); return; } const q = inp.value.trim(); if (q.length < 3 || bt.disabled) return;
       /* pergunta repetida: mostra na hora a resposta guardada e os atalhos (sem gastar a IA); "perguntar de novo" atualiza */
       const tq = tok(q), H = ler('_hist') || [], vh = !e.lbqNova && H.filter(h => Date.now() - h.t < 7 * 864e5).map(h => [h, parecido(tq, h.tk)]).sort((a, b) => b[1] - a[1])[0];
       if (vh && vh[1] >= 0.75) { const h = vh[0], d = new Date(h.t); DOC = h.doc || null;

@@ -331,10 +331,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwhy8uxq"></script>
-<script src="lbmetas.js?v=mwhy8uxq"></script>
-<script src="lbchat.js?v=mwhy8uxq"></script>
-<script src="lbvendas.js?v=mwhy8uxq"></script>
+<script src="lb.js?v=mwi54iw0"></script>
+<script src="lbmetas.js?v=mwi54iw0"></script>
+<script src="lbchat.js?v=mwi54iw0"></script>
+<script src="lbvendas.js?v=mwi54iw0"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -367,7 +367,7 @@ const ATALHOS=[
 {id:'vendas',rot:'Vendas',chaves:'venda vendas vendedor vendedores vendido negociacao contrato fechado',ir:ATP('ven','pven')},
 {id:'rendimento',rot:'Rendimento da equipe',chaves:'rendimento equipe desempenho atraso prazo pessoa funcionario produtividade',ir:ATP('ren','rpess')},
 ];
-LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}try{renderSaldo()}catch(e){}try{renderFalta();loadVSL()}catch(e){}try{LBCHAT.montar(document.getElementById('lbq'),{base:'',exemplo:'quanto falta receber em dezembro?',contexto:()=>ctxPainel()+'\n\nTELA ABERTA:\n'+LBCHAT.texto(document.querySelector('main')),base_dados:()=>D.ctx_ia||'',pagina:'painel',atalhos:ATALHOS})}catch(e){}}});
+LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}try{renderSaldo()}catch(e){}try{renderFalta();loadVSL()}catch(e){}try{LBCHAT.montar(document.getElementById('lbq'),{base:'',exemplo:'quanto falta receber em dezembro?',contexto:()=>ctxPainel()+'\n\nTELA ABERTA:\n'+LBCHAT.texto(document.querySelector('main')),base_dados:()=>D.ctx_ia||'',pagina:'painel',anexo:true,atalhos:ATALHOS})}catch(e){}}});
 let PAG=[];
 
 /* ---------- início ---------- */
