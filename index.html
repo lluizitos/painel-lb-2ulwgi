@@ -331,10 +331,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwhxw96p"></script>
-<script src="lbmetas.js?v=mwhxw96p"></script>
-<script src="lbchat.js?v=mwhxw96p"></script>
-<script src="lbvendas.js?v=mwhxw96p"></script>
+<script src="lb.js?v=mwhy8uxq"></script>
+<script src="lbmetas.js?v=mwhy8uxq"></script>
+<script src="lbchat.js?v=mwhy8uxq"></script>
+<script src="lbvendas.js?v=mwhy8uxq"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -352,7 +352,22 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},se
 let D,HOJE,mesAtual,KEYS;
 
 /* ---------- login (lb.js) ---------- */
-LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}try{renderSaldo()}catch(e){}try{renderFalta();loadVSL()}catch(e){}try{LBCHAT.montar(document.getElementById('lbq'),{base:'',exemplo:'quanto falta receber em dezembro?',contexto:()=>ctxPainel()+'\n\nTELA ABERTA:\n'+LBCHAT.texto(document.querySelector('main')),base_dados:()=>D.ctx_ia||''})}catch(e){}}});
+const ATP=(p,id)=>()=>{if(document.getElementById('p'+p).style.display==='none')aba(p);return document.getElementById(id)};
+const ATALHOS=[
+{id:'saldo',rot:'Saldo de agora',chaves:'saldo caixa conta banco dinheiro disponivel tem quanto sobra',ir:ATP('fin','saldoat')},
+{id:'mes',rot:'Resumo do mês',chaves:'mes resumo entrou saiu lucro balanco gastos gastei mensal',ir:ATP('fin','mes')},
+{id:'falta',rot:'Falta receber',chaves:'falta receber recebimento receber deve devendo cache contratante entrada',ir:ATP('fin','fent')},
+{id:'pagar',rot:'Contas e pagamentos',chaves:'pagar pagamento pagamentos contas conta boleto fixo fixos vence vencimento salario equipe pago pix',ir:ATP('fin','pagar')},
+{id:'agenda',rot:'Agenda e tarefas',chaves:'agenda tarefa tarefas fazer calendario dia hoje amanha semana meta',ir:ATP('fin','tarefas')},
+{id:'shows',rot:'Shows',chaves:'show shows apresentacao data cidade evento proximo proximos borderô bordero',ir:ATP('fin','shows')},
+{id:'linha',rot:'Linha do tempo',chaves:'linha tempo historico timeline',ir:ATP('fin','tl')},
+{id:'estimativa',rot:'Estimativa',chaves:'estimativa previsao projecao futuro ano fim temporada',ir:ATP('fin','estimativa')},
+{id:'riscos',rot:'Riscos',chaves:'risco riscos alerta atencao problema perigo',ir:ATP('fin','riscos')},
+{id:'ocorrencias',rot:'Ocorrências',chaves:'ocorrencia ocorrencias aviso avisos aconteceu',ir:ATP('fin','ocp')},
+{id:'vendas',rot:'Vendas',chaves:'venda vendas vendedor vendedores vendido negociacao contrato fechado',ir:ATP('ven','pven')},
+{id:'rendimento',rot:'Rendimento da equipe',chaves:'rendimento equipe desempenho atraso prazo pessoa funcionario produtividade',ir:ATP('ren','rpess')},
+];
+LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}try{renderSaldo()}catch(e){}try{renderFalta();loadVSL()}catch(e){}try{LBCHAT.montar(document.getElementById('lbq'),{base:'',exemplo:'quanto falta receber em dezembro?',contexto:()=>ctxPainel()+'\n\nTELA ABERTA:\n'+LBCHAT.texto(document.querySelector('main')),base_dados:()=>D.ctx_ia||'',pagina:'painel',atalhos:ATALHOS})}catch(e){}}});
 let PAG=[];
 
 /* ---------- início ---------- */
