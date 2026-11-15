@@ -202,13 +202,16 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 .psl{display:flex;flex-direction:column;gap:6px;margin-top:10px}.psl div{display:flex;gap:10px;font-size:13px;color:var(--sub)}.psl span{flex:1;min-width:0}.psl b{white-space:nowrap;color:var(--ink)}
 .cal{margin-top:12px;background:var(--card);border-radius:14px;padding:10px}
 .cw,.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}.cw span{text-align:center;font-size:10.5px;color:var(--muted);font-weight:700;padding-bottom:4px}
-.cd{aspect-ratio:1/1;min-height:36px;border:0;border-radius:9px;background:none;color:var(--sub);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:0;font:inherit}
+.cd{min-height:74px;min-width:0;border:0;border-top:1px solid var(--line);border-radius:6px;background:none;color:var(--sub);display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:2px;cursor:pointer;padding:4px 2px 3px;font:inherit;overflow:hidden}.cd>b{align-self:center;margin-bottom:1px}
+.ce{display:block;font-style:normal;font-size:9.5px;line-height:1.3;font-weight:700;padding:1px 4px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;color:#141218}.ce.fe{opacity:.45;text-decoration:line-through}.cm{display:block;font-style:normal;font-size:9.5px;color:var(--muted);text-align:left;padding-left:4px}
+@media(min-width:700px){.cd{min-height:96px;padding:5px 4px}.ce,.cm{font-size:11px;padding:2px 6px}}
 .cd b{font-size:13px;font-weight:600}.cd span{display:flex;gap:2px;height:5px}.cd.sel{background:var(--card2)}.cd.hj b{color:#fff;background:var(--pink);border-radius:99px;padding:1px 6px}.cd.ok b{opacity:.55}
-.cd em,.clg em{display:inline-block;width:5px;height:5px;border-radius:99px}.pt-s{background:var(--pinkl)}.pt-c{background:var(--amber)}.pt-t{background:#7AB8FF}.pt-a{background:var(--neg)}
+.clg em{display:inline-block;width:8px;height:8px;border-radius:3px}.pt-s{background:var(--pinkl)}.pt-c{background:var(--amber)}.pt-t{background:#7AB8FF}.pt-a{background:var(--neg)}
 .clg{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:center;margin-top:8px;font-size:11px;color:var(--muted)}.clg em{margin-right:4px;vertical-align:middle}
 #tfsem{display:flex;align-items:center}#tfsem small{margin-left:auto;font-size:18px;letter-spacing:0}
 .atrb{margin-top:12px;border-left:3px solid var(--neg)}.atrb summary{list-style:none;display:flex;align-items:center;cursor:pointer;font-size:14px}.atrb summary::-webkit-details-marker{display:none}.atrb summary small{margin-left:auto;color:var(--muted)}.atrb[open] summary small{visibility:hidden}
 .mtal{display:block;text-decoration:none;color:inherit;background:linear-gradient(135deg,rgba(225,29,72,.2),rgba(225,29,72,.06));border:1px solid rgba(240,80,126,.45);border-radius:14px;padding:12px 14px;margin:14px 0 4px}.mtal b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--pinkl);margin-bottom:4px}.mtal span{display:block;font-size:14.5px;font-weight:600;margin-top:3px}.mtal small{color:var(--pinkl);font-weight:700}.mtal i{display:block;font-style:normal;font-size:13px;font-weight:700;color:var(--pinkl);margin-top:6px}
+.mbar{display:inline-block;vertical-align:middle;width:70px;height:6px;border-radius:99px;background:var(--card2);overflow:hidden;margin-left:6px}.mbar i{display:block;height:100%;background:var(--pink);border-radius:99px}
 </style>
 </head>
 <body>
@@ -307,8 +310,11 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <p class="note" id="rnota"></p>
   <div class="grid g3" id="rkpi" style="margin-top:16px"></div>
   <h3>Pessoas <small>mês atual, média e histórico</small></h3>
+  <div class="chips" id="rsel" style="margin-bottom:10px"></div>
   <div class="list" id="rpess"></div>
   <h3>Perfil dos vendedores <small>desde jan</small></h3>
+  <div class="chart" id="rvg" style="margin-bottom:10px"></div>
+  <div id="rvm"></div>
   <div class="list" id="rvend"></div>
 </div>
 
@@ -433,7 +439,7 @@ async function marcarPago(marcas,btn,gms=[]){ // grava na planilha e atualiza a 
     btn.disabled=true;btn.innerHTML='salvando…'}
   try{if(marcas.length){const r=await (await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'marcar_pago',marcas,usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
     if(!r.ok)throw new Error(r.erro||'erro');
-    Object.entries(r.borderos||{}).forEach(([k,b])=>{b.equipe.forEach(e=>delete e.doc);D.borderos[k]=b})}
+    Object.entries(r.borderos||{}).forEach(([k,b])=>{if(b.tipo==='despesa'||!b.equipe)return;b.equipe.forEach(e=>delete e.doc);D.borderos[k]=b})}
     const porId={};gms.forEach(g=>(porId[g.id]=porId[g.id]||[]).push(g.ref));
     for(const [id,ref] of Object.entries(porId)){const r=await (await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'pagar_pagamento',id,ref,data:HOJE,usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
       if(!r.ok)throw new Error(r.erro||'erro');PAGS=r.pagamentos}
@@ -465,12 +471,12 @@ async function bordAoVivo(){ // com a planilha ligada, os borderôs vêm ao vivo
   try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;API_URL=c.api_url;
     const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'borderos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
     if(!r.ok)return;const px={};(r.pessoas||[]).forEach(p=>px[p.id]=p.pix);
-    Object.entries(r.borderos).forEach(([k,b])=>{b.equipe.forEach(e=>{if(e.pessoa&&px[e.pessoa])e.pix=px[e.pessoa];delete e.doc});D.borderos[k]=b});
+    Object.entries(r.borderos).forEach(([k,b])=>{if(b.tipo==='despesa'||!b.equipe)return;b.equipe.forEach(e=>{if(e.pessoa&&px[e.pessoa])e.pix=px[e.pessoa];delete e.doc});D.borderos[k]=b});
     renderMes();renderTL();renderPagar()}catch(e){}
 }
 
 /* ---------- abas do painel ---------- */
-let VFEITO=false,RFEITO=false,ALIAS={};
+let VFEITO=false,RFEITO=false,ALIAS={},RSEL=null,VSL=null,VSLT=false;
 function aba(p){
   document.querySelectorAll('#ptabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
   ['fin','ven','ren'].forEach(x=>document.getElementById('p'+x).style.display=x===p?'block':'none');
@@ -492,23 +498,25 @@ function histV(f){
 }
 document.getElementById('vhf').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;document.querySelectorAll('#vhf .chip').forEach(c=>c.classList.toggle('on',c===b));histV(b.dataset.h)};
 
-/* meta de cada pessoa e o que fez no mês (atividades.json; Bruninho = vendas do mês, Lau = postagens) */
+/* meta de cada pessoa e o que fez no mês: SÓ o que está no app (tarefas concluídas, metas marcadas, vendas pela data da venda) */
+const VSH=()=>VSL||((D.vendas&&D.vendas.shows)||[]); // shows de Vendas: ao vivo (com data da venda) ou do último build
+const nmV=s=>s.vendedor?(ALIAS[LB.norm(s.vendedor)]||s.vendedor):'Sem vendedor';
+const barra=p=>`<span class="mbar"><i style="width:${Math.round(Math.min(1,Math.max(0,p))*100)}%"></i></span>`;
 function atv(r,MA){const A=D.atividades||{metas:{},feito:{}},mn=MESES[+MA.slice(5,7)-1].toLowerCase();
-  const meta=A.metas[r.nome],fe=(A.feito[MA]||{})[r.nome];let mt='',corpo='';
-  const vazio=v=>v==null||v===''||v==='a definir';
-  if(/Bruninho|Bruno/.test(r.nome)){const l=((D.vendas&&D.vendas.shows)||[]).filter(s=>s.status!=='Cancelado'&&mkey(s.data)===MA&&(ALIAS[LB.norm(s.vendedor||'')]||s.vendedor)==='Bruninho');
-    mt=vazio(meta)?'<span class="pk">a definir</span>':esc(meta);
-    corpo=l.length?`<div class="list" data-max="4">${l.map(s=>`<div class="it"><span>${dtx(s.data)} · ${esc(s.evento)} · ${esc(s.cidade)}</span><b>${s.valor?brl(s.valor):'—'}</b></div>`).join('')}</div><div class="vend">${l.length} show${l.length>1?'s':''} vendidos para ${mn} · ${brl(l.reduce((a,s)=>a+(+s.valor||0),0))}</div>`:'<div class="vend">Nenhum show vendido para este mês ainda.</div>'}
-  else if(meta&&typeof meta==='object'){const f=fe||{};const lin=(n,feito,alvo)=>`<div class="it"><span>${n}</span><b>${feito==null?'a informar':feito}${alvo?' / '+alvo+(feito!=null?(feito>=alvo?' <span class="pos">✓ meta</span>':' <span class="pk">abaixo</span>'):''):''}</b></div>`;
-    mt=meta.postagens||meta.conteudos?[meta.postagens?meta.postagens+' postagens':'',meta.conteudos?meta.conteudos+' conteúdos':''].filter(Boolean).join(' + ')+' por mês':'<span class="pk">a definir</span>';
-    corpo=`<div class="list" data-max="0">${lin('Postagens',f.postagens,meta.postagens)}${lin('Conteúdos produzidos',f.conteudos,meta.conteudos)}</div>`}
-  else{mt=vazio(meta)?'<span class="pk">a definir</span>':esc(meta);
-    corpo=Array.isArray(fe)&&fe.length?`<div class="list" data-max="4">${fe.map(t=>`<div class="it"><span>${esc(t)}</span></div>`).join('')}</div>`:'<div class="vend">Nada registrado neste mês.</div>'}
-  const pf=perfilDe(r.nome);if(pf&&!vazio(pf.meta))mt=esc(pf.meta);
-  let tf='';if(pf){const l=TAR.tarefas.filter(t=>t.pessoa===pf.id),fe2=l.filter(t=>(t.concluido_em||'').startsWith(MA)),ab=l.filter(t=>t.status!=='Concluída'),at=ab.filter(t=>t.prazo&&t.prazo<HOJE);
-    tf=`<h5>Tarefas · ${fe2.length} concluída${fe2.length!==1?'s':''} em ${mn}${ab.length?` · ${ab.length} em aberto`:''}${at.length?` · <span class="pk">${at.length} atrasada${at.length>1?'s':''}</span>`:''}</h5>`+
-      (fe2.length||ab.length?`<div class="list" data-max="4">${[...ab.sort((a,b)=>(a.prazo||'9').localeCompare(b.prazo||'9')),...fe2].map(t=>`<div class="it"><span>${t.status==='Concluída'?'✓':t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)}</span><b class="${t.status==='Concluída'?'pos':t.prazo&&t.prazo<HOJE?'pk':''}" style="font-weight:600">${t.status==='Concluída'?'feito '+ddmm(t.concluido_em):t.prazo?'até '+ddmm(t.prazo):t.status.toLowerCase()}</b></div>`).join('')}</div>`:'<div class="vend">Nenhuma tarefa designada.</div>')}
-  return `<div class="atv"><div class="mt"><span>Meta</span><b>${mt}</b></div>${tf}<h5>O que fez em ${mn}</h5>${corpo}</div>`}
+  const meta=A.metas[r.nome],vazio=v=>v==null||v===''||v==='a definir',pf=perfilDe(r.nome);
+  let mt=meta&&typeof meta==='object'?([meta.postagens?meta.postagens+' postagens':'',meta.conteudos?meta.conteudos+' conteúdos':''].filter(Boolean).join(' + ')+' por mês'||'<span class="pk">a definir</span>'):vazio(meta)?'<span class="pk">a definir</span>':esc(meta);
+  if(pf&&!vazio(pf.meta))mt=esc(pf.meta);
+  const L=[];
+  if(/Bruninho|Bruno/.test(r.nome)){const l=VSH().filter(s=>s.status!=='Cancelado'&&(s.data_venda||'').startsWith(MA)&&nmV(s)==='Bruninho');
+    l.forEach(s=>L.push(`<div class="it"><span>🤝 vendeu ${ddmm(s.data_venda)} · ${esc(s.evento)} · ${esc(s.cidade)} <small style="color:var(--muted)">(show ${dtx(s.data)})</small></span><b>${s.valor?brl(s.valor):'—'}</b></div>`))}
+  const rts=pf?(TAR.rotinas||[]).filter(x=>x.pessoa===pf.id&&x.ativo!=='não'&&(!x.inicio||x.inicio.slice(0,7)<=MA)):[];
+  rts.forEach(x=>{const p=LBROT.pct(x,MA);L.push(`<div class="it"><span>◎ ${esc(x.titulo)} ${barra(p.pct)}</span><b class="${p.pct>=1?'pos':''}" style="font-weight:600">${p.feitos} de ${p.total}</b></div>`)});
+  const tl=pf?TAR.tarefas.filter(t=>t.pessoa===pf.id):[],fe2=tl.filter(t=>(t.concluido_em||'').startsWith(MA)),ab=tl.filter(t=>t.status!=='Concluída'),at=ab.filter(t=>t.prazo&&t.prazo<HOJE);
+  fe2.forEach(t=>L.push(`<div class="it"><span>✓ ${esc(t.titulo)}</span><b class="pos" style="font-weight:600">feito ${ddmm(t.concluido_em)}</b></div>`));
+  if(meta&&typeof meta==='object'&&!rts.length){const f=(A.feito[MA]||{})[r.nome]||{};[['Postagens','postagens'],['Conteúdos produzidos','conteudos']].forEach(([n,k])=>{if(meta[k])L.push(`<div class="it"><span>${n}</span><b>${f[k]==null?'a informar':f[k]} / ${meta[k]}</b></div>`)})}
+  const abH=ab.length?`<h5>Em aberto · ${ab.length}${at.length?` · <span class="pk">${at.length} atrasada${at.length>1?'s':''}</span>`:''}</h5><div class="list" data-max="4">${ab.sort((a,b)=>(a.prazo||'9').localeCompare(b.prazo||'9')).map(t=>`<div class="it"><span>${t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)}</span><b class="${t.prazo&&t.prazo<HOJE?'pk':''}" style="font-weight:600">${t.prazo?'até '+ddmm(t.prazo):t.status.toLowerCase()}</b></div>`).join('')}</div>`:'';
+  return `<div class="atv"><div class="mt"><span>Meta</span><b>${mt}</b></div><h5>O que fez em ${mn}</h5>${L.length?`<div class="list" data-max="6">${L.join('')}</div>`:`<div class="vend">Nada concluído nem marcado ainda em ${mn}.</div>`}${abH}
+    <div class="vend" style="font-size:11.5px">Muda sozinho: tarefas concluídas e metas marcadas (Admin → Individuais)${/Bruninho|Bruno/.test(r.nome)?' e shows vendidos no mês (data da venda)':''}.</div></div>`}
 let TAR={perfis:[],tarefas:[]};
 function perfilDe(nome){const n=LB.norm(nome);return TAR.perfis.find(p=>{const q=LB.norm(p.nome);return q===n||n.startsWith(q+' ')||q.startsWith(n+' ')})}
 async function tarAoVivo(){try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;
@@ -525,7 +533,11 @@ function renderRend(){
   document.getElementById('rnota').textContent='Pagamentos que saíram da conta e do dinheiro em mãos para cada pessoa: o fixo mensal e o que recebe por show (cachê de produção, técnico, viagem). Dados até '+ddmm(D.atualizado)+'.';
   const vs=D.vendas?D.vendas.shows.filter(s=>s.status!=='Cancelado'&&s.data>=ANO+'-01-01'):[];
   const pv=nome=>{const l=vs.filter(s=>s.vendedor&&(ALIAS[LB.norm(s.vendedor)]||s.vendedor)===nome);return {n:l.length,v:l.reduce((a,s)=>a+(+s.valor||0),0)}};
-  document.getElementById('rpess').innerHTML=R.map(r=>{
+  if(!VSLT){VSLT=true;fetch('config.json',{cache:'no-store'}).then(x=>x.json()).then(c=>c.api_url&&fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'listar',usuario:LB.login,senha:LB.senha,nome:LB.usuario})}).then(x=>x.json())).then(x=>{if(x&&x.ok&&x.shows){VSL=x.shows;renderRend()}}).catch(()=>{})}
+  if(!RSEL||!R.some(r=>r.nome===RSEL))RSEL=R[0]&&R[0].nome;
+  const rs=document.getElementById('rsel');rs.innerHTML=R.map(r=>`<button class="chip${r.nome===RSEL?' on':''}" data-rs="${esc(r.nome)}">${esc(r.nome.split(' (')[0])}</button>`).join('');
+  rs.onclick=e=>{const b=e.target.closest('[data-rs]');if(!b)return;RSEL=b.dataset.rs;renderRend()};
+  document.getElementById('rpess').innerHTML=R.filter(r=>r.nome===RSEL).map(r=>{
     const m=r.meses[MA]||{total:0,shows:0,fixo:0};
     const ks=Object.keys(r.meses).filter(x=>x.startsWith(ANO)&&x<MA);
     const med=ks.length?ks.reduce((a,x)=>a+r.meses[x].total,0)/ks.length:null;
@@ -546,6 +558,22 @@ function renderRend(){
     ${vd&&vd.n?`<div class="vend">Vendeu <b style="color:var(--ink)">${vd.n} show${vd.n>1?'s':''}</b> em ${ANO} · ${brl(vd.v)} em cachês</div>`:r.vendedor&&r.vendedor.length&&/Bruno|Bruninho/.test(r.nome)?`<div class="vend">Vendas: nenhum show com o nome dele no campo Vendedor ainda — preencher na página de Vendas.</div>`:''}
     <details><summary>Ver pagamentos (${r.pagamentos.length})</summary>${r.pagamentos.slice().reverse().slice(0,40).map(p=>`<div class="pg"><span>${ddmm(p.data)}/${p.data.slice(2,4)} · ${esc(p.cat)}${p.show?' · show '+esc(p.show):''}${p.meio==='dinheiro'?' · dinheiro':''}</span><b>${brl(p.valor)}</b></div>`).join('')}</details></div>`}).join('');
   // perfil dos vendedores (todos os nomes que aparecem no campo Vendedor)
+  // vendas por mês pela DATA DA VENDA (quando fechou), não pela data do show
+  {const VV=VSH().filter(s=>s.status!=='Cancelado'),cv=VV.filter(s=>/^\d{4}-\d{2}-\d{2}$/.test(s.data_venda||'')),sem=VV.length-cv.length;
+   const nomes=[...new Set(cv.map(nmV))].sort((a,b)=>cv.filter(s=>nmV(s)===b).reduce((x,s)=>x+(+s.valor||0),0)-cv.filter(s=>nmV(s)===a).reduce((x,s)=>x+(+s.valor||0),0));
+   const COR=['#F0507E','#6FA8FF','#7FDDA9','#FFBE5A','#B48CFF','#8B8697'],cor=n=>COR[Math.min(nomes.indexOf(n),COR.length-1)];
+   const pm={};cv.forEach(s=>{const k=s.data_venda.slice(0,7),n=nmV(s);const x=(pm[k]=pm[k]||{});x[n]=x[n]||{n:0,v:0};x[n].n++;x[n].v+=(+s.valor||0)});
+   const W=360,H=110,cw=W/12,mx=Math.max(1,...ult12.map(k=>Object.values(pm[k]||{}).reduce((a,x)=>a+x.v,0)));
+   let g=`<div class="ct" style="padding:0 6px 6px;font-size:12px;color:var(--sub)">Vendido por mês · <b style="color:var(--ink)">data da venda</b></div><svg viewBox="0 0 ${W} ${H+16}" style="display:block;width:100%;max-width:560px;height:auto">`;
+   ult12.forEach((k,i)=>{let y=H;const bx=i*cw+cw*.18,bw=cw*.64;nomes.forEach(n=>{const v=((pm[k]||{})[n]||{}).v||0;if(!v)return;const h=H*v/mx;y-=h;g+=`<rect x="${bx}" y="${y}" width="${bw}" height="${h}" fill="${cor(n)}" rx="2"><title>${esc(n)} · ${brl(v)}</title></rect>`});
+     g+=`<text x="${bx+bw/2}" y="${H+12}" text-anchor="middle" font-size="9" fill="${k===MA?'#F0507E':'#8B8697'}">${MES3[+k.slice(5,7)-1]}</text>`});
+   g+=`</svg><div class="leg" style="padding:4px 6px 0">${nomes.map(n=>`<span><i style="background:${cor(n)}"></i>${esc(n)}</span>`).join('')}</div>`;
+   const ms=Object.keys(pm).sort().reverse();
+   g+=ms.length?`<div class="list" data-max="4" style="margin-top:8px">${ms.map(k=>{const e=Object.entries(pm[k]).sort((a,b)=>b[1].v-a[1].v);return `<div class="it" style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:6px 6px;border-top:1px solid var(--line)"><span>${MES3[+k.slice(5,7)-1]}/${k.slice(2,4)} · ${e.map(([n,x],j)=>`${j?'':'🏆 '}<b style="color:${j?'var(--sub)':'var(--ink)'}">${esc(n)}</b> ${x.n} show${x.n>1?'s':''}`).join(' · ')}</span><b>${brl(e.reduce((a,[,x])=>a+x.v,0))}</b></div>`}).join('')}</div>`:'';
+   g+=sem?`<div class="vend" style="padding:6px">${sem} show${sem>1?'s':''} sem data da venda (cadastrados antes do campo existir) não entra${sem>1?'m':''} no gráfico. Preencha em Vendas → abrir o show → Data da venda.</div>`:'';
+   document.getElementById('rvg').innerHTML=g;
+   const am=cv.filter(s=>s.data_venda.startsWith(MA)).sort((a,b)=>a.data_venda.localeCompare(b.data_venda));
+   document.getElementById('rvm').innerHTML=`<h3 style="margin-top:14px">Vendidos em ${MESES[+MA.slice(5,7)-1].toLowerCase()} <small>pela data da venda</small></h3>`+(am.length?`<div class="list" style="margin-bottom:12px">${am.map(s=>`<div class="row"><div style="flex:1;min-width:0"><b style="display:block;font-size:14px">${esc(s.evento||'Show')} · ${esc(s.cidade||'')}</b><span style="font-size:12px;color:var(--muted)">vendido ${ddmm(s.data_venda)} por ${esc(nmV(s))} · show ${dtx(s.data)}</span></div><b style="white-space:nowrap">${s.valor?brl(s.valor):'—'}</b></div>`).join('')}<div class="tot"><span>${am.length} show${am.length>1?'s':''}</span><b>${brl(am.reduce((a,s)=>a+(+s.valor||0),0))}</b></div></div>`:`<div class="empty" style="margin-bottom:12px">Nenhum show com data da venda neste mês${VSL?'':' (carregando…)'}.</div>`)}
   const pvs={};vs.forEach(s=>{const q=s.vendedor?(ALIAS[LB.norm(s.vendedor)]||s.vendedor):'Sem vendedor';const x=pvs[q]=pvs[q]||{n:0,v:0,fut:0,cid:new Set()};x.n++;x.v+=(+s.valor||0);if(s.data>=HOJE)x.fut++;x.cid.add(s.cidade)});
   const com=D.vendas&&D.vendas.comissao;
   document.getElementById('rvend').innerHTML=Object.entries(pvs).sort((a,b)=>b[1].v-a[1].v).map(([n,x],i)=>`<div class="pess"><div class="hd"><div><b>${i+1}º · ${esc(n)}</b><span>${x.n} shows · ${x.fut} marcados · ${x.cid.size} cidades</span></div><div style="text-align:right;font-weight:800;white-space:nowrap">${brl(x.v)}<span style="display:block;font-weight:400">ticket médio ${brl(x.v/x.n)}</span></div></div>${n!=='Sem vendedor'?`<div class="vend">Comissão: ${com!=null?'<b class="pos">'+brl(x.v*com/100)+'</b> ('+com+'% padrão)':'<b class="pk">% a definir</b>'}</div>`:'<div class="vend">Shows sem vendedor na ficha: edite em Vendas para entrar no ranking.</div>'}</div>`).join('')||'<div class="empty">Sem vendas no ano.</div>';
@@ -716,7 +744,9 @@ function renderTarefas(){
   if(tfSem==null)tfSem=mkey(HOJE)===tfMes?semDe(+HOJE.slice(8,10)):0;
   let c='<div class="cw">'+['S','T','Q','Q','S','S','D'].map(x=>`<span>${x}</span>`).join('')+'</div><div class="cg">'+'<i></i>'.repeat(off);
   for(let d=1;d<=n;d++){const k=iso(d),l=porDia[k]||[],pend=l.filter(x=>!x.ok);
-    c+=`<button class="cd${k===HOJE?' hj':''}${semDe(d)===tfSem?' sel':''}${l.length&&!pend.length?' ok':''}" data-w="${semDe(d)}"><b>${d}</b><span>${l.some(x=>x.tipo==='Show')?'<em class="pt-s"></em>':''}${l.some(x=>x.tipo==='Conta'&&!x.atr)?'<em class="pt-c"></em>':''}${l.some(x=>x.atr)?'<em class="pt-a"></em>':''}${l.some(x=>x.tipo==='Tarefa'&&!x.atr)?'<em class="pt-t"></em>':''}</span></button>`}
+    const ord=l.slice().sort((a,b)=>({Show:0,Conta:1,Tarefa:2}[a.tipo])-({Show:0,Conta:1,Tarefa:2}[b.tipo])),MX=3;
+    const curto=x=>x.tipo==='Show'?String(x.sub||x.txt).split(' – ')[0].split(' - ')[0]:x.txt;
+    c+=`<button class="cd${k===HOJE?' hj':''}${semDe(d)===tfSem?' sel':''}${l.length&&!pend.length?' ok':''}" data-w="${semDe(d)}"><b>${d}</b>${ord.slice(0,ord.length>MX?MX-1:MX).map(x=>`<i class="ce ${x.atr?'pt-a':x.tipo==='Show'?'pt-s':x.tipo==='Conta'?'pt-c':'pt-t'}${x.ok?' fe':''}" title="${esc(x.txt)}">${esc(curto(x))}</i>`).join('')}${ord.length>MX?`<i class="cm">+${ord.length-MX+1}</i>`:''}</button>`}
   c+='</div><div class="clg"><span><em class="pt-s"></em>show</span><span><em class="pt-c"></em>conta</span><span><em class="pt-t"></em>tarefa</span><span><em class="pt-a"></em>atrasado</span></div>';
   const cal=document.getElementById('tfcal');cal.innerHTML=c;
   cal.onclick=e=>{const b=e.target.closest('[data-w]');if(b){tfSem=+b.dataset.w;renderTarefas()}};

@@ -141,6 +141,7 @@ label textarea{min-height:64px;resize:vertical}
     <label>Contrato<select name="contrato"><option>Assinado</option><option>Enviado, aguardando</option><option>Não assinado</option><option>Sem contrato</option><option>Não informado</option></select></label>
     <label>Nota fiscal<select name="nota"><option>Com NF</option><option>Sem NF</option><option>Não informado</option></select></label>
     <div class="sec">Venda</div>
+    <label>Data da venda<input type="date" name="data_venda"></label>
     <label>Vendedor<input name="vendedor" list="vendl"></label>
     <label>Comissão (%)<input name="comissao_pct" inputmode="decimal" placeholder="padrão"></label>
     <label class="w">Como chegou<select name="origem"><option value="">—</option><option>Indicação</option><option>Instagram</option><option>WhatsApp</option><option>Contratante antigo</option><option>Prefeitura / licitação</option><option>Escritório / produtora</option><option>Outro</option></select></label>
@@ -329,7 +330,7 @@ document.getElementById('pgx').addEventListener('change',e=>{const t=e.target,d=
 ef.valor.addEventListener('change',()=>{if(PL.tipo&&PL.tipo!=='sem'&&!RC.length)gerarPlano(PL.tipo,PL.parcelas.length);renderPg()});
 function abrirEd(s){editId=s?s.id:null;document.getElementById('edt').textContent=RO?'Ficha do show':s?'Editar show':'Novo show';ef.reset();
   ef.classList.toggle('ro',RO);[...ef.elements].forEach(el=>{if(el.name)el.disabled=RO});document.getElementById('salvar').style.display=RO?'none':'';document.getElementById('cancel').textContent=RO?'Fechar':'Cancelar';
-  const d=s||{status:'Confirmado',contrato:'Não informado',nota:'Não informado',tipo:'Show',uf:'MG',vendedor:ALIAS[LB.norm(NOME)]||NOME};
+  const d=s||{status:'Confirmado',contrato:'Não informado',nota:'Não informado',tipo:'Show',uf:'MG',vendedor:ALIAS[LB.norm(NOME)]||NOME,data_venda:HOJE};
   [...ef.elements].forEach(el=>{if(el.name&&d[el.name]!=null)el.value=d[el.name]});
   const adm=PAPEL==='admin';['vendedor','comissao_pct'].forEach(k=>{ef[k].readOnly=!adm;ef[k].title=adm?'':'Só a administração muda'});if(!adm&&!s)ef.vendedor.value=ALIAS[LB.norm(NOME)]||NOME;
   PL=jp(d.plano)||{tipo:'',parcelas:[]};PL.parcelas=PL.parcelas||[];RC=jp(d.recebimentos)||[];if(!RC.length&&+d.recebido>0)RC=[{data:'',valor:+d.recebido,obs:'total lançado antes, sem detalhe'}];RCED=null; // não some o que já tinha sido lançado só como total

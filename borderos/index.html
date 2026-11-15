@@ -51,7 +51,8 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
 @media(max-width:520px){.f4{grid-template-columns:1fr 1fr}}
 .w{grid-column:1/-1}
 /* editor */
-#ed{position:fixed;inset:0;z-index:40;background:var(--bg);display:none;overflow:auto}
+#ed,#dp{position:fixed;inset:0;z-index:40;background:var(--bg);display:none;overflow:auto}#dp.open{display:block}#dp .bar{position:sticky;top:0;z-index:5;background:rgba(20,18,24,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}#dp .bar .wrap{display:flex;justify-content:space-between;align-items:center;gap:10px;height:56px}#dp .bar b{font-size:14px;letter-spacing:.14em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.xb{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:99px;margin-top:6px}.xb.ok{background:rgba(127,221,169,.16);color:var(--pos)}.xb.av{background:rgba(255,190,90,.16);color:var(--amber)}.xb.pd{background:rgba(240,80,126,.16);color:var(--pinkl)}.xb.nt{background:var(--card2);color:var(--sub)}
 #ed.open{display:block}
 #ed .bar{position:sticky;top:0;z-index:5;background:rgba(20,18,24,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 #ed .bar .wrap{display:flex;justify-content:space-between;align-items:center;gap:10px;height:56px}
@@ -98,11 +99,18 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
   <p class="eyebrow">Custos de cada show</p>
   <h1>Bor<em>derôs</em></h1>
   <div id="modo"></div>
-  <div class="tabs" id="tabs"><button class="on" data-t="shows">Shows</button><button data-t="pes">Pessoas</button><button data-t="aj">Ajustes</button></div>
+  <div class="tabs" id="tabs"><button class="on" data-t="shows">Shows</button><button data-t="desp">Despesas</button><button data-t="pes">Pessoas</button><button data-t="aj">Ajustes</button></div>
 
   <div id="tshows">
     <div class="chips" id="fil"><button class="chip on" data-f="prox">Próximos</button><button class="chip" data-f="pend">Com pendência</button><button class="chip" data-f="hist">Histórico</button></div>
     <div class="list" id="lshows"></div>
+  </div>
+
+  <div id="tdesp" style="display:none">
+    <p class="note">Borderô de gastos que não são de show (manutenção do ônibus, equipamento, figurino…): cada item com quem recebeu e quanto. Item pago é conferido com o extrato.</p>
+    <div class="chips" id="dfil"><button class="chip on" data-f="todas">Todas</button><button class="chip" data-f="pagar">Com item a pagar</button></div>
+    <div id="dres" class="note"></div>
+    <div class="list" id="ldesp"></div>
   </div>
 
   <div id="tpes" style="display:none">
@@ -170,6 +178,28 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
   <div class="tot"><div class="wrap" id="e_tot"></div></div>
 </div>
 
+<!-- editor da despesa -->
+<div id="dp">
+  <div class="bar"><div class="wrap"><button class="btn sm" id="dp_x">‹ Voltar</button><b id="dp_t">Despesa</b><button class="btn pkb sm" id="dp_s">Salvar</button></div></div>
+  <div class="wrap">
+    <h3>Despesa</h3>
+    <div class="f2">
+      <label class="w">Título<input id="dp_tit" placeholder="ex.: Manutenção do ônibus – novembro"></label>
+      <label>Categoria<input id="dp_cat" list="dl_dcat" placeholder="ex.: Manutenção do ônibus"></label>
+      <label>Data<input type="date" id="dp_data"></label>
+    </div>
+    <datalist id="dl_dcat"></datalist>
+    <h3>Itens <small>o que foi comprado ou feito, de quem, quanto</small></h3>
+    <div id="dp_it"></div>
+    <button class="btn sm" id="dp_add">+ Item</button>
+    <h3>Observações</h3>
+    <label><textarea id="dp_obs" rows="2"></textarea></label>
+    <div class="acts"><button class="btn" id="dp_cp">Copiar resumo</button><button class="btn dg" id="dp_del">Excluir despesa</button></div>
+    <div id="dp_msg"></div>
+  </div>
+  <div class="tot"><div class="wrap" id="dp_tot"></div></div>
+</div>
+
 <!-- pessoa -->
 <div id="pm"><form id="pf" autocomplete="off">
   <h2 id="pm_t">Pessoa</h2>
@@ -197,7 +227,7 @@ const ddmm=s=>s.slice(8,10)+'/'+s.slice(5,7);
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
 const GR=['Artista','Músicos','Produção','Técnica','Outros','Comissão'];
 const store=LB.store;
-let D,API='',BORD={},PES=[],CFG={},LOCAL=false,filtro='prox',ED=null;
+let D,API='',BORD={},PES=[],CFG={},LOCAL=false,filtro='prox',ED=null,DESP={},DP=null,dfil='todas';
 const doc11=d=>{const x=String(d||'').replace(/\D/g,'');return x.length===11?x.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4'):String(d||'')};
 
 /* ---------- dados: arquivo cifrado + ajustes/alterações locais; com a planilha ligada, tudo ao vivo ---------- */
@@ -211,18 +241,19 @@ LB.entrar({pagina:'bordero',base:'../',titulo:'Borderôs',ok:async r=>{
   LOCAL=!API;
   if(API){try{const a=await api({acao:'borderos'});if(a.ok){Object.assign(BORD,a.borderos);PES=a.pessoas}else LOCAL=true}catch(e){LOCAL=true}}
   if(LOCAL){const l=carregaLocal();Object.assign(BORD,l.borderos);l.excluidos.forEach(id=>delete BORD[id]);if(l.pessoas)PES=l.pessoas}
+  Object.assign(DESP,D.despesas||{});Object.values(BORD).filter(b=>b.tipo==='despesa'||!b.equipe).forEach(b=>{DESP[b.id]=b;delete BORD[b.id]});
   document.getElementById('app').style.display='block';
   document.getElementById('links').innerHTML=LB.links(r.paginas,'bordero','../');
   document.getElementById('modo').innerHTML=LOCAL?`<div class="aviso">Modo deste aparelho: a planilha ainda não está ligada, então o que você salvar fica guardado só neste celular/PC (e não aparece para o Lucas). Ao ligar a planilha, tudo passa a salvar nela e as pessoas são editadas direto na LB Lista de Equipe. <button class="btn sm" id="exp" style="margin-left:6px">Exportar alterações</button></div>`:'';
   if(LOCAL)document.getElementById('exp').onclick=exportar;
   document.getElementById('dl_fun').innerHTML=D.funcoes.map(f=>`<option value="${esc(f.funcao)}">`).join('');
-  renderShows();renderPes();renderAj()}})})();
+  renderShows();renderPes();renderAj();renderDesp()}})})();
 function exportar(){const l=carregaLocal();const b=new Blob([JSON.stringify(l,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='borderos-alteracoes-'+HOJE+'.json';a.click()}
 
 /* ---------- abas ---------- */
 document.getElementById('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));
-  ['shows','pes','aj'].forEach(t=>document.getElementById('t'+t).style.display=t===b.dataset.t?'block':'none');
-  document.getElementById('novo').style.display=b.dataset.t==='shows'?'':'none'};
+  ['shows','desp','pes','aj'].forEach(t=>document.getElementById('t'+t).style.display=t===b.dataset.t?'block':'none');
+  const nv=document.getElementById('novo');nv.style.display=['shows','desp'].includes(b.dataset.t)?'':'none';nv.textContent=b.dataset.t==='desp'?'+ Nova despesa':'+ Novo borderô';nv.dataset.t=b.dataset.t};
 document.getElementById('fil').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;filtro=b.dataset.f;document.querySelectorAll('#fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderShows()};
 
 /* ---------- cálculos ---------- */
@@ -251,7 +282,7 @@ function renderShows(){
     <button class="btn sm${b?'':' pkb'}" data-ab="${esc(b?b.id:'')}" data-sid="${esc(s.id||'')}">${b?'Abrir':'Montar'}</button></div>`}).join(''):'<div class="empty">Nada neste filtro.</div>';
 }
 document.getElementById('lshows').onclick=e=>{const b=e.target.closest('[data-ab]');if(!b)return;if(b.dataset.ab)abrir(JSON.parse(JSON.stringify(BORD[b.dataset.ab])));else novo(D.shows.find(s=>s.id===b.dataset.sid))};
-document.getElementById('novo').onclick=()=>novo(null);
+document.getElementById('novo').onclick=e=>e.currentTarget.dataset.t==='desp'?abrirDesp(null):novo(null);
 
 /* ---------- editor ---------- */
 const $=id=>document.getElementById(id);
@@ -391,6 +422,63 @@ $('cp_pag').onclick=e=>{lerCab();const L=[`💸 Pagamentos – ${ED.show} (${ddm
   Object.values(P).forEach(p=>{const tot=p.l.reduce((a,x)=>a+totP(x),0);const parts=p.l.map(x=>`${x.funcao} (${brl2(num(x.valor))})`+[['gasolina','Gasolina'],['diaria','Diária'],['ajuda','Ajuda de custo'],['estacionamento','Estacionamento']].filter(([k])=>num(x[k])).map(([k,n])=>`; ${n}: ${brl2(num(x[k]))}`).join(''));
     L.push(`${p.st==='Pago'?'✅':'⏳'} ${p.n}: ${parts.join('; ')}\nTOTAL: ${brl2(tot)}${p.pix?'\nPix: '+p.pix:''}`)});copiar(L.join('\n\n'),e.target)};
 $('cp_eq').onclick=e=>{lerCab();const n=ED.equipe.filter(x=>!x.fora&&x.grupo!=='Comissão');copiar(`*${ED.show}* · ${ddmm(ED.data)}/${ED.data.slice(0,4)}${ED.local?' · '+ED.local:''}\nEquipe de ${new Set(n.map(x=>x.pessoa||x.nome)).size} pessoas\n\n`+n.map(x=>{const p=PES.find(y=>y.id===x.pessoa)||{};return `*${x.nome}* - ${x.funcao}${x.doc?' _'+x.doc+'_':''}${p.carro?' _'+p.carro+'_':''}`}).join('\n'),e.target)};
+
+/* ---------- despesas (borderô de gastos que não são de show) ---------- */
+const DCATS=['Manutenção do ônibus','Equipamentos','Figurino e visual','Marketing','Transporte e viagens','Administrativo e banco','Outros'];
+const EXTA=()=>D.ext_ate||'';
+function dTot(b){const it=b.itens||[],v=t=>num(t.valor);return {g:it.reduce((a,t)=>a+v(t),0),pg:it.filter(t=>t.status==='Pago').reduce((a,t)=>a+v(t),0),ap:it.filter(t=>t.status!=='Pago').reduce((a,t)=>a+v(t),0)}}
+function xBadge(b,i,t){ // conferência com o extrato (mesma regra do Admin)
+  if(t.status!=='Pago')return '<span class="xb pd">a pagar</span>';
+  const c=((D.desp_conf||{})[b.id]||{})[String(i)];if(c)return `<span class="xb ok">✓ no extrato ${ddmm(c.data)}</span>`;
+  if(t.meio==='Dinheiro')return '<span class="xb nt">dinheiro · sem extrato</span>';
+  return (t.pago_em||b.data)<=EXTA()?'<span class="xb av">⚠ não achei no extrato</span>':'<span class="xb nt">a conferir no extrato</span>'}
+function renderDesp(){let l=Object.values(DESP).sort((a,b)=>b.data.localeCompare(a.data));
+  if(dfil==='pagar')l=l.filter(b=>(b.itens||[]).some(t=>t.status!=='Pago'));
+  const T=l.reduce((a,b)=>{const t=dTot(b);a.g+=t.g;a.ap+=t.ap;return a},{g:0,ap:0});
+  $('dres').innerHTML=l.length?`${l.length} despesa${l.length>1?'s':''} · total ${brl(T.g)}${T.ap?' · <b class="pk">a pagar '+brl(T.ap)+'</b>':''}`:'';
+  $('ldesp').innerHTML=l.length?l.map(b=>{const t=dTot(b),n=(b.itens||[]).length;
+    return `<div class="card sc"><div class="d"><b>${b.data.slice(8,10)}</b><span>${MES[+b.data.slice(5,7)-1]} ${b.data.slice(2,4)}</span></div>
+    <div class="t"><b>${esc(b.titulo||'Despesa')}</b><span>${esc(b.categoria||'sem categoria')} · ${n} ${n===1?'item':'itens'} · ${brl(t.g)}${t.ap?' · <b class="pk" style="display:inline;font-size:12px">'+brl(t.ap)+' a pagar</b>':''}</span></div>
+    <button class="btn sm" data-dab="${esc(b.id)}">Abrir</button></div>`}).join(''):'<div class="empty">Nenhuma despesa ainda. Use "+ Nova despesa".</div>'}
+$('dfil').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;dfil=b.dataset.f;document.querySelectorAll('#dfil .chip').forEach(c=>c.classList.toggle('on',c===b));renderDesp()};
+$('ldesp').onclick=e=>{const b=e.target.closest('[data-dab]');if(b)abrirDesp(JSON.parse(JSON.stringify(DESP[b.dataset.dab])))};
+function abrirDesp(b){DP=b||{id:'D'+HOJE+'-'+Math.random().toString(36).slice(2,6),tipo:'despesa',titulo:'',categoria:'',data:HOJE,itens:[{desc:'',fornecedor:'',valor:'',status:'Pendente'}],obs:'',fonte:'app',_novo:1};
+  $('dl_dcat').innerHTML=[...new Set(DCATS.concat(Object.values(DESP).map(x=>x.categoria).filter(Boolean)))].map(c=>`<option value="${esc(c)}">`).join('');
+  $('dp_tit').value=DP.titulo||'';$('dp_cat').value=DP.categoria||'';$('dp_data').value=DP.data;$('dp_obs').value=DP.obs||'';$('dp_t').textContent=b?(DP.titulo||'Despesa'):'Nova despesa';
+  $('dp_del').style.display=b?'':'none';$('dp_msg').textContent='';renderDpIt();$('dp').classList.add('open');$('dp').scrollTop=0;if(!b)setTimeout(()=>$('dp_tit').focus(),50)}
+function lerDp(){DP.titulo=$('dp_tit').value.trim();DP.categoria=$('dp_cat').value.trim();DP.data=$('dp_data').value;DP.obs=$('dp_obs').value.trim()}
+function renderDpIt(){$('dp_it').innerHTML=(DP.itens||[]).map((t,i)=>`<div class="pp" data-di="${i}"><div class="f4" style="grid-template-columns:2fr 1.4fr 1fr auto;align-items:end">
+  <label>Item<input data-k="desc" value="${esc(t.desc)}" placeholder="ex.: troca de óleo"></label><label>Quem recebeu<input data-k="fornecedor" value="${esc(t.fornecedor)}" placeholder="oficina, loja…"></label>
+  <label>Valor (R$)<input data-k="valor" inputmode="decimal" value="${nf(t.valor)}"></label><button type="button" class="x" data-drm>×</button></div>
+  <div class="f4" style="grid-template-columns:1fr 1fr 1fr;margin-top:6px;align-items:end"><label>Situação<select data-k="status"><option${t.status!=='Pago'?' selected':''}>Pendente</option><option${t.status==='Pago'?' selected':''}>Pago</option></select></label>
+  <label>Pago em<input type="date" data-k="pago_em" value="${esc(t.pago_em||'')}"${t.status==='Pago'?'':' disabled'}></label><label>Como<select data-k="meio"${t.status==='Pago'?'':' disabled'}><option${t.meio!=='Dinheiro'?' selected':''}>Conta</option><option${t.meio==='Dinheiro'?' selected':''}>Dinheiro</option></select></label></div>
+  <label style="margin-top:6px">Comprovante / nota (link, opcional)<input data-k="comprovante" value="${esc(t.comprovante||'')}" placeholder="https://…"></label>
+  ${DP._novo?'':xBadge(DP,i,t)}</div>`).join('')||'<div class="empty">Sem itens.</div>';dpTot()}
+function dpTot(){const t=dTot(DP);$('dp_tot').innerHTML=`<div>Total<b>${brl2(t.g)}</b></div><div>Pago<b class="pos">${brl2(t.pg)}</b></div><div>A pagar<b class="${t.ap?'neg':''}">${brl2(t.ap)}</b></div>`}
+$('dp_add').onclick=()=>{DP.itens=DP.itens||[];const u=DP.itens[DP.itens.length-1];DP.itens.push({desc:'',fornecedor:u?u.fornecedor:'',valor:'',status:'Pendente'});DP._sujo=true;renderDpIt();const n=$('dp_it').querySelector(`[data-di="${DP.itens.length-1}"] [data-k="desc"]`);if(n)n.focus()};
+$('dp_it').addEventListener('input',e=>{const c=e.target.closest('[data-di]'),k=e.target.dataset.k;if(!c||!k||e.target.tagName==='SELECT')return;const t=DP.itens[+c.dataset.di];t[k]=k==='valor'?num(e.target.value):e.target.value;DP._sujo=true;dpTot()});
+$('dp_it').addEventListener('change',e=>{const c=e.target.closest('[data-di]'),k=e.target.dataset.k;if(!c||!k||e.target.tagName!=='SELECT')return;const t=DP.itens[+c.dataset.di];
+  if(k==='status'){t.status=e.target.value;if(t.status==='Pago'){t.pago_em=t.pago_em||HOJE;t.meio=t.meio||'Conta'}else{delete t.pago_em;delete t.meio}renderDpIt()}else t[k]=e.target.value;DP._sujo=true});
+$('dp_it').addEventListener('click',e=>{const c=e.target.closest('[data-di]');if(!c||!e.target.closest('[data-drm]'))return;DP.itens.splice(+c.dataset.di,1);DP._sujo=true;renderDpIt()});
+$('dp_x').onclick=()=>{if(!DP){$('dp').classList.remove('open');return}lerDp();if(DP._sujo&&!confirm('Sair sem salvar?'))return;$('dp').classList.remove('open');DP=null};
+['dp_tit','dp_cat','dp_data','dp_obs'].forEach(k=>$(k).addEventListener('input',()=>{if(DP)DP._sujo=true}));
+$('dp_s').onclick=async()=>{lerDp();const m=$('dp_msg');
+  if(!DP.titulo){m.innerHTML='<span class="neg">Dê um título (ex.: Manutenção do ônibus).</span>';return}
+  if(!DP.data){m.innerHTML='<span class="neg">Informe a data.</span>';return}
+  DP.itens=(DP.itens||[]).filter(t=>String(t.desc||'').trim()||num(t.valor));
+  if(DP.itens.some(t=>!(num(t.valor)>0))){m.innerHTML='<span class="neg">Todo item precisa de valor.</span>';renderDpIt();return}
+  const o=JSON.parse(JSON.stringify(DP));delete o._novo;delete o._sujo;const t=dTot(o);o.tipo='despesa';o.show='';
+  o.itens.forEach(x=>{x.valor=num(x.valor)});o.totais={gasto:Math.round(t.g*100)/100,pago:Math.round(t.pg*100)/100,a_pagar:Math.round(t.ap*100)/100};o.fonte='app';
+  m.textContent='Salvando…';
+  try{if(LOCAL){const l=carregaLocal();l.borderos[o.id]=o;l.excluidos=l.excluidos.filter(x=>x!==o.id);salvaLocal(l)}
+    else{const r=await api({acao:'salvar_bordero',bordero:o});if(!r.ok)throw new Error(r.erro)}
+    DESP[o.id]=o;DP=JSON.parse(JSON.stringify(o));$('dp_t').textContent=o.titulo;$('dp_del').style.display='';renderDpIt();renderDesp();
+    m.innerHTML='<span class="pos">Salvo'+(LOCAL?' neste aparelho':' na planilha')+'. A conferência com o extrato aparece na próxima atualização do app.</span>'}
+  catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+').</span>'}};
+$('dp_del').onclick=async()=>{if(!confirm('Excluir esta despesa? Não dá para desfazer.'))return;
+  try{if(LOCAL){const l=carregaLocal();delete l.borderos[DP.id];l.excluidos.push(DP.id);salvaLocal(l)}else{const r=await api({acao:'excluir_bordero',id:DP.id});if(!r.ok)throw new Error(r.erro)}
+    delete DESP[DP.id];$('dp').classList.remove('open');DP=null;renderDesp()}catch(e){$('dp_msg').innerHTML='<span class="neg">Não excluiu ('+esc(e.message)+').</span>'}};
+$('dp_cp').onclick=e=>{lerDp();const t=dTot(DP);copiar(`🧾 *${DP.titulo}* (${ddmm(DP.data)}/${DP.data.slice(0,4)})${DP.categoria?'\n'+DP.categoria:''}\n\n`+(DP.itens||[]).map(x=>`${x.status==='Pago'?'✅':'⏳'} ${x.desc}${x.fornecedor?' – '+x.fornecedor:''}: ${brl2(num(x.valor))}`).join('\n')+`\n\nTOTAL: ${brl2(t.g)}${t.ap?'\nA pagar: '+brl2(t.ap):''}`,e.target)};
 
 /* ---------- pessoas (banco LB Lista de Equipe) ---------- */
 function renderPes(){const q=$('pbusca').value.trim();const l=q?achar(q):PES.slice().sort((a,b)=>a.nome.localeCompare(b.nome));
