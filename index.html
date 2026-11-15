@@ -299,6 +299,9 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <h1>Ven<em>das</em></h1>
   <p class="note">Mesmos números da página de Vendas. Para cadastrar ou corrigir um show: <a href="vendas/" style="color:var(--pinkl)">abrir Vendas</a>.</p>
   <div id="vana" style="margin-top:16px"></div>
+  <h3>Vendido por mês <small>pela data da venda (quando fechou)</small></h3>
+  <div class="chart" id="vvg" style="margin-bottom:10px"></div>
+  <div id="vvm"></div>
   <h3>Shows marcados e histórico</h3>
   <div class="chips" id="vhf"><button class="chip on" data-h="fut">Marcados</button><button class="chip" data-h="pas">Histórico</button></div>
   <div class="list hist" id="vhl"></div>
@@ -485,7 +488,7 @@ function aba(p){
   scrollTo(0,0);
   if(!D.vendas)return;
   (D.vendas.vendedores||[]).forEach(v=>[v.nome,...v.apelidos].forEach(a=>ALIAS[LB.norm(a)]=v.nome));
-  if(p==='ven'&&!VFEITO){VFEITO=true;LBV.analise(document.getElementById('vana'),D.vendas.shows,{hoje:HOJE,conf:D.vendas,aliases:ALIAS});histV('fut')}
+  if(p==='ven'&&!VFEITO){VFEITO=true;LBV.analise(document.getElementById('vana'),D.vendas.shows,{hoje:HOJE,conf:D.vendas,aliases:ALIAS});histV('fut');renderVV('vvg','vvm');loadVSL()}
   if(p==='ren'&&!RFEITO){RFEITO=true;renderRend()}
 }
 function histV(f){
@@ -522,6 +525,24 @@ function perfilDe(nome){const n=LB.norm(nome);return TAR.perfis.find(p=>{const q
 async function tarAoVivo(){try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;
   const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'tarefas',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
   if(r.ok){TAR=r;if(RFEITO)renderRend();renderInfo()}}catch(e){}}
+/* vendas por mês pela DATA DA VENDA (quando fechou), não pela data do show — Rendimento e aba Vendas */
+function renderVV(gid,mid){if(!document.getElementById(gid))return;const MA=mkey(HOJE),ult12=[];for(let i=11;i>=0;i--){const d=new Date(+MA.slice(0,4),+MA.slice(5,7)-1-i,1);ult12.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
+  {const VV=VSH().filter(s=>s.status!=='Cancelado'),cv=VV.filter(s=>/^\d{4}-\d{2}-\d{2}$/.test(s.data_venda||'')),sem=VV.length-cv.length;
+   const nomes=[...new Set(cv.map(nmV))].sort((a,b)=>cv.filter(s=>nmV(s)===b).reduce((x,s)=>x+(+s.valor||0),0)-cv.filter(s=>nmV(s)===a).reduce((x,s)=>x+(+s.valor||0),0));
+   const COR=['#F0507E','#6FA8FF','#7FDDA9','#FFBE5A','#B48CFF','#8B8697'],cor=n=>COR[Math.min(nomes.indexOf(n),COR.length-1)];
+   const pm={};cv.forEach(s=>{const k=s.data_venda.slice(0,7),n=nmV(s);const x=(pm[k]=pm[k]||{});x[n]=x[n]||{n:0,v:0};x[n].n++;x[n].v+=(+s.valor||0)});
+   const W=360,H=110,cw=W/12,mx=Math.max(1,...ult12.map(k=>Object.values(pm[k]||{}).reduce((a,x)=>a+x.v,0)));
+   let g=`<div class="ct" style="padding:0 6px 6px;font-size:12px;color:var(--sub)">Vendido por mês · <b style="color:var(--ink)">data da venda</b></div><svg viewBox="0 0 ${W} ${H+16}" style="display:block;width:100%;max-width:560px;height:auto">`;
+   ult12.forEach((k,i)=>{let y=H;const bx=i*cw+cw*.18,bw=cw*.64;nomes.forEach(n=>{const v=((pm[k]||{})[n]||{}).v||0;if(!v)return;const h=H*v/mx;y-=h;g+=`<rect x="${bx}" y="${y}" width="${bw}" height="${h}" fill="${cor(n)}" rx="2"><title>${esc(n)} · ${brl(v)}</title></rect>`});
+     g+=`<text x="${bx+bw/2}" y="${H+12}" text-anchor="middle" font-size="9" fill="${k===MA?'#F0507E':'#8B8697'}">${MES3[+k.slice(5,7)-1]}</text>`});
+   g+=`</svg><div class="leg" style="padding:4px 6px 0">${nomes.map(n=>`<span><i style="background:${cor(n)}"></i>${esc(n)}</span>`).join('')}</div>`;
+   const ms=Object.keys(pm).sort().reverse();
+   g+=ms.length?`<div class="list" data-max="4" style="margin-top:8px">${ms.map(k=>{const e=Object.entries(pm[k]).sort((a,b)=>b[1].v-a[1].v);return `<div class="it" style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:6px 6px;border-top:1px solid var(--line)"><span>${MES3[+k.slice(5,7)-1]}/${k.slice(2,4)} · ${e.map(([n,x],j)=>`${j?'':'🏆 '}<b style="color:${j?'var(--sub)':'var(--ink)'}">${esc(n)}</b> ${x.n} show${x.n>1?'s':''}`).join(' · ')}</span><b>${brl(e.reduce((a,[,x])=>a+x.v,0))}</b></div>`}).join('')}</div>`:'';
+   g+=sem?`<div class="vend" style="padding:6px">${sem} show${sem>1?'s':''} sem data da venda (cadastrados antes do campo existir) não entra${sem>1?'m':''} no gráfico. Preencha em Vendas → abrir o show → Data da venda.</div>`:'';
+   document.getElementById(gid).innerHTML=g;
+   const am=cv.filter(s=>s.data_venda.startsWith(MA)).sort((a,b)=>a.data_venda.localeCompare(b.data_venda));
+   document.getElementById(mid).innerHTML=`<h3 style="margin-top:14px">Vendidos em ${MESES[+MA.slice(5,7)-1].toLowerCase()} <small>pela data da venda</small></h3>`+(am.length?`<div class="list" style="margin-bottom:12px">${am.map(s=>`<div class="row"><div style="flex:1;min-width:0"><b style="display:block;font-size:14px">${esc(s.evento||'Show')} · ${esc(s.cidade||'')}</b><span style="font-size:12px;color:var(--muted)">vendido ${ddmm(s.data_venda)} por ${esc(nmV(s))} · show ${dtx(s.data)}</span></div><b style="white-space:nowrap">${s.valor?brl(s.valor):'—'}</b></div>`).join('')}<div class="tot"><span>${am.length} show${am.length>1?'s':''}</span><b>${brl(am.reduce((a,s)=>a+(+s.valor||0),0))}</b></div></div>`:`<div class="empty" style="margin-bottom:12px">Nenhum show com data da venda neste mês${VSL?'':' (carregando…)'}.</div>`)}}
+function loadVSL(){if(VSLT)return;VSLT=true;fetch('config.json',{cache:'no-store'}).then(x=>x.json()).then(c=>c.api_url&&fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'listar',usuario:LB.login,senha:LB.senha,nome:LB.usuario})}).then(x=>x.json())).then(x=>{if(x&&x.ok&&x.shows){VSL=x.shows;if(RFEITO)renderRend();renderVV('vvg','vvm')}}).catch(()=>{})}
 function renderRend(){
   const R=D.rendimento||[],MA=mkey(HOJE),ANO=HOJE.slice(0,4);
   const ult12=[];for(let i=11;i>=0;i--){const d=new Date(+MA.slice(0,4),+MA.slice(5,7)-1-i,1);ult12.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
@@ -533,7 +554,7 @@ function renderRend(){
   document.getElementById('rnota').textContent='Pagamentos que saíram da conta e do dinheiro em mãos para cada pessoa: o fixo mensal e o que recebe por show (cachê de produção, técnico, viagem). Dados até '+ddmm(D.atualizado)+'.';
   const vs=D.vendas?D.vendas.shows.filter(s=>s.status!=='Cancelado'&&s.data>=ANO+'-01-01'):[];
   const pv=nome=>{const l=vs.filter(s=>s.vendedor&&(ALIAS[LB.norm(s.vendedor)]||s.vendedor)===nome);return {n:l.length,v:l.reduce((a,s)=>a+(+s.valor||0),0)}};
-  if(!VSLT){VSLT=true;fetch('config.json',{cache:'no-store'}).then(x=>x.json()).then(c=>c.api_url&&fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'listar',usuario:LB.login,senha:LB.senha,nome:LB.usuario})}).then(x=>x.json())).then(x=>{if(x&&x.ok&&x.shows){VSL=x.shows;renderRend()}}).catch(()=>{})}
+  loadVSL();
   if(!RSEL||!R.some(r=>r.nome===RSEL))RSEL=R[0]&&R[0].nome;
   const rs=document.getElementById('rsel');rs.innerHTML=R.map(r=>`<button class="chip${r.nome===RSEL?' on':''}" data-rs="${esc(r.nome)}">${esc(r.nome.split(' (')[0])}</button>`).join('');
   rs.onclick=e=>{const b=e.target.closest('[data-rs]');if(!b)return;RSEL=b.dataset.rs;renderRend()};
@@ -558,22 +579,7 @@ function renderRend(){
     ${vd&&vd.n?`<div class="vend">Vendeu <b style="color:var(--ink)">${vd.n} show${vd.n>1?'s':''}</b> em ${ANO} · ${brl(vd.v)} em cachês</div>`:r.vendedor&&r.vendedor.length&&/Bruno|Bruninho/.test(r.nome)?`<div class="vend">Vendas: nenhum show com o nome dele no campo Vendedor ainda — preencher na página de Vendas.</div>`:''}
     <details><summary>Ver pagamentos (${r.pagamentos.length})</summary>${r.pagamentos.slice().reverse().slice(0,40).map(p=>`<div class="pg"><span>${ddmm(p.data)}/${p.data.slice(2,4)} · ${esc(p.cat)}${p.show?' · show '+esc(p.show):''}${p.meio==='dinheiro'?' · dinheiro':''}</span><b>${brl(p.valor)}</b></div>`).join('')}</details></div>`}).join('');
   // perfil dos vendedores (todos os nomes que aparecem no campo Vendedor)
-  // vendas por mês pela DATA DA VENDA (quando fechou), não pela data do show
-  {const VV=VSH().filter(s=>s.status!=='Cancelado'),cv=VV.filter(s=>/^\d{4}-\d{2}-\d{2}$/.test(s.data_venda||'')),sem=VV.length-cv.length;
-   const nomes=[...new Set(cv.map(nmV))].sort((a,b)=>cv.filter(s=>nmV(s)===b).reduce((x,s)=>x+(+s.valor||0),0)-cv.filter(s=>nmV(s)===a).reduce((x,s)=>x+(+s.valor||0),0));
-   const COR=['#F0507E','#6FA8FF','#7FDDA9','#FFBE5A','#B48CFF','#8B8697'],cor=n=>COR[Math.min(nomes.indexOf(n),COR.length-1)];
-   const pm={};cv.forEach(s=>{const k=s.data_venda.slice(0,7),n=nmV(s);const x=(pm[k]=pm[k]||{});x[n]=x[n]||{n:0,v:0};x[n].n++;x[n].v+=(+s.valor||0)});
-   const W=360,H=110,cw=W/12,mx=Math.max(1,...ult12.map(k=>Object.values(pm[k]||{}).reduce((a,x)=>a+x.v,0)));
-   let g=`<div class="ct" style="padding:0 6px 6px;font-size:12px;color:var(--sub)">Vendido por mês · <b style="color:var(--ink)">data da venda</b></div><svg viewBox="0 0 ${W} ${H+16}" style="display:block;width:100%;max-width:560px;height:auto">`;
-   ult12.forEach((k,i)=>{let y=H;const bx=i*cw+cw*.18,bw=cw*.64;nomes.forEach(n=>{const v=((pm[k]||{})[n]||{}).v||0;if(!v)return;const h=H*v/mx;y-=h;g+=`<rect x="${bx}" y="${y}" width="${bw}" height="${h}" fill="${cor(n)}" rx="2"><title>${esc(n)} · ${brl(v)}</title></rect>`});
-     g+=`<text x="${bx+bw/2}" y="${H+12}" text-anchor="middle" font-size="9" fill="${k===MA?'#F0507E':'#8B8697'}">${MES3[+k.slice(5,7)-1]}</text>`});
-   g+=`</svg><div class="leg" style="padding:4px 6px 0">${nomes.map(n=>`<span><i style="background:${cor(n)}"></i>${esc(n)}</span>`).join('')}</div>`;
-   const ms=Object.keys(pm).sort().reverse();
-   g+=ms.length?`<div class="list" data-max="4" style="margin-top:8px">${ms.map(k=>{const e=Object.entries(pm[k]).sort((a,b)=>b[1].v-a[1].v);return `<div class="it" style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:6px 6px;border-top:1px solid var(--line)"><span>${MES3[+k.slice(5,7)-1]}/${k.slice(2,4)} · ${e.map(([n,x],j)=>`${j?'':'🏆 '}<b style="color:${j?'var(--sub)':'var(--ink)'}">${esc(n)}</b> ${x.n} show${x.n>1?'s':''}`).join(' · ')}</span><b>${brl(e.reduce((a,[,x])=>a+x.v,0))}</b></div>`}).join('')}</div>`:'';
-   g+=sem?`<div class="vend" style="padding:6px">${sem} show${sem>1?'s':''} sem data da venda (cadastrados antes do campo existir) não entra${sem>1?'m':''} no gráfico. Preencha em Vendas → abrir o show → Data da venda.</div>`:'';
-   document.getElementById('rvg').innerHTML=g;
-   const am=cv.filter(s=>s.data_venda.startsWith(MA)).sort((a,b)=>a.data_venda.localeCompare(b.data_venda));
-   document.getElementById('rvm').innerHTML=`<h3 style="margin-top:14px">Vendidos em ${MESES[+MA.slice(5,7)-1].toLowerCase()} <small>pela data da venda</small></h3>`+(am.length?`<div class="list" style="margin-bottom:12px">${am.map(s=>`<div class="row"><div style="flex:1;min-width:0"><b style="display:block;font-size:14px">${esc(s.evento||'Show')} · ${esc(s.cidade||'')}</b><span style="font-size:12px;color:var(--muted)">vendido ${ddmm(s.data_venda)} por ${esc(nmV(s))} · show ${dtx(s.data)}</span></div><b style="white-space:nowrap">${s.valor?brl(s.valor):'—'}</b></div>`).join('')}<div class="tot"><span>${am.length} show${am.length>1?'s':''}</span><b>${brl(am.reduce((a,s)=>a+(+s.valor||0),0))}</b></div></div>`:`<div class="empty" style="margin-bottom:12px">Nenhum show com data da venda neste mês${VSL?'':' (carregando…)'}.</div>`)}
+  renderVV('rvg','rvm');
   const pvs={};vs.forEach(s=>{const q=s.vendedor?(ALIAS[LB.norm(s.vendedor)]||s.vendedor):'Sem vendedor';const x=pvs[q]=pvs[q]||{n:0,v:0,fut:0,cid:new Set()};x.n++;x.v+=(+s.valor||0);if(s.data>=HOJE)x.fut++;x.cid.add(s.cidade)});
   const com=D.vendas&&D.vendas.comissao;
   document.getElementById('rvend').innerHTML=Object.entries(pvs).sort((a,b)=>b[1].v-a[1].v).map(([n,x],i)=>`<div class="pess"><div class="hd"><div><b>${i+1}º · ${esc(n)}</b><span>${x.n} shows · ${x.fut} marcados · ${x.cid.size} cidades</span></div><div style="text-align:right;font-weight:800;white-space:nowrap">${brl(x.v)}<span style="display:block;font-weight:400">ticket médio ${brl(x.v/x.n)}</span></div></div>${n!=='Sem vendedor'?`<div class="vend">Comissão: ${com!=null?'<b class="pos">'+brl(x.v*com/100)+'</b> ('+com+'% padrão)':'<b class="pk">% a definir</b>'}</div>`:'<div class="vend">Shows sem vendedor na ficha: edite em Vendas para entrar no ranking.</div>'}</div>`).join('')||'<div class="empty">Sem vendas no ano.</div>';

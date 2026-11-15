@@ -123,6 +123,7 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
     <h3>Ônibus (diesel)</h3>
     <div class="f3"><label>Autonomia (km/L)<input id="cj_kml" inputmode="decimal"></label><label>Preço do diesel (R$/L)<input id="cj_dp" inputmode="decimal"></label><label>Km adicional (% da ida)<input id="cj_ad" inputmode="decimal"></label></div>
     <p class="note">Mesmo cálculo da planilha do show: (km ida + km volta + km adicional) ÷ km/L × preço. A autonomia do ônibus veio da planilha (último borderô com diesel).</p>
+    <label style="max-width:320px;margin-top:8px">Saída do ônibus (cidade para o Maps)<input id="cj_base" placeholder="Divinópolis, MG"></label>
     <h3>Carros (gasolina)</h3>
     <label style="max-width:220px">Preço da gasolina (R$/L)<input id="cj_gp" inputmode="decimal" placeholder="ex.: 6,29"></label>
     <div class="list" id="lveic" style="margin-top:10px"></div>
@@ -169,6 +170,8 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
     <div class="dz">
       <div class="f4"><label>Km ida<input id="d_ida" inputmode="decimal"></label><label>Km volta<input id="d_volta" inputmode="decimal"></label><label>Km adicional<input id="d_ad" inputmode="decimal" placeholder="auto"></label><label>Km/L<input id="d_kml" inputmode="decimal"></label><label>Preço R$/L<input id="d_pr" inputmode="decimal"></label><label>Abastecido (R$)<input id="d_ab" inputmode="decimal" placeholder="real, se houver"></label></div>
       <div class="r" id="d_res"></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px"><button type="button" class="btn sm pkb" id="d_maps">📍 Calcular km pelo Maps</button><a id="d_rota" href="#" target="_blank" rel="noopener" class="note" style="margin:0;color:var(--pinkl)">abrir rota no Maps</a></div>
+      <div class="note" id="d_mres" style="margin-top:6px"></div>
     </div>
     <h3>Observações</h3>
     <label><textarea id="e_obs" rows="2"></textarea></label>
@@ -298,7 +301,7 @@ function novo(s){const b={id:'B'+(s?s.id:HOJE+'-'+Math.random().toString(36).sli
   if(ult&&confirm('Começar com a mesma equipe do último borderô ('+ddmm(ult.data)+' · '+ult.show+')? Dá para tirar e trocar depois.'))
     b.equipe=ult.equipe.filter(e=>!e.fora&&e.grupo!=='Comissão').map(e=>({pessoa:e.pessoa,nome:e.nome,pix:e.pix,doc:e.doc,grupo:e.grupo,funcao:e.funcao,valor:e.valor,status:'Pendente'}));
   abrir(b,true)}
-function abrir(b,isNovo){ED=b;ED._novo=!!isNovo;ED.diesel=Object.assign({km_ida:'',km_volta:'',km_adic:'',kml:CFG.onibus_kml,preco:CFG.diesel_preco,abastecido:''},b.diesel||{});
+function abrir(b,isNovo){ED=b;$('d_mres').textContent='';ED._novo=!!isNovo;ED.diesel=Object.assign({km_ida:'',km_volta:'',km_adic:'',kml:CFG.onibus_kml,preco:CFG.diesel_preco,abastecido:''},b.diesel||{});
   if(b.fonte==='planilha'){ED.diesel.km_adic=b.diesel.km_adic;ED.diesel.abastecido=b.totais?b.totais.diesel:''}
   $('e_show').innerHTML='<option value="">— borderô avulso —</option>'+D.shows.map(s=>`<option value="${esc(s.id)}">${ddmm(s.data)}/${s.data.slice(2,4)} · ${esc(s.evento)} · ${esc(s.cidade)}</option>`).join('');
   $('e_show').value=b.show_id||'';$('e_nome').value=b.show||'';$('e_data').value=b.data;$('e_local').value=b.local||'';$('e_valor').value=nf(b.valor);$('e_com').value=nf(b.comissao);$('e_obs').value=b.obs||'';
@@ -384,6 +387,20 @@ function gasCalc(c,p){const box=c.querySelector('[data-gc]');if(box.innerHTML){b
   g('v').onchange=()=>{const v=vs.find(x=>x.pessoa===g('v').value);g('kml').value=nf(v&&v.kml);cc()};
   box.addEventListener('input',cc);cc();
   g('ok').onclick=()=>{const v=cc();if(!v)return;p.gasolina=Math.round(v*100)/100;ED._sujo=true;renderEq();calcTot()}}
+
+/* km pelo Google Maps (API do app usa o serviço Maps do Google): saída do ônibus → local do show, ida = volta */
+const BASE=()=>CFG.base||'Divinópolis, MG';
+function destino(){const s=ED&&D.shows.find(x=>x.id===ED.show_id);const l=($('e_local').value||'').trim();const c=s&&s.cidade||'';
+  return [l,c&&!l.toLowerCase().includes(c.toLowerCase())?c:''].filter(Boolean).join(', ')+(/,\s*[A-Z]{2}$/.test(l)?'':', MG')}
+function rotaLink(){$('d_rota').href='https://www.google.com/maps/dir/?api=1&travelmode=driving&origin='+encodeURIComponent(BASE())+'&destination='+encodeURIComponent(destino())}
+$('d_rota').addEventListener('mousedown',rotaLink);$('d_rota').addEventListener('touchstart',rotaLink,{passive:true});$('d_rota').addEventListener('focus',rotaLink);
+$('d_maps').onclick=async()=>{const m=$('d_mres'),de=destino();if(!$('e_local').value.trim()&&!ED.show_id){m.innerHTML='<span class="neg">Preencha o Local do show primeiro.</span>';return}
+  if(LOCAL||!API){m.innerHTML='<span class="neg">Precisa da planilha ligada (internet).</span>';return}
+  m.textContent='Calculando '+BASE()+' → '+de+'…';
+  try{const r=await api({acao:'distancia',origem:BASE(),destino:de});if(!r.ok)throw new Error(r.erro);
+    const d=ED.diesel;d.km_ida=r.km;d.km_volta=r.km;$('d_ida').value=nf(r.km);$('d_volta').value=nf(r.km);ED._sujo=true;calcTot();
+    m.innerHTML=`<span class="pos">${nf(r.km)} km</span> de ${esc(r.de)} até ${esc(r.para)} (~${Math.floor(r.min/60)}h${String(r.min%60).padStart(2,'0')}). Ida e volta preenchidas; confira a rota no link se o local for um lugar específico.`}
+  catch(e){m.innerHTML='<span class="neg">Não achei a rota ('+esc(e.message)+'). Escreva o local como "Cidade, UF" e tente de novo.</span>'}};
 
 /* itens */
 function renderIt(){$('e_it').innerHTML=(ED.itens||[]).map((t,i)=>`<div class="pp" data-ii="${i}"><div class="f4" style="grid-template-columns:2fr 1fr 1fr auto;align-items:end"><label>Item<input data-k="desc" value="${esc(t.desc)}"></label><label>Valor (R$)<input data-k="valor" inputmode="decimal" value="${nf(t.valor)}"></label><label>Situação<select data-k="status"><option${t.status!=='Pago'?' selected':''}>Pendente</option><option${t.status==='Pago'?' selected':''}>Pago</option></select></label><button type="button" class="x" data-rmi>×</button></div>
@@ -519,11 +536,11 @@ $('pm_del').onclick=async()=>{if(!pesAt||!confirm('Excluir '+pesAt.nome+' da lis
     $('pm').classList.remove('open');renderPes()}catch(err){$('pm_msg').innerHTML='<span class="neg">Não excluiu ('+esc(err.message)+').</span>'}};
 
 /* ---------- ajustes (autonomias e preços) ---------- */
-function renderAj(){$('cj_kml').value=nf(CFG.onibus_kml);$('cj_dp').value=nf(CFG.diesel_preco);$('cj_ad').value=nf(CFG.adicional_pct);$('cj_gp').value=nf(CFG.gasolina_preco);
+function renderAj(){$('cj_base').value=CFG.base||'Divinópolis, MG';$('cj_kml').value=nf(CFG.onibus_kml);$('cj_dp').value=nf(CFG.diesel_preco);$('cj_ad').value=nf(CFG.adicional_pct);$('cj_gp').value=nf(CFG.gasolina_preco);
   $('lveic').innerHTML=(CFG.veiculos||[]).map((v,i)=>`<div class="card sc"><div class="t"><b>${esc(v.carro)}</b><span>${esc(v.nome)}</span></div><label style="width:110px">Km/L<input data-vi="${i}" inputmode="decimal" value="${nf(v.kml)}" placeholder="informar"></label></div>`).join('')}
-$('cj_salvar').onclick=()=>{CFG.onibus_kml=num($('cj_kml').value)||2.8;CFG.diesel_preco=num($('cj_dp').value)||6;CFG.adicional_pct=num($('cj_ad').value);CFG.gasolina_preco=num($('cj_gp').value)||null;
+$('cj_salvar').onclick=()=>{CFG.base=$('cj_base').value.trim()||'Divinópolis, MG';CFG.onibus_kml=num($('cj_kml').value)||2.8;CFG.diesel_preco=num($('cj_dp').value)||6;CFG.adicional_pct=num($('cj_ad').value);CFG.gasolina_preco=num($('cj_gp').value)||null;
   document.querySelectorAll('[data-vi]').forEach(i=>CFG.veiculos[+i.dataset.vi].kml=num(i.value)||null);
-  store.set('lb_bord_cfg',JSON.stringify({onibus_kml:CFG.onibus_kml,diesel_preco:CFG.diesel_preco,adicional_pct:CFG.adicional_pct,gasolina_preco:CFG.gasolina_preco,veiculos:CFG.veiculos}));
+  store.set('lb_bord_cfg',JSON.stringify({base:CFG.base,onibus_kml:CFG.onibus_kml,diesel_preco:CFG.diesel_preco,adicional_pct:CFG.adicional_pct,gasolina_preco:CFG.gasolina_preco,veiculos:CFG.veiculos}));
   $('cj_msg').textContent='Salvo neste aparelho.';setTimeout(()=>$('cj_msg').textContent='',2500)};
 </script>
 </body>
