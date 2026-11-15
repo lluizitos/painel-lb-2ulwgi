@@ -331,10 +331,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwhgvm19"></script>
-<script src="lbmetas.js?v=mwhgvm19"></script>
-<script src="lbchat.js?v=mwhgvm19"></script>
-<script src="lbvendas.js?v=mwhgvm19"></script>
+<script src="lb.js?v=mwhh6up9"></script>
+<script src="lbmetas.js?v=mwhh6up9"></script>
+<script src="lbchat.js?v=mwhh6up9"></script>
+<script src="lbvendas.js?v=mwhh6up9"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -352,7 +352,7 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},se
 let D,HOJE,mesAtual,KEYS;
 
 /* ---------- login (lb.js) ---------- */
-LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}try{renderSaldo()}catch(e){}try{renderFalta();loadVSL()}catch(e){}try{LBCHAT.montar(document.getElementById('lbq'),{base:'',exemplo:'quanto falta receber em dezembro?',contexto:ctxPainel})}catch(e){}}});
+LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}try{renderSaldo()}catch(e){}try{renderFalta();loadVSL()}catch(e){}try{LBCHAT.montar(document.getElementById('lbq'),{base:'',exemplo:'quanto falta receber em dezembro?',contexto:()=>ctxPainel()+'\n\nTELA ABERTA:\n'+LBCHAT.texto(document.querySelector('main'))})}catch(e){}}});
 let PAG=[];
 
 /* ---------- início ---------- */
