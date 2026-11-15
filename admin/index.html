@@ -79,7 +79,7 @@ label textarea{min-height:60px;resize:vertical}
 .sh.ro .f,.sh.ro .acts{display:none}.sh:not(.ro) #ln_ro{display:none}
 .lnx{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;background:var(--bg);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:var(--sub)}.lnx b{font-size:17px;color:var(--ink)}.lnx b.pos{color:var(--pos)}
 .rlig{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow:auto}.rl{display:flex!important;flex-direction:row!important;align-items:center;gap:8px;font-size:13px;color:var(--ink)!important}.rl input{width:auto!important}.rl small{color:var(--muted)}.mpb{height:8px;border-radius:99px;background:var(--card2);overflow:hidden;margin-top:8px}.mpb i{display:block;height:100%;background:var(--pink);border-radius:99px}.mpb.ok i{background:var(--pos)}.mpt{font-size:11.5px;color:var(--sub);margin-top:4px}
-.rtadm{margin-top:10px}.rtadm>summary{cursor:pointer;font-size:12.5px;color:var(--pinkl);font-weight:600}.rtadm .rt{margin-top:8px;border-left-color:var(--line);background:var(--card2)}.rtadm .rt .cal button:not(.ok){background:var(--card)}
+.rtadm{margin-top:10px}.rtadm>summary{cursor:pointer;font-size:12.5px;color:var(--pinkl);font-weight:600}.rtadm .rt{margin-top:8px;border-left-color:var(--line);background:var(--card2)}.rtadm .rt .rcal button:not(.ok){background:var(--card)}
 .pdl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px}
 .pcl{margin-top:8px;font-size:12.5px}.pcl>div{margin-top:4px}.pcl b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--sub)}.pcl span{display:block;padding:3px 0;border-bottom:1px solid var(--line)}
 .ppf .ppx{margin-top:8px}
@@ -293,8 +293,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwi63p9w"></script>
-<script src="../lbmetas.js?v=mwi63p9w"></script>
+<script src="../lb.js?v=mwi68gyv"></script>
+<script src="../lbmetas.js?v=mwi68gyv"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -749,7 +749,7 @@ $('duv_f').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;DUVF=b.
 $('duv_l').addEventListener('click',async e=>{const b=e.target.closest('[data-ds]');if(!b)return;const r=document.querySelector(`[data-dr="${b.dataset.ds}"]`).value.trim();if(!r){b.textContent='escreva a resposta';return}
   b.disabled=true;b.textContent='enviando…';try{DUV=(await api({acao:'responder_duvida',id:b.dataset.ds,resposta:r})).duvidas||DUV;duvRender()}catch(err){b.disabled=false;b.textContent='não enviou: '+err.message}});
 </script>
-<script src="../lbchat.js?v=mwi63p9w"></script>
+<script src="../lbchat.js?v=mwi68gyv"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>
