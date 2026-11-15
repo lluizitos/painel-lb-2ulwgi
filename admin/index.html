@@ -140,7 +140,7 @@ label textarea{min-height:60px;resize:vertical}
     <div class="list" id="e_lista"></div>
     <h3 id="e_h">Novo item</h3>
     <div class="card"><div class="f">
-      <label>Tipo<select id="e_tp"><option value="meta">Meta</option><option value="alerta">Alerta</option><option value="despesa">Despesa prevista</option></select></label>
+      <label>Tipo<select id="e_tp"><option value="meta">Meta</option><option value="alerta">Alerta</option><option value="despesa">Despesa prevista</option><option value="tarefa">Tarefa da empresa</option></select></label>
       <label>Mostrar para o sócio<select id="e_so"><option value="não">Não (só administração)</option><option value="sim">Sim</option></select></label>
       <label>Aviso no topo do painel<select id="e_pn"><option value="não">Não</option><option value="sim">Sim</option></select></label>
       <label class="w">Título<input id="e_tit" placeholder="ex.: Cachê de prefeitura em R$ 35 mil"></label>
@@ -150,10 +150,12 @@ label textarea{min-height:60px;resize:vertical}
       <label>Situação<select id="e_sit"></select></label>
       <label>Ordem<input id="e_ord" inputmode="numeric" placeholder="1 = primeiro"></label>
       <label class="w">Detalhes / andamento<textarea id="e_pro"></textarea></label>
-      <div class="w" id="e_pg"><div style="font-size:12px;color:var(--sub);margin:4px 0">Barra de progresso <small style="color:var(--muted)">(só metas)</small></div>
+      <div class="w" id="e_pg"><div style="font-size:12px;color:var(--sub);margin:4px 0">Barra de progresso <small style="color:var(--muted)">(metas e tarefas da empresa)</small></div>
         <div class="f" style="grid-template-columns:1fr 1fr;margin:0"><label>Já tem / feito<input id="e_at" inputmode="decimal" placeholder="ex.: 2"></label><label>De quanto (alvo)<input id="e_mn" inputmode="decimal" placeholder="ex.: 5"></label></div>
         <div style="font-size:12px;color:var(--sub);margin:10px 0 4px">ou ligar a metas individuais <small style="color:var(--muted)">(a barra vira a média delas no mês; ex.: reunião semanal)</small></div>
-        <div id="e_rl" class="rlig"></div></div>
+        <div id="e_rl" class="rlig"></div>
+        <div style="font-size:12px;color:var(--sub);margin:12px 0 4px">e/ou ligar a tarefas das pessoas <small style="color:var(--muted)">(trabalho em equipe: cada tarefa concluída avança a barra)</small></div>
+        <input id="e_tf" placeholder="🔎 buscar tarefa ou pessoa" style="margin-bottom:6px;width:100%;box-sizing:border-box;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:9px 12px;font:inherit;font-size:14px"><div id="e_tl" class="rlig"></div></div>
     </div><div class="acts"><button class="btn pkb" id="e_ok">Salvar</button><button class="btn" id="e_can" style="display:none">Cancelar edição</button><span class="msg" id="e_msg"></span></div></div>
   </div>
 
@@ -499,37 +501,48 @@ $('pg_lista').addEventListener('click',async e=>{const fm=e.target.closest('[dat
 
 /* empresa: metas, alertas, despesas previstas (cada item: mostrar ou não ao sócio) */
 const TIPOS={meta:'Meta',alerta:'Alerta',despesa:'Despesa prevista'};
-const SITS={meta:['A iniciar','Em andamento','Atingida','Não atingida'],alerta:['Previsto','Confirmado','Pago','Resolvido'],despesa:['Previsto','Confirmado','Pago']};
+const SITS={tarefa:['A fazer','Em andamento','Concluída'],meta:['A iniciar','Em andamento','Atingida','Não atingida'],alerta:['Previsto','Confirmado','Pago','Resolvido'],despesa:['Previsto','Confirmado','Pago']};
 const brl=v=>'R$ '+(+v).toLocaleString('pt-BR',{minimumFractionDigits:+v%1?2:0,maximumFractionDigits:2});
 const fechado=x=>['Atingida','Não atingida','Pago','Resolvido'].includes(x.situacao);
 function sitPill(x){const s=x.situacao||'';return `<span class="pill ${['Atingida','Pago','Resolvido'].includes(s)?'ok':s==='Não atingida'?'neg':['Em andamento','Confirmado'].includes(s)?'bl':''}">${esc(s.toLowerCase())}</span>`}
 function sitOpts(tp,v){$('e_sit').innerHTML=SITS[tp].map(s=>`<option${s===v?' selected':''}>${s}</option>`).join('')}
-function progMeta(x){ // barra: média das metas individuais ligadas no mês; senão feito ÷ alvo; atingida = 100%
-  const ids=String(x.rotinas||'').split(',').filter(Boolean),rs=ids.map(i=>RT.find(r=>r.id===i)).filter(Boolean),M=HOJE.slice(0,7);
-  if(rs.length){const ps=rs.map(r=>LBROT.pct(r,M));return {p:ps.reduce((a,y)=>a+y.pct,0)/ps.length,t:`média de ${rs.length} meta${rs.length>1?'s':''} individua${rs.length>1?'is':'l'} em ${LBROT.MESES?LBROT.MESES[+M.slice(5,7)-1]:M}: `+rs.map((r,i)=>esc(r.titulo)+' '+ps[i].feitos+'/'+ps[i].total).join(' · ')}}
+function progMeta(x){ // barra: média dos itens ligados (metas individuais no mês + tarefas das pessoas: concluída = 100%); senão feito ÷ alvo
+  const rs=String(x.rotinas||'').split(',').filter(Boolean).map(i=>RT.find(r=>r.id===i)).filter(Boolean),M=HOJE.slice(0,7);
+  const ts=String(x.tarefas||'').split(',').filter(Boolean).map(i=>TF.find(t=>t.id===i)).filter(Boolean);
+  if(rs.length||ts.length){const ps=rs.map(r=>LBROT.pct(r,M)),ok=ts.filter(t=>t.status==='Concluída').length,n=rs.length+ts.length;
+    const p=(ps.reduce((a,y)=>a+y.pct,0)+ok)/n,T=[];
+    if(ts.length)T.push(`${ok} de ${ts.length} tarefa${ts.length>1?'s':''} concluída${ok===1?'':'s'}: `+ts.map(t=>`${t.status==='Concluída'?'✓':t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)} <small>(${esc(nomeP(t.pessoa))})</small>`).join(' · '));
+    if(rs.length)T.push(`metas em ${LBROT.MESES?LBROT.MESES[+M.slice(5,7)-1]:M}: `+rs.map((r,i)=>`${esc(r.titulo)} <small>(${esc(nomeP(r.pessoa))})</small> ${ps[i].feitos}/${ps[i].total}`).join(' · '));
+    return {p,t:T.join('<br>')}}
   const a=+x.atual,m=+x.meta_num;if(m>0&&String(x.atual)!=='')return {p:Math.min(1,a/m),t:`${String(a).replace('.',',')} de ${String(m).replace('.',',')}`};
-  if(x.situacao==='Atingida')return {p:1,t:'atingida'};return null}
+  if(x.situacao==='Atingida'||x.situacao==='Concluída')return {p:1,t:x.situacao.toLowerCase()};return null}
 const nomeP=id=>{const p=PF.find(y=>y.id===id);return p?p.nome:''};
+function tlRender(sel){const s=new Set(String(sel||'').split(',').filter(Boolean)),q=LB.norm($('e_tf').value||''),lim=new Date(Date.now()-45*864e5).toISOString().slice(0,10);
+  const l=TF.filter(t=>s.has(t.id)||t.status!=='Concluída'||(t.concluido_em||'')>=lim).filter(t=>s.has(t.id)||!q||LB.norm(t.titulo+' '+nomeP(t.pessoa)).includes(q))
+    .sort((a,b)=>s.has(b.id)-s.has(a.id)||nomeP(a.pessoa).localeCompare(nomeP(b.pessoa))||a.titulo.localeCompare(b.titulo));
+  $('e_tl').innerHTML=l.map(t=>`<label class="rl"><input type="checkbox" value="${esc(t.id)}"${s.has(t.id)?' checked':''}> ${t.status==='Concluída'?'✓':t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)} <small>${esc(nomeP(t.pessoa))}</small></label>`).join('')||'<span class="note">Nenhuma tarefa encontrada (crie em Admin → Individuais).</span>'}
+const tlSel=()=>[...$('e_tl').querySelectorAll('input:checked')].map(i=>i.value);
+$('e_tf').oninput=()=>tlRender(tlSel().join(','));
 function rlRender(sel){const s=new Set(String(sel||'').split(',').filter(Boolean));
   $('e_rl').innerHTML=RT.filter(r=>r.ativo!=='não'||s.has(r.id)).map(r=>`<label class="rl"><input type="checkbox" value="${esc(r.id)}"${s.has(r.id)?' checked':''}> ${esc(r.titulo)} <small>${esc(nomeP(r.pessoa))}</small></label>`).join('')||'<span class="note">Nenhuma meta individual cadastrada (Admin → Individuais).</span>'}
 function renderEmp(){const l=MT.filter(x=>!EFIL||(x.tipo||'meta')===EFIL).sort((a,b)=>fechado(a)-fechado(b)||(+a.ordem||99)-(+b.ordem||99));
   $('e_lista').innerHTML=l.length?l.map(x=>`<div class="tf ${fechado(x)?'s-concluida':(x.tipo==='alerta'?'s-atrasada':x.situacao==='Em andamento'?'s-andamento':'')}"><div class="hd"><div><span class="pill">${TIPOS[x.tipo||'meta']}</span> <b style="display:inline">${esc(x.titulo)}</b>${x.alvo?`<div class="ds">${esc(x.alvo)}</div>`:''}${x.progresso?`<div class="ds" style="color:var(--muted)">${esc(x.progresso)}</div>`:''}</div>
-    <button class="btn sm" data-me="${esc(x.id)}">editar</button></div>${(g=>g?`<div class="mpb${g.p>=1?' ok':''}"><i style="width:${Math.round(g.p*100)}%"></i></div><div class="mpt"><b>${Math.round(g.p*100)}%</b> · ${g.t}</div>`:'')((x.tipo||'meta')==='meta'?progMeta(x):null)}
+    <button class="btn sm" data-me="${esc(x.id)}">editar</button></div>${(g=>g?`<div class="mpb${g.p>=1?' ok':''}"><i style="width:${Math.round(g.p*100)}%"></i></div><div class="mpt"><b>${Math.round(g.p*100)}%</b> · ${g.t}</div>`:'')(['meta','tarefa'].includes(x.tipo||'meta')?progMeta(x):null)}
     <div class="mt">${sitPill(x)}${x.prazo?' · '+esc(x.prazo):''}${x.valor?' · <b style="display:inline;color:var(--ink)">'+brl(x.valor)+'</b>':''} · ${x.socio==='sim'?'<span style="color:var(--pos)">sócio vê</span>':'só administração'} · <a href="#" data-mso="${esc(x.id)}" style="color:var(--pinkl)">${x.socio==='sim'?'esconder do sócio':'mostrar ao sócio'}</a> · ${x.painel==='sim'?'<span style="color:var(--pos)">aviso no painel</span> · ':''}<a href="#" data-mpn="${esc(x.id)}" style="color:var(--pinkl)">${x.painel==='sim'?'tirar do painel':'avisar no painel'}</a> · <a href="#" data-mdel="${esc(x.id)}" style="color:var(--muted)">excluir</a></div></div>`).join('')
     :'<div class="empty">Nada aqui ainda.</div>';
-  if(!EDE&&!$('e_sit').options.length)sitOpts($('e_tp').value);if(!EDE&&!$('e_rl').children.length)rlRender('');pgVis()}
-function limpaE(){EDE=null;['e_tit','e_alvo','e_pz','e_val','e_ord','e_pro','e_at','e_mn'].forEach(i=>$(i).value='');rlRender('');setTimeout(pgVis);$('e_tp').value='meta';$('e_so').value='não';$('e_pn').value='não';sitOpts('meta');$('e_can').style.display='none';$('e_h').textContent='Novo item';$('e_msg').textContent=''}
+  if(!EDE&&!$('e_sit').options.length)sitOpts($('e_tp').value);if(!EDE&&!$('e_rl').children.length)rlRender('');if(!EDE&&!$('e_tl').children.length)tlRender('');pgVis()}
+function limpaE(){EDE=null;['e_tit','e_alvo','e_pz','e_val','e_ord','e_pro','e_at','e_mn','e_tf'].forEach(i=>$(i).value='');rlRender('');tlRender('');setTimeout(pgVis);$('e_tp').value='meta';$('e_so').value='não';$('e_pn').value='não';sitOpts('meta');$('e_can').style.display='none';$('e_h').textContent='Novo item';$('e_msg').textContent=''}
 const salvaMeta=x=>api({acao:'salvar_meta',meta:x});
-const pgVis=()=>{$('e_pg').style.display=$('e_tp').value==='meta'?'':'none'};
+const pgVis=()=>{$('e_pg').style.display=['meta','tarefa'].includes($('e_tp').value)?'':'none'};
 $('e_tp').onchange=()=>{sitOpts($('e_tp').value,$('e_sit').value);pgVis()};
 $('e_can').onclick=limpaE;
 $('e_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;EFIL=b.dataset.f;document.querySelectorAll('#e_fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderEmp()};
 $('e_ok').onclick=async()=>{const m=$('e_msg'),t=$('e_tit').value.trim();if(!t){m.innerHTML='<span class="neg">Escreva o título.</span>';return}
   const v=$('e_val').value.trim().replace(/\./g,'').replace(',','.');
-  m.textContent='Salvando…';try{await salvaMeta({id:EDE||undefined,tipo:$('e_tp').value,socio:$('e_so').value,painel:$('e_pn').value,titulo:t,alvo:$('e_alvo').value,prazo:$('e_pz').value,valor:v,situacao:$('e_sit').value,ordem:$('e_ord').value,progresso:$('e_pro').value,atual:$('e_at').value.trim().replace(',','.'),meta_num:$('e_mn').value.trim().replace(',','.'),rotinas:[...$('e_rl').querySelectorAll('input:checked')].map(i=>i.value)});limpaE();m.innerHTML='<span class="pos">Salvo ✓</span>';render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
+  m.textContent='Salvando…';try{await salvaMeta({id:EDE||undefined,tipo:$('e_tp').value,socio:$('e_so').value,painel:$('e_pn').value,titulo:t,alvo:$('e_alvo').value,prazo:$('e_pz').value,valor:v,situacao:$('e_sit').value,ordem:$('e_ord').value,progresso:$('e_pro').value,atual:$('e_at').value.trim().replace(',','.'),meta_num:$('e_mn').value.trim().replace(',','.'),rotinas:[...$('e_rl').querySelectorAll('input:checked')].map(i=>i.value),tarefas:tlSel()});limpaE();m.innerHTML='<span class="pos">Salvo ✓</span>';render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
 $('e_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data-me]'),so=e.target.closest('[data-mso]'),pn=e.target.closest('[data-mpn]'),del=e.target.closest('[data-mdel]');if(!ed&&!so&&!pn&&!del)return;e.preventDefault();
   if(pn){const x=MT.find(y=>y.id===pn.dataset.mpn);pn.textContent='salvando…';try{await salvaMeta(Object.assign({},x,{painel:x.painel==='sim'?'não':'sim'}));render()}catch(err){pn.textContent='erro'}return}
-  if(ed){const x=MT.find(y=>y.id===ed.dataset.me);EDE=x.id;$('e_tp').value=x.tipo||'meta';$('e_so').value=x.socio==='sim'?'sim':'não';$('e_pn').value=x.painel==='sim'?'sim':'não';$('e_tit').value=x.titulo;$('e_alvo').value=x.alvo;$('e_pz').value=x.prazo;$('e_val').value=x.valor?String(x.valor).replace('.',','):'';sitOpts(x.tipo||'meta',x.situacao);$('e_ord').value=x.ordem;$('e_pro').value=x.progresso;$('e_at').value=x.atual?String(x.atual).replace('.',','):'';$('e_mn').value=x.meta_num?String(x.meta_num).replace('.',','):'';rlRender(x.rotinas);pgVis();$('e_can').style.display='';$('e_h').textContent='Editar item';$('e_tit').scrollIntoView({block:'center'});return}
+  if(ed){const x=MT.find(y=>y.id===ed.dataset.me);EDE=x.id;$('e_tp').value=x.tipo||'meta';$('e_so').value=x.socio==='sim'?'sim':'não';$('e_pn').value=x.painel==='sim'?'sim':'não';$('e_tit').value=x.titulo;$('e_alvo').value=x.alvo;$('e_pz').value=x.prazo;$('e_val').value=x.valor?String(x.valor).replace('.',','):'';sitOpts(x.tipo||'meta',x.situacao);$('e_ord').value=x.ordem;$('e_pro').value=x.progresso;$('e_at').value=x.atual?String(x.atual).replace('.',','):'';$('e_mn').value=x.meta_num?String(x.meta_num).replace('.',','):'';rlRender(x.rotinas);$('e_tf').value='';tlRender(x.tarefas);pgVis();$('e_can').style.display='';$('e_h').textContent='Editar item';$('e_tit').scrollIntoView({block:'center'});return}
   if(so){const x=MT.find(y=>y.id===so.dataset.mso);so.textContent='salvando…';try{await salvaMeta(Object.assign({},x,{socio:x.socio==='sim'?'não':'sim'}));render()}catch(err){so.textContent='erro'}return}
   if(del.dataset.ok!=='1'){del.dataset.ok='1';del.textContent='toque de novo para excluir';return}
   try{await api({acao:'excluir_meta',id:del.dataset.mdel});render()}catch(err){del.textContent='erro'}});
