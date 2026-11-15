@@ -17,14 +17,33 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
+  const BUILD = 'mwhezm7b';
+  function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
+    fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
+      if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
+      const k = 'lb_rv_' + j.v; try { if (sessionStorage.getItem(k)) return; sessionStorage.setItem(k, '1'); } catch (e) { return; }
+      location.replace(location.pathname + '?v=' + j.v + location.hash);
+    }).catch(() => { });
+  }
+  /* chave da senha (PBKDF2, 600 mil rodadas = lento no celular): calcula 1 vez e guarda neste aparelho (o login já fica guardado nele) */
+  async function kekDe(u, p, salt, iter) {
+    const id = 'lbk_' + hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(norm(u) + '|' + p + '|' + salt + '|' + iter))).slice(0, 24);
+    let raw = store.get(id);
+    if (!raw) {
+      const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(norm(u) + '|' + p), 'PBKDF2', false, ['deriveBits']);
+      raw = btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: b64(salt), iterations: iter, hash: 'SHA-256' }, km, 256))));
+      try { const ks = Object.keys(localStorage).filter(x => x.startsWith('lbk_')); if (ks.length > 20) ks.slice(0, ks.length - 20).forEach(x => localStorage.removeItem(x)); } catch (e) { }
+      store.set(id, raw);
+    }
+    return { kek: await crypto.subtle.importKey('raw', b64(raw), 'AES-GCM', false, ['decrypt']), id };
+  }
   async function abrir(base, pagina, u, p) {
     const j = await (await fetch(base + pagina + '.enc.json', { cache: 'no-store' })).json();
     const k = j.chaves[await slotId(pagina, u)];
     if (!k) throw new Error('acesso');
     try {
-      const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(norm(u) + '|' + p), 'PBKDF2', false, ['deriveKey']);
-      const kek = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(k.salt), iterations: j.iter, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
-      const raw = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(k.iv) }, kek, b64(k.chave));
+      const { kek, id } = await kekDe(u, p, k.salt, j.iter);
+      let raw; try { raw = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(k.iv) }, kek, b64(k.chave)); } catch (e) { store.del(id); throw e; }
       const dk = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
       const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(j.iv) }, dk, b64(j.ct));
       const dados = JSON.parse(new TextDecoder().decode(pt));
@@ -48,6 +67,7 @@
   /* Monta a tela de login e chama ok({dados, paginas, nome}) quando abrir. */
   function entrar(opc) {
     const { pagina, base, titulo, ok } = opc;
+    versao(base);
     if (!document.getElementById('lbcss')) {
       const st = document.createElement('style'); st.id = 'lbcss';
       st.textContent = `#lock{position:fixed;inset:0;z-index:50;background:#141218;display:flex;align-items:center;justify-content:center;padding:24px;font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
@@ -89,7 +109,7 @@
     let c = null; try { c = JSON.parse(store.get('lb_cred') || 'null'); } catch (e) { }
     if (c && c.u) { f.u.value = c.u; tentar(c.u, c.p, true); }
   }
-  function sair() { store.del('lb_cred'); store.del('lb_pf'); location.reload(); }
+  function sair() { store.del('lb_cred'); store.del('lb_pf'); try { Object.keys(localStorage).filter(x => x.startsWith('lbk_')).forEach(x => localStorage.removeItem(x)); } catch (e) { } location.reload(); }
   /* ---------- Meu perfil: foto, WhatsApp, e-mail e troca de senha ---------- */
   let CFG = null;
   const cfg = async () => CFG || (CFG = await (await fetch((LB.base || '') + 'config.json', { cache: 'no-store' })).json());

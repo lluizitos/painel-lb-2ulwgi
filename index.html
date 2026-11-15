@@ -329,10 +329,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js"></script>
-<script src="lbmetas.js"></script>
-<script src="lbchat.js"></script>
-<script src="lbvendas.js"></script>
+<script src="lb.js?v=mwhezm7b"></script>
+<script src="lbmetas.js?v=mwhezm7b"></script>
+<script src="lbchat.js?v=mwhezm7b"></script>
+<script src="lbvendas.js?v=mwhezm7b"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -603,8 +603,10 @@ function montaMeses(){
 }
 function k4(l,v,s,c){return `<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`}
 function renderSaldo(){const el=document.getElementById('saldoat');if(!el||!D.linha||!D.linha.length)return; // estimado em destaque; extrato embaixo
-  const HJ=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),x=D.linha[0],l=D.linha.filter(y=>y.data<=HJ),u=l[l.length-1]||x,est=(D.ext_ate||'')<HJ&&u!==x;
-  el.innerHTML=`<div class="card k" style="margin-top:12px"><div class="l">Saldo atual${est?' (estimado)':''}</div><div class="v ${u.saldo<0?'neg':''}">${brl(u.saldo)}</div><div class="s">conta + dinheiro${est?` · extrato ${ddmm(D.ext_ate)}: ${brl(x.saldo)}`:' · conferido no extrato'}</div></div>`+pendShows()}
+  // REGRA: saldo atual = extrato + só o que entrou/saiu de verdade (lançado no app). Atrasado não pago/não recebido fica para o fim do mês.
+  const HJ=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),x=D.linha[0],l=D.linha.filter(y=>y.real&&y.data<=HJ),u=l[l.length-1]||x,est=u!==x;
+  const atr=D.linha.filter(y=>!y.real&&/\((atrasad[oa]|a pagar)\)$/.test(y.txt||'')),ap=atr.filter(y=>y.v<0).reduce((a,y)=>a-y.v,0),ar=atr.filter(y=>y.v>0).reduce((a,y)=>a+y.v,0),fm=atr.length?atr[0].data:'';
+  el.innerHTML=`<div class="card k" style="margin-top:12px"><div class="l">Saldo atual</div><div class="v ${u.saldo<0?'neg':''}">${brl(u.saldo)}</div><div class="s">conta + dinheiro · ${est?`extrato ${ddmm(D.ext_ate)} (${brl(x.saldo)}) + o que foi lançado no app depois`:'conferido no extrato '+ddmm(D.ext_ate)}</div>${atr.length?`<div class="s" style="margin-top:6px">Não entra no saldo atual (ainda não foi pago/recebido, conta no fim do mês ${ddmm(fm)}):${ap?` <b class="neg">${brl(ap)}</b> a pagar atrasado`:''}${ap&&ar?' ·':''}${ar?` <b class="pos">${brl(ar)}</b> a receber atrasado`:''}</div>`:''}</div>`+pendShows()}
 /* shows de meses passados que ainda têm valor a receber */
 function pendShows(){const l=D.pend_shows||[];if(!l.length)return '';
   const t=l.reduce((a,s)=>a+s.falta,0);
@@ -630,7 +632,7 @@ function renderOc(){const el=document.getElementById('ocp');if(!el)return;
   el.innerHTML=al+((D.ocorrencias||[]).slice().sort((x,y)=>y.data.localeCompare(x.data)).map(o=>`<div class="row"><div class="d"><b>${o.data.slice(8,10)}</b><span>${MES3[+o.data.slice(5,7)-1]}${o.data.slice(0,4)!==ANO_AT?' '+o.data.slice(2,4):''}</span></div><div class="t"><b>${esc(o.titulo)} ${o.confirmado?'':'<span class="pill am">sem confirmação</span>'}</b><span>${esc(o.detalhe||'')}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`).join('')||(al?'':'<div class="empty">Nenhuma.</div>'))}
 /* resumo curto dos dados do painel para o assistente (texto enxuto = poucos tokens) */
 function ctxPainel(){const R=v=>v==null?'?':Math.round(v),L=[],HJ=HOJE,dd=d=>d?d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(2,4):'';
-  const ln=(D.linha||[]).filter(y=>y.data<=HJ),u=ln[ln.length-1];if(u)L.push(`Saldo atual (conta+dinheiro): ${R(u.saldo)} · extrato conferido até ${dd(D.ext_ate)}`);
+  const ln=(D.linha||[]).filter(y=>y.real&&y.data<=HJ),u=ln[ln.length-1];if(u)L.push(`Saldo atual (conta+dinheiro): ${R(u.saldo)} · extrato conferido até ${dd(D.ext_ate)}`);
   L.push('MESES (entradas/saídas/saldo fim/tipo):');KEYS.forEach(k=>{const m=D.meses[k];if(m)L.push(`${k}: ent ${R(m.ent)} sai ${R(m.sai)} fim ${R(m.fim)} ${m.tipo}${m.aporte?' aporte '+R(m.aporte):''}`)});
   const ma=D.meses[mkey(HJ)];if(ma){if(ma.ent_tipos)L.push('Mês atual, já entrou por tipo: '+Object.entries(ma.ent_tipos).map(([k,v])=>k+' '+R(v)).join(', '));if(ma.sai_tipos)L.push('Mês atual, já saiu por tipo: '+Object.entries(ma.sai_tipos).map(([k,v])=>k+' '+R(v)).join(', '))}
   try{const fe=faltaEntrar();L.push('FALTA ENTRAR (data/quem/valor):');fe.forEach(x=>L.push(`${dd(x.data)} ${x.nome}${x.sub?' ('+x.sub+')':''} ${R(x.f)}${x.conf?' a confirmar':''}${x.data<HJ?' ATRASADO':''}`))}catch(e){}
