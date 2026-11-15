@@ -14,33 +14,36 @@
   function diasMes(m) { const n = new Date(+m.slice(0, 4), +m.slice(5, 7), 0).getDate(); return Array.from({ length: n }, (_, i) => m + '-' + String(i + 1).padStart(2, '0')); }
   function checks(r) { try { return JSON.parse(r.checks || '[]') || []; } catch (e) { return []; } }
   function notas(r) { try { return JSON.parse(r.notas || '{}') || {}; } catch (e) { return {}; } }
-  const dentro = (r, d) => (!r.inicio || d >= r.inicio) && (!r.fim || d <= r.fim);
+  const ini = r => { const c = checks(r).slice().sort()[0]; return r.inicio && c && c < r.inicio ? c : (r.inicio || ''); };
+  const dentro = (r, d) => (!ini(r) || d >= ini(r)) && (!r.fim || d <= r.fim);
+  const ehJ = t => String(t || '').startsWith('✗');
+  const justs = r => { const nt = notas(r), ck = new Set(checks(r)); return new Set(Object.keys(nt).filter(d => ehJ(nt[d]) && !ck.has(d))); };
   const valeNoDia = (r, d) => dentro(r, d) && (r.freq !== 'util' || dow(d) % 6 !== 0);
   const alvo = r => Math.max(1, +r.alvo || 1);
   const naSemana = (r, w) => checks(r).filter(d => d >= w && d <= soma(w, 6)).length;
   /* resultado do mês m: feitos, total do mês, esperado até hoje, % do mês e % até hoje (ritmo) */
   function pct(r, m, hj) {
-    hj = hj || hoje(); const ck = checks(r).filter(d => d.startsWith(m));
+    hj = hj || hoje(); const ck = checks(r).filter(d => d.startsWith(m)), J = justs(r);
     if (r.freq === 'mes') {
-      const al = alvo(r), dm = diasMes(m), passou = m < hj.slice(0, 7) ? 1 : m > hj.slice(0, 7) ? 0 : (+hj.slice(8, 10)) / dm.length;
-      const ate = Math.max(1, Math.round(al * passou));
-      return { feitos: ck.length, total: al, ate, pct: Math.min(1, ck.length / al), ritmo: Math.min(1, ck.length / ate) };
+      const al = Math.max(0, alvo(r) - [...J].filter(d => d.startsWith(m)).length), dm = diasMes(m), passou = m < hj.slice(0, 7) ? 1 : m > hj.slice(0, 7) ? 0 : (+hj.slice(8, 10)) / dm.length;
+      const ate = al ? Math.max(1, Math.round(al * passou)) : 0;
+      return { feitos: ck.length, total: al, ate, pct: al ? Math.min(1, ck.length / al) : 1, ritmo: ate ? Math.min(1, ck.length / ate) : 1, just: J.size };
     }
     if (r.freq === 'semana') { // semanas que começam (segunda) no mês
-      const al = alvo(r), ws = diasMes(m).filter(d => dow(d) === 1 && soma(d, 6) >= (r.inicio || '') && (!r.fim || d <= r.fim));
-      let f = 0, ate = 0, fa = 0;
-      ws.forEach(w => { const n = Math.min(al, naSemana(r, w)); f += n; if (soma(w, 6) < hj) { ate += al; fa += n; } else if (w <= hj && n) { ate += n; fa += n; } });
-      return { feitos: f, total: ws.length * al, ate, pct: ws.length ? f / (ws.length * al) : 0, ritmo: ate ? fa / ate : null, semanas: ws.length };
+      const al = alvo(r), ws = diasMes(m).filter(d => dow(d) === 1 && soma(d, 6) >= ini(r) && (!r.fim || d <= r.fim));
+      let f = 0, ate = 0, fa = 0, tot = 0;
+      ws.forEach(w => { const n = Math.min(al, naSemana(r, w)), jw = n < al && [...J].some(d => d >= w && d <= soma(w, 6)); f += n; tot += jw ? n : al; if (soma(w, 6) < hj) { ate += jw ? n : al; fa += n; } else if (w <= hj && n) { ate += n; fa += n; } });
+      return { feitos: f, total: tot, ate, pct: tot ? f / tot : 1, ritmo: ate ? fa / ate : null, semanas: ws.length, just: [...J].filter(d => d.startsWith(m)).length };
     }
-    const ds = diasMes(m).filter(d => valeNoDia(r, d)), set = new Set(ck), f = ds.filter(d => set.has(d)).length;
+    const ds = diasMes(m).filter(d => valeNoDia(r, d) && !J.has(d)), set = new Set(ck), f = ds.filter(d => set.has(d)).length;
     const ate = ds.filter(d => d < hj || (d === hj && set.has(d))).length;
-    return { feitos: f, total: ds.length, ate, pct: ds.length ? f / ds.length : 0, ritmo: ate ? f / ate : (f ? 1 : 0) };
+    return { feitos: f, total: ds.length, ate, pct: ds.length ? f / ds.length : 0, ritmo: ate ? f / ate : (f ? 1 : 0), just: [...J].filter(d => d.startsWith(m)).length };
   }
   /* o que falta marcar agora (hoje / esta semana / ritmo do mês) */
   function pend(r, hj) {
     hj = hj || hoje(); if (r.ativo === 'não' || (!dentro(r, hj) && r.freq !== 'semana')) return null;
-    if (r.freq === 'dia' || r.freq === 'util') return valeNoDia(r, hj) && !checks(r).includes(hj) ? 'hoje' : null;
-    if (r.freq === 'semana') { const w = seg(hj), n = naSemana(r, w); if ((r.inicio && soma(w, 6) < r.inicio) || (r.fim && w > r.fim)) return null;
+    if (r.freq === 'dia' || r.freq === 'util') return valeNoDia(r, hj) && !checks(r).includes(hj) && !justs(r).has(hj) ? 'hoje' : null;
+    if (r.freq === 'semana') { const w = seg(hj), n = naSemana(r, w); if (n < alvo(r) && [...justs(r)].some(d => d >= w && d <= soma(w, 6))) return null; if ((r.inicio && soma(w, 6) < r.inicio) || (r.fim && w > r.fim)) return null;
       return n < alvo(r) ? 'esta semana' + (alvo(r) > 1 ? ` (${n} de ${alvo(r)})` : '') : null; }
     const x = pct(r, hj.slice(0, 7), hj); return x.feitos < x.ate ? `no mês (${x.feitos} de ${x.total})` : null;
   }
@@ -61,6 +64,8 @@
 .cal button{aspect-ratio:1;border:1px solid var(--line);background:transparent;border-radius:8px;font-size:11px;color:var(--sub);padding:0;position:relative;cursor:pointer}
 .cal button.ok{background:var(--pos);border-color:var(--pos);color:#141218;font-weight:700}.cal button.fx{border-color:rgba(255,143,168,.45);color:var(--neg)}
 .cal button.nt::after{content:'';position:absolute;top:3px;right:3px;width:5px;height:5px;border-radius:9px;background:#141218;opacity:.55}
+.cal button.js{background:rgba(245,196,81,.18);border-color:#F5C451;color:#F5C451;font-weight:700}.jtx{font-style:normal;color:#F5C451;font-weight:700}
+.rkj{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.rkj button{border:1px solid var(--line);background:transparent;color:var(--sub);border-radius:99px;padding:6px 10px;font-size:12.5px;cursor:pointer}.rkj button.on{border-color:#F5C451;color:#F5C451}.rkf .rkb .jb{color:#F5C451;border-color:rgba(245,196,81,.5)}
 .cal button.hj{outline:2px solid var(--pinkl);outline-offset:1px}.cal button:disabled{opacity:.3;cursor:default}.cal button.na{visibility:hidden}
 .rlg{margin-top:10px;font-size:12.5px}.rlg div{display:flex;gap:8px;padding:5px 0;border-top:1px solid var(--line)}.rlg div b{flex:none;width:40px;color:var(--sub)}.rlg div span{flex:1;min-width:0;word-break:break-word}
 .alr{background:linear-gradient(135deg,rgba(225,29,72,.18),rgba(225,29,72,.06));border:1px solid rgba(240,80,126,.45);border-radius:14px;padding:12px 14px;margin:14px 0}
@@ -77,8 +82,9 @@
     const nHj = ck.filter(d => d === hj).length, min = op.adm ? '2000-01-01' : soma(hj, -40);
     const ds = diasMes(m), pad = dow(ds[0]), sem = r.freq === 'semana';
     const cal = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map(d => `<span>${d}</span>`).join('') + '<button class="na" disabled></button>'.repeat(pad) +
-      ds.map(d => { const vale = sem || r.freq === 'mes' ? dentro(r, d) : valeNoDia(r, d), n = ck.filter(y => y === d).length, fut = d > hj, pode = !fut && d >= min && (vale || n);
-        const c = n ? 'ok' : (vale && d < hj && (r.freq === 'dia' || r.freq === 'util') ? 'fx' : '');
+      ds.map(d => { const vale = sem || r.freq === 'mes' ? dentro(r, d) : valeNoDia(r, d), n = ck.filter(y => y === d).length, fut = d > hj, js = !n && ehJ(nt[d]),
+        pode = !fut && d >= min && (vale || n || js || (d < (r.inicio || '') && (r.freq !== 'util' || dow(d) % 6 !== 0)));
+        const c = n ? 'ok' : js ? 'js' : (vale && d < hj && (r.freq === 'dia' || r.freq === 'util') ? 'fx' : '');
         return `<button class="${c}${d === hj ? ' hj' : ''}${nt[d] ? ' nt' : ''}" ${pode ? `data-rf="${d}" data-rid="${esc(r.id)}"` : 'disabled'} title="${ddmm(d)}${nt[d] ? ' · ' + esc(nt[d]) : ''}">${(r.freq === 'mes' || sem) && n > 1 ? n : +d.slice(8)}</button>`; }).join('');
     const w = seg(hj), nW = naSemana(r, w);
     const sub = r.freq === 'mes' ? `meta ${r.alvo}× no mês · ${x.feitos} feitas`
@@ -93,10 +99,10 @@
     }
     const reg = Object.keys(nt).filter(d => d.startsWith(m)).sort().reverse();
     return `<div class="rt" id="rt-${esc(r.id)}"><div class="rh"><b>${esc(r.titulo)}</b><span class="rp" style="color:${cor(ehMes ? x.ritmo : x.pct)}">${P100(ehMes ? x.ritmo : x.pct)}</span></div>
-      <div class="rs">${sub}${ehMes ? ` · ${P100(x.pct)} do mês inteiro` : ''}</div><div class="br"><i style="width:${Math.round(x.pct * 100)}%;background:${cor(ehMes ? x.ritmo : x.pct)}"></i></div>
+      <div class="rs">${sub}${x.just ? ` · ${x.just} justificad${x.just > 1 ? 'os' : 'o'} (não conta contra)` : ''}${ehMes ? ` · ${P100(x.pct)} do mês inteiro` : ''}</div><div class="br"><i style="width:${Math.round(x.pct * 100)}%;background:${cor(ehMes ? x.ritmo : x.pct)}"></i></div>
       ${bt}<div class="rkx"></div>
       <details${ehMes && !op.adm ? '' : ' open'}><summary style="margin:10px 2px 0;font-size:12px">Calendário de ${MESES[+m.slice(5, 7) - 1]} (toque num dia para marcar ou corrigir)</summary><div class="cal">${cal}</div>
-      ${reg.length ? `<div class="rlg">${reg.map(d => `<div><b>${ddmm(d)}</b><span>${esc(nt[d])}</span></div>`).join('')}</div>` : ''}</details></div>`;
+      ${reg.length ? `<div class="rlg">${reg.map(d => `<div><b>${ddmm(d)}</b><span>${ehJ(nt[d]) && !ck.includes(d) ? `<em class="jtx">não feito · justificado</em> ${esc(String(nt[d]).replace(/^✗\s*/, ''))}` : esc(nt[d])}</span></div>`).join('')}</div>` : ''}</details></div>`;
   }
 
   /* formulário rápido dentro do cartão: marcar (com justificativa), editar justificativa, desmarcar.
@@ -106,18 +112,25 @@
       const f = e.target.closest('[data-rf]'), a = e.target.closest('[data-rka]');
       if (f) {
         e.preventDefault(); const card = f.closest('.rt'), R = (box._rot ? box._rot() : []).find(x => x.id === f.dataset.rid); if (!card || !R) return;
-        const d = f.dataset.rf, n = checks(R).filter(y => y === d).length, nt = notas(R)[d] || '', novo = f.dataset.novo === '1' || !n;
-        card.querySelector('.rkx').innerHTML = `<div class="rkf"><b>${novo ? 'Marcar ' + (d === hoje() ? 'hoje' : ddmm(d)) : '✓ Marcado em ' + ddmm(d)}</b>
-          <textarea placeholder="O que foi feito? (link do post, assunto da reunião…)">${novo && (R.freq === 'mes' || R.freq === 'semana') ? '' : esc(nt)}</textarea>
-          <div class="rkb"><button class="ok" data-rka="${novo ? 'on' : 'nota'}" data-rd="${d}" data-rid="${esc(R.id)}">${novo ? '✓ Confirmar' : 'Salvar justificativa'}</button>${n ? `<button class="x" data-rka="off" data-rd="${d}" data-rid="${esc(R.id)}">Desmarcar</button>` : ''}<button data-rka="can">Cancelar</button></div></div>`;
+        const d = f.dataset.rf, n = checks(R).filter(y => y === d).length, nt = notas(R)[d] || '', js = !n && ehJ(nt), novo = f.dataset.novo === '1' || !n, rid = esc(R.id);
+        const motivos = ['Dependia de outra pessoa', 'Imprevisto', 'Viagem / show', 'Doença'];
+        card.querySelector('.rkx').innerHTML = `<div class="rkf"><b>${js ? 'Justificado em ' + ddmm(d) : novo ? 'Marcar ' + (d === hoje() ? 'hoje' : ddmm(d)) : '✓ Marcado em ' + ddmm(d)}</b>
+          <textarea placeholder="${novo ? 'O que foi feito? (link do post, assunto da reunião…) · ou, se não fez, o motivo' : 'O que foi feito?'}">${js ? esc(nt.replace(/^✗\s*/, '')) : novo && (R.freq === 'mes' || R.freq === 'semana') ? '' : esc(nt)}</textarea>
+          ${novo ? `<div class="rkj">${motivos.map(x => `<button data-rkm="${x}">${x}</button>`).join('')}</div>` : ''}
+          <div class="rkb"><button class="ok" data-rka="${novo ? 'on' : 'nota'}" data-rd="${d}" data-rid="${rid}">${novo ? '✓ Fiz' : 'Salvar'}</button>${novo ? `<button class="jb" data-rka="just" data-rd="${d}" data-rid="${rid}">✗ Não fiz · ${js ? 'salvar justificativa' : 'justificar'}</button>` : ''}${js ? `<button class="x" data-rka="unj" data-rd="${d}" data-rid="${rid}">Tirar justificativa</button>` : ''}${n ? `<button class="x" data-rka="off" data-rd="${d}" data-rid="${rid}">Desmarcar</button>` : ''}<button data-rka="can">Cancelar</button></div></div>`;
         const ta = card.querySelector('.rkx textarea'); if (novo) setTimeout(() => ta.focus(), 30); card.querySelector('.rkx').scrollIntoView({ block: 'nearest' }); return;
       }
+      const mo = e.target.closest('[data-rkm]');
+      if (mo) { e.preventDefault(); const ta = mo.closest('.rkf').querySelector('textarea'), t = mo.dataset.rkm; mo.classList.toggle('on');
+        ta.value = mo.classList.contains('on') ? (t + (t === 'Dependia de outra pessoa' ? ': ' : '') + (ta.value ? ' · ' + ta.value : '')) : ta.value.replace(t + ': ', '').replace(t + ' · ', '').replace(t, '').trim(); ta.focus(); return; }
       if (!a) return; e.preventDefault(); const card = a.closest('.rt');
       if (a.dataset.rka === 'can') { card.querySelector('.rkx').innerHTML = ''; return; }
       if (a.dataset.rka === 'off' && a.dataset.ok !== '1') { a.dataset.ok = '1'; a.textContent = 'Toque de novo para desmarcar'; return; }
-      const nota = (card.querySelector('.rkx textarea') || {}).value || ''; a.disabled = true; a.textContent = 'salvando…';
+      const nota = ((card.querySelector('.rkx textarea') || {}).value || '').trim(), k = a.dataset.rka;
+      if (k === 'just' && !nota) { const ta = card.querySelector('.rkx textarea'); ta.placeholder = 'Escreva o motivo (ou toque num dos botões acima)'; ta.focus(); return; }
+      a.disabled = true; a.textContent = 'salvando…';
       try {
-        const r = await chamar({ acao: 'marcar_rotina', id: a.dataset.rid, data: a.dataset.rd, on: a.dataset.rka !== 'off', so_nota: a.dataset.rka === 'nota', nota: nota.trim() });
+        const r = await chamar({ acao: 'marcar_rotina', id: a.dataset.rid, data: a.dataset.rd, on: k !== 'off', so_nota: k === 'nota' || k === 'just' || k === 'unj', nota: k === 'just' ? '✗ ' + nota : k === 'unj' ? '' : nota });
         depois(r);
       } catch (err) { a.disabled = false; a.textContent = 'não salvou, tente de novo'; }
     });

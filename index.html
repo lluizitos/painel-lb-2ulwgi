@@ -224,6 +224,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <nav id="nav"><a href="#mes" class="on">Mês</a><a href="#pagar">Pagamentos</a><a href="#tarefas">Agenda do mês</a><a href="#shows">Shows</a><a href="#estimativa">Estimativa</a></nav>
 </header>
 <main class="wrap">
+<div id="lbq"></div>
 <div id="mtal"></div>
 <div id="pfin">
 <section id="mes">
@@ -330,6 +331,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 
 <script src="lb.js"></script>
 <script src="lbmetas.js"></script>
+<script src="lbchat.js"></script>
 <script src="lbvendas.js"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
@@ -348,7 +350,7 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},se
 let D,HOJE,mesAtual,KEYS;
 
 /* ---------- login (lb.js) ---------- */
-LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}try{renderSaldo()}catch(e){}try{renderFalta();loadVSL()}catch(e){}}});
+LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}try{renderSaldo()}catch(e){}try{renderFalta();loadVSL()}catch(e){}try{LBCHAT.montar(document.getElementById('lbq'),{base:'',exemplo:'quanto falta receber em dezembro?',contexto:ctxPainel})}catch(e){}}});
 let PAG=[];
 
 /* ---------- início ---------- */
@@ -617,6 +619,18 @@ function renderInfo(){const el=document.getElementById('infobase');if(!el||!D)re
   el.innerHTML=`<div class="avh"><span>🔔 <b>${av.length} aviso${av.length>1?'s':''}</b></span><button class="avt" id="avt">${min?'ver ▾':'minimizar ▴'}</button></div>${!min?`<div class="avl">${av.join('')}</div>`:''}`;
   const b=document.getElementById('avt');if(b)b.onclick=()=>{LB.store.set('lb_av_min',min?'0':'1');renderInfo()}}
 let PEND=null;
+/* resumo curto dos dados do painel para o assistente (texto enxuto = poucos tokens) */
+function ctxPainel(){const R=v=>v==null?'?':Math.round(v),L=[],HJ=HOJE,dd=d=>d?d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(2,4):'';
+  const ln=(D.linha||[]).filter(y=>y.data<=HJ),u=ln[ln.length-1];if(u)L.push(`Saldo atual (conta+dinheiro): ${R(u.saldo)} · extrato conferido até ${dd(D.ext_ate)}`);
+  L.push('MESES (entradas/saídas/saldo fim/tipo):');KEYS.forEach(k=>{const m=D.meses[k];if(m)L.push(`${k}: ent ${R(m.ent)} sai ${R(m.sai)} fim ${R(m.fim)} ${m.tipo}${m.aporte?' aporte '+R(m.aporte):''}`)});
+  const ma=D.meses[mkey(HJ)];if(ma){if(ma.ent_tipos)L.push('Mês atual, já entrou por tipo: '+Object.entries(ma.ent_tipos).map(([k,v])=>k+' '+R(v)).join(', '));if(ma.sai_tipos)L.push('Mês atual, já saiu por tipo: '+Object.entries(ma.sai_tipos).map(([k,v])=>k+' '+R(v)).join(', '))}
+  try{const fe=faltaEntrar();L.push('FALTA ENTRAR (data/quem/valor):');fe.forEach(x=>L.push(`${dd(x.data)} ${x.nome}${x.sub?' ('+x.sub+')':''} ${R(x.f)}${x.conf?' a confirmar':''}${x.data<HJ?' ATRASADO':''}`))}catch(e){}
+  L.push('CONTAS A PAGAR (vencimento/descrição/valor):');(D.contas||[]).filter(c=>!cPago(c)).forEach(c=>L.push(`${dd(c.venc)} ${c.desc} ${R(c.valor)}`));
+  L.push('SHOWS 2026+ (data/nome/cidade/situação/cachê/recebido/lucro):');D.shows.filter(s=>s.data>='2026-01-01').forEach(s=>L.push(`${dd(s.data)} ${s.nome} · ${s.local||''} · ${s.sit} · ${R(s.valor)}/${R(s.rec)}/${R(s.lucro)}`));
+  const mk=mkey(HJ),mp=(()=>{const d=new Date(+mk.slice(0,4),+mk.slice(5,7)-2,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')})();
+  if(D.rendimento)L.push('EQUIPE (recebeu no mês anterior/atual): '+D.rendimento.map(p=>`${p.nome} ${R((p.meses[mp]||{}).total||0)}/${R((p.meses[mk]||{}).total||0)}`).join('; '));
+  const mt=((TAR&&TAR.metas)||[]).filter(x=>(x.tipo||'meta')==='meta');if(mt.length)L.push('METAS DA EMPRESA: '+mt.map(x=>`${x.titulo} (${x.situacao||'?'})`).join('; '));
+  return L.join('\n').slice(0,12000)}
 /* ---------- FALTA ENTRAR (topo): shows com valor em aberto (Vendas) + entradas do Admin; quadros limitados com "Mostrar mais" ---------- */
 let FE_LIM=4;
 function faltaEntrar(){const HJ=HOJE,it=[];
