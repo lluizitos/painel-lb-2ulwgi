@@ -111,14 +111,25 @@
   const pgx = {
     ocorr(g, ate) {
       let pago = {}; try { pago = JSON.parse(g.pagos || '{}') || {}; } catch (e) { }
-      if (g.tipo !== 'fixo') return g.data && g.data <= ate ? [{ ref: 'unico', data: g.data, pago: pago.unico || '' }] : [];
+      const pc = pgx.parc(g), sm = r => (pc[r] || []).reduce((a, x) => a + (+x.valor || 0), 0), V = +g.valor || 0;
+      const oc = (ref, data) => { const p = Math.round(sm(ref) * 100) / 100; return { ref, data, pago: pago[ref] || '', pg: p, falta: Math.round((V - p) * 100) / 100 }; };
+      if (g.tipo !== 'fixo') return g.data && g.data <= ate ? [oc('unico', g.data)] : [];
       if (!/^\d{4}-\d{2}$/.test(g.inicio || '')) return [];
       const out = []; let [y, m] = g.inicio.split('-').map(Number); const lim = g.fim || '9999-99';
       for (let n = 0; n < 240; n++) {
         const k = y + '-' + String(m).padStart(2, '0'); if (k > lim) break;
         const d = k + '-' + String(Math.min(+g.dia || 1, new Date(y, m, 0).getDate())).padStart(2, '0'); if (d > ate) break;
-        out.push({ ref: k, data: d, pago: pago[k] || '' }); if (++m > 12) { m = 1; y++; }
+        out.push(oc(k, d)); if (++m > 12) { m = 1; y++; }
       }
+      return out;
+    },
+    parc(g) { try { return JSON.parse(g.parciais || '{}') || {}; } catch (e) { return {}; } },
+    /* tudo o que já saiu/entrou de um pagamento: cada parte, ou o valor cheio quando foi pago de uma vez. id = pg-<id>-<ref>[-p<i>] */
+    movs(g) {
+      let pago = {}; try { pago = JSON.parse(g.pagos || '{}') || {}; } catch (e) { }
+      const pc = pgx.parc(g), out = [];
+      Object.entries(pc).forEach(([ref, l]) => l.forEach((x, i) => out.push({ id: 'pg-' + g.id + '-' + ref + '-p' + i, ref, i, data: x.data, valor: +x.valor || 0, obs: x.obs || '', parte: true })));
+      Object.entries(pago).forEach(([ref, q]) => { if (q && !(pc[ref] || []).length) out.push({ id: 'pg-' + g.id + '-' + ref, ref, data: q, valor: +g.valor || 0 }); });
       return out;
     },
     prox(g, hoje) { // próxima data depois de hoje
