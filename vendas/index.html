@@ -33,6 +33,8 @@ h3{font-size:11px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;
 .pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:var(--card2);color:var(--sub);white-space:nowrap}
 .pill.pk{background:rgba(207,29,81,.18);color:var(--pinkl)}.pill.ok{background:rgba(127,221,169,.14);color:var(--pos)}.pill.am{background:rgba(242,182,107,.14);color:var(--amber)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 10px}
+.busca{display:flex;gap:8px;margin:16px 0 0}.busca input,.busca select{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:15px;min-width:0}.busca input{flex:1}.busca select{flex:none;max-width:46%}
+.bres{font-size:13px;color:var(--sub);margin:0 0 10px}.bres b{color:var(--ink)}.bres a{color:var(--pinkl)}
 .chip{border:1px solid var(--line);background:transparent;border-radius:99px;padding:6px 12px;font-size:12.5px;color:var(--sub)}.chip.on{background:var(--card2);color:var(--ink);border-color:var(--sub)}
 .list{display:flex;flex-direction:column;gap:10px}
 .show .hd{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -99,10 +101,12 @@ label textarea{min-height:64px;resize:vertical}
   <div id="tshows">
   <div class="grid g4" id="resumo" style="margin-top:16px"></div>
   <div id="arec"></div>
+  <div class="busca"><input type="search" id="bq" placeholder="Buscar show, cidade…" aria-label="Buscar show" autocomplete="off"><select id="bm" aria-label="Mês do show"><option value="">Todos os meses</option></select></div>
   <div class="chips" id="fil">
     <button class="chip on" data-f="prox">Próximos</button><button class="chip" data-f="contrato">Sem contrato</button>
     <button class="chip" data-f="nota">NF a definir</button><button class="chip" data-f="receber">Falta receber</button><button class="chip" data-f="hist">Histórico</button><button class="chip" data-f="todos">Todos</button>
   </div>
+  <div class="bres" id="bres"></div>
   <div class="list" id="lista"></div>
   <p class="note" id="regras"></p>
   </div>
@@ -154,8 +158,8 @@ label textarea{min-height:64px;resize:vertical}
 </form></div>
 <div id="vw"><div class="vwc"><div id="vwb"></div><button type="button" class="btn" id="vwx">Fechar</button></div></div>
 
-<script src="../lb.js?v=mwi68gyv"></script>
-<script src="../lbvendas.js?v=mwi68gyv"></script>
+<script src="../lb.js?v=mwigr1zv"></script>
+<script src="../lbvendas.js?v=mwigr1zv"></script>
 <script>
 const TIPOS=['Show','Prefeitura','Casamento','Aniversário','Formatura','Evento corporativo','Evento de fim de ano','Réveillon','Rodeio','Exposição','Show próprio (Sem Roteiro)','Show próprio (Colab)'];
 const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
@@ -203,6 +207,11 @@ function iniciar(){
   render();
 }
 document.getElementById('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));const n=b.dataset.t==='num';document.getElementById('tshows').style.display=n?'none':'block';document.getElementById('tnum').style.display=n?'block':'none';if(n)LBV.analise(document.getElementById('tnum'),SHOWS,{hoje:HOJE,conf:CONF,aliases:ALIAS})};
+const MESN=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+document.getElementById('bq').oninput=()=>render();
+document.getElementById('bm').onchange=()=>{if(document.getElementById('bm').value&&filtro!=='todos'){filtro='todos';document.querySelectorAll('#fil .chip').forEach(c=>c.classList.toggle('on',c.dataset.f==='todos'))}render()};
+document.getElementById('bres').onclick=e=>{if(e.target.id==='bver'){e.preventDefault();filtro='todos';document.querySelectorAll('#fil .chip').forEach(c=>c.classList.toggle('on',c.dataset.f==='todos'));render()}
+  if(e.target.id==='blimpa'){e.preventDefault();document.getElementById('bq').value='';document.getElementById('bm').value='';render()}};
 document.getElementById('fil').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;filtro=b.dataset.f;document.querySelectorAll('#fil .chip').forEach(c=>c.classList.toggle('on',c===b));render()};
 
 function pills(s){
@@ -219,6 +228,14 @@ function render(){
   if(filtro==='nota')l=fut.filter(s=>!s.nota||s.nota==='Não informado');
   if(filtro==='hist')l=SHOWS.filter(s=>s.data<HOJE).sort((a,b)=>b.data.localeCompare(a.data));
   if(filtro==='receber')l=SHOWS.filter(s=>s.status!=='Cancelado'&&calc(s).falta>0);
+  {const bm=document.getElementById('bm'),ms=[...new Set(SHOWS.map(s=>String(s.data||'').slice(0,7)).filter(x=>/^\d{4}-\d{2}$/.test(x)))].sort().reverse(),cur=bm.value;
+   bm.innerHTML='<option value="">Todos os meses</option>'+ms.map(m=>`<option value="${m}"${m===cur?' selected':''}>${MESN[+m.slice(5,7)-1]}/${m.slice(0,4)} (${SHOWS.filter(s=>String(s.data||'').startsWith(m)).length})</option>`).join('');
+   const q=LB.norm(document.getElementById('bq').value.trim()),mes=bm.value,casa=s=>(!mes||String(s.data||'').startsWith(mes))&&(!q||q.split(/\s+/).every(w=>LB.norm([s.evento,s.cidade,s.local,s.contratante,s.vendedor,ALIAS[LB.norm(s.vendedor||'')],s.contato,s.tipo,s.status,s.obs,s.data?fdata(s.data):''].filter(Boolean).join(' ')).includes(w)));
+   const br=document.getElementById('bres');
+   if(q||mes){l=l.filter(casa);if(mes)l=l.slice().sort((a,b)=>String(a.data).localeCompare(String(b.data)));
+     const fora=filtro==='todos'?0:SHOWS.filter(casa).length-l.length,cs2=l.filter(s=>s.status!=='Cancelado').map(calc);
+     br.innerHTML=`<b>${l.length} show${l.length===1?'':'s'}</b>${l.length?' · vendido '+brl(cs2.reduce((a,c)=>a+c.v,0))+' · falta receber '+brl(cs2.reduce((a,c)=>a+c.falta,0)):''}${fora>0?` · <a href="#" id="bver">+${fora} fora deste filtro (ver em Todos)</a>`:''} · <a href="#" id="blimpa">limpar</a>`}
+   else br.innerHTML=''}
   const cs=fut.map(calc);
   const vend=cs.reduce((a,c)=>a+c.v,0),fal=cs.reduce((a,c)=>a+c.falta,0),com=cs.some(c=>c.com==null)?null:cs.reduce((a,c)=>a+c.com,0);
   const semc=fut.filter(s=>s.contrato!=='Assinado').length;
@@ -356,7 +373,7 @@ ef.addEventListener('submit',async e=>{e.preventDefault();const m=document.getEl
   catch(err){m.innerHTML='<span class="neg">Não salvou ('+esc(err.message)+'). Tente de novo.</span>'}
   bt.disabled=false});
 </script>
-<script src="../lbchat.js?v=mwi68gyv"></script>
+<script src="../lbchat.js?v=mwigr1zv"></script>
 <script>LBCHAT.auto(document.querySelector('main.wrap').firstElementChild,{base:'../',pagina:'Vendas',exemplo:'quantos shows vendi este mês?'})</script>
 </body>
 </html>
