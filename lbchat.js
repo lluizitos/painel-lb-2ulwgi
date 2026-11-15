@@ -42,7 +42,7 @@
       try {
         if (!api) api = (await (await fetch((op.base || '') + 'config.json', { cache: 'no-store' })).json()).api_url;
         let ctx = ''; try { ctx = op.contexto(); } catch (er) { }
-        const r = await (await fetch(api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'perguntar', pergunta: q, contexto: limpa(ctx).slice(0, 16000) }, op.auth ? op.auth() : { usuario: LB.login, senha: LB.senha, nome: LB.usuario })) })).json();
+        const r = await (await fetch(api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'perguntar', pergunta: q, contexto: limpa(ctx).slice(0, 16000), base: op.base_dados ? String(op.base_dados() || '').slice(0, 400000) : '' }, op.auth ? op.auth() : { usuario: LB.login, senha: LB.senha, nome: LB.usuario })) })).json();
         if (!r.ok) { out.innerHTML = `<div class="qr"><div class="qp">${esc(q)}</div><div class="qt qe">${r.erro === 'espera' ? `Espere ${r.s} s para a próxima pergunta.` : ERR[r.erro] || 'Não consegui responder agora. Tente de novo.'}</div></div>`; return; }
         out.innerHTML = `<div class="qr"><div class="qp">${esc(q)}</div><div class="qt">${esc(r.resposta)}</div>${r.grafico ? grafico(r.grafico) : ''}<div class="qn"><span>Resposta automática com os dados do app · confira os valores antes de decidir</span><span>${r.uso != null ? 'uso de hoje: ' + r.uso + '% · ' : ''}<a href="#" class="qx">fechar</a></span></div></div>`;
         inp.value = '';
@@ -54,7 +54,7 @@
   /* dados pessoais nunca vão para o assistente: some PIX, CPF/CNPJ, telefone, e-mail e dados de conta */
   function limpa(t) {
     return String(t || '').replace(/[\w.+-]+@[\w-]+\.[\w.]+/g, '[e-mail]').replace(/\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g, '[doc]').replace(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g, '[doc]')
-      .replace(/\(?\b\d{2}\)?\s?9\d{4}-?\d{4}\b/g, '[tel]').replace(/\b(PIX|chave pix|chave)\s*:?\s*[^\s,;·]+/gi, '$1 [oculto]').replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '[chave]')
+      .replace(/\(?\b\d{2}\)?\s?9\d{4}-?\d{4}\b/g, '[tel]').replace(/\b(PIX|chave pix|chave)\s*:?\s*(?=[^\s,;·|]*\d{5}|[^\s,;·|]*@)[^\s,;·|]+/gi, '$1 [oculto]').replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '[chave]')
       .replace(/\b(ag(ência)?|conta|cc)\s*:?\s*\d[\d.-]{2,}/gi, '$1 [oculto]');
   }
   /* texto que está visível na tela agora (aba aberta), sem o próprio chat, botões e campos */

@@ -45,6 +45,11 @@ h3 small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)
 .tip{font-size:12.5px;color:var(--sub);min-height:20px;padding:4px 6px 0}
 #app{display:none}
 .blk{margin-top:30px;padding-top:4px}
+.ptabs{display:flex;gap:4px;max-width:980px;margin:0 auto;padding:0 16px 8px}
+.ptabs button{flex:1;background:none;border:0;border-bottom:2px solid var(--line);padding:9px 2px;font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);cursor:pointer;font-family:inherit}
+.ptabs button.on{color:var(--ink);border-color:var(--pink)}
+body[data-aba="fin"] #bvv,body[data-aba="fin"] #b25,body[data-aba="ven"] .fin,body[data-aba="ven"] #b25,body[data-aba="met"] .fin,body[data-aba="met"] #bvv{display:none!important}
+body[data-aba="ven"] #bvv,body[data-aba="met"] #b25{margin-top:14px}
 .blk>.eyebrow{margin-top:0}
 .oc{display:flex;gap:12px;background:var(--card);border-radius:12px;padding:12px 14px;align-items:flex-start}
 .oc .d{flex:none;width:46px;text-align:center;line-height:1.1}.oc .d b{display:block;font-size:19px;font-weight:800}.oc .d span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -89,7 +94,8 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </head>
 <body>
 <div id="app">
-<header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div></header>
+<header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
+  <div class="ptabs" id="ptabs"><button class="on" data-p="fin">Financeiro</button><button data-p="ven">Vendas</button><button data-p="met">Metas e equipe</button></div></header>
 <main class="wrap">
 <div id="lbq"></div>
   <p class="eyebrow">Prestação de contas para o sócio</p>
@@ -98,7 +104,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <div id="alertas"></div>
   <div class="info" id="infobase"></div>
 
-  <div class="blk" id="b1">
+  <div class="blk fin" id="b1">
   <p class="eyebrow">1 · Agora</p>
   <h1 id="mesnm" style="font-size:24px"></h1>
   <p class="note" id="mestp" style="margin:4px 0 0"></p>
@@ -113,7 +119,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <div class="list" id="smes"></div>
   </div>
 
-  <div class="blk" id="b2">
+  <div class="blk fin" id="b2">
   <p class="eyebrow">2 · Próximos meses</p>
   <h1 style="font-size:24px">O que já está <em>certo</em></h1>
   <h3>Shows confirmados <small id="proxs"></small></h3>
@@ -125,7 +131,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 
   <div class="blk" id="bvv" style="display:none">
   <p class="eyebrow">Vendas</p>
-  <h3>Shows vendidos <small>mesmos números da página de Vendas · só shows confirmados</small></h3>
+  <h3>Shows vendidos <small>mesmos números da aba Vendas do painel · todos os shows, com o status de cada um</small></h3>
   <div id="vana"></div>
   <h3>Vendido por mês <small>pela data da venda (quando o show foi fechado)</small></h3>
   <div class="chart" id="vvg"></div>
@@ -145,7 +151,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <div class="list" id="equipe"></div>
   </div>
 
-  <div class="blk" id="b3">
+  <div class="blk fin" id="b3">
   <p class="eyebrow">3 · Geral</p>
   <h1 style="font-size:24px">Temporada <em id="anonm"></em></h1>
   <div class="grid g4" id="kpis" style="margin-top:14px"></div>
@@ -165,9 +171,9 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <footer>Lucas Barros Ltda · números do extrato bancário, do caixa em dinheiro e das planilhas de cada show (borderôs)</footer>
 </main>
 </div>
-<script src="../lb.js?v=mwhh6up9"></script>
-<script src="../lbchat.js?v=mwhh6up9"></script>
-<script src="../lbvendas.js?v=mwhh6up9"></script>
+<script src="../lb.js?v=mwhhfmw5"></script>
+<script src="../lbchat.js?v=mwhhfmw5"></script>
+<script src="../lbvendas.js?v=mwhhfmw5"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -178,7 +184,7 @@ const ddmm=s=>s.slice(8,10)+'/'+s.slice(5,7);
 const ANO_AT=new Date(Date.now()-3*3600e3).toISOString().slice(0,4);
 const dtx=s=>s?+s.slice(8,10)+' de '+MES3[+s.slice(5,7)-1]+(s.slice(0,4)!==ANO_AT?' '+s.slice(2,4):''):''; // 1 de fev 27 (igual ao painel)
 let D;
-LB.entrar({pagina:'socio',base:'../',titulo:'Prestação de contas',ok:r=>{D=r.dados;document.getElementById('links').innerHTML=LB.links(r.paginas,'socio','../');render();try{LBCHAT.montar(document.getElementById('lbq'),{base:'../',exemplo:'qual foi o lucro dos shows em outubro?',contexto:()=>{const x=Object.assign({},D);delete x.links;delete x.vendas_venda;return JSON.stringify(x).slice(0,12000)}})}catch(e){}}});
+LB.entrar({pagina:'socio',base:'../',titulo:'Prestação de contas',ok:r=>{D=r.dados;document.getElementById('links').innerHTML=LB.links(r.paginas,'socio','../');render();abasSoc();try{LBCHAT.montar(document.getElementById('lbq'),{base:'../',exemplo:'qual foi o lucro dos shows em outubro?',base_dados:()=>D.ctx_ia||'',contexto:()=>{const x=Object.assign({},D);delete x.links;delete x.vendas_venda;return JSON.stringify(x).slice(0,12000)}})}catch(e){}}});
 const k4=(l,v,s,c)=>`<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`;
 const dia=d=>`<div class="d"><b>${d.slice(8,10)}</b><span>${MES3[+d.slice(5,7)-1]} ${d.slice(2,4)}</span></div>`;
 const ocRow=o=>`<div class="oc">${dia(o.data)}<div class="t"><b>${esc(o.titulo)}</b><span>${esc(o.detalhe||'')}${o.doc?` · <a href="#docs" style="color:var(--pinkl)">ver documento</a>`:''}${o.data>D.atualizado?' · <span class="pill">programado</span>':''}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`;
@@ -269,7 +275,13 @@ function chart(){
 }
 addEventListener('resize',()=>{if(D){clearTimeout(window._r);window._r=setTimeout(chart,200)}});
 
-/* ---------- Vendas: o mesmo da aba Vendas do painel (só shows confirmados) ---------- */
+/* ---------- Vendas: o mesmo da aba Vendas do painel (todos os shows) ---------- */
+/* abas do topo (Financeiro · Vendas · Metas e equipe), iguais às do painel; aba sem dados some */
+function abaSoc(p){document.body.dataset.aba=p;document.querySelectorAll('#ptabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));try{LB.store.set('lb_soc_aba',p)}catch(e){}scrollTo(0,0)}
+function abasSoc(){const tem={fin:true,ven:document.getElementById('bvv').style.display!=='none',met:document.getElementById('b25').style.display!=='none'};
+  document.querySelectorAll('#ptabs button').forEach(b=>b.style.display=tem[b.dataset.p]?'':'none');
+  document.getElementById('ptabs').onclick=e=>{const b=e.target.closest('button');if(b)abaSoc(b.dataset.p)};
+  let p='fin';try{p=LB.store.get('lb_soc_aba')||'fin'}catch(e){}abaSoc(tem[p]?p:'fin')}
 let VALIAS={};
 const nmV=s=>s.vendedor?(VALIAS[LB.norm(s.vendedor)]||s.vendedor):'Sem vendedor';
 function renderVendas(){const V=D.vendas;if(!V||!V.shows||!V.shows.length)return;document.getElementById('bvv').style.display='';
