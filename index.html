@@ -48,6 +48,7 @@ h3 small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)
 .note{color:var(--muted);font-size:12.5px;margin:8px 0 0}
 /* cartões */
 .card{background:var(--card);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden}
+.fent{margin-top:10px}.fqg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:12px}.fq{background:var(--card2);border-radius:11px;padding:10px 11px;min-width:0;border-left:3px solid var(--pos)}.fq.atr{border-left-color:var(--pink)}.fqd{font-size:11px;color:var(--muted);text-transform:lowercase}.fq.atr .fqd{color:var(--pinkl)}.fqd span{color:var(--amber)}.fqv{display:block;font-size:17px;margin:3px 0 2px;color:var(--ink)}.fqn{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fqs{font-size:11.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fqw{white-space:normal}.fqb{height:5px;border-radius:99px;background:var(--line);overflow:hidden;margin:6px 0 3px}.fqb i{display:block;height:100%;background:var(--pos)}
 .bar::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--pink)}
 .grid{display:grid;gap:10px}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -229,6 +230,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <p class="eyebrow">Balanço</p>
   <h1>O <em>mês</em></h1>
   <div id="saldoat"></div>
+  <div id="fent"></div>
   <div class="info" id="infobase"></div>
   <div class="mesbar">
     <button class="ib" id="prev" aria-label="Mês anterior">‹</button>
@@ -346,7 +348,7 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},se
 let D,HOJE,mesAtual,KEYS;
 
 /* ---------- login (lb.js) ---------- */
-LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}try{renderSaldo()}catch(e){}}});
+LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}try{renderSaldo()}catch(e){}try{renderFalta();loadVSL()}catch(e){}}});
 let PAG=[];
 
 /* ---------- início ---------- */
@@ -460,7 +462,7 @@ async function metasAlerta(url){ // metas com check da própria pessoa (Luiz, Lu
 async function pagAoVivo(){ // pagamentos avulsos e fixos da página Admin
   try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;API_URL=API_URL||c.api_url;metasAlerta(c.api_url);
     const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'pagamentos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
-    if(r.ok){PAGS=r.pagamentos||[];PAGS_OK=true;renderPagar();renderMes()}
+    if(r.ok){PAGS=r.pagamentos||[];PAGS_OK=true;renderPagar();renderMes();try{renderFalta()}catch(e){}}
     const l=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'lancamentos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json(); // ajustes e lançamentos novos do Admin
     if(l.ok){LANCS=l.lancamentos||[];LANCS_OK=true;renderMes()}}catch(e){}}
 let LANCS=[],LANCS_OK=false;
@@ -542,7 +544,7 @@ function renderVV(gid,mid){if(!document.getElementById(gid))return;const MA=mkey
    document.getElementById(gid).innerHTML=g;
    const am=cv.filter(s=>s.data_venda.startsWith(MA)).sort((a,b)=>a.data_venda.localeCompare(b.data_venda));
    document.getElementById(mid).innerHTML=`<h3 style="margin-top:14px">Vendidos em ${MESES[+MA.slice(5,7)-1].toLowerCase()} <small>pela data da venda</small></h3>`+(am.length?`<div class="list" style="margin-bottom:12px">${am.map(s=>`<div class="row"><div style="flex:1;min-width:0"><b style="display:block;font-size:14px">${esc(s.evento||'Show')} · ${esc(s.cidade||'')}</b><span style="font-size:12px;color:var(--muted)">vendido ${ddmm(s.data_venda)} por ${esc(nmV(s))} · show ${dtx(s.data)}</span></div><b style="white-space:nowrap">${s.valor?brl(s.valor):'—'}</b></div>`).join('')}<div class="tot"><span>${am.length} show${am.length>1?'s':''}</span><b>${brl(am.reduce((a,s)=>a+(+s.valor||0),0))}</b></div></div>`:`<div class="empty" style="margin-bottom:12px">Nenhum show com data da venda neste mês${VSL?'':' (carregando…)'}.</div>`)}}
-function loadVSL(){if(VSLT)return;VSLT=true;fetch('config.json',{cache:'no-store'}).then(x=>x.json()).then(c=>c.api_url&&fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'listar',usuario:LB.login,senha:LB.senha,nome:LB.usuario})}).then(x=>x.json())).then(x=>{if(x&&x.ok&&x.shows){VSL=x.shows;if(RFEITO)renderRend();renderVV('vvg','vvm')}}).catch(()=>{})}
+function loadVSL(){if(VSLT)return;VSLT=true;fetch('config.json',{cache:'no-store'}).then(x=>x.json()).then(c=>c.api_url&&fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'listar',usuario:LB.login,senha:LB.senha,nome:LB.usuario})}).then(x=>x.json())).then(x=>{if(x&&x.ok&&x.shows){VSL=x.shows;if(RFEITO)renderRend();renderVV('vvg','vvm');try{renderFalta()}catch(e){}}}).catch(()=>{})}
 function renderRend(){
   const R=D.rendimento||[],MA=mkey(HOJE),ANO=HOJE.slice(0,4);
   const ult12=[];for(let i=11;i>=0;i--){const d=new Date(+MA.slice(0,4),+MA.slice(5,7)-1-i,1);ult12.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
@@ -613,6 +615,25 @@ function renderInfo(){const el=document.getElementById('infobase');if(!el||!D)re
   el.innerHTML=`<div class="avh"><span>🔔 <b>${av.length} aviso${av.length>1?'s':''}</b></span><button class="avt" id="avt">${min?'ver ▾':'minimizar ▴'}</button></div>${!min?`<div class="avl">${av.join('')}</div>`:''}`;
   const b=document.getElementById('avt');if(b)b.onclick=()=>{LB.store.set('lb_av_min',min?'0':'1');renderInfo()}}
 let PEND=null;
+/* ---------- FALTA ENTRAR (topo): shows com valor em aberto (Vendas) + entradas do Admin; quadros limitados com "Mostrar mais" ---------- */
+let FE_LIM=4;
+function faltaEntrar(){const HJ=HOJE,it=[];
+  (VSL||D.fe_shows||[]).forEach(s=>{const v=+s.valor||0,r=+s.recebido||0,f=Math.round((v-r)*100)/100;if(!s.data||/cancel/i.test(s.status||'')||v<=0||f<1)return;
+    it.push({data:s.data,nome:s.evento||'Show',sub:s.cidade||'',f,v,r,show:true,conf:/confirmar/i.test(s.status||'')})});
+  const ate=(+HJ.slice(0,4)+1)+HJ.slice(4);
+  (PAGS_OK?PAGS.filter(g=>g.direcao==='entrada'):(D.fe_pags||[])).filter(g=>g.ativo!=='não').forEach(g=>LB.pgx.ocorr(g,ate).forEach(o=>{if(o.pago||o.falta<1)return;
+    it.push({data:o.data,nome:g.nome||'Entrada',sub:g.descricao||'',f:o.falta,v:+g.valor||0,r:o.pg,fora:g.estimativa==='não'})}));
+  return it.sort((a,b)=>a.data.localeCompare(b.data))}
+function renderFalta(){const el=document.getElementById('fent');if(!el||!D)return;const l=faltaEntrar(),HJ=HOJE;
+  if(!l.length){el.innerHTML='';return}
+  const t=l.reduce((a,x)=>a+x.f,0),at=l.filter(x=>x.data<HJ),d30=new Date(Date.parse(HJ)+30*864e5).toISOString().slice(0,10),p30=l.filter(x=>x.data>=HJ&&x.data<=d30).reduce((a,x)=>a+x.f,0);
+  const q=x=>{const atr=x.data<HJ,pc=x.v>0?Math.min(100,Math.round(x.r/x.v*100)):0;
+    return `<div class="fq${atr?' atr':''}"><div class="fqd">${atr?'atrasado · ':''}${dtx(x.data)}${x.conf?' · <span>a confirmar</span>':''}${x.fora?' · <span>fora da estimativa</span>':''}</div><b class="fqv">${brl(x.f)}</b><div class="fqn">${esc(x.nome)}</div>${x.sub?`<div class="fqs">${esc(x.sub)}</div>`:''}${x.r>0?`<div class="fqb"><i style="width:${pc}%"></i></div><div class="fqs fqw">entrou ${brl(x.r)} de ${brl(x.v)}</div>`:''}</div>`};
+  const n=l.length,vis=l.slice(0,FE_LIM);
+  el.innerHTML=`<div class="card k fent"><div class="feh"><div><div class="l">Falta entrar</div><div class="v pos">${brl(t)}</div><div class="s">${n} ite${n>1?'ns':'m'}${p30?` · próximos 30 dias ${brl(p30)}`:''}${at.length?` · <b class="pk">${at.length} atrasado${at.length>1?'s':''}</b>`:''}</div></div></div>
+    <div class="fqg">${vis.map(q).join('')}</div>${n>4?`<div class="center" style="margin-top:10px">${n>FE_LIM?`<button class="btn" id="femais">Mostrar mais (${n-FE_LIM})</button>`:`<button class="btn" id="femenos">Mostrar menos</button>`}</div>`:''}</div>`;
+  const b=document.getElementById('femais');if(b)b.onclick=()=>{FE_LIM=999;renderFalta()};
+  const m=document.getElementById('femenos');if(m)m.onclick=()=>{FE_LIM=4;renderFalta();el.scrollIntoView({block:'start',behavior:'smooth'})}}
 function etpHtml(et){const S=[['Cachês',et.cache,'var(--pos)'],['Sinal',et.sinal,'var(--amber)'],['Investidor',et.aporte,'var(--pinkl)'],['Outras',et.outros,'var(--muted)']].filter(x=>x[1]>0.5),tt=S.reduce((a,x)=>a+x[1],0);if(!tt)return '';
   let a0=0;const R=15.9155,arc=S.map(x=>{const p=x[1]/tt*100,c=`<circle r="${R}" cx="21" cy="21" fill="none" stroke="${x[2]}" stroke-width="6" stroke-dasharray="${Math.max(p-.6,.1)} ${100-Math.max(p-.6,.1)}" stroke-dashoffset="${25-a0}"/>`;a0+=p;return c}).join('');
   return `<div class="card k" style="margin-top:10px"><div class="l">De onde veio o que entrou</div><div class="dnt"><svg viewBox="0 0 42 42" width="110" height="110" aria-hidden="true"><circle r="${R}" cx="21" cy="21" fill="none" stroke="var(--card2)" stroke-width="6"/>${arc}<text x="21" y="22.5" text-anchor="middle" font-size="5.2" font-weight="700" fill="var(--ink)">${brl(tt).replace('R$ ','')}</text></svg><div class="etp">${S.map(x=>`<div><i style="background:${x[2]}"></i>${x[0]}<b>${brl(x[1])}</b><small>${Math.round(x[1]/tt*100)}%</small></div>`).join('')}</div></div></div>`}
