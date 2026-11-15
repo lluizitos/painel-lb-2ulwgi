@@ -189,6 +189,11 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
       <label>Data<input type="date" id="dp_data"></label>
     </div>
     <datalist id="dl_dcat"></datalist>
+    <details class="massa" id="dp_copia"><summary>Copiar de outra despesa</summary>
+      <div class="f4" style="grid-template-columns:1fr;margin-top:8px"><label>Despesa<select id="dpc_de"></select></label></div>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap"><button type="button" class="btn sm pkb" id="dpc_ok">Copiar itens</button><span class="note" id="dpc_res" style="margin:0"></span></div>
+      <p class="note">Copia os itens (descrição, quem recebeu e valor) como "a pagar". Também traz título e categoria se estiverem em branco.</p>
+    </details>
     <h3>Itens <small>o que foi comprado ou feito, de quem, quanto</small></h3>
     <div id="dp_it"></div>
     <button class="btn sm" id="dp_add">+ Item</button>
@@ -445,7 +450,9 @@ $('ldesp').onclick=e=>{const b=e.target.closest('[data-dab]');if(b)abrirDesp(JSO
 function abrirDesp(b){DP=b||{id:'D'+HOJE+'-'+Math.random().toString(36).slice(2,6),tipo:'despesa',titulo:'',categoria:'',data:HOJE,itens:[{desc:'',fornecedor:'',valor:'',status:'Pendente'}],obs:'',fonte:'app',_novo:1};
   $('dl_dcat').innerHTML=[...new Set(DCATS.concat(Object.values(DESP).map(x=>x.categoria).filter(Boolean)))].map(c=>`<option value="${esc(c)}">`).join('');
   $('dp_tit').value=DP.titulo||'';$('dp_cat').value=DP.categoria||'';$('dp_data').value=DP.data;$('dp_obs').value=DP.obs||'';$('dp_t').textContent=b?(DP.titulo||'Despesa'):'Nova despesa';
-  $('dp_del').style.display=b?'':'none';$('dp_msg').textContent='';renderDpIt();$('dp').classList.add('open');$('dp').scrollTop=0;if(!b)setTimeout(()=>$('dp_tit').focus(),50)}
+  $('dp_del').style.display=b?'':'none';$('dp_msg').textContent='';$('dpc_res').textContent='';$('dp_copia').open=false;
+  const ou=Object.values(DESP).filter(x=>x.id!==DP.id).sort((a,c)=>c.data.localeCompare(a.data));$('dp_copia').style.display=ou.length?'':'none';
+  $('dpc_de').innerHTML=ou.map(x=>`<option value="${esc(x.id)}">${ddmm(x.data)}/${x.data.slice(2,4)} · ${esc(x.titulo||'Despesa')} · ${brl(dTot(x).g)}</option>`).join('');renderDpIt();$('dp').classList.add('open');$('dp').scrollTop=0;if(!b)setTimeout(()=>$('dp_tit').focus(),50)}
 function lerDp(){DP.titulo=$('dp_tit').value.trim();DP.categoria=$('dp_cat').value.trim();DP.data=$('dp_data').value;DP.obs=$('dp_obs').value.trim()}
 function renderDpIt(){$('dp_it').innerHTML=(DP.itens||[]).map((t,i)=>`<div class="pp" data-di="${i}"><div class="f4" style="grid-template-columns:2fr 1.4fr 1fr auto;align-items:end">
   <label>Item<input data-k="desc" value="${esc(t.desc)}" placeholder="ex.: troca de óleo"></label><label>Quem recebeu<input data-k="fornecedor" value="${esc(t.fornecedor)}" placeholder="oficina, loja…"></label>
@@ -455,6 +462,11 @@ function renderDpIt(){$('dp_it').innerHTML=(DP.itens||[]).map((t,i)=>`<div class
   <label style="margin-top:6px">Comprovante / nota (link, opcional)<input data-k="comprovante" value="${esc(t.comprovante||'')}" placeholder="https://…"></label>
   ${DP._novo?'':xBadge(DP,i,t)}</div>`).join('')||'<div class="empty">Sem itens.</div>';dpTot()}
 function dpTot(){const t=dTot(DP);$('dp_tot').innerHTML=`<div>Total<b>${brl2(t.g)}</b></div><div>Pago<b class="pos">${brl2(t.pg)}</b></div><div>A pagar<b class="${t.ap?'neg':''}">${brl2(t.ap)}</b></div>`}
+$('dpc_ok').onclick=()=>{const o=DESP[$('dpc_de').value];if(!o)return;lerDp();
+  DP.itens=(DP.itens||[]).filter(t=>String(t.desc||'').trim()||num(t.valor));
+  (o.itens||[]).forEach(t=>DP.itens.push({desc:t.desc,fornecedor:t.fornecedor||'',valor:t.valor,status:'Pendente'}));
+  if(!DP.titulo){DP.titulo=o.titulo||'';$('dp_tit').value=DP.titulo}if(!DP.categoria){DP.categoria=o.categoria||'';$('dp_cat').value=DP.categoria}
+  DP._sujo=true;renderDpIt();$('dpc_res').textContent=(o.itens||[]).length+' itens copiados. Confira e salve.'};
 $('dp_add').onclick=()=>{DP.itens=DP.itens||[];const u=DP.itens[DP.itens.length-1];DP.itens.push({desc:'',fornecedor:u?u.fornecedor:'',valor:'',status:'Pendente'});DP._sujo=true;renderDpIt();const n=$('dp_it').querySelector(`[data-di="${DP.itens.length-1}"] [data-k="desc"]`);if(n)n.focus()};
 $('dp_it').addEventListener('input',e=>{const c=e.target.closest('[data-di]'),k=e.target.dataset.k;if(!c||!k||e.target.tagName==='SELECT')return;const t=DP.itens[+c.dataset.di];t[k]=k==='valor'?num(e.target.value):e.target.value;DP._sujo=true;dpTot()});
 $('dp_it').addEventListener('change',e=>{const c=e.target.closest('[data-di]'),k=e.target.dataset.k;if(!c||!k||e.target.tagName!=='SELECT')return;const t=DP.itens[+c.dataset.di];
