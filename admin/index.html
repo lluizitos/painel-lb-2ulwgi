@@ -294,8 +294,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwih45nk"></script>
-<script src="../lbmetas.js?v=mwih45nk"></script>
+<script src="../lb.js?v=mwihmtkf"></script>
+<script src="../lbmetas.js?v=mwihmtkf"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -430,9 +430,13 @@ $('l_ok').onclick=async()=>{const m=$('l_msg'),u=$('l_u').value.trim(),s=$('l_s'
   if(!u)return er('Escreva o usuário.');if(!ps.length)return er('Marque pelo menos um papel.');if(!EDL&&!s)return er('Defina a senha.');if(s&&s.length<6)return er('Senha com pelo menos 6 caracteres.');
   if(s&&!PUB)return er('Sem a chave do site. Recarregue a página.');
   m.textContent='Salvando…';
-  try{const r=await api({acao:'salvar_usuario',login:{de:EDL||u,usuario:u,senha:s,senha_rsa:s?await cifra(s):'',papeis:ps,perfil:$('l_pf').value,ativo:$('l_at').value}});
+  const R0=EDL&&AD.rec&&LB.norm(EDL)===LB.norm(u)?AD.rec[EDL]||'':'',rec=s?R0:'',ponte=rec?await LB.ponteRec(u,s,rec):''; // senha vale na hora (sem esperar publicar)
+  /* páginas liberadas agora: cofre extra com a chave reserva da pessoa (vale na hora; a próxima publicação já inclui a pessoa) */
+  const PPG={admin:['painel','admin','bordero','vendas','socio','contador','metas'],artista:['painel','metas'],socio:['socio'],vendedor:['vendas'],contador:['contador'],funcionario:['metas']};
+  const chaves={};let semRec=false;for(const pg of [...new Set(ps.flatMap(x=>PPG[x]||[]))]){if(pg==='contador')continue;if(!R0){semRec=true;continue}try{const c=await LB.cofreExtra(pg,u,R0);if(c)chaves[pg]=c}catch(e){}}
+  try{const r=await api({acao:'salvar_usuario',login:{de:EDL||u,usuario:u,senha:s,senha_rsa:s?await cifra(s):'',ponte,chaves,papeis:ps,perfil:$('l_pf').value,ativo:$('l_at').value}});
     if(s&&eu(EDL||u))LB.senha=s;US=r.usuarios;limpaL();
-    m.innerHTML='<span class="pos">Salvo ✓</span>'+(s?` <span>· senha de <b>${esc(u)}</b>: <b>${esc(s)}</b> (anote e mande para a pessoa; as páginas abrem com ela depois da próxima atualização do site)</span>`:'');render()}
+    m.innerHTML='<span class="pos">Salvo ✓</span>'+(semRec&&!s?' <span>· login novo ou nome trocado: as páginas abrem depois da próxima atualização do site</span>':'')+(s?` <span>· senha de <b>${esc(u)}</b>: <b>${esc(s)}</b> (anote e mande para a pessoa; ${rec?'já vale agora':'as páginas abrem com ela depois da próxima atualização do site'})</span>`:'');render()}
   catch(e){er('Não salvou ('+esc(e.message)+')')}};
 $('l_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data-el]'),x=e.target.closest('[data-xl]');if(!ed&&!x)return;e.preventDefault();
   if(ed){const u=US.find(y=>y.usuario===ed.dataset.el);EDL=u.usuario;$('l_u').value=u.usuario;$('l_s').value='';$('l_s').placeholder='vazio = manter a senha atual';$('l_pf').value=u.perfil||'';$('l_at').value=u.ativo==='não'?'não':'sim';
@@ -751,7 +755,7 @@ $('duv_f').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;DUVF=b.
 $('duv_l').addEventListener('click',async e=>{const b=e.target.closest('[data-ds]');if(!b)return;const r=document.querySelector(`[data-dr="${b.dataset.ds}"]`).value.trim();if(!r){b.textContent='escreva a resposta';return}
   b.disabled=true;b.textContent='enviando…';try{DUV=(await api({acao:'responder_duvida',id:b.dataset.ds,resposta:r})).duvidas||DUV;duvRender()}catch(err){b.disabled=false;b.textContent='não enviou: '+err.message}});
 </script>
-<script src="../lbchat.js?v=mwih45nk"></script>
+<script src="../lbchat.js?v=mwihmtkf"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

@@ -17,7 +17,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwih45nk';
+  const BUILD = 'mwihmtkf';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -37,13 +37,16 @@
     }
     return { kek: await crypto.subtle.importKey('raw', b64(raw), 'AES-GCM', false, ['decrypt']), id };
   }
-  async function abrir(base, pagina, u, p) {
+  const RP = '\u0001R:';
+  /* abre a página. rec = entrar pela chave reserva (p é a chave); extra = cofre criado pelo Admin depois da última publicação */
+  async function abrir(base, pagina, u, p, rec, extra) {
     const j = await (await fetch(base + pagina + '.enc.json', { cache: 'no-store' })).json();
-    const k = j.chaves[await slotId(pagina, u)];
+    const k = extra || j.chaves[await slotId(pagina, rec ? u + ' #rec' : u)];
     if (!k) throw new Error('acesso');
     try {
       const { kek, id } = await kekDe(u, p, k.salt, j.iter);
       let raw; try { raw = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(k.iv) }, kek, b64(k.chave)); } catch (e) { store.del(id); throw e; }
+      if (k.rc && !rec) try { store.set('lb_rec', JSON.stringify({ u: norm(u), r: new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(k.ri) }, kek, b64(k.rc))) })); } catch (e) { }
       const dk = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
       const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(j.iv) }, dk, b64(j.ct));
       const dados = JSON.parse(new TextDecoder().decode(pt));
@@ -51,14 +54,15 @@
       return { dados, paginas: k.paginas || [pagina], nome: k.nome || u };
     } catch (e) { throw new Error('senha'); }
   }
-  /* Arquivo anexo cifrado com a mesma chave da página (prestação de contas). */
   async function anexo(nomeArq, iv, pasta) {
     const r = await fetch(LB.base + (pasta || 'arquivos') + '/' + nomeArq, { cache: 'no-store' });
     const ct = new Uint8Array(await r.arrayBuffer());
     return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(iv) }, LB.chave, ct);
   }
+  let MENU = null; // última montagem do menu: o "Meu perfil" da API corrige as páginas liberadas sem esperar publicar
   function links(paginas, atual, base) {
     // menu só com as páginas do login; quem tem uma página só (ex.: artista) não vê menu, só o Sair
+    MENU = { paginas: paginas.slice(), atual, base };
     const ps = ORDEM.filter(p => paginas.includes(p));
     return (ps.length > 1 ? ps.concat('agenda') : []).map(p =>
       `<a href="${base}${ROTAS[p]}" class="${p === atual ? 'on' : ''}">${NOMES[p]}</a>`).join('') +
@@ -123,18 +127,50 @@
     const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(norm(u) + '|' + p), 'PBKDF2', false, ['deriveKey']);
     return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 150000, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, false, [uso]);
   }
-  async function abrir2(base, pagina, u, p) { // abre o arquivo do site; senha trocada há pouco → pega na API a senha antiga cifrada com a nova
+  /* abre o arquivo do site já com o que o Admin mudou (sem esperar publicar):
+     senha trocada → "ponte" na API (senha antiga ou chave reserva, cifrada com a senha nova);
+     página liberada depois da última publicação → cofre extra na API, aberto com a chave reserva da pessoa */
+  async function ponteDe(u, p) {
+    const j = await (await fetch((await cfg()).api_url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ acao: 'ponte', usuario: u, senha: p }) })).json();
+    if (!j.ok) throw new Error('senha');
+    let velha = ''; const x = JSON.parse(j.ponte || 'null');
+    if (x) try { velha = new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(x.i) }, await kSenha(u, p, b64(x.s), 'decrypt'), b64(x.c))); } catch (e) { }
+    return { velha, chaves: j.chaves || {} };
+  }
+  async function abrir2(base, pagina, u, p) {
+    LB.base = base;
     try { const r = await abrir(base, pagina, u, p); LB.senhaCofre = p; return r; }
     catch (e) {
-      if (e.message !== 'senha') throw e;
-      let velha = '';
-      try {
-        LB.base = base; const j = await (await fetch((await cfg()).api_url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ acao: 'ponte', usuario: u, senha: p }) })).json();
-        const x = JSON.parse(j.ok && j.ponte || 'null'); if (!x) throw 0;
-        velha = new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(x.i) }, await kSenha(u, p, b64(x.s), 'decrypt'), b64(x.c)));
-      } catch (e2) { throw new Error('senha'); }
-      const r = await abrir(base, pagina, u, velha); LB.senhaCofre = velha; return r;
+      if (e.message !== 'senha' && e.message !== 'acesso') throw e;
+      let pt; try { pt = await ponteDe(u, p); } catch (e2) { throw e; }
+      const { velha, chaves } = pt;
+      if (e.message === 'senha') {
+        if (!velha) throw e;
+        const r = velha.startsWith(RP) ? await abrir(base, pagina, u, velha.slice(RP.length), true) : await abrir(base, pagina, u, velha); LB.senhaCofre = velha; return r;
+      }
+      const x = chaves[pagina]; if (!x) throw e; // sem acesso mesmo
+      let rec = velha.startsWith(RP) ? velha.slice(RP.length) : '';
+      if (!rec) { try { const c = JSON.parse(store.get('lb_rec') || 'null'); if (c && c.u === norm(u)) rec = c.r; } catch (e3) { } }
+      if (!rec) for (const pg of ORDEM.filter(y => y !== pagina)) { // a chave reserva vem guardada no cofre de outra página da pessoa
+        for (const sp of [p, velha].filter(Boolean)) { try { await abrir(base, pg, u, sp); const c = JSON.parse(store.get('lb_rec') || 'null'); if (c && c.u === norm(u)) { rec = c.r; break; } } catch (e4) { } }
+        if (rec) break;
+      }
+      if (!rec) throw e;
+      const r = await abrir(base, pagina, u, rec, true, x); LB.senhaCofre = velha || p; return r;
     }
+  }
+  /* Admin: cria o cofre de uma página para alguém que acabou de ganhar acesso (vale na hora; some na próxima publicação) */
+  async function cofreExtra(pagina, u, rec) {
+    const j = await (await fetch((LB.base || '') + pagina + '.enc.json', { cache: 'no-store' })).json();
+    if (j.chaves[await slotId(pagina, u)]) return null; // já tem
+    const mc = String(LB.senhaCofre || LB.senha || ''), viaRec = mc.startsWith(RP), k = j.chaves[await slotId(pagina, viaRec ? LB.login + ' #rec' : LB.login)];
+    if (!k) return null;
+    const { kek } = await kekDe(LB.login, viaRec ? mc.slice(RP.length) : mc, k.salt, j.iter);
+    const raw = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(k.iv) }, kek, b64(k.chave));
+    const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(norm(u) + '|' + rec), 'PBKDF2', false, ['deriveKey']);
+    const kk = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: j.iter, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, false, ['encrypt']);
+    return { salt: enc64(salt), iv: enc64(iv), chave: enc64(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, kk, raw)), nome: u, paginas: [pagina] };
   }
   const ini = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
   const escH = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -160,7 +196,10 @@
   async function carregar() {
     css(); document.querySelectorAll('.links > a.lbav').forEach(a => { const l = a.parentElement; l.style.marginLeft = 'auto'; l.parentElement.querySelectorAll(':scope > a.lbav').forEach(x => x.remove()); l.after(a); }); // fora da rolagem: sempre visível à direita
     pintar(); if (buscou || !LB.login) return; buscou = true;
-    try { const r = await api({ acao: 'meu_perfil' }); if (r.ok) { PF = r; store.set('lb_pf', JSON.stringify({ u: LB.login, pf: { foto: r.foto } })); pintar(); } } catch (e) { }
+    try { const r = await api({ acao: 'meu_perfil' }); if (r.ok) { PF = r; store.set('lb_pf', JSON.stringify({ u: LB.login, pf: { foto: r.foto } })); pintar();
+      if (MENU && Array.isArray(r.paginas)) { const nv = r.paginas.filter(x => ROTAS[x] != null && (x !== 'contador' || MENU.paginas.includes('contador'))); // contador só se publicado
+        if (nv.join() !== ORDEM.filter(x => MENU.paginas.includes(x)).join() && ORDEM.filter(x => nv.includes(x)).join() !== ORDEM.filter(x => MENU.paginas.includes(x)).join()) {
+          const el = document.querySelector('.links'); if (el) { el.innerHTML = links(nv, MENU.atual, MENU.base); setTimeout(() => { css(); document.querySelectorAll('.links > a.lbav').forEach(a => { const l = a.parentElement; l.parentElement.querySelectorAll(':scope > a.lbav').forEach(x => x.remove()); l.after(a); }); pintar(); }, 0); } } } } } catch (e) { }
   }
   function foto(file) { // recorta no centro e reduz para 240×240 (JPEG leve, cabe na planilha)
     return new Promise((ok, no) => {
@@ -269,7 +308,11 @@
       const t = pgx.ocorr(g, (+hoje.slice(0, 4) + 1) + hoje.slice(4)).find(o => o.data > hoje); return t || null;
     }
   };
-  window.LB = { entrar, links, anexo, sair, perfil, norm, store, NOMES, pg, pgx };
+  /* Admin trocou a senha de alguém: guarda a chave reserva dessa pessoa cifrada com a senha nova (vale na hora) */
+  async function ponteRec(u, nova, rec) { const s = crypto.getRandomValues(new Uint8Array(16)), i = crypto.getRandomValues(new Uint8Array(12));
+    const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: i }, await kSenha(u, nova, s, 'encrypt'), new TextEncoder().encode(RP + rec));
+    return JSON.stringify({ s: enc64(s), i: enc64(i), c: enc64(ct) }); }
+  window.LB = { ponteRec, cofreExtra, entrar, links, anexo, sair, perfil, norm, store, NOMES, pg, pgx };
 
   /* "Ver mais": toda lista longa (.list) e todo grupo de borderô (.gp) mostra só os primeiros itens.
      Limite: data-max no elemento (padrão 5 em listas, 4 em grupos). data-max="0" desliga. */
