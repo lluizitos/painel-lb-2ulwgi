@@ -197,6 +197,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 .avl{display:flex;flex-direction:column;gap:5px;margin-top:8px}.av{display:block;font-size:13px;color:var(--sub);text-decoration:none;padding:6px 10px;background:var(--card2);border-radius:8px}.av b{color:var(--ink)}.av.pk{border-left:3px solid var(--pinkl)}.avd{padding:9px 12px}.avd.al{border-left:3px solid var(--amber)}.avt1{font-size:14px}.avt2{font-size:13px;color:var(--sub);margin-top:3px;line-height:1.45}.avt3{font-size:12px;color:var(--amber);margin-top:4px}.avt4{color:var(--muted);font-size:12.5px}
 .dnt{display:flex;align-items:center;gap:16px;margin-top:8px}.dnt svg{flex:none;transform:rotate(0)}.dnt .etp{flex:1;margin:0;min-width:0}
 .mc{display:inline-flex;gap:6px;flex-wrap:wrap;align-items:center}.mc b{font-weight:600;border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--card)}.mc b.on{border-color:var(--pos);color:var(--pos)}button.pt.ad{color:var(--muted);border-style:dashed}.sdiv{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font-size:13px;color:var(--sub)}.sdiv b{color:var(--ink)}
+.cclk{cursor:pointer}.cclk:hover{outline:1px solid var(--line)}.cxb{margin-top:12px;display:grid;gap:8px}.cxpix{background:var(--card);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}.cxpix span,.cxl span{font-size:12px;color:var(--muted)}.cxpix b{font-size:18px;overflow-wrap:anywhere}.cxpix .cpg{margin:0;padding:7px 14px;font-size:13px}.cxl{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:10px;padding:9px 14px}.cxl span{width:84px;flex:none}.cxl b{flex:1;font-weight:600;overflow-wrap:anywhere}
 .cmb{flex:none;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--muted);font-size:15px;cursor:pointer;padding:0}
 .row.cmin{padding:8px 14px;opacity:.75}.row.cmin .t b{font-size:13px;font-weight:500}
 .cat summary{list-style:none;display:flex;gap:8px;align-items:center;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);margin:12px 2px 8px}.cat summary::-webkit-details-marker{display:none}.cat summary small{color:var(--muted);letter-spacing:0;font-weight:500}.cat summary::after{content:'▾';color:var(--muted);margin-left:auto}.cat:not([open]) summary::after{content:'▸'}
@@ -329,10 +330,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwhgfjd2"></script>
-<script src="lbmetas.js?v=mwhgfjd2"></script>
-<script src="lbchat.js?v=mwhgfjd2"></script>
-<script src="lbvendas.js?v=mwhgfjd2"></script>
+<script src="lb.js?v=mwhgqq6c"></script>
+<script src="lbmetas.js?v=mwhgqq6c"></script>
+<script src="lbchat.js?v=mwhgqq6c"></script>
+<script src="lbvendas.js?v=mwhgqq6c"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -440,7 +441,21 @@ function renderPagar(){const tp=document.getElementById('tpag');if(tp&&D.avisos)
     <div class="px">${pxBtn(x.pix)}<button class="cp" data-cp="${esc(x.nome+' — '+brl(x.tot)+(x.pix?' — PIX '+x.pix:''))}">copiar resumo</button>${pode?`<button class="cp pgall" data-pgp="${esc(x.k)}">marcar tudo pago${x.it.some(i=>i.fut)?' (só o vencido)':''}</button>`:''}</div></div>`).join('')
     :'<div class="empty">Nenhum pagamento pendente. Show só entra aqui depois que acontece; contas e fixos do mês (página Admin) entram todos, menos os adiados.</div>';
 }
-let PAGP={},API_URL='',PAGS=[],PAGS_OK=false;
+let PAGP={},API_URL='',PAGS=[],PAGS_OK=false,PESS=[];
+/* conta a pagar: toque no quadro abre a tela com PIX, nome, valor e vencimento para copiar */
+const limpaPix=x=>String(x||'').replace(/\s*\((nubank|picpay|inter|banco c6)\)\s*$/i,'').replace(/\s+(Inter|Banco c6)$/i,'').trim();
+function pesPorNome(n){const k=LB.norm(n||'');if(!k)return null;const m=PESS.filter(p=>LB.norm(p.nome||'')===k||LB.norm(p.apelido||'')===k);return m.length===1?m[0]:null}
+function abreConta(pg){const c=((D.contas)||[]).find(x=>x.pg===pg);if(!c)return;const[id]=pg.split('|'),g=PAGS.find(x=>x.id===id)||{};
+  const pe=(g.pessoa&&PESS.find(p=>p.id===g.pessoa))||pesPorNome(g.nome||c.para);
+  const pix=g.pix||(pe&&pe.pix)||'',nome=(pe&&pe.nome)||g.nome||c.para||'',falta=c.valor-(cParc(c)||0),dados=g.dados||'',meio=g.meio||c.meio||'';
+  const v2=n=>n.toFixed(2).replace('.',','),ln=(r,v,cp)=>`<div class="cxl"><span>${r}</span><b>${esc(v)}</b>${cp?`<button class="cp" data-cp="${esc(cp)}">copiar</button>`:''}</div>`;
+  document.getElementById('bds').innerHTML=`<div class="top"><div><p class="eyebrow" style="margin:0">Conta a pagar · vence ${ddmm(c.venc)}</p><h2>${esc(c.desc)}</h2></div><button class="x" onclick="fecharBord()" aria-label="Fechar">×</button></div>
+  <div class="cxb">${pix?`<div class="cxpix"><span>Chave PIX</span><b>${esc(limpaPix(pix))}</b><button class="cp cpg" data-cp="${esc(limpaPix(pix))}">copiar PIX</button>${limpaPix(pix)!==pix?`<small class="mut">${esc(pix)}</small>`:''}</div>`:`<div class="cxpix sem"><span>Chave PIX</span><b>sem PIX no cadastro</b><small class="mut">cadastre em Admin → Pagamentos ou no cadastro do borderô</small></div>`}
+  ${nome?ln('Nome',nome,nome):''}${ln('Valor',brl2(falta),v2(falta))}${cParc(c)?ln('Já pago',brl2(cParc(c))+' de '+brl2(c.valor)):''}${ln('Vencimento',ddmm(c.venc)+'/'+c.venc.slice(0,4))}${meio?ln('Meio',meio):''}${dados?ln('Dados',dados,dados):''}${pe&&pe.doc?ln('CPF/CNPJ',pe.doc,pe.doc):''}</div>
+  <button class="pxb" data-cp="${esc([c.desc,nome,brl2(falta),'vence '+ddmm(c.venc),pix?'PIX '+limpaPix(pix):'',dados].filter(Boolean).join(' — '))}">copiar tudo</button>`;
+  document.getElementById('bd').classList.add('open');document.body.style.overflow='hidden'}
+document.addEventListener('click',e=>{const r=e.target.closest('[data-cx]');if(!r||e.target.closest('button'))return;abreConta(r.dataset.cx)});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches&&e.target.matches('[data-cx]'))abreConta(e.target.dataset.cx)});
 const jso=t=>{try{return JSON.parse(t||'{}')||{}}catch(e){return {}}};
 const pAdiado=(g,ref)=>!!jso(g.adiados)[ref];
 const cAdiada=c=>{if(!c.pg)return false;if(!PAGS_OK)return !!c.adiado;const[id,ref]=c.pg.split('|'),g=PAGS.find(x=>x.id===id);return g?pAdiado(g,ref):!!c.adiado};
@@ -500,7 +515,7 @@ function comLancs(movs,app){if(!LANCS_OK)return movs.concat(app);const aj={};LAN
 async function bordAoVivo(){ // com a planilha ligada, os borderôs vêm ao vivo
   try{const c=await (await fetch('config.json',{cache:'no-store'})).json();if(!c.api_url)return;API_URL=c.api_url;
     const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'borderos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
-    if(!r.ok)return;const px={};(r.pessoas||[]).forEach(p=>px[p.id]=p.pix);
+    if(!r.ok)return;const px={};PESS=r.pessoas||[];PESS.forEach(p=>px[p.id]=p.pix);
     Object.entries(r.borderos).forEach(([k,b])=>{if(b.tipo==='despesa'||!b.equipe)return;b.equipe.forEach(e=>{if(e.pessoa&&px[e.pessoa])e.pix=px[e.pessoa];delete e.doc});D.borderos[k]=b});
     renderMes();renderTL();renderPagar()}catch(e){}
 }
@@ -734,7 +749,7 @@ function renderMes(){
     const linhaC=(c,min)=>{
       const venc=c.venc<HOJE;const dias=Math.round((new Date(c.venc)-new Date(HOJE))/864e5);
       const st=venc?`<span class="pill pk">venceu ${ddmm(c.venc)}</span>`:dias===0?`<span class="pill am">vence hoje</span>`:`<span class="pill">vence ${ddmm(c.venc)}${dias<=7?` · ${dias} dia${dias>1?'s':''}`:''}</span>`;
-      return `<div class="row${min?' cmin':''}"><div class="t"><b>${esc(c.desc)}</b>${min?'':`<span>${c.para?esc(c.para)+' · ':''}${st}${c.conf?' <span class="pill am">valor a confirmar</span>':''}${c.fora?' <span class="pill">fora da estimativa</span>':''}</span>`}</div><div class="v">${cParc(c)?`${brl2(c.valor-cParc(c))}<small style="display:block;font-size:11px;color:var(--muted);font-weight:500">pago ${brl2(cParc(c))} de ${brl2(c.valor)}</small>`:brl2(c.valor)}</div><button class="cmb" data-cm="${esc(ck(c))}" title="${min?'voltar para o assistente de pagamento':'adiar: minimiza e tira do assistente de pagamento'}" aria-label="${min?'voltar':'adiar'}">${min?'＋':'–'}</button></div>`};
+      return `<div class="row cclk${min?' cmin':''}" data-cx="${esc(c.pg||'')}" role="button" tabindex="0"><div class="t"><b>${esc(c.desc)}</b>${min?'':`<span>${c.para?esc(c.para)+' · ':''}${st}${c.conf?' <span class="pill am">valor a confirmar</span>':''}${c.fora?' <span class="pill">fora da estimativa</span>':''}</span>`}</div><div class="v">${cParc(c)?`${brl2(c.valor-cParc(c))}<small style="display:block;font-size:11px;color:var(--muted);font-weight:500">pago ${brl2(cParc(c))} de ${brl2(c.valor)}</small>`:brl2(c.valor)}</div><button class="cmb" data-cm="${esc(ck(c))}" title="${min?'voltar para o assistente de pagamento':'adiar: minimiza e tira do assistente de pagamento'}" aria-label="${min?'voltar':'adiar'}">${min?'＋':'–'}</button></div>`};
     h+=`<h3>Contas a pagar <small>${cs.length} contas · ${brl2(tot)}</small></h3><div class="list" id="clist">`+ab.map(c=>linhaC(c,0)).join('')+`</div>`+(mn.length?`<details class="cat cmins"><summary>Adiadas (fora do assistente de pagamento) <small>${mn.length} · ${brl2(mn.reduce((a,c)=>a+c.valor,0))}</small></summary><div class="list">${mn.map(c=>linhaC(c,1)).join('')}</div></details>`:'');
     if(cs.some(c=>c.venc<HOJE))h+=`<p class="note">“Venceu” = vencimento já passou e o pagamento ainda não apareceu no extrato conferido (até ${ddmm(D.saldo_inicial.data)}).</p>`;
   }

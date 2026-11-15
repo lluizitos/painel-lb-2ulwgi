@@ -263,7 +263,7 @@ label textarea{min-height:60px;resize:vertical}
       <label>Tipo<select id="pg_tp"><option value="avulso">Avulso (uma vez)</option><option value="fixo">Fixo mensal</option></select></label>
       <label><span id="pg_qrl">Quem recebe</span><input id="pg_pes" list="pes_dl" autocomplete="off" placeholder="da lista da equipe, ou escreva (ex.: padaria)"></label>
       <label>Meio<select id="pg_meio"><option>Pix</option><option>Transferência bancária</option><option>Dinheiro</option><option>Boleto</option></select></label>
-      <label>Chave PIX<input id="pg_pix"></label>
+      <label>Chave PIX<input id="pg_pix"><small id="pg_pixh" class="note" style="display:block;margin-top:3px"></small></label>
       <label class="w" id="pg_dl" style="display:none">Dados bancários / boleto<input id="pg_dados" placeholder="banco, agência, conta, titular · ou linha do boleto"></label>
       <label class="w">Descrição<input id="pg_desc" placeholder="ex.: edição do vídeo · salário · aluguel do estúdio"></label>
       <label><span id="pg_vl">Valor (R$)</span><input id="pg_val" inputmode="decimal"></label>
@@ -279,8 +279,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwhgfjd2"></script>
-<script src="../lbmetas.js?v=mwhgfjd2"></script>
+<script src="../lb.js?v=mwhgqq6c"></script>
+<script src="../lbmetas.js?v=mwhgqq6c"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -490,11 +490,18 @@ function dirPg(){const e=$('pg_dir').value==='entrada';$('pg_qrl').textContent=e
 $('pg_dir').onchange=dirPg;
 function meioPg(){$('pg_dl').style.display=$('pg_meio').value==='Pix'?'none':''}
 $('pg_tp').onchange=tipoPg;$('pg_meio').onchange=meioPg;
-$('pg_pes').addEventListener('input',()=>{const x=PESK[$('pg_pes').value];PGID=x?x.id:'';if(x&&x.pix)$('pg_pix').value=x.pix});
-function limpaG(){EDG=null;PGID='';['pg_pes','pg_pix','pg_dados','pg_desc','pg_val','pg_data','pg_dia','pg_fim'].forEach(i=>$(i).value='');$('pg_ini').value=HOJE.slice(0,7);$('pg_tp').value='avulso';$('pg_sit').value='';$('pg_meio').value='Pix';$('pg_at').value='sim';$('pg_dir').value='saida';$('pg_est').value='sim';$('pg_var').value='';tipoPg();meioPg();dirPg();$('pg_can').style.display='none';$('pg_h').textContent='Novo pagamento'}
+function acharPes(t){const v=String(t||'');if(PESK[v])return PESK[v];const k=LB.norm(v.replace(/\s*\(.*\)\s*$/,''));if(!k)return null;
+  let m=PES.filter(p=>LB.norm(p.nome||'')===k||LB.norm(p.apelido||'')===k);if(m.length===1)return m[0];
+  m=PES.filter(p=>LB.norm(p.nome||'').split(' ')[0]===k);return m.length===1?m[0]:null}
+let PIXAUTO='';
+function pixPg(){const x=acharPes($('pg_pes').value),h=$('pg_pixh');PGID=x?x.id:(EDG?PGID:'');
+  if(x&&x.pix){if(!$('pg_pix').value||$('pg_pix').value===PIXAUTO){$('pg_pix').value=x.pix;PIXAUTO=x.pix}h.textContent='PIX do cadastro de '+x.nome+(x.pix!==$('pg_pix').value?' (você mudou a chave)':'')}
+  else{if($('pg_pix').value===PIXAUTO){$('pg_pix').value='';PIXAUTO=''}h.textContent=x?x.nome+' está no cadastro, mas sem PIX':$('pg_pes').value.trim()?'nome fora da lista do borderô: preencha a chave':''}}
+$('pg_pes').addEventListener('input',pixPg);$('pg_pes').addEventListener('change',pixPg);
+function limpaG(){EDG=null;PGID='';PIXAUTO='';$('pg_pixh').textContent='';['pg_pes','pg_pix','pg_dados','pg_desc','pg_val','pg_data','pg_dia','pg_fim'].forEach(i=>$(i).value='');$('pg_ini').value=HOJE.slice(0,7);$('pg_tp').value='avulso';$('pg_sit').value='';$('pg_meio').value='Pix';$('pg_at').value='sim';$('pg_dir').value='saida';$('pg_est').value='sim';$('pg_var').value='';tipoPg();meioPg();dirPg();$('pg_can').style.display='none';$('pg_h').textContent='Novo pagamento'}
 $('pg_can').onclick=()=>{limpaG();$('pg_msg').textContent=''};
 $('g2_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;G2F=b.dataset.f;document.querySelectorAll('#g2_fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderPag()};
-$('pg_ok').onclick=async()=>{const m=$('pg_msg'),nome=$('pg_pes').value.trim(),x=PESK[nome];const er=t=>m.innerHTML='<span class="neg">'+t+'</span>';
+$('pg_ok').onclick=async()=>{const m=$('pg_msg'),nome=$('pg_pes').value.trim(),x=acharPes(nome);const er=t=>m.innerHTML='<span class="neg">'+t+'</span>';
   const v=+$('pg_val').value.trim().replace(/\./g,'').replace(',','.');const tp=$('pg_tp').value;
   if(!nome)return er('Escolha quem recebe.');if(!(v>0))return er('Valor.');if(tp==='avulso'&&!$('pg_data').value)return er('Data do pagamento.');
   if(tp==='fixo'&&!(+$('pg_dia').value>=1&&+$('pg_dia').value<=31&&$('pg_ini').value))return er('Dia do mês e mês de início.');
