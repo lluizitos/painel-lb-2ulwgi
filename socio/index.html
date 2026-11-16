@@ -48,8 +48,30 @@ h3 small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)
 .ptabs{display:flex;gap:4px;max-width:980px;margin:0 auto;padding:0 16px 8px}
 .ptabs button{flex:1;background:none;border:0;border-bottom:2px solid var(--line);padding:9px 2px;font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);cursor:pointer;font-family:inherit}
 .ptabs button.on{color:var(--ink);border-color:var(--pink)}
-body[data-aba="fin"] #bvv,body[data-aba="fin"] #b25,body[data-aba="ven"] .fin,body[data-aba="ven"] #b25,body[data-aba="met"] .fin,body[data-aba="met"] #bvv{display:none!important}
-body[data-aba="ven"] #bvv,body[data-aba="met"] #b25{margin-top:14px}
+.aba{display:none}body[data-aba="fin"] .aba[data-a="fin"],body[data-aba="ven"] .aba[data-a="ven"],body[data-aba="eq"] .aba[data-a="eq"]{display:block}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:560px){.g3{gap:6px}.g3 .card{padding:10px}.g3 .k .l{font-size:9px;letter-spacing:.1em}.g3 .k .v{font-size:16px}.g3 .k .s{font-size:11px}}
+.chart .leg{padding:0 6px 8px}.chart .tip{min-height:18px}
+.vx{display:none}.aberto>.vx{display:block}
+button.mais{display:block;width:100%;margin-top:6px;border:1px dashed var(--line);background:transparent;border-radius:10px;padding:9px;font:inherit;font-size:12.5px;font-weight:700;letter-spacing:.06em;color:var(--pinkl);cursor:pointer}
+details.det{margin-top:22px;background:var(--card);border-radius:14px;padding:0 14px}details.det>summary{cursor:pointer;list-style:none;padding:14px 0;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--sub);display:flex;justify-content:space-between}details.det>summary::-webkit-details-marker{display:none}details.det>summary::after{content:'+';font-size:16px;color:var(--pinkl);letter-spacing:0}details.det[open]>summary::after{content:'−'}details.det[open]{padding-bottom:14px}details.det h3:first-of-type{margin-top:4px}details.det .row,details.det .oc,details.det .doc{background:var(--card2)}
+.oc .t span.um{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb{background:var(--card);border-radius:14px;padding:14px 16px;margin-top:10px}.hb .it{display:grid;grid-template-columns:62px 1fr auto;gap:10px;align-items:center;font-size:13px;margin-top:8px}.hb .it:first-child{margin-top:0}.hb .it span{color:var(--sub)}.hb .it b{white-space:nowrap}.hb .tr{height:12px;background:var(--card2);border-radius:99px;overflow:hidden}.hb .tr i{display:block;height:100%;border-radius:99px}
+.cal{background:var(--card);border-radius:14px;padding:10px}
+.cnav{display:flex;align-items:center;gap:6px;margin-bottom:8px}.cnav b{flex:1;font-size:15px;text-transform:capitalize;padding-left:4px}.cnav button{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:99px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+.cw,.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}.cw span{text-align:center;font-size:10.5px;color:var(--muted);font-weight:700;padding-bottom:4px}
+.cd{min-height:62px;min-width:0;border:0;border-top:1px solid var(--line);border-radius:6px;background:none;color:var(--sub);display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:2px;cursor:pointer;padding:4px 2px 3px;font:inherit;overflow:hidden}.cd>b{align-self:center;margin-bottom:1px;font-size:13px;font-weight:600}
+.cd.hj>b{color:#fff;background:var(--pink);border-radius:99px;padding:1px 6px}.cd.sel{background:var(--card2);outline:1px solid var(--pinkl)}
+.ce{display:block;font-style:normal;font-size:9.5px;line-height:1.3;font-weight:700;padding:1px 4px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;color:#141218}
+@media(min-width:700px){.cd{min-height:84px;padding:5px 4px}.ce{font-size:11px;padding:2px 6px}}
+.pt-s{background:var(--pinkl)}.pt-c{background:var(--amber)}.pt-ok{background:var(--pos)}
+.clg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--sub);padding:10px 4px 2px}.clg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.lhd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:14px 2px 8px;font-size:13px;color:var(--sub)}.lhd b{color:var(--ink);font-size:14px}.lhd button{border:0;background:none;color:var(--pinkl);font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;padding:0}
+.eqc{background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:12px}.eqc .n{display:flex;justify-content:space-between;gap:10px;align-items:baseline}.eqc .n b{font-size:17px}.eqc .f{font-size:12.5px;color:var(--muted);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.eqc .g3{margin-top:12px}.eqc .g3 .card{background:var(--card2)}
+.eqc h5{font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--pinkl);margin:16px 0 6px;display:flex;gap:8px;align-items:baseline}.eqc h5 span{color:var(--muted);letter-spacing:0;text-transform:none;font-weight:400;font-size:11.5px}
+.tl{display:flex;gap:10px;align-items:baseline;font-size:13.5px;padding:7px 0;border-top:1px solid var(--line)}.tl:first-child{border-top:0}.tl .ic{flex:none;width:16px;text-align:center;font-weight:800}.tl span{flex:1;min-width:0;overflow-wrap:anywhere}.tl small{flex:none;font-size:12px;color:var(--muted);white-space:nowrap}.tl small.at{color:var(--neg)}
+.eqc .chart{background:var(--card2);padding:10px 6px 4px}
+.mt .p.cl{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .blk>.eyebrow{margin-top:0}
 .oc{display:flex;gap:12px;background:var(--card);border-radius:12px;padding:12px 14px;align-items:flex-start}
 .oc .d{flex:none;width:46px;text-align:center;line-height:1.1}.oc .d b{display:block;font-size:19px;font-weight:800}.oc .d span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -95,248 +117,256 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 <body>
 <div id="app">
 <header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
-  <div class="ptabs" id="ptabs"><button class="on" data-p="fin">Financeiro</button><button data-p="ven">Vendas</button><button data-p="met">Metas e equipe</button></div></header>
+  <div class="ptabs" id="ptabs"><button class="on" data-p="fin">Financeiro</button><button data-p="ven">Vendas</button><button data-p="eq">Equipe</button></div></header>
 <main class="wrap">
 <div id="lbq"></div>
-  <p class="eyebrow">Prestação de contas para o sócio</p>
+  <p class="eyebrow">Sócio</p>
   <h1>Lucas <em>Barros</em></h1>
   <p class="note" id="upd"></p>
+
+  <!-- ===================== FINANCEIRO ===================== -->
+  <section class="aba" data-a="fin">
   <div id="alertas"></div>
-  <div class="info" id="infobase"></div>
-
-  <div class="blk fin" id="b1">
-  <p class="eyebrow">1 · Agora</p>
-  <h1 id="mesnm" style="font-size:24px"></h1>
-  <p class="note" id="mestp" style="margin:4px 0 0"></p>
-  <div class="grid g4" id="kagora" style="margin-top:14px"></div>
-  <h3>O que aconteceu <small>no mês</small></h3>
-  <div class="list" id="ocm"></div>
-  <h3>Entrou e saiu <small id="gsub"></small></h3>
-  <div class="g2d"><div id="entt"></div><div id="gastos"></div></div>
-  <h3>Movimentações do mês <small id="mvsub"></small></h3>
-  <div class="list" id="mvl"></div>
-  <h3>Shows do mês</h3>
-  <div class="list" id="smes"></div>
-  </div>
-
-  <div class="blk fin" id="b2">
-  <p class="eyebrow">2 · Próximos meses</p>
-  <h1 style="font-size:24px">O que já está <em>certo</em></h1>
-  <h3>Shows confirmados <small id="proxs"></small></h3>
-  <div id="prox"></div>
-  <h3>Contas fixas por mês <small id="fixs"></small></h3>
-  <div class="gb" id="fixos"></div>
-  <p class="note" id="apnota"></p>
-  </div>
-
-  <div class="blk" id="bvv" style="display:none">
-  <p class="eyebrow">Vendas</p>
-  <h3>Shows vendidos <small>mesmos números da aba Vendas do painel · todos os shows, com o status de cada um</small></h3>
-  <div id="vana"></div>
-  <h3>Vendido por mês <small>pela data da venda (quando o show foi fechado)</small></h3>
-  <div class="chart" id="vvg"></div>
-  <div id="vvm"></div>
-  <h3>Shows marcados e histórico</h3>
-  <div class="chips" id="vhf"><button class="chip on" data-h="fut">Marcados</button><button class="chip" data-h="pas">Histórico</button></div>
-  <div class="list hist" id="vhl"></div>
-  <h3>Perfil dos vendedores <small id="pvano"></small></h3>
-  <div class="list" id="rvend"></div>
-  </div>
-
-  <div class="blk" id="b25" style="display:none">
-  <p class="eyebrow">Metas e equipe</p>
-  <h3>Metas e tarefas da empresa</h3>
-  <div class="list" id="metas"></div>
-  <h3>Equipe no mês <small id="eqmes"></small></h3>
-  <div class="list" id="equipe"></div>
-  </div>
-
-  <div class="blk fin" id="b3">
-  <p class="eyebrow">3 · Geral</p>
-  <h1 style="font-size:24px">Temporada <em id="anonm"></em></h1>
-  <div class="grid g4" id="kpis" style="margin-top:14px"></div>
-  <h3>Mês a mês <small>cachês × lucro</small></h3>
-  <div class="chart"><div class="leg"><span><i style="background:var(--pink)"></i>Cachês</span><span><i style="background:var(--pos)"></i>Lucro dos shows</span></div><div id="ch"></div><div class="tip" id="tip">Toque num mês para ver os valores.</div></div>
-  <h3>Meses fechados <small>entrou × saiu</small></h3>
-  <div class="card fb"><div class="leg"><span><i style="background:var(--pos)"></i>Entrou</span><span><i style="background:var(--sai)"></i>Saiu</span></div><div class="fbc" id="fech"></div></div>
-  <h3>Investimento do sócio</h3>
-  <div class="list" id="aportes"></div>
-  <h3>Tudo o que aconteceu</h3>
+  <h3>Visão geral <small id="fano"></small></h3>
+  <div class="grid g4" id="fkpi"></div>
+  <div class="hb" id="fano2"></div>
+  <h3>Mês a mês <small>cachês e lucro dos shows</small></h3>
+  <div id="fch"></div>
+  <h3>Entrou e saiu <small>meses fechados</small></h3>
+  <div id="ffech"></div>
+  <h3 id="fmesh"></h3>
+  <div class="grid" id="fmesk" style="grid-template-columns:1fr 1fr"></div>
+  <div class="g2d" style="margin-top:10px"><div id="entt"></div><div id="gastos"></div></div>
+  <h3>Acontecimentos da empresa</h3>
   <div class="list" id="ocall"></div>
-  <h3>Últimos shows</h3>
-  <div class="list" id="ult"></div>
+  <details class="det"><summary>Detalhes do mês</summary>
+    <div id="sinais"></div>
+    <h3>Shows do mês</h3><div class="list" id="smes"></div>
+    <h3>Movimentações <small id="mvsub"></small></h3><div class="list" id="mvl"></div>
+  </details>
+  <details class="det"><summary>Contas fixas e investimento</summary>
+    <h3>Contas fixas por mês <small id="fixs"></small></h3><div class="gb" id="fixos" style="background:var(--card2)"></div><p class="note" id="apnota"></p>
+    <h3>Investimento do sócio</h3><div class="list" id="aportes"></div>
+    <h3>Últimos shows</h3><div class="list" id="ult"></div>
+  </details>
   <h3>Documentos</h3>
   <div class="list" id="docs"></div>
-  </div>
+  </section>
+
+  <!-- ===================== VENDAS ===================== -->
+  <section class="aba" data-a="ven" id="bvv">
+  <h3>Visão geral <small id="vano"></small></h3>
+  <div class="grid g4" id="vkpi"></div>
+  <h3>Agenda de shows</h3>
+  <div class="cal" id="vcal"></div>
+  <div id="vlis"></div>
+  <h3>Shows por mês <small id="vpmh"></small></h3>
+  <div id="vpm"></div>
+  <h3>Shows vendidos <small id="vvh"></small></h3>
+  <div id="vvg"></div>
+  <h3>Comparativo <small>pela data do show</small></h3>
+  <div class="grid g3" id="vcmp"></div>
+  <div id="vcmpg" style="margin-top:10px"></div>
+  <h3>Vendedores <small id="pvano"></small></h3>
+  <div class="list" id="rvend"></div>
+  <details class="det"><summary>Análise completa das vendas</summary><div id="vana"></div></details>
+  </section>
+
+  <!-- ===================== EQUIPE ===================== -->
+  <section class="aba" data-a="eq">
+  <h3>Metas da empresa</h3>
+  <div class="list" id="metas"></div>
+  <h3>Equipe <small id="eqmes"></small></h3>
+  <div id="equipe"></div>
+  <h3>Valores da equipe <small>soma de todos, por mês</small></h3>
+  <div class="grid g3" id="eqvk"></div>
+  <div id="eqvg" style="margin-top:10px"></div>
+  <p class="note">Soma do que a equipe recebeu no mês (fixos e cachês dos shows). Valores de cada pessoa não aparecem nesta página.</p>
+  </section>
+
   <footer>Lucas Barros Ltda · números do extrato bancário, do caixa em dinheiro e das planilhas de cada show (borderôs)</footer>
 </main>
 </div>
-<script src="../lb.js?v=mwioh56e"></script>
-<script src="../lbchat.js?v=mwioh56e"></script>
-<script src="../lbvendas.js?v=mwioh56e"></script>
+<script src="../lb.js?v=mwioy28g"></script>
+<script src="../lbchat.js?v=mwioy28g"></script>
+<script src="../lbvendas.js?v=mwioy28g"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const brl=v=>v==null?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
-const kf=v=>{const a=Math.abs(v);return (v<0?'−':'')+(a>=1000?Math.round(a/1000)+' mil':a.toFixed(0))};
+const kf=v=>{const a=Math.abs(v);return (v<0?'−':'')+(a>=1000?Math.round(a/1000)+'k':a.toFixed(0))};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ddmm=s=>s.slice(8,10)+'/'+s.slice(5,7);
-const ANO_AT=new Date(Date.now()-3*3600e3).toISOString().slice(0,4);
-const dtx=s=>s?+s.slice(8,10)+' de '+MES3[+s.slice(5,7)-1]+(s.slice(0,4)!==ANO_AT?' '+s.slice(2,4):''):''; // 1 de fev 27 (igual ao painel)
+const HJ=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),ANO=HJ.slice(0,4),MA=HJ.slice(0,7);
+const dtx=s=>s?+s.slice(8,10)+' de '+MES3[+s.slice(5,7)-1]+(s.slice(0,4)!==ANO?' '+s.slice(2,4):''):'';
+const mesAdd=(k,n)=>{const d=new Date(+k.slice(0,4),+k.slice(5,7)-1+n,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+const nomeMes=k=>MESES[+k.slice(5,7)-1]+(k.slice(0,4)!==ANO?' '+k.slice(0,4):'');
 let D;
-const ATS=(p,id)=>()=>{if(document.body.dataset.aba!==p)abaSoc(p);const e=document.getElementById(id);return e&&e.offsetParent!==null?e:null};
-const ATALHOS=[
-{id:'agora',rot:'Como está agora',chaves:'agora saldo caixa situacao resumo hoje',ir:ATS('fin','b1')},
-{id:'gastos',rot:'Gastos',chaves:'gasto gastos despesa despesas saiu custo custos categoria',ir:ATS('fin','gastos')},
-{id:'movs',rot:'Movimentações',chaves:'movimentacao movimentacoes extrato entrada saida lancamento pagamento pagamentos pago transferencia pix',ir:ATS('fin','mvl')},
-{id:'showsmes',rot:'Shows do mês',chaves:'show shows mes cache lucro bordero',ir:ATS('fin','smes')},
-{id:'proximos',rot:'Próximos shows',chaves:'proximo proximos agenda futuro data datas show',ir:ATS('fin','prox')},
-{id:'fixos',rot:'Contas fixas',chaves:'fixo fixos conta contas pagar mensal mensalidade salario boleto',ir:ATS('fin','fixos')},
-{id:'temporada',rot:'Números da temporada',chaves:'temporada ano total lucro faturamento resultado kpi',ir:ATS('fin','kpis')},
-{id:'fechados',rot:'Meses fechados',chaves:'fechamento fechado fechados mes meses balanco',ir:ATS('fin','fech')},
-{id:'aportes',rot:'Aportes',chaves:'aporte aportes socio investimento colocou retirada',ir:ATS('fin','aportes')},
-{id:'ocorrencias',rot:'Ocorrências',chaves:'ocorrencia ocorrencias aviso avisos aconteceu',ir:ATS('fin','ocall')},
-{id:'ultimos',rot:'Últimos lançamentos',chaves:'ultimo ultimos recente recentes lancamento',ir:ATS('fin','ult')},
-{id:'docs',rot:'Documentos',chaves:'documento documentos nota notas comprovante contrato arquivo',ir:ATS('fin','docs')},
-{id:'vendas',rot:'Vendas',chaves:'venda vendas vendedor negociacao fechado contrato',ir:ATS('ven','bvv')},
-{id:'metas',rot:'Metas',chaves:'meta metas objetivo objetivos',ir:ATS('met','metas')},
-{id:'equipe',rot:'Equipe',chaves:'equipe tarefa tarefas rendimento pessoa funcionario',ir:ATS('met','equipe')},
-];
-LB.entrar({pagina:'socio',base:'../',titulo:'Sócio',ok:r=>{D=r.dados;document.getElementById('links').innerHTML=LB.links(['socio'],'socio','../');/* sócio: página única, só com as abas (sem menu de páginas) */render();abasSoc();try{LBCHAT.montar(document.getElementById('lbq'),{base:'../',pagina:'socio',atalhos:[],exemplo:'qual foi o lucro dos shows em outubro?',base_dados:()=>D.ctx_ia||'',contexto:()=>{const x=Object.assign({},D);delete x.links;delete x.vendas_venda;return JSON.stringify(x).slice(0,12000)}})}catch(e){}}});
+
+/* ---------- peças ---------- */
 const k4=(l,v,s,c)=>`<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`;
 const dia=d=>`<div class="d"><b>${d.slice(8,10)}</b><span>${MES3[+d.slice(5,7)-1]} ${d.slice(2,4)}</span></div>`;
-const ocRow=o=>`<div class="oc">${dia(o.data)}<div class="t"><b>${esc(o.titulo)}</b><span>${esc(o.detalhe||'')}${o.doc?` · <a href="#docs" style="color:var(--pinkl)">ver documento</a>`:''}${o.data>D.atualizado?' · <span class="pill">programado</span>':''}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`;
-const PAL=['var(--pink)','var(--amber)','#8EC5FF','var(--pos)','#C9A0FF','var(--sai)','#5FD3C6'];
+const nada=t=>`<div class="oc"><div class="t"><span>${t}</span></div></div>`;
+/* lista longa: mostra n e o resto atrás do "Ver mais" */
+const vm=(itens,n)=>itens.length<=n?itens.join(''):itens.map((x,i)=>i<n?x:`<div class="vx">${x}</div>`).join('')+`<button class="mais" data-vm="${itens.length-n}">Ver mais (${itens.length-n})</button>`;
+const leg=S=>`<div class="leg">${S.map(s=>`<span><i style="background:${s.cor}"></i>${esc(s.nome)}</span>`).join('')}</div>`;
+/* gráfico de barras: series=[{nome,cor,vals}] · modo empilhado (padrão) ou 'lado' · toque na coluna mostra os valores */
+function grafico(labels,series,o={}){const st=o.modo!=='lado',n=labels.length,W=Math.max(320,n*(st?30:38)),H=o.h||140,T=16,B=18,cw=W/n,fmt=o.fmt||(v=>v),tf=o.tfmt||fmt,k=series.length,ph=H-B-T;
+  const V=(s,i)=>Math.max(0,s.vals[i]||0),tot=labels.map((_,i)=>series.reduce((a,s)=>a+V(s,i),0));
+  const mx=Math.max(1,...(st?tot:labels.flatMap((_,i)=>series.map(s=>V(s,i)))));let g='';
+  labels.forEach((l,i)=>{const x0=i*cw;
+    if(st){let y=H-B;const bx=x0+cw*.2,bw=cw*.6;series.forEach(s=>{const v=V(s,i);if(!v)return;const hh=ph*v/mx;y-=hh;g+=`<rect x="${bx}" y="${y}" width="${bw}" height="${hh}" rx="2" fill="${s.cor}"/>`});
+      if(o.rot!==false&&tot[i])g+=`<text x="${bx+bw/2}" y="${y-4}" text-anchor="middle" font-size="10" font-weight="700" fill="#F3F1F6">${fmt(tot[i])}</text>`}
+    else{const bw=cw*.72/k;series.forEach((s,j)=>{const v=V(s,i),hh=ph*v/mx;if(v)g+=`<rect x="${x0+cw*.14+j*bw+1}" y="${H-B-hh}" width="${Math.max(1,bw-2)}" height="${hh}" rx="2" fill="${s.cor}"/>`})}
+    g+=`<text x="${x0+cw/2}" y="${H-5}" text-anchor="middle" font-size="10" fill="${i===o.hi?'#F0507E':'#8B8697'}">${esc(l)}</text>`;
+    const ss=series.filter(s=>s.vals[i]);const t=(o.nomes?o.nomes[i]:l)+': '+(ss.length?ss.map(s=>s.nome+' '+tf(s.vals[i])).join(' · '):'nada');
+    g+=`<rect x="${x0}" y="0" width="${cw}" height="${H}" fill="transparent" data-t="${esc(t)}" style="cursor:pointer"/>`});
+  return `<div class="chart">${o.semLeg?'':leg(series)}<svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:auto">${g}</svg><div class="tip">${esc(o.dica||'Toque numa barra para ver os valores.')}</div></div>`}
 /* rosca: S = [[nome, valor, cor]] · centro = total */
+const PAL=['var(--pink)','var(--amber)','#8EC5FF','var(--pos)','#C9A0FF','var(--sai)','#5FD3C6'];
 function dnt(titulo,S){S=S.filter(x=>x[1]>0.5);const tt=S.reduce((a,x)=>a+x[1],0);if(!tt)return '';let a0=0;const R=15.9155;
   const arc=S.map(x=>{const p=x[1]/tt*100,d=Math.max(p-.6,.1),c=`<circle r="${R}" cx="21" cy="21" fill="none" stroke="${x[2]}" stroke-width="6" stroke-dasharray="${d} ${100-d}" stroke-dashoffset="${25-a0}"/>`;a0+=p;return c}).join('');
   return `<div class="card dn"><div class="l">${titulo}</div><div class="dnt"><svg viewBox="0 0 42 42" aria-hidden="true"><circle r="${R}" cx="21" cy="21" fill="none" stroke="var(--card2)" stroke-width="6"/>${arc}<text x="21" y="22.6" text-anchor="middle" font-size="5" font-weight="700" fill="var(--ink)">${brl(tt).replace('R$ ','')}</text></svg><div class="etp">${S.map(x=>`<div><i style="background:${x[2]}"></i><span>${x[0]}</span><b>${Math.round(x[1]/tt*100)}%</b></div>`).join('')}</div></div></div>`}
-function etpHtml(et){return dnt('De onde entrou',[['Cachês',et.cache,'var(--pos)'],['Sinal',et.sinal,'var(--amber)'],['Investidor',et.aporte,'var(--pinkl)'],['Outras',et.outros,'var(--sai)']])}
-function gastHtml(G){const l=G.slice().sort((a,b)=>b.valor-a.valor),top=l.slice(0,5),resto=l.slice(5).reduce((a,g)=>a+g.valor,0);
-  return dnt('Para onde foi',top.map((g,i)=>[g.grupo,g.valor,PAL[i]]).concat(resto?[['Outros',resto,'var(--sai)']]:[]))}
-function sinaisHtml(S){if(!S||!S.total)return '';
-  return `<div class="card k" style="margin-top:10px;border-left:3px solid var(--pinkl)"><div class="l">Do caixa, quanto é sinal</div><div class="v" style="font-size:20px">${brl(S.total)}</div><div class="s">já recebido de shows que ainda vão acontecer · a equipe e os custos desses shows ainda vão sair</div><div class="sxl">${S.shows.map(x=>`<span>${esc(x.show)} <b>${brl(x.valor)}</b></span>`).join('')}</div></div>`}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-vm]');if(b){const p=b.parentElement,o=p.classList.toggle('aberto');b.textContent=o?'Ver menos':'Ver mais ('+b.dataset.vm+')';return}
+  const t=e.target.closest('[data-t]');if(t){const c=t.closest('.chart'),x=c&&c.querySelector('.tip');if(x)x.textContent=t.dataset.t}});
+document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.closest('[data-t]');if(t){const c=t.closest('.chart'),x=c&&c.querySelector('.tip');if(x)x.textContent=t.dataset.t}});
+
 function render(){
   document.getElementById('app').style.display='block';
-  const hoje=D.atualizado,mk=D.mes,A=D.agora,P=D.proximos,G=D.geral;
-  document.getElementById('alertas').innerHTML=(D.alertas||[]).map(x=>`<div class="alerta"><b class="t">${x.tipo==='despesa'?'💸 Despesa prevista: ':'⚠️ '}${esc(x.titulo)}</b><p>${esc(x.texto)}</p>
-    <div class="vv">${x.valor!=null?`<div>${x.situacao==='Confirmado'?'Valor':'Valor provável'}<b>${brl(x.valor)}</b></div>`:''}${x.minimo!=null&&x.maximo!=null?`<div>Pode variar de<b>${brl(x.minimo)} a ${brl(x.maximo)}</b></div>`:''}${x.prazo?`<div>Quando<b>${esc(x.prazo)}</b></div>`:''}</div><p style="font-size:12px;color:var(--muted)">${esc(x.rodape||'')}</p></div>`).join('');
-  try{renderVendas()}catch(e){console.error(e)}
-  {const M=D.metas_empresa||[],E=D.equipe_resumo;if(M.length||(E&&E.pessoas.length)){document.getElementById('b25').style.display='';
-    document.getElementById('metas').innerHTML=M.map(m=>`<div class="mt ${['Atingida','Concluída'].includes(m.situacao)?'ok':m.situacao==='Em andamento'?'and':''}"><b>${esc(m.titulo)}</b>${m.alvo?`<div class="s">${esc(m.alvo)}</div>`:''}<div class="p">${esc(m.situacao.toLowerCase())}${m.prazo?' · até '+esc(m.prazo):''}${m.progresso?' · '+esc(m.progresso):''}</div>${m.pct!=null?`<div style="height:7px;border-radius:99px;background:var(--card2,#2a2730);overflow:hidden;margin-top:8px"><i style="display:block;height:100%;width:${Math.round(m.pct*100)}%;background:${m.pct>=1?'var(--pos)':'var(--pink)'}"></i></div><div class="p" style="margin-top:4px"><b>${Math.round(m.pct*100)}%</b>${m.ptxt?' · '+esc(m.ptxt):''}</div>`:''}</div>`).join('')||'<div class="oc"><div class="t"><span>Nenhuma meta publicada.</span></div></div>';
-    if(E){document.getElementById('eqmes').textContent=MESES[+E.mes.slice(5,7)-1]+' '+E.mes.slice(0,4);
-    {const mx=Math.max(1,...E.pessoas.map(p=>p.concedidas||0));
-    // gráfico das metas individuais do mês: uma barra por meta, agrupada por pessoa (média da pessoa no título)
-    const RT=E.pessoas.filter(p=>(p.rotinas||[]).length),cor=x=>x>=1?'var(--pos)':x>=.5?'#F2B66B':'var(--pink)';
-    const gMI=RT.length?`<div class="mig"><div class="mih">Metas individuais em ${MESES[+E.mes.slice(5,7)-1].toLowerCase()} <small>% cumprido até hoje</small></div>${RT.map(p=>{const at=p.rotinas.filter(r=>!r.comeca),md=at.length?at.reduce((a,r)=>a+r.pct,0)/at.length:null;
-      return `<div class="mip"><div class="mipn"><b>${esc(p.nome)}</b>${md!=null?`<span style="color:${cor(md)}">média ${Math.round(md*100)}%</span>`:''}</div>${p.rotinas.map(r=>`<div class="mib"><span title="${esc(r.titulo)}">${esc(r.titulo)}</span><div class="tr"><i style="width:${Math.max(r.comeca?0:2,r.pct*100)}%;background:${cor(r.pct)}"></i></div><b>${r.comeca?'começa '+r.comeca.slice(8,10)+'/'+r.comeca.slice(5,7):Math.round(r.pct*100)+'%'}</b></div>`).join('')}</div>`}).join('')}</div>`:'';
-    document.getElementById('equipe').innerHTML=gMI+`<div class="eqg"><div class="leg"><span><i style="background:var(--card2);outline:1px solid var(--muted)"></i>Concedidas</span><span><i style="background:var(--pos)"></i>Executadas</span></div>${E.pessoas.map(p=>`<div class="eqb"><span>${esc(p.nome.split(' ')[0])}</span><div class="tr"><i class="c" style="width:${(p.concedidas||0)/mx*100}%"></i><i class="e" style="width:${p.concluidas/mx*100}%"></i></div><b>${p.concluidas}/${p.concedidas||0}</b></div>`).join('')}</div>`+E.pessoas.map(p=>`<div class="eq"><div class="n"><b>${esc(p.nome)}</b><span class="f">${p.feito_total} entrega${p.feito_total===1?'':'s'} no mês</span></div><div class="f">${esc(p.funcao)}</div>${p.meta?`<div class="me">Meta: ${esc(p.meta)}</div>`:''}
-      ${(p.rotinas||[]).map(r=>`<div class="rt"><div class="top"><span>${esc(r.titulo)}</span><b>${Math.round(r.pct*100)}%</b></div><div class="tr"><i style="width:${r.pct*100}%"></i></div><small>${r.comeca?'começa em '+r.comeca.slice(8,10)+'/'+r.comeca.slice(5,7):r.feitos+' de '+r.total+(r.freq==='mes'?' no mês':r.freq==='semana'?' semanas até agora':' dias até hoje')}</small></div>`).join('')}<div class="nums"><span>Concedidas <b>${p.concedidas||0}</b></span><span>Executadas <b>${p.concluidas}</b></span>${p.atrasadas?`<span>Atrasadas <b style="color:var(--neg)">${p.atrasadas}</b></span>`:''}</div>${p.feito.length?`<ul>${p.feito.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`:''}</div>`).join('')}}}}
-  {const a=D.extrato_ate||(D.agora&&D.agora.ate)||'';document.getElementById('infobase').style.display='none';document.getElementById('mestp').textContent='Mês atual · extrato até '+a} // igual ao painel: texto pequeno ao lado do mês, sem quadro
-  document.getElementById('upd').textContent='Atualizado em '+hoje.split('-').reverse().join('/');
-  // 1 · agora
-  document.getElementById('mesnm').innerHTML=`${MESES[+mk.slice(5,7)-1]} <em>${mk.slice(0,4)}</em>`;
-  const cx=A.caixa.conta+A.caixa.maos,feitos=A.shows.filter(s=>s.data<=hoje),mesF=A.shows.reduce((a,s)=>a+(s.valor||0),0);
-  document.getElementById('kagora').innerHTML=k4('Caixa conferido',brl(cx),`conta ${brl(A.caixa.conta)} + dinheiro ${brl(A.caixa.maos)} (${A.caixa.data.slice(0,5)})`)+
-    k4('Entrou no mês',brl(A.entrou),'até '+A.ate,'pos')+k4('Saiu no mês',brl(A.saiu),'até '+A.ate)+
-    k4('Shows do mês',A.shows.length,`${feitos.length} feito${feitos.length===1?'':'s'} · ${brl(mesF)} em cachês`);
-  document.getElementById('ocm').innerHTML=A.ocorrencias.length?A.ocorrencias.map(ocRow).join(''):'<div class="oc"><div class="t"><span>Nada fora do normal neste mês.</span></div></div>';
-  const tg=A.gastos.reduce((a,g)=>a+g.valor,0)||1,mg=Math.max(...A.gastos.map(g=>g.valor),1);
-  document.getElementById('gsub').textContent=`${brl(A.saiu)} até ${A.ate}`;
-  {const T=A.ent_tipos,mv=(A.movs||[]).slice().reverse();
-    document.getElementById('entt').innerHTML=T?etpHtml(T):''; // sinal já aparece na rosca
-    document.getElementById('mvsub').textContent=mv.length?mv.length+' lançamentos (conta, dinheiro e app)':'';
-    document.getElementById('mvl').innerHTML=mv.map(x=>`<div class="row">${dia(x.data)}<div class="t"><b>${esc(x.quem||'—')}</b><span>${x.tipo==='sinal'?`<span class="pill pk">sinal · show ${dtx(x.show_data||'')}</span> `:x.tipo==='cache'?'<span class="pill ok">cachê</span> ':''}${esc(x.cat||'')}${x.show_nome?' · '+esc(x.show_nome):''}${x.meio==='dinheiro'?' · dinheiro':''}${x.app?' · <span class="pill">a conferir</span>':''}</span></div><div class="v ${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl(x.valor)}</div></div>`).join('')||'<div class="oc"><div class="t"><span>Nenhuma movimentação neste mês ainda.</span></div></div>'}
-  document.getElementById('gastos').innerHTML=gastHtml(A.gastos)||'<span class="mut">Nenhuma saída no mês ainda.</span>';
-  document.getElementById('smes').innerHTML=A.shows.map(s=>`<div class="row">${dia(s.data)}<div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')} · ${s.sit==='A confirmar'?'<span class="pill">a confirmar</span>':s.data<=hoje?'<span class="pill ok">realizado</span>':'<span class="pill pk">confirmado</span>'}</span></div><div class="v">${brl(s.valor)}<small>${s.lucro!=null?'lucro <span class="'+(s.lucro<0?'neg':'pos')+'">'+brl(s.lucro)+'</span>':(s.rec?'já recebido '+brl(s.rec):'nada recebido ainda')}</small></div></div>`).join('')||'<div class="oc"><div class="t"><span>Sem shows confirmados neste mês.</span></div></div>';
-  // 2 · próximos meses
-  const vend=P.shows.reduce((a,s)=>a+(s.valor||0),0),recA=P.shows.reduce((a,s)=>a+(s.rec||0),0);
-  document.getElementById('proxs').textContent=`${P.shows.length} shows · ${brl(vend)} em cachês · ${brl(recA)} já recebido de sinal`;
-  let pm='',ult='';P.shows.forEach(s=>{const k=s.data.slice(0,7);if(k!==ult){pm+=(ult?'</div>':'')+`<div class="mhd">${MESES[+k.slice(5,7)-1]} ${k.slice(0,4)}</div><div class="list">`;ult=k}
-    pm+=`<div class="row">${dia(s.data)}<div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')}</span></div><div class="v">${brl(s.valor)}<small>${s.rec?'já recebido '+brl(s.rec):'nada recebido ainda'}</small></div></div>`});
-  document.getElementById('prox').innerHTML=pm?pm+'</div>':'<div class="oc"><div class="t"><span>Nenhum show confirmado depois deste mês ainda.</span></div></div>';
-  const mf=Math.max(...P.fixos.map(f=>f.valor),1);
-  document.getElementById('fixs').textContent=`${brl(P.total_fixos)} por mês`;
+  document.getElementById('upd').textContent='Atualizado em '+D.atualizado.split('-').reverse().join('/')+' · extrato até '+(D.extrato_ate||(D.agora&&D.agora.ate)||'');
+  for(const f of [renderFin,renderVendas,renderEquipe])try{f()}catch(e){console.error(e)}
+}
+
+/* ===================== FINANCEIRO ===================== */
+function renderFin(){
+  const A=D.agora,P=D.proximos,G=D.geral,a=G.ano,mk=D.mes;
+  document.getElementById('alertas').innerHTML=(D.alertas||[]).map(x=>`<div class="alerta"><b class="t">${x.tipo==='despesa'?'Despesa prevista: ':''}${esc(x.titulo)}</b><p>${esc(x.texto)}</p>
+    <div class="vv">${x.valor!=null?`<div>${x.situacao==='Confirmado'?'Valor':'Valor provável'}<b>${brl(x.valor)}</b></div>`:''}${x.minimo!=null&&x.maximo!=null?`<div>Pode variar de<b>${brl(x.minimo)} a ${brl(x.maximo)}</b></div>`:''}${x.prazo?`<div>Quando<b>${esc(x.prazo)}</b></div>`:''}</div></div>`).join('');
+  // visão geral do ano
+  const ap=G.aportes.reduce((s,x)=>s+x.valor,0),cx=A.caixa.conta+A.caixa.maos;
+  document.getElementById('fano').textContent=D.atualizado.slice(0,4);
+  document.getElementById('fkpi').innerHTML=k4('Caixa agora',brl(cx),'conferido em '+A.caixa.data.slice(0,5))+k4('Lucro dos shows',brl(a.lucro),(a.fat?Math.round(a.lucro/a.fat*100):0)+'% dos cachês','pos')+
+    k4('Shows no ano',a.shows,brl(a.fat)+' em cachês')+k4('Investido',brl(ap),G.aportes.length+' aporte'+(G.aportes.length===1?'':'s'));
+  const fk=Object.keys(G.fechados).sort(),te=fk.reduce((s,k)=>s+G.fechados[k].ent,0),ts=fk.reduce((s,k)=>s+G.fechados[k].sai,0),mxa=Math.max(te,ts,1);
+  document.getElementById('fano2').innerHTML=fk.length?`<div class="it"><span>Entrou</span><div class="tr"><i style="width:${te/mxa*100}%;background:var(--pos)"></i></div><b>${brl(te)}</b></div><div class="it"><span>Saiu</span><div class="tr"><i style="width:${ts/mxa*100}%;background:var(--sai)"></i></div><b>${brl(ts)}</b></div><div class="it"><span>Sobrou</span><div></div><b class="${te-ts<0?'neg':'pos'}">${brl(te-ts)}</b></div><p class="note" style="margin-top:10px">Soma dos meses fechados (${MES3[+fk[0].slice(5,7)-1]} a ${MES3[+fk[fk.length-1].slice(5,7)-1]}).</p>`:'';
+  if(!fk.length)document.getElementById('fano2').style.display='none';
+  // mês a mês
+  const ks=Object.keys(G.meses).sort(),M=G.meses;
+  document.getElementById('fch').innerHTML=grafico(ks.map(k=>MES3[+k.slice(5,7)-1]),[{nome:'Cachês',cor:'#CF1D51',vals:ks.map(k=>M[k].fat)},{nome:'Lucro',cor:'#7FDDA9',vals:ks.map(k=>M[k].lucro)}],{modo:'lado',tfmt:brl,nomes:ks.map(k=>nomeMes(k)+' ('+M[k].shows+' show'+(M[k].shows===1?'':'s')+')'),hi:ks.indexOf(mk),h:150});
+  document.getElementById('ffech').innerHTML=fk.length?grafico(fk.map(k=>MES3[+k.slice(5,7)-1]),[{nome:'Entrou',cor:'#7FDDA9',vals:fk.map(k=>G.fechados[k].ent)},{nome:'Saiu',cor:'#6F697D',vals:fk.map(k=>G.fechados[k].sai)}],{modo:'lado',tfmt:brl,nomes:fk.map(k=>nomeMes(k)+' · sobrou '+brl(G.fechados[k].res)),h:130}):nada('Nenhum mês fechado ainda.');
+  // este mês
+  document.getElementById('fmesh').innerHTML=`${MESES[+mk.slice(5,7)-1]} <small>mês atual · até ${esc(A.ate)}</small>`;
+  document.getElementById('fmesk').innerHTML=k4('Entrou',brl(A.entrou),'','pos')+k4('Saiu',brl(A.saiu),'');
+  const T=A.ent_tipos;document.getElementById('entt').innerHTML=T?dnt('De onde entrou',[['Cachês',T.cache,'var(--pos)'],['Sinal',T.sinal,'var(--amber)'],['Investidor',T.aporte,'var(--pinkl)'],['Outras',T.outros,'var(--sai)']]):'';
+  {const l=A.gastos.slice().sort((x,y)=>y.valor-x.valor),top=l.slice(0,5),resto=l.slice(5).reduce((s,g)=>s+g.valor,0);
+   document.getElementById('gastos').innerHTML=dnt('Para onde foi',top.map((g,i)=>[g.grupo,g.valor,PAL[i]]).concat(resto?[['Outros',resto,'var(--sai)']]:[]))||'<span class="mut">Nenhuma saída no mês ainda.</span>'}
+  // acontecimentos (curto: título e uma linha)
+  const oc=G.ocorrencias.slice().sort((x,y)=>y.data.localeCompare(x.data));
+  document.getElementById('ocall').innerHTML=oc.length?vm(oc.map(o=>`<div class="oc">${dia(o.data)}<div class="t"><b>${esc(o.titulo)}</b><span class="um">${o.data>D.atualizado?'programado · ':''}${esc(o.detalhe||'')}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`),5):nada('Nada fora do normal.');
+  // detalhes do mês
+  const S=A.sinais_caixa;document.getElementById('sinais').innerHTML=S&&S.total?`<div class="card k" style="background:var(--card2)"><div class="l">Do caixa, quanto é sinal</div><div class="v" style="font-size:20px">${brl(S.total)}</div><div class="s">recebido de shows que ainda vão acontecer · os custos deles ainda vão sair</div></div>`:'';
+  document.getElementById('smes').innerHTML=A.shows.map(s=>`<div class="row">${dia(s.data)}<div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')} · ${s.sit==='A confirmar'?'a confirmar':s.data<=D.atualizado?'realizado':'confirmado'}</span></div><div class="v">${brl(s.valor)}<small>${s.lucro!=null?'lucro <span class="'+(s.lucro<0?'neg':'pos')+'">'+brl(s.lucro)+'</span>':(s.rec?'recebido '+brl(s.rec):'nada recebido')}</small></div></div>`).join('')||nada('Sem shows neste mês.');
+  const mv=(A.movs||[]).slice().reverse();document.getElementById('mvsub').textContent=mv.length?mv.length+' lançamentos':'';
+  document.getElementById('mvl').innerHTML=mv.length?vm(mv.map(x=>`<div class="row">${dia(x.data)}<div class="t"><b>${esc(x.quem||'—')}</b><span>${x.tipo==='sinal'?'sinal · show '+dtx(x.show_data||'')+' · ':x.tipo==='cache'?'cachê · ':''}${esc(x.cat||'')}${x.meio==='dinheiro'?' · dinheiro':''}${x.app?' · a conferir':''}</span></div><div class="v ${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl(x.valor)}</div></div>`),6):nada('Nenhuma movimentação neste mês ainda.');
+  // fixos, aportes, últimos
+  const mf=Math.max(...P.fixos.map(f=>f.valor),1);document.getElementById('fixs').textContent=`${brl(P.total_fixos)} por mês`;
   document.getElementById('fixos').innerHTML=P.fixos.map(f=>`<div class="it"><div class="top"><span>${esc(f.desc)}</span><b>${brl(f.valor)}</b></div><div class="tr"><i style="width:${f.valor/mf*100}%;background:var(--sai)"></i></div></div>`).join('');
   document.getElementById('apnota').textContent=P.aporte_mensal?`Investimento combinado: ${brl(P.aporte_mensal)}/mês`:'';
-  // 3 · geral
-  const a=G.ano;document.getElementById('anonm').textContent=hoje.slice(0,4);
-  document.getElementById('kpis').innerHTML=k4('Shows',a.shows,'realizados com cachê')+k4('Cachês',brl(a.fat),'soma dos shows')+k4('Lucro dos shows',brl(a.lucro),Math.round(a.lucro/a.fat*100)+'% dos cachês','pos')+k4('Cachê médio',brl(a.media),'por show');
-  const fk=Object.keys(G.fechados).sort();
-  {const mx=Math.max(...fk.map(k=>Math.max(G.fechados[k].ent,G.fechados[k].sai)),1);
-  document.getElementById('fech').innerHTML=fk.map(k=>{const m=G.fechados[k];return `<div class="fbm" title="${MES3[+k.slice(5,7)-1]}/${k.slice(2,4)} · entrou ${brl(m.ent)} · saiu ${brl(m.sai)}"><div class="fbb"><i style="height:${m.ent/mx*100}%;background:var(--pos)"></i><i style="height:${m.sai/mx*100}%;background:var(--sai)"></i></div><b class="${m.res<0?'neg':'pos'}">${(m.res>=0?'+':'−')+(Math.abs(m.res)>=1000?Math.round(Math.abs(m.res)/1000)+'k':Math.round(Math.abs(m.res)))}</b><span>${MES3[+k.slice(5,7)-1]}</span></div>`}).join('')}
-  const ap=G.aportes.reduce((s,x)=>s+x.valor,0);
-  document.getElementById('aportes').innerHTML=G.aportes.map(x=>`<div class="row">${dia(x.data)}<div class="t"><b>Aporte${x.quando?' de '+x.quando:' recebido na conta'}</b><span style="display:block;font-size:12.5px;color:var(--muted)">Foi para: ${x.destino||'a informar'}${x.obs?' · '+x.obs:''}</span></div><div class="v">${brl(x.valor)}</div></div>`).join('')+`<div class="row"><div class="t"><b>Total investido</b></div><div class="v">${brl(ap)}</div></div>`;
-  document.getElementById('ocall').innerHTML=G.ocorrencias.slice().sort((x,y)=>y.data.localeCompare(x.data)).map(ocRow).join('');
+  document.getElementById('aportes').innerHTML=G.aportes.map(x=>`<div class="row">${dia(x.data)}<div class="t"><b>Aporte${x.quando?' de '+esc(x.quando):''}</b><span>Foi para: ${esc(x.destino||'a informar')}</span></div><div class="v">${brl(x.valor)}</div></div>`).join('')+`<div class="row"><div class="t"><b>Total investido</b></div><div class="v">${brl(ap)}</div></div>`;
   document.getElementById('ult').innerHTML=G.ultimos.map(s=>`<div class="row">${dia(s.data)}<div class="t"><b>${esc(s.nome)}</b><span>${esc(s.local||'')}</span></div><div class="v">${brl(s.valor)}<small>lucro <span class="${s.lucro<0?'neg':'pos'}">${brl(s.lucro)}</span></small></div></div>`).join('');
+  // documentos
   const arqs=D.arquivos||[];
-  document.getElementById('docs').innerHTML=(D.links||[]).map(f=>`<div class="doc"><div><b>${esc(f.nome)}</b></div><a class="dla" href="${esc(f.link)}" target="_blank" rel="noopener">Abrir</a></div>`).join('')+arqs.map((f,i)=>`<div class="doc"><div><b>${esc(f.nome)}</b><div class="note" style="margin:2px 0 0">${esc(f.arq)}</div></div><button data-i="${i}">Baixar</button></div>`).join('')||'<div class="oc"><div class="t"><span>Nenhum documento ainda.</span></div></div>';
+  document.getElementById('docs').innerHTML=(D.links||[]).map(f=>`<div class="doc"><div><b>${esc(f.nome)}</b></div><a class="dla" href="${esc(f.link)}" target="_blank" rel="noopener">Abrir</a></div>`).join('')+arqs.map((f,i)=>`<div class="doc"><div><b>${esc(f.nome)}</b><div class="note" style="margin:2px 0 0">${esc(f.arq)}</div></div><button data-i="${i}">Baixar</button></div>`).join('')||nada('Nenhum documento ainda.');
   document.getElementById('docs').onclick=async e=>{const b=e.target.closest('button');if(!b)return;const f=arqs[+b.dataset.i];b.textContent='Abrindo…';
     try{const buf=await LB.anexo(f.id,f.iv,'arquivos-socio');const u=URL.createObjectURL(new Blob([buf],{type:f.tipo}));const l=document.createElement('a');l.href=u;l.download=f.arq;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);b.textContent='Baixar'}catch(err){b.textContent='Erro, tente de novo'}};
-  chart();
 }
-function chart(){
-  const M=D.geral.meses,ks=Object.keys(M).sort(),el=document.getElementById('ch');
-  const W=Math.max(330,Math.min(860,el.clientWidth||640)),H=W<500?220:250,L=42,R=6,T=12,B=28,n=ks.length,bw=(W-L-R)/n;
-  const vals=ks.flatMap(k=>[M[k].fat,M[k].lucro]);const mn=Math.min(0,...vals),mx=Math.max(...vals)*1.05;
-  const y=v=>T+(mx-v)/(mx-mn)*(H-T-B);
-  let g='';for(let v=0;v<=mx;v+=25000)g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="${v?'#2E2B36':'#6F697D'}"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#8B8697">${kf(v)}</text>`;
-  ks.forEach((k,i)=>{const m=M[k],x0=L+i*bw,w=bw*.33,gp=bw*.05;
-    g+=`<rect x="${x0+bw/2-w-gp/2}" y="${y(m.fat)}" width="${w}" height="${y(0)-y(m.fat)}" rx="2" fill="#CF1D51"/>`;
-    const yl=Math.min(y(m.lucro),y(0)),hl=Math.abs(y(m.lucro)-y(0));
-    g+=`<rect x="${x0+bw/2+gp/2}" y="${yl}" width="${w}" height="${hl}" rx="2" fill="${m.lucro<0?'#FF8FA8':'#7FDDA9'}"/>`;
-    g+=`<text x="${x0+bw/2}" y="${H-10}" text-anchor="middle" font-size="11" fill="#B8B3C3">${MES3[+k.slice(5,7)-1]}</text>`;
-    g+=`<rect x="${x0}" y="${T}" width="${bw}" height="${H-T-B}" fill="transparent" class="hm" data-k="${k}"/>`});
-  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cachês e lucro dos shows por mês">${g}</svg>`;
-  el.querySelectorAll('.hm').forEach(r=>{const f=()=>{const k=r.dataset.k,m=M[k];
-    document.getElementById('tip').innerHTML=`<b style="color:var(--ink);text-transform:capitalize">${MESES[+k.slice(5,7)-1]}</b> · ${m.shows} show${m.shows>1?'s':''} · cachês <b>${brl(m.fat)}</b> · lucro <b class="${m.lucro<0?'neg':'pos'}">${brl(m.lucro)}</b>`};r.addEventListener('mouseenter',f);r.addEventListener('click',f)});
-}
-addEventListener('resize',()=>{if(D){clearTimeout(window._r);window._r=setTimeout(chart,200)}});
 
-/* ---------- Vendas: o mesmo da aba Vendas do painel (todos os shows) ---------- */
-/* abas do topo (Financeiro · Vendas · Metas e equipe), iguais às do painel; aba sem dados some */
-function abaSoc(p){document.body.dataset.aba=p;document.querySelectorAll('#ptabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));try{LB.store.set('lb_soc_aba',p)}catch(e){}scrollTo(0,0)}
-function abasSoc(){const tem={fin:true,ven:document.getElementById('bvv').style.display!=='none',met:document.getElementById('b25').style.display!=='none'};
-  document.querySelectorAll('#ptabs button').forEach(b=>b.style.display=tem[b.dataset.p]?'':'none');
-  document.getElementById('ptabs').onclick=e=>{const b=e.target.closest('button');if(b)abaSoc(b.dataset.p)};
-  let p='fin';try{p=LB.store.get('lb_soc_aba')||'fin'}catch(e){}abaSoc(tem[p]?p:'fin')}
-let VALIAS={};
+/* ===================== VENDAS ===================== */
+let VALIAS={},SV=[],VREF=MA,VDIA=null;
 const nmV=s=>s.vendedor?(VALIAS[LB.norm(s.vendedor)]||s.vendedor):'Sem vendedor';
-function renderVendas(){const V=D.vendas;if(!V||!V.shows||!V.shows.length)return;document.getElementById('bvv').style.display='';
-  const HJ=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),MA=HJ.slice(0,7),ANO=HJ.slice(0,4);
+const feito=s=>s.status==='Realizado'||s.data<HJ;
+const cls=s=>feito(s)?'pt-ok':s.status==='A confirmar'?'pt-c':'pt-s';
+const stTxt=s=>feito(s)?'<span class="pill ok">realizado</span>':s.status==='A confirmar'?'<span class="pill am">a confirmar</span>':'<span class="pill pk">confirmado</span>';
+function renderVendas(){const V=D.vendas;if(!V||!V.shows||!V.shows.length){document.querySelector('#ptabs [data-p="ven"]').style.display='none';return}
   (V.vendedores||[]).forEach(v=>[v.nome,...(v.apelidos||[])].forEach(a=>VALIAS[LB.norm(a)]=v.nome));
-  if(window.LBV)LBV.analise(document.getElementById('vana'),V.shows,{hoje:HJ,conf:V,aliases:VALIAS});
-  const S=V.shows.filter(s=>s.status!=='Cancelado');
-  // vendido por mês pela data da venda
-  const ult=[];for(let i=11;i>=0;i--){const d=new Date(+MA.slice(0,4),+MA.slice(5,7)-1-i,1);ult.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
-  const cv=S.filter(s=>/^\d{4}-\d{2}-\d{2}$/.test(s.data_venda||'')),sem=S.length-cv.length,tv=n=>cv.filter(s=>nmV(s)===n).reduce((a,s)=>a+(+s.valor||0),0);
-  const nomes=[...new Set(cv.map(nmV))].sort((a,b)=>tv(b)-tv(a));
-  const COR=['#F0507E','#6FA8FF','#7FDDA9','#FFBE5A','#B48CFF','#8B8697'],cor=n=>COR[Math.min(nomes.indexOf(n),COR.length-1)];
-  const pm={};cv.forEach(s=>{const k=s.data_venda.slice(0,7),n=nmV(s),x=(pm[k]=pm[k]||{});x[n]=x[n]||{n:0,v:0};x[n].n++;x[n].v+=(+s.valor||0)});
-  const W=360,H=110,cw=W/12,mx=Math.max(1,...ult.map(k=>Object.values(pm[k]||{}).reduce((a,x)=>a+x.v,0)));
-  let g=`<svg viewBox="0 0 ${W} ${H+16}" style="display:block;width:100%;max-width:560px;height:auto">`;
-  ult.forEach((k,i)=>{let y=H;const bx=i*cw+cw*.18,bw=cw*.64;nomes.forEach(n=>{const v=((pm[k]||{})[n]||{}).v||0;if(!v)return;const h=H*v/mx;y-=h;g+=`<rect x="${bx}" y="${y}" width="${bw}" height="${h}" fill="${cor(n)}" rx="2"><title>${esc(n)} · ${brl(v)}</title></rect>`});
-    g+=`<text x="${bx+bw/2}" y="${H+12}" text-anchor="middle" font-size="9" fill="${k===MA?'#F0507E':'#8B8697'}">${MES3[+k.slice(5,7)-1]}</text>`});
-  g+=`</svg><div class="leg" style="padding:6px 6px 0">${nomes.map(n=>`<span><i style="background:${cor(n)}"></i>${esc(n)}</span>`).join('')}</div>`;
-  g+=Object.keys(pm).sort().reverse().map(k=>{const e=Object.entries(pm[k]).sort((a,b)=>b[1].v-a[1].v);return `<div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:6px;border-top:1px solid var(--line);color:var(--sub)"><span>${MES3[+k.slice(5,7)-1]}/${k.slice(2,4)} · ${e.map(([n,x],j)=>`${j?'':'🏆 '}<b style="color:${j?'var(--sub)':'var(--ink)'}">${esc(n)}</b> ${x.n} show${x.n>1?'s':''}`).join(' · ')}</span><b style="color:var(--ink)">${brl(e.reduce((a,[,x])=>a+x.v,0))}</b></div>`}).join('');
-  if(sem)g+=`<p class="note" style="padding:6px">${sem} show${sem>1?'s':''} cadastrado${sem>1?'s':''} antes do campo “data da venda” não entra${sem>1?'m':''} no gráfico.</p>`;
-  document.getElementById('vvg').innerHTML=g;
-  const am=cv.filter(s=>s.data_venda.startsWith(MA)).sort((a,b)=>a.data_venda.localeCompare(b.data_venda));
-  document.getElementById('vvm').innerHTML=`<h3>Vendidos em ${MESES[+MA.slice(5,7)-1]}</h3>`+(am.length?`<div class="hist" style="display:flex;flex-direction:column;gap:6px">${am.map(s=>`<div class="r"><div class="t"><b>${esc(s.evento||'Show')} · ${esc(s.cidade||'')}</b><span>vendido ${ddmm(s.data_venda)} por ${esc(nmV(s))} · show ${dtx(s.data)}</span></div><div class="v">${s.valor?brl(s.valor):'—'}</div></div>`).join('')}</div>`:`<p class="note">Nenhum show vendido ainda neste mês.</p>`);
-  // marcados e histórico
-  const hist=f=>{const l=f==='fut'?S.filter(s=>s.data>=HJ).sort((a,b)=>a.data.localeCompare(b.data)):S.filter(s=>s.data<HJ).sort((a,b)=>b.data.localeCompare(a.data));
-    document.getElementById('vhl').innerHTML=l.map(s=>{const v=+s.valor||0,rec=+s.recebido||0;
-      return `<div class="r"><div style="flex:none;width:44px;text-align:center;line-height:1.1"><b style="display:block;font-size:18px">${s.data.slice(8,10)}</b><span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">${MES3[+s.data.slice(5,7)-1]} ${s.data.slice(2,4)}</span></div>
-      <div class="t"><b>${esc(s.evento||s.tipo)}</b><span>${esc(s.cidade)}${s.contratante?' · '+esc(s.contratante):''}${s.vendedor?' · vendido por '+esc(nmV(s)):''}${s.status==='A confirmar'?' · <b style="display:inline;font-size:12px;color:var(--pinkl)">a confirmar</b>':''}</span></div>
-      <div class="v">${v?brl(v):'<span class="mut">a definir</span>'}<small>${f==='fut'?(rec?'recebido '+brl(rec):'nada recebido'):(s.lucro!=null?'lucro '+brl(s.lucro):'')}</small></div></div>`}).join('')||'<p class="note">Nada aqui.</p>'};
-  hist('fut');
-  document.getElementById('vhf').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;document.querySelectorAll('#vhf .chip').forEach(c=>c.classList.toggle('on',c===b));hist(b.dataset.h)};
-  // perfil dos vendedores no ano
-  document.getElementById('pvano').textContent='desde jan/'+ANO.slice(2);
-  const vs=S.filter(s=>s.data>=ANO+'-01-01'),pvs={};vs.forEach(s=>{const q=nmV(s),x=pvs[q]=pvs[q]||{n:0,v:0,fut:0,cid:new Set()};x.n++;x.v+=(+s.valor||0);if(s.data>=HJ)x.fut++;x.cid.add(s.cidade)});
-  const com=V.comissao;
-  document.getElementById('rvend').innerHTML=Object.entries(pvs).sort((a,b)=>b[1].v-a[1].v).map(([n,x],i)=>`<div class="pv"><div class="hd"><div><b>${i+1}º · ${esc(n)}</b><span>${x.n} shows · ${x.fut} marcados · ${x.cid.size} cidades</span></div><div style="text-align:right;font-weight:800;white-space:nowrap">${brl(x.v)}<span style="display:block;font-weight:400">ticket médio ${brl(x.v/x.n)}</span></div></div>${n!=='Sem vendedor'?`<div class="cm">Comissão: ${com!=null?'<b class="pos">'+brl(x.v*com/100)+'</b> ('+com+'% padrão)':'<b class="pk">% a definir</b>'}</div>`:''}</div>`).join('')||'<p class="note">Sem vendas no ano.</p>';
+  SV=V.shows.filter(s=>s.status!=='Cancelado'&&/^\d{4}-\d{2}-\d{2}/.test(s.data||''));
+  const S=SV,noAno=S.filter(s=>s.data.startsWith(ANO)),fe=noAno.filter(feito),fa=noAno.filter(s=>!feito(s)),ac=fa.filter(s=>s.status==='A confirmar'),dep=S.filter(s=>s.data.slice(0,4)>ANO);
+  const soma=l=>l.reduce((a,s)=>a+(+s.valor||0),0),vmes=S.filter(s=>(s.data_venda||'').startsWith(MA));
+  document.getElementById('vano').textContent=ANO;
+  document.getElementById('vkpi').innerHTML=k4('Shows no ano',noAno.length,brl(soma(noAno))+' em cachês')+k4('Já feitos',fe.length,brl(soma(fe)),'pos')+
+    k4('Ainda faltam',fa.length,(ac.length?ac.length+' a confirmar':brl(soma(fa)))+(dep.length?' · +'+dep.length+' em '+(+ANO+1):'')) +k4('Vendidos no mês',vmes.length,vmes.length?brl(soma(vmes)):'nenhum ainda');
+  renderAgenda();
+  // shows por mês (data do show): feitos × faltam
+  const mm=[...Array(12)].map((_,i)=>ANO+'-'+String(i+1).padStart(2,'0')),doMes=k=>S.filter(s=>s.data.startsWith(k));
+  document.getElementById('vpmh').textContent=`${ANO} · ${fe.length} feitos, ${fa.length} faltam`;
+  document.getElementById('vpm').innerHTML=grafico(mm.map(k=>MES3[+k.slice(5,7)-1]),[{nome:'Feitos',cor:'#7FDDA9',vals:mm.map(k=>doMes(k).filter(feito).length)},{nome:'Confirmados',cor:'#F0507E',vals:mm.map(k=>doMes(k).filter(s=>!feito(s)&&s.status!=='A confirmar').length)},{nome:'A confirmar',cor:'#F2B66B',vals:mm.map(k=>doMes(k).filter(s=>!feito(s)&&s.status==='A confirmar').length)}],{hi:+MA.slice(5,7)-1,nomes:mm.map(nomeMes)});
+  // vendidos por mês (data da venda), por vendedor
+  const ult=[];for(let i=11;i>=0;i--)ult.push(mesAdd(MA,-i));
+  const cv=S.filter(s=>/^\d{4}-\d{2}-\d{2}$/.test(s.data_venda||'')),sem=S.length-cv.length;
+  const nomes=[...new Set(cv.map(nmV))].sort((a,b)=>soma(cv.filter(s=>nmV(s)===b))-soma(cv.filter(s=>nmV(s)===a)));
+  const COR=['#F0507E','#6FA8FF','#7FDDA9','#FFBE5A','#B48CFF','#8B8697'];
+  if(cv.length>=5){
+  document.getElementById('vvh').textContent='por vendedor · pela data em que o show foi fechado';
+  document.getElementById('vvg').innerHTML=grafico(ult.map(k=>MES3[+k.slice(5,7)-1]),nomes.map((n,i)=>({nome:n,cor:COR[Math.min(i,COR.length-1)],vals:ult.map(k=>cv.filter(s=>nmV(s)===n&&s.data_venda.startsWith(k)).length)})),{hi:11,nomes:ult.map(k=>nomeMes(k)+' · '+brl(soma(cv.filter(s=>s.data_venda.startsWith(k)))))})+(sem?`<p class="note">${sem} show${sem>1?'s':''} sem data da venda não entra${sem>1?'m':''} neste gráfico.</p>`:'');
+  }else{ // a data da venda começou a ser registrada há pouco: por enquanto, por vendedor no mês do show
+  const nv=[...new Set(noAno.map(nmV))].sort((a,b)=>soma(noAno.filter(s=>nmV(s)===b))-soma(noAno.filter(s=>nmV(s)===a)));
+  document.getElementById('vvh').textContent='por vendedor · '+ANO+', pelo mês do show';
+  document.getElementById('vvg').innerHTML=grafico(mm.map(k=>MES3[+k.slice(5,7)-1]),nv.map((n,i)=>({nome:n,cor:COR[Math.min(i,COR.length-1)],vals:mm.map(k=>doMes(k).filter(s=>nmV(s)===n).length)})),{hi:+MA.slice(5,7)-1,nomes:mm.map(k=>nomeMes(k)+' · '+brl(soma(doMes(k))))})+`<p class="note">A data da venda começou a ser registrada agora (${cv.length} show${cv.length===1?'':'s'} com ela); quando houver mais, o gráfico passa a ser pelo mês da venda.</p>`;
+  }
+  // comparativo
+  const mp=mesAdd(MA,-1),ma1=(+ANO-1)+MA.slice(4),cc=(t,k)=>{const l=doMes(k);return k4(t,l.length+' show'+(l.length===1?'':'s'),nomeMes(k)+' · '+brl(soma(l)))};
+  document.getElementById('vcmp').innerHTML=cc('Este mês',MA)+cc('Mês passado',mp)+cc('Mesmo mês, ano passado',ma1);
+  const mm1=mm.map(k=>(+ANO-1)+k.slice(4)),a1=S.filter(s=>s.data.startsWith(String(+ANO-1)));
+  document.getElementById('vcmpg').innerHTML=grafico(mm.map(k=>MES3[+k.slice(5,7)-1]),[{nome:String(+ANO-1)+' ('+a1.length+')',cor:'#6F697D',vals:mm1.map(k=>doMes(k).length)},{nome:ANO+' ('+noAno.length+')',cor:'#F0507E',vals:mm.map(k=>doMes(k).length)}],{modo:'lado',hi:+MA.slice(5,7)-1,nomes:mm.map(k=>MESES[+k.slice(5,7)-1]),tfmt:v=>v+' show'+(v===1?'':'s')});
+  // vendedores no ano
+  document.getElementById('pvano').textContent='shows de '+ANO;
+  const pvs={};noAno.forEach(s=>{const q=nmV(s),x=pvs[q]=pvs[q]||{n:0,v:0,fut:0,cid:new Set()};x.n++;x.v+=(+s.valor||0);if(!feito(s))x.fut++;x.cid.add(s.cidade)});
+  const L=Object.entries(pvs).sort((a,b)=>b[1].v-a[1].v),mxv=Math.max(1,...L.map(([,x])=>x.v)),com=V.comissao;
+  document.getElementById('rvend').innerHTML=L.map(([n,x],i)=>`<div class="pv" style="background:var(--card);border-radius:14px;padding:14px 16px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><b style="font-size:16px">${i+1}º · ${esc(n)}</b><b style="white-space:nowrap">${brl(x.v)}</b></div>
+    <div class="hb" style="background:none;padding:0;margin-top:8px"><div class="tr" style="height:12px;background:var(--card2);border-radius:99px;overflow:hidden"><i style="display:block;height:100%;width:${x.v/mxv*100}%;background:${COR[Math.min(i,COR.length-1)]};border-radius:99px"></i></div></div>
+    <div class="sxl"><span><b>${x.n}</b> shows</span><span><b>${x.fut}</b> ainda vão acontecer</span><span><b>${x.cid.size}</b> cidades</span><span>médio <b>${brl(x.v/x.n)}</b></span>${n!=='Sem vendedor'?`<span>comissão ${com!=null?'<b class="pos">'+brl(x.v*com/100)+'</b> ('+com+'%)':'<b class="pk">a definir</b>'}</span>`:''}</div></div>`).join('')||nada('Sem vendas no ano.');
+  try{if(window.LBV)LBV.analise(document.getElementById('vana'),V.shows,{hoje:HJ,conf:V,aliases:VALIAS})}catch(e){console.error(e)}
 }
+function renderAgenda(){const [y,m]=VREF.split('-').map(Number),ini=new Date(y,m-1,1).getDay(),nd=new Date(y,m,0).getDate(),por={};
+  SV.forEach(s=>{const k=s.data.slice(0,10);(por[k]=por[k]||[]).push(s)});
+  let c='';for(let i=0;i<ini;i++)c+='<div></div>';
+  for(let d=1;d<=nd;d++){const k=VREF+'-'+String(d).padStart(2,'0'),l=por[k]||[];c+=`<button class="cd${k===HJ?' hj':''}${k===VDIA?' sel':''}" data-vd="${k}"><b>${d}</b>${l.map(s=>`<i class="ce ${cls(s)}">${esc(s.cidade||s.evento||'show')}</i>`).join('')}</button>`}
+  document.getElementById('vcal').innerHTML=`<div class="cnav"><b>${esc(nomeMes(VREF+'-01'))}</b><button data-vn="-1" aria-label="mês anterior">‹</button><button data-vn="0">Hoje</button><button data-vn="1" aria-label="próximo mês">›</button></div><div class="cw">${['D','S','T','Q','Q','S','S'].map(x=>`<span>${x}</span>`).join('')}</div><div class="cg">${c}</div><div class="clg"><span><i class="pt-ok"></i>Realizado</span><span><i class="pt-s"></i>Confirmado</span><span><i class="pt-c"></i>A confirmar</span></div>`;
+  const L=(VDIA?(por[VDIA]||[]):SV.filter(s=>s.data.startsWith(VREF))).slice().sort((a,b)=>a.data.localeCompare(b.data)),tv=L.reduce((a,s)=>a+(+s.valor||0),0);
+  document.getElementById('vlis').innerHTML=`<div class="lhd"><span><b>${VDIA?'Dia '+ddmm(VDIA):'Shows de '+esc(MESES[m-1])}</b> · ${L.length} show${L.length===1?'':'s'}${tv?' · '+brl(tv):''}</span>${VDIA?'<button data-vd="">ver o mês todo</button>':''}</div><div class="list">${L.length?vm(L.map(s=>`<div class="row">${dia(s.data)}<div class="t"><b>${esc(s.evento||s.tipo||'Show')}</b><span>${stTxt(s)} ${esc(s.cidade||'')}${s.vendedor?' · '+esc(nmV(s)):''}</span></div><div class="v">${+s.valor?brl(+s.valor):'<span class="mut">a definir</span>'}</div></div>`),6):nada(VDIA?'Nenhum show neste dia.':'Nenhum show neste mês.')}</div>`}
+document.addEventListener('click',e=>{const n=e.target.closest('[data-vn]');if(n){const v=+n.dataset.vn;VREF=v?mesAdd(VREF,v):MA;VDIA=null;renderAgenda();return}
+  const d=e.target.closest('[data-vd]');if(d){const k=d.dataset.vd;VDIA=k&&k!==VDIA?k:null;renderAgenda()}});
+
+/* ===================== EQUIPE ===================== */
+function renderEquipe(){const M=D.metas_empresa||[],E=D.equipe_resumo,EV=D.equipe_valores;
+  if(!M.length&&!(E&&E.pessoas.length)){document.querySelector('#ptabs [data-p="eq"]').style.display='none';return}
+  document.getElementById('metas').innerHTML=M.map(m=>{const p=m.pct!=null?Math.round(m.pct*100):null,ok=['Atingida','Concluída'].includes(m.situacao);
+    return `<div class="mt ${ok?'ok':m.situacao==='Em andamento'?'and':''}"><div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><b>${esc(m.titulo)}</b>${p!=null?`<b style="color:${p>=100?'var(--pos)':'var(--pinkl)'};white-space:nowrap">${p}%</b>`:''}</div>${m.alvo?`<div class="s">${esc(m.alvo)}</div>`:''}
+    ${p!=null?`<div style="height:8px;border-radius:99px;background:var(--card2);overflow:hidden;margin-top:8px"><i style="display:block;height:100%;width:${Math.max(2,p)}%;background:${p>=100?'var(--pos)':'var(--pink)'}"></i></div>`:''}<div class="p">${esc(m.situacao.toLowerCase())}${m.prazo?' · '+esc(m.prazo):''}${m.ptxt?' · '+esc(m.ptxt):''}</div></div>`}).join('')||nada('Nenhuma meta publicada.');
+  if(E){document.getElementById('eqmes').textContent=MESES[+E.mes.slice(5,7)-1]+' '+E.mes.slice(0,4);
+    const SEM=(E.semanas||[]).map(ddmm);
+    document.getElementById('equipe').innerHTML=E.pessoas.map(p=>{const ab=p.abertos||[],fe=p.feitos||[],sm=p.semanas||[];
+      const abL=ab.map(t=>`<div class="tl"><span class="ic" style="color:var(--amber)">○</span><span>${esc(t.t)}</span>${t.p?`<small class="${t.p<HJ?'at':''}">${t.p<HJ?'venceu ':'até '}${ddmm(t.p)}</small>`:''}</div>`);
+      const feL=fe.map(t=>`<div class="tl"><span class="ic" style="color:var(--pos)">✓</span><span>${esc(t.t)}</span>${t.d?`<small class="${t.atraso?'at':''}">${ddmm(t.d)}${t.atraso?' · atrasada':''}</small>`:''}</div>`);
+      const rot=(p.rotinas||[]);
+      return `<div class="eqc"><div class="n"><b>${esc(p.nome)}</b></div>${p.funcao?`<div class="f">${esc(p.funcao)}</div>`:''}
+        <div class="grid g3">${k4('Em aberto',p.abertas,'')}${k4('Atrasadas',p.atrasadas,'',p.atrasadas?'neg':'')}${k4('Feitas no mês',p.concluidas,'','pos')}</div>
+        <h5>Em aberto <span>${ab.length}</span></h5><div>${ab.length?vm(abL,3):'<div><div class="tl"><span style="color:var(--muted)">nada em aberto</span></div></div>'}</div>
+        <h5>Cumpridas <span>${fe.length} no total · por semana</span></h5>${sm.some(Boolean)?grafico(SEM,[{nome:'Cumpridas',cor:'#7FDDA9',vals:sm}],{semLeg:true,h:110,nomes:SEM.map(s=>'semana de '+s)}):'<div><div class="tl"><span style="color:var(--muted)">nenhuma nas últimas 8 semanas</span></div></div>'}
+        ${fe.length?`<div style="margin-top:6px">${vm(feL,3)}</div>`:''}
+        ${rot.length?`<h5>Metas do mês</h5>${rot.map(r=>`<div class="rt"><div class="top"><span>${esc(r.titulo)}</span><b>${r.comeca?'começa '+ddmm(r.comeca):Math.round(r.pct*100)+'%'}</b></div><div class="tr"><i style="width:${Math.min(100,r.pct*100)}%;background:${r.pct>=1?'var(--pos)':r.pct>=.5?'var(--amber)':'var(--pink)'}"></i></div></div>`).join('')}`:''}
+      </div>`}).join('')}
+  if(EV&&Object.keys(EV.meses||{}).length){const ks=Object.keys(EV.meses).sort(),vs=ks.map(k=>EV.meses[k]),u6=vs.slice(-7,-1),md=u6.length?u6.reduce((a,v)=>a+v,0)/u6.length:0;
+    document.getElementById('eqvk').innerHTML=k4('Fixo por mês',brl(EV.fixo),'')+k4('Média por mês',brl(md),'últimos '+u6.length+' meses fechados')+k4('Este mês',brl(EV.meses[MA]||0),'até agora');
+    document.getElementById('eqvg').innerHTML=grafico(ks.map(k=>MES3[+k.slice(5,7)-1]),[{nome:'Equipe',cor:'#CF1D51',vals:vs}],{semLeg:true,fmt:kf,tfmt:brl,hi:ks.indexOf(MA),nomes:ks.map(nomeMes)})}
+}
+
+/* abas do topo (Financeiro · Vendas · Equipe) */
+function aba(p){document.body.dataset.aba=p;document.querySelectorAll('#ptabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));try{LB.store.set('lb_soc_aba',p)}catch(e){}scrollTo(0,0)}
+function abas(){document.getElementById('ptabs').onclick=e=>{const b=e.target.closest('button');if(b)aba(b.dataset.p)};
+  let p='fin';try{p=LB.store.get('lb_soc_aba')||'fin'}catch(e){}if(p==='met')p='eq';
+  const b=document.querySelector(`#ptabs [data-p="${p}"]`);aba(b&&b.style.display!=='none'?p:'fin')}
+LB.entrar({pagina:'socio',base:'../',titulo:'Sócio',ok:r=>{D=r.dados;document.getElementById('links').innerHTML=LB.links(['socio'],'socio','../');/* sócio: página única, só com as abas (sem menu de páginas) */render();abas();try{LBCHAT.montar(document.getElementById('lbq'),{base:'../',pagina:'socio',atalhos:[],exemplo:'qual foi o lucro dos shows em outubro?',base_dados:()=>D.ctx_ia||'',contexto:()=>{const x=Object.assign({},D);delete x.links;delete x.vendas_venda;return JSON.stringify(x).slice(0,12000)}})}catch(e){}}});
 </script>
 </body>
 </html>
