@@ -92,7 +92,7 @@ label textarea{min-height:60px;resize:vertical}
   <p class="eyebrow">Administração</p>
   <h1>Ad<em>min</em></h1>
   <p class="note">Logins e equipe, tarefas, metas da empresa e pagamentos fora dos shows. Só a administração vê esta página.</p>
-  <div class="tabs" id="tabs"><button class="on" data-t="equipe">Equipe e logins</button><button data-t="todos">Tarefas para todos</button><button data-t="ind">Individuais</button><button data-t="emp">Empresa</button><button data-t="pag">Pagamentos</button><button data-t="lan">Lançamentos <span id="env_n" style="color:var(--pinkl)"></span></button><button data-t="soc">Sócio</button><button data-t="duv">Dúvidas <span id="duv_n"></span></button><button data-t="cfg">Parâmetros</button></div>
+  <div class="tabs" id="tabs"><button class="on" data-t="equipe">Equipe e logins</button><button data-t="todos">Tarefas para todos</button><button data-t="ind">Individuais</button><button data-t="emp">Empresa</button><button data-t="pag">Pagamentos</button><button data-t="lan">Lançamentos <span id="env_n" style="color:var(--pinkl)"></span></button><button data-t="soc">Sócio</button><button data-t="duv">Dúvidas <span id="duv_n"></span></button><button data-t="cfg">Parâmetros</button><button data-t="ia">Contexto da IA</button></div>
 
   <!-- PARA TODOS -->
   <div id="t_todos" style="display:none">
@@ -230,6 +230,15 @@ label textarea{min-height:60px;resize:vertical}
   <datalist id="ln_cdl"></datalist><datalist id="ln_sdl"></datalist>
 
   <!-- PÁGINA DO SÓCIO -->
+  <!-- CONTEXTO DA IA: fatos que o Luiz escreve para o assistente responder melhor -->
+  <div id="t_ia" style="display:none">
+    <p class="note">Escreva aqui fatos que ajudam o assistente a entender a empresa (ex.: "A gestão do Gui foi de novembro/2025 até setembro/2026" · "Nessa gestão não havia controle financeiro adequado"). Vale na hora, em todos os chats, para quem você escolher. Não coloque senhas, PIX ou dados pessoais.</p>
+    <div class="card" style="margin-top:10px"><div class="f">
+      <label class="w">Contexto<textarea id="ia_tx" maxlength="2000" placeholder="ex.: A gestão do Gui foi de novembro do ano passado até setembro deste ano."></textarea></label>
+      <label>Quem pode ver no chat<select id="ia_qm"><option value="gestao">Só Luiz e Lucas</option><option value="socio">Luiz, Lucas e sócio</option><option value="todos">Todos (equipe, vendas, contador)</option></select></label>
+    </div><div class="acts"><button class="btn pkb" id="ia_salvar">Salvar contexto</button><button class="btn" id="ia_cancel" style="display:none">Cancelar edição</button><span class="note" id="ia_msg"></span></div></div>
+    <div class="list" id="ia_l" style="margin-top:10px"></div>
+  </div>
   <!-- DÚVIDAS que a IA não soube responder -->
   <div id="t_duv" style="display:none">
     <p class="note">Perguntas que o assistente não soube responder (sócio, contador, painel…). Quem perguntou vê a resposta na própria página até tocar em "Vi a resposta". A sessão na nuvem também responde por aqui.</p>
@@ -295,8 +304,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwiimvwd"></script>
-<script src="../lbmetas.js?v=mwiimvwd"></script>
+<script src="../lb.js?v=mwij3xu9"></script>
+<script src="../lbmetas.js?v=mwij3xu9"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -684,6 +693,19 @@ function lnSheet(x){ENVID=null;LED=x||null;const ext=x&&!x.novo&&!x.src,nv=!x||x
   $('ln_qm').value=x?x.quem||'':'';$('ln_ct').value=x?x.cat||'':'';$('ln_shw').value=x?x.show||'':'';$('ln_ob').value=x&&(x.aj||x.novo)?x.obs||'':'';
   const d=$('ln_del');d.dataset.ok='';d.style.display=x&&(x.aj||x.novo)?'':'none';d.textContent=x&&x.novo?'Excluir':'Desfazer ajuste';
   $('ln_sh').classList.add('on');$('ln_sh').setAttribute('aria-hidden','false');setTimeout(()=>(nv&&!x?$('ln_vl'):$('ln_ct')).focus(),50)}
+/* aba Contexto da IA */
+let IA=[],IAED=null;const IAQ={gestao:'Luiz e Lucas',socio:'Luiz, Lucas e sócio',todos:'todos'};
+function iaRender(){$('ia_l').innerHTML=IA.length?IA.slice().sort((a,b)=>(b.atualizado_em||'').localeCompare(a.atualizado_em||'')).map(x=>`<div class="tf" style="${x.ativo==='não'?'opacity:.55':''}"><div class="hd"><div style="white-space:pre-line">${x.ativo==='não'?'<span class="pill">pausado</span> ':''}${esc(x.texto)}</div></div><div class="note" style="margin-top:6px">vê: ${esc(IAQ[x.quem]||IAQ.gestao)} · ${esc(String(x.atualizado_em||'').slice(8,10)+'/'+String(x.atualizado_em||'').slice(5,7))}${x.por?' · '+esc(x.por):''}</div><div class="acts" style="margin-top:8px"><button class="btn sm" data-iae="${esc(x.id)}">Editar</button><button class="btn sm" data-iap="${esc(x.id)}">${x.ativo==='não'?'Reativar':'Pausar'}</button><button class="btn sm" data-iad="${esc(x.id)}">Excluir</button></div></div>`).join(''):'<div class="empty">Nenhum contexto ainda. Escreva o primeiro acima.</div>'}
+async function iaApi(c){const r=await api(c);if(!r.ok)throw new Error(r.erro||'erro');IA=r.itens||[];iaRender()}
+async function iaAbre(){$('ia_l').innerHTML='<div class="empty">Carregando…</div>';try{await iaApi({acao:'contexto_ia'})}catch(e){$('ia_l').innerHTML=`<div class="empty">Não consegui carregar (${esc(e.message)}).</div>`}}
+const iaLimpa=()=>{IAED=null;$('ia_tx').value='';$('ia_qm').value='gestao';$('ia_cancel').style.display='none';$('ia_salvar').textContent='Salvar contexto'};
+$('ia_cancel').onclick=iaLimpa;
+$('ia_salvar').onclick=async()=>{const t=$('ia_tx').value.trim();if(t.length<3){$('ia_msg').textContent='Escreva o contexto.';return}const b=$('ia_salvar');b.disabled=true;$('ia_msg').textContent='Salvando…';
+  try{const at=IAED?IA.find(x=>x.id===IAED):null;await iaApi({acao:'salvar_contexto_ia',item:{id:IAED||'',texto:t,quem:$('ia_qm').value,ativo:at?at.ativo:'sim'}});iaLimpa();$('ia_msg').textContent='Salvo ✓ o assistente já usa.'}catch(e){$('ia_msg').textContent='Não salvou ('+e.message+').'}finally{b.disabled=false}};
+$('ia_l').onclick=async e=>{const ed=e.target.closest('[data-iae]'),pa=e.target.closest('[data-iap]'),de=e.target.closest('[data-iad]');
+  if(ed){const x=IA.find(y=>y.id===ed.dataset.iae);if(!x)return;IAED=x.id;$('ia_tx').value=x.texto;$('ia_qm').value=x.quem||'gestao';$('ia_cancel').style.display='';$('ia_salvar').textContent='Salvar alteração';$('ia_tx').focus();scrollTo({top:$('t_ia').offsetTop-80,behavior:'smooth'});return}
+  if(pa){const x=IA.find(y=>y.id===pa.dataset.iap);if(!x)return;pa.disabled=true;try{await iaApi({acao:'salvar_contexto_ia',item:Object.assign({},x,{ativo:x.ativo==='não'?'sim':'não'})})}catch(er){pa.disabled=false;pa.textContent='tente de novo'}return}
+  if(de){if(!de.dataset.ok){de.dataset.ok='1';de.textContent='Confirmar exclusão';return}de.disabled=true;try{await iaApi({acao:'excluir_contexto_ia',id:de.dataset.iad})}catch(er){de.disabled=false;de.textContent='tente de novo'}}};
 /* aba Sócio */
 let SO=[],SOOK=false,SOF='ocorrencia',SOED=null;
 async function socAbre(){if(!SOOK){$('so_lista').innerHTML='<div class="empty">Carregando…</div>';try{SO=(await api({acao:'socio'})).socio||[];SOOK=true}catch(e){$('so_lista').innerHTML=`<div class="empty">Não consegui carregar (${esc(e.message)}).</div>`;return}}socRender()}
@@ -727,7 +749,7 @@ $('ln_del').onclick=async()=>{const d=$('ln_del'),x=LED,id=x&&(x.novo?x.novo.id:
   if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent=x.novo?'Toque de novo para excluir':'Toque de novo: volta como veio do extrato';return}
   try{LN=(await api({acao:'excluir_lancamento',id})).lancamentos||[];lnRender();lnFecha()}catch(e){$('ln_msg').innerHTML='<span class="neg">erro</span>'}};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')lnFecha()});
-$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag','lan','soc','duv','cfg'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='cfg')cfgAbre();if(b.dataset.t==='lan')lnAbre();if(b.dataset.t==='pag')arecAbre();if(b.dataset.t==='soc')socAbre();if(b.dataset.t==='duv')duvAbre()};
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','todos','ind','emp','pag','lan','soc','duv','cfg','ia'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='ia')iaAbre();if(b.dataset.t==='cfg')cfgAbre();if(b.dataset.t==='lan')lnAbre();if(b.dataset.t==='pag')arecAbre();if(b.dataset.t==='soc')socAbre();if(b.dataset.t==='duv')duvAbre()};
 /* ---------- COMPROVANTES enviados pelo painel (📎 no assistente) ---------- */
 let ENV=[],ENVID=null,ENVT=false;
 async function envCarrega(){try{ENV=(await api({acao:'envios'})).envios||[];envRender()}catch(e){}}
@@ -757,7 +779,7 @@ $('duv_f').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;DUVF=b.
 $('duv_l').addEventListener('click',async e=>{const b=e.target.closest('[data-ds]');if(!b)return;const r=document.querySelector(`[data-dr="${b.dataset.ds}"]`).value.trim();if(!r){b.textContent='escreva a resposta';return}
   b.disabled=true;b.textContent='enviando…';try{DUV=(await api({acao:'responder_duvida',id:b.dataset.ds,resposta:r})).duvidas||DUV;duvRender()}catch(err){b.disabled=false;b.textContent='não enviou: '+err.message}});
 </script>
-<script src="../lbchat.js?v=mwiimvwd"></script>
+<script src="../lbchat.js?v=mwij3xu9"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

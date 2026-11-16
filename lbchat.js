@@ -31,6 +31,13 @@
 .lbq .qf{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:6px;font-size:13px}.lbq .qf img{width:38px;height:38px;object-fit:cover;border-radius:8px}.lbq .qf span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lbq .qf a{color:var(--muted);text-decoration:none;font-size:16px;padding:0 4px}
 .lbq .ev{background:var(--card);border-radius:14px;padding:10px 14px;margin-bottom:10px;font-size:13px}.lbq .ev b{display:block;font-size:12px;letter-spacing:.04em;color:var(--sub);margin-bottom:4px}.lbq .ev div{display:flex;gap:8px;align-items:baseline;padding:4px 0;border-top:1px solid var(--line)}.lbq .ev div:first-of-type{border-top:0}
 .lbq .ev span{flex:1;min-width:0;color:var(--ink)}.lbq .ev small{color:var(--muted);white-space:nowrap}.lbq .ev em{font-style:normal;font-size:11.5px;white-space:nowrap;border-radius:99px;padding:2px 8px;background:rgba(245,196,81,.12);color:#F5C451}.lbq .ev em.ok{background:rgba(127,221,169,.12);color:var(--pos)}.lbq .ev em.x{background:var(--card2);color:var(--muted)}
+.lbq .qtb{display:flex;gap:6px;overflow-x:auto;margin-top:8px;scrollbar-width:none;padding-bottom:2px}.lbq .qtb::-webkit-scrollbar{display:none}.lbq .qtb:empty{display:none}
+.lbq .qtb button{flex:none;max-width:230px;display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);color:var(--sub);border-radius:99px;padding:6px 6px 6px 12px;font-size:12.5px;font-weight:600;white-space:nowrap}.lbq .qtb button span{overflow:hidden;text-overflow:ellipsis}.lbq .qtb button.on{border-color:var(--pink);color:var(--ink);background:var(--card2)}
+.lbq .qtb i{font-style:normal;color:var(--muted);padding:2px 6px;border-radius:99px;font-size:12px}.lbq .qtb i:hover{color:var(--ink);background:var(--line)}.lbq .qtb .qnew{color:var(--pinkl);padding:6px 12px}.lbq .qtb .ql{width:10px;height:10px;margin:0}
+.lbq .qcv{position:relative;background:var(--card);border-radius:14px;padding:12px 14px 10px;margin-top:8px;border-left:3px solid var(--pink)}.lbq .qtt{font-size:11.5px;color:var(--muted);padding-right:220px;min-height:28px}.lbq .qbts{position:absolute;top:10px;right:10px;display:flex;gap:6px}.lbq .qbts .qxb{position:static}
+.lbq .qbts .qmn{background:var(--card2)!important;border:1px solid var(--line)!important;color:var(--sub)!important;border-radius:99px!important;padding:6px 12px!important;font-size:13px!important;font-weight:700!important;line-height:1.1}.lbq .qbts .qmn:hover{color:var(--ink)!important}
+@media(max-width:480px){.lbq .qtt{padding-right:0;padding-top:34px}}
+.lbq .qcv .qr{background:transparent;border-left:0;padding:0;margin:4px 0 14px;border-radius:0}.lbq .qme{display:flex;justify-content:flex-end;margin:8px 0 6px}.lbq .qme span{background:var(--pink);color:#fff;border-radius:14px 14px 4px 14px;padding:8px 12px;font-size:14px;line-height:1.4;max-width:85%;white-space:pre-line}
 .lbq .dui small{display:block;color:var(--muted);font-size:11.5px;margin-top:6px}.lbq .dui button{margin-top:10px;border:0;background:var(--pos);color:#141218;border-radius:10px;padding:9px 14px;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer}`;
   const fmt = (v, it) => it.some(x => Math.abs(x.valor) >= 100) ? brl(v) : String(Math.round(v * 10) / 10).replace('.', ',');
   function grafico(g) {
@@ -48,8 +55,8 @@
     if (!el) return; if (op.anexo === undefined) op = Object.assign({}, op, { anexo: true }); // 📎 em todos os chats
     if (!document.getElementById('lbqcss')) { const s = document.createElement('style'); s.id = 'lbqcss'; s.textContent = CSS; document.head.appendChild(s); }
     el.className = 'lbq';
-    el.innerHTML = `<div class="du"></div>${op.anexo ? '<div class="ev" hidden></div><div class="qf" hidden></div>' : ''}<form>${op.anexo ? '<button type="button" class="qan" title="Mandar comprovante ou documento (foto ou PDF)" aria-label="Anexar arquivo">📎</button>' : ''}<input maxlength="300" placeholder="💬 Pergunte sua dúvida${op.exemplo ? ' · ex.: ' + esc(op.exemplo) : ''}" aria-label="Pergunte sua dúvida" enterkeyhint="send"><button>Perguntar</button></form>${op.anexo ? '<div class="qm"><button type="button" data-qm="cam">📷 Tirar foto</button><button type="button" data-qm="arq">🖼️ Foto ou PDF do celular</button></div><input type="file" accept="image/*" capture="environment" hidden data-qin="cam"><input type="file" accept="image/*,application/pdf" hidden data-qin="arq">' : ''}<div class="qs"></div><div class="qo"></div>`;
-    const f = el.querySelector('form'), inp = f.querySelector('input'), bt = f.querySelector('button:not(.qan)'), out = el.querySelector('.qo'), du = el.querySelector('.du');
+    el.innerHTML = `<div class="du"></div>${op.anexo ? '<div class="ev" hidden></div><div class="qf" hidden></div>' : ''}<form>${op.anexo ? '<button type="button" class="qan" title="Mandar comprovante ou documento (foto ou PDF)" aria-label="Anexar arquivo">📎</button>' : ''}<input maxlength="300" placeholder="💬 Pergunte sua dúvida${op.exemplo ? ' · ex.: ' + esc(op.exemplo) : ''}" aria-label="Pergunte sua dúvida" enterkeyhint="send"><button>Perguntar</button></form>${op.anexo ? '<div class="qm"><button type="button" data-qm="cam">📷 Tirar foto</button><button type="button" data-qm="arq">🖼️ Foto ou PDF do celular</button></div><input type="file" accept="image/*" capture="environment" hidden data-qin="cam"><input type="file" accept="image/*,application/pdf" hidden data-qin="arq">' : ''}<div class="qs"></div><div class="qtb"></div><div class="qoa"></div><div class="qo"></div>`;
+    const f = el.querySelector('form'), inp = f.querySelector('input'), bt = f.querySelector('button:not(.qan)'), out = el.querySelector('.qo'), du = el.querySelector('.du'), tb = el.querySelector('.qtb'), oa = el.querySelector('.qoa');
     let api = '', DOC = null;
     const AT = op.atalhos || [], PG = 'lbq_' + (op.pagina || location.pathname.split('/').filter(Boolean).slice(-1)[0] || 'painel');
     const ler = k => { try { return JSON.parse(localStorage.getItem(PG + k) || 'null'); } catch (e) { return null; } }, gravar = (k, v) => { try { localStorage.setItem(PG + k, JSON.stringify(v)); } catch (e) { } };
@@ -99,7 +106,7 @@
       if (/^image\//.test(a.type)) { const img = await createImageBitmap(a), k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); return { tipo: 'image/jpeg', dados: c.toDataURL('image/jpeg', .82).split(',')[1] }; }
       if (a.type === 'application/pdf') { if (a.size > 5e6) throw new Error('PDF maior que 5 MB'); const u = await new Promise((ok, er) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = er; fr.readAsDataURL(a); }); return { tipo: 'application/pdf', dados: u.split(',')[1] }; }
       throw new Error('use foto ou PDF'); };
-    const tiraArq = () => { ARQ = null; if (qf) { qf.hidden = true; qf.innerHTML = ''; } inp.placeholder = PH; bt.textContent = 'Perguntar'; };
+    const tiraArq = () => { ARQ = null; if (qf) { qf.hidden = true; qf.innerHTML = ''; } phSet(); bt.textContent = 'Perguntar'; };
     const STV = { pendente: ['⏳ o Luiz vai conferir', ''], 'lançado': ['✅ lançado', 'ok'], conferido: ['✓ conferido', 'ok'], descartado: ['descartado', 'x'] };
     const evRender = l => { if (!ev) return; const v = (l || []).filter(x => x.status === 'pendente' || Date.now() - new Date(String(x.atualizado_em).replace(' ', 'T')).getTime() < 3 * 864e5).slice(0, 5);
       ev.hidden = !v.length; ev.innerHTML = v.length ? '<b>📎 SEUS ENVIOS</b>' + v.map(x => { const s = STV[x.status] || STV.pendente; return `<div><small>${esc(String(x.criado_em).slice(8, 10) + '/' + String(x.criado_em).slice(5, 7))}</small><span>${esc((x.ia && x.ia.e_comprovante !== false && x.ia.resumo) || x.nota || 'Comprovante')}</span><em class="${s[1]}">${s[0]}</em></div>`; }).join('') : ''; };
@@ -111,7 +118,7 @@
       document.addEventListener('click', e => { if (!e.target.closest('.qm')) qm.classList.remove('on'); });
       qm.onclick = e => { const b = e.target.closest('[data-qm]'); if (!b) return; qm.classList.remove('on'); const i = el.querySelector(`[data-qin="${b.dataset.qm}"]`); i.value = ''; i.click(); };
       el.querySelectorAll('[data-qin]').forEach(i => i.onchange = () => { const a = i.files && i.files[0]; if (!a) return;
-        if (!/^image\//.test(a.type) && a.type !== 'application/pdf') { out.innerHTML = '<div class="qr"><div class="qt qe">Mande foto ou PDF.</div></div>'; return; }
+        if (!/^image\//.test(a.type) && a.type !== 'application/pdf') { oa.innerHTML = '<div class="qr"><div class="qt qe">Mande foto ou PDF.</div><div class="qn"><span></span><span><a href="#" class="qx">fechar</a></span></div></div>'; return; }
         ARQ = a; const im = /^image\//.test(a.type) ? URL.createObjectURL(a) : '';
         qf.innerHTML = `${im ? `<img src="${im}" alt="">` : '📄'}<span>${esc(a.name || 'comprovante')}</span><a href="#" class="qfx" aria-label="Tirar anexo">✕</a>`; qf.hidden = false;
         inp.placeholder = 'O que é? (opcional) · ex.: comprovante do som de Patos'; bt.textContent = 'Enviar'; inp.focus(); });
@@ -119,47 +126,80 @@
     }
     async function enviaArq() {
       const nota = inp.value.trim(), a = ARQ; bt.disabled = true;
-      out.innerHTML = `<div class="qr"><div class="qp">📎 ${esc(a.name || 'comprovante')}${nota ? ' · ' + esc(nota) : ''}</div><div class="qt"><span class="ql"></span>Enviando e lendo o comprovante…</div></div>`;
+      oa.innerHTML = `<div class="qr"><div class="qp">📎 ${esc(a.name || 'comprovante')}${nota ? ' · ' + esc(nota) : ''}</div><div class="qt"><span class="ql"></span>Enviando e lendo o comprovante…</div></div>`;
       try {
         const x = await prepArq(a); await URL_();
         const r = await (await fetch(api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'enviar_comprovante', dados: x.dados, tipo: x.tipo, nota: nota, pagina: String(op.pagina || document.title || '').slice(0, 30) }, cred())) })).json();
-        if (!r.ok) { out.innerHTML = `<div class="qr"><div class="qt qe">${r.erro === 'grande' ? 'Arquivo grande demais (máx. 5 MB).' : r.erro === 'limite' ? 'Muitos envios hoje. Amanhã libera de novo.' : r.erro === 'acesso' ? 'Sem acesso para mandar comprovante.' : 'Não consegui enviar. Tente de novo.'}</div></div>`; return; }
+        if (!r.ok) { oa.innerHTML = `<div class="qr"><div class="qt qe">${r.erro === 'grande' ? 'Arquivo grande demais (máx. 5 MB).' : r.erro === 'limite' ? 'Muitos envios hoje. Amanhã libera de novo.' : r.erro === 'acesso' ? 'Sem acesso para mandar comprovante.' : 'Não consegui enviar. Tente de novo.'}</div></div>`; return; }
         const L = r.leitura, ok = L && L.e_comprovante !== false;
         const det = ok ? [L.tipo === 'entrada' ? 'Entrada' : L.tipo === 'saida' ? 'Saída' : '', L.valor ? brl(L.valor) : '', L.quem, L.data ? L.data.slice(8, 10) + '/' + L.data.slice(5, 7) : ''].filter(Boolean).join(' · ') : '';
-        out.innerHTML = `<div class="qr"><div class="qp">📎 ${esc(a.name || 'comprovante')}${nota ? ' · ' + esc(nota) : ''}</div><div class="qt">✅ Enviado para o Luiz conferir.${ok && L.resumo ? '\n\nLi aqui: ' + esc(L.resumo) : ''}</div>${det ? `<div class="qc">${esc(det)}</div>` : ''}${L && L.e_comprovante === false ? `<div class="qv">Não parece um comprovante: ${esc(L.resumo || '')}. Se estiver certo, tudo bem: o Luiz vê do mesmo jeito.</div>` : ''}<div class="qn"><span>Fica guardado numa pasta privada do Drive.</span><span><a href="#" class="qx">fechar</a></span></div></div>`;
+        oa.innerHTML = `<div class="qr"><div class="qp">📎 ${esc(a.name || 'comprovante')}${nota ? ' · ' + esc(nota) : ''}</div><div class="qt">✅ Enviado para o Luiz conferir.${ok && L.resumo ? '\n\nLi aqui: ' + esc(L.resumo) : ''}</div>${det ? `<div class="qc">${esc(det)}</div>` : ''}${L && L.e_comprovante === false ? `<div class="qv">Não parece um comprovante: ${esc(L.resumo || '')}. Se estiver certo, tudo bem: o Luiz vê do mesmo jeito.</div>` : ''}<div class="qn"><span>Fica guardado numa pasta privada do Drive.</span><span><a href="#" class="qx">fechar</a></span></div></div>`;
         inp.value = ''; tiraArq(); evCarrega();
-      } catch (er) { out.innerHTML = `<div class="qr"><div class="qt qe">${esc(er && er.message && /PDF|foto/.test(er.message) ? er.message : 'Sem conexão. Tente de novo.')}</div></div>`; }
+      } catch (er) { oa.innerHTML = `<div class="qr"><div class="qt qe">${esc(er && er.message && /PDF|foto/.test(er.message) ? er.message : 'Sem conexão. Tente de novo.')}</div></div>`; }
       finally { setTimeout(() => { bt.disabled = false; }, 1500); }
     }
+    /* ---------- CONVERSAS: cada pergunta nova abre uma conversa; as que não foram fechadas viram abas (ficam até fechar, mesmo recarregando) ---------- */
+    gravar('_aberta', null); // formato antigo (uma resposta só)
+    const novaId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    let CV = (ler('_conv') || []).filter(c => c && c.id && Array.isArray(c.msgs) && Date.now() - c.t < 14 * 864e5);
+    CV.forEach(c => c.msgs.forEach(m => { if (m.pend) { m.pend = false; m.erro = 'A resposta não chegou (a página foi fechada). Pergunte de novo.'; } }));
+    let ATV = ler('_atv'); if (!CV.some(c => c.id === ATV)) ATV = CV.length ? CV[0].id : null;
+    const salva = () => { gravar('_conv', CV.slice(0, 8)); gravar('_atv', ATV); };
+    const curto = s => { s = String(s || ''); return s.length > 30 ? s.slice(0, 28) + '…' : s; };
+    const ddh = t => { const d = new Date(t); return d.toLocaleDateString('pt-BR').slice(0, 5) + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); };
+    function msgH(m, i) {
+      const r = m.r || {}, eu = `<div class="qme"><span>${esc(m.q)}</span></div>`;
+      if (m.pend) return eu + `<div class="qr"><div class="qt"><span class="ql"></span>Pensando…</div>${m.sg && m.sg.length ? linkH(m.sg) : ''}</div>`;
+      if (m.erro) return eu + `<div class="qr"><div class="qt qe">${esc(m.erro)}</div></div>`;
+      return eu + `<div class="qr"><div class="qt">${esc(r.resposta)}</div>${linkH(r.links)}${r.grafico ? grafico(r.grafico) : ''}${r.doc ? `<div class="qd"><button class="qdb" data-di="${i}">📄 Abrir documento: ${esc(r.doc.titulo || 'relatório')}</button></div>` : ''}${r.duvida ? '<div class="qv">📨 Já avisei a equipe. Quando a resposta chegar, ela aparece aqui em cima.</div>' : ''}${m.cache ? `<div class="qc">Você já perguntou isso em ${ddh(m.cache)}. Os atalhos levam aos números de agora. <a href="#" class="qnv" data-ni="${i}">Perguntar de novo</a></div>` : ''}</div>`;
+    }
+    function phSet() { if (!ARQ) inp.placeholder = CV.some(c => c.id === ATV) ? '💬 Continue a conversa… (ou toque em + Nova)' : PH; }
+    function render(rolar) {
+      tb.innerHTML = CV.length ? CV.map(c => `<button type="button" class="qtab${c.id === ATV ? ' on' : ''}" data-cv="${esc(c.id)}" title="${esc(c.titulo)}"><span>${esc(curto(c.titulo))}</span>${c.msgs.some(m => m.pend) ? '<span class="ql"></span>' : ''}<i data-cx="${esc(c.id)}" role="button" aria-label="Fechar conversa">✕</i></button>`).join('') + `<button type="button" class="qtab qnew${ATV ? '' : ' on'}" data-cv="">+ Nova</button>` : '';
+      const c = CV.find(x => x.id === ATV);
+      out.innerHTML = c ? `<div class="qcv"><div class="qbts"><button type="button" class="qmn" data-min="1" aria-label="Minimizar conversa">— Minimizar</button><button type="button" class="qx qxb" data-cx="${esc(c.id)}" aria-label="Fechar conversa">✕ Fechar</button></div><div class="qtt">Conversa · ${esc(ddh(c.ini || c.t))}${c.msgs.length > 1 ? ' · ' + c.msgs.length + ' perguntas' : ''}</div>${c.msgs.map(msgH).join('')}<div class="qn"><span>Resposta automática com os dados do app · confira os valores antes de decidir</span><span>${c.uso != null ? 'uso de hoje: ' + c.uso + '%' : ''}</span></div></div>` : '';
+      phSet();
+      if (rolar && c) { const ul = out.querySelectorAll('.qme'), x = ul[ul.length - 1]; if (x) { const r = x.getBoundingClientRect(); if (r.top < 60 || r.top > innerHeight - 120) x.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }
+    }
+    render();
     f.onsubmit = async e => {
       e.preventDefault(); if (ARQ) { if (!bt.disabled) enviaArq(); return; } const q = inp.value.trim(); if (q.length < 3 || bt.disabled) return;
-      /* pergunta repetida: mostra na hora a resposta guardada e os atalhos (sem gastar a IA); "perguntar de novo" atualiza */
-      const tq = tok(q), H = ler('_hist') || [], vh = !e.lbqNova && H.filter(h => Date.now() - h.t < 7 * 864e5).map(h => [h, parecido(tq, h.tk)]).sort((a, b) => b[1] - a[1])[0];
-      if (vh && vh[1] >= 0.75) { const h = vh[0], d = new Date(h.t); DOC = h.doc || null;
-        out.innerHTML = `<div class="qr"><div class="qp">${esc(q)}</div><div class="qt">${esc(h.resposta)}</div>${linkH(h.links)}${h.grafico ? grafico(h.grafico) : ''}${DOC ? `<div class="qd"><button class="qdb">📄 Abrir documento: ${esc(DOC.titulo || 'relatório')}</button></div>` : ''}<div class="qc">Você já perguntou isso em ${d.toLocaleDateString('pt-BR').slice(0, 5)} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}. Os atalhos levam aos números de agora. <a href="#" class="qnv">Perguntar de novo</a></div><div class="qn"><span></span><span><a href="#" class="qx">fechar</a></span></div></div>`;
-        out.dataset.q = q; inp.value = ''; return; }
-      const SG = sugere(q);
-      bt.disabled = true; out.innerHTML = `<div class="qr"><div class="qp">${esc(q)}</div><div class="qt"><span class="ql"></span>Pensando…</div>${SG.length ? linkH(SG) : ''}</div>`;
+      let c = CV.find(x => x.id === ATV);
+      /* pergunta repetida numa conversa nova: mostra na hora a resposta guardada (sem gastar a IA); "perguntar de novo" atualiza */
+      const tq = tok(q), H = ler('_hist') || [];
+      if (!c && !e.lbqNova) { const vh = H.filter(h => Date.now() - h.t < 7 * 864e5).map(h => [h, parecido(tq, h.tk)]).sort((a, b) => b[1] - a[1])[0];
+        if (vh && vh[1] >= 0.75) { const h = vh[0]; c = { id: novaId(), titulo: q, msgs: [{ q, r: { resposta: h.resposta, links: h.links, doc: h.doc || null, grafico: h.grafico || null }, cache: h.t }], t: Date.now(), ini: Date.now() };
+          CV.unshift(c); ATV = c.id; salva(); render(true); inp.value = ''; return; } }
+      if (!c) { c = { id: novaId(), titulo: q, msgs: [], t: Date.now(), ini: Date.now() }; CV.unshift(c); ATV = c.id; }
+      /* o assistente recebe a conversa desta aba (perguntas e respostas) e um resumo das outras abas abertas */
+      const hist = c.msgs.filter(m => m.r && !m.erro && !m.pend).slice(-6).map(m => ({ q: String(m.q).slice(0, 300), r: String(m.r.resposta || '').slice(0, 1500) }));
+      const outras = CV.filter(x => x !== c).slice(0, 5).map(x => { const u = x.msgs.filter(m => m.r).slice(-1)[0]; return '• ' + String(x.titulo).slice(0, 120) + (u ? ' → ' + String(u.r.resposta || '').slice(0, 300) : ''); }).join('\n');
+      const SG = sugere(q), m = { q, pend: true, sg: SG }; c.msgs.push(m); c.msgs = c.msgs.slice(-20); c.t = Date.now(); CV = [c].concat(CV.filter(x => x !== c));
+      salva(); render(true); inp.value = ''; bt.disabled = true;
       try {
         await URL_();
         let ctx = ''; try { ctx = op.contexto(); } catch (er) { }
-        const r = await (await fetch(api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'perguntar', pergunta: q, contexto: limpa(ctx).slice(0, 16000), base: op.base_dados ? String(op.base_dados() || '').slice(0, 400000) : '', atalhos: AT.map(a => a.id + ': ' + a.rot + (a.desc ? ' (' + a.desc + ')' : '')).join('\n') }, op.auth ? op.auth() : { usuario: LB.login, senha: LB.senha, nome: LB.usuario })) })).json();
-        if (!r.ok) { out.innerHTML = `<div class="qr"><div class="qp">${esc(q)}</div><div class="qt qe">${r.erro === 'espera' ? `Espere ${r.s} s para a próxima pergunta.` : ERR[r.erro] || 'Não consegui responder agora. Tente de novo.'}</div></div>`; return; }
-        DOC = r.doc || null; const LK = (r.links && r.links.length ? r.links : SG).slice(0, 4);
-        if (!r.duvida) { H.unshift({ tk: tq, t: Date.now(), resposta: r.resposta, links: LK, doc: DOC, grafico: r.grafico || null }); gravar('_hist', H.slice(0, 30)); }
-        out.innerHTML = `<div class="qr"><div class="qp">${esc(q)}</div><div class="qt">${esc(r.resposta)}</div>${linkH(LK)}${r.grafico ? grafico(r.grafico) : ''}${DOC ? `<div class="qd"><button class="qdb">📄 Abrir documento: ${esc(DOC.titulo || 'relatório')}</button></div>` : ''}${r.duvida ? '<div class="qv">📨 Já avisei a equipe. Quando a resposta chegar, ela aparece aqui em cima.</div>' : ''}<div class="qn"><span>Resposta automática com os dados do app · confira os valores antes de decidir</span><span>${r.uso != null ? 'uso de hoje: ' + r.uso + '% · ' : ''}<a href="#" class="qx">fechar</a></span></div></div>`;
-        inp.value = ''; if (r.duvida) dCarrega();
-      } catch (er) { out.innerHTML = `<div class="qr"><div class="qt qe">Sem conexão. Tente de novo.</div></div>`; }
-      finally { setTimeout(() => { bt.disabled = false; }, 3000); }
+        const r = await (await fetch(api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'perguntar', pergunta: q, contexto: limpa(ctx).slice(0, 16000), base: op.base_dados ? String(op.base_dados() || '').slice(0, 400000) : '', atalhos: AT.map(a => a.id + ': ' + a.rot + (a.desc ? ' (' + a.desc + ')' : '')).join('\n'), historico: hist, outras: limpa(outras).slice(0, 3000) }, op.auth ? op.auth() : { usuario: LB.login, senha: LB.senha, nome: LB.usuario })) })).json();
+        m.pend = false; delete m.sg;
+        if (!r.ok) { m.erro = r.erro === 'espera' ? `Espere ${r.s} s para a próxima pergunta.` : ERR[r.erro] || 'Não consegui responder agora. Tente de novo.'; if (!inp.value) inp.value = q; }
+        else { const LK = (r.links && r.links.length ? r.links : SG).slice(0, 4);
+          m.r = { resposta: r.resposta, links: LK, grafico: r.grafico || null, doc: r.doc || null, duvida: !!r.duvida }; if (r.uso != null) c.uso = r.uso;
+          if (!r.duvida && !hist.length) { H.unshift({ tk: tq, t: Date.now(), resposta: r.resposta, links: LK, doc: r.doc || null, grafico: r.grafico || null }); gravar('_hist', H.slice(0, 30)); }
+          if (r.duvida) dCarrega(); }
+      } catch (er) { m.pend = false; delete m.sg; m.erro = 'Sem conexão. Tente de novo.'; if (!inp.value) inp.value = q; }
+      finally { c.t = Date.now(); salva(); if (CV.includes(c)) render(c.id === ATV); else render(); setTimeout(() => { bt.disabled = false; }, 3000); }
     };
-    /* a resposta fica na tela (mesmo recarregando a página) até a pessoa fechar; botão ✕ Fechar bem visível */
-    new MutationObserver(() => { out.querySelectorAll('.qr').forEach(r => { if (!r.querySelector(':scope > .qxb')) r.insertAdjacentHTML('afterbegin', '<button type="button" class="qx qxb" aria-label="Fechar resposta">✕ Fechar</button>'); });
-      if (!out.querySelector('.qr')) gravar('_aberta', null); else if (out.querySelector('.qn .qx')) gravar('_aberta', { html: out.innerHTML, doc: DOC, q: out.dataset.q || '', t: Date.now() }); }).observe(out, { childList: true });
-    { const a = ler('_aberta'); if (a && a.html && Date.now() - a.t < 7 * 864e5 && !out.innerHTML.trim()) { DOC = a.doc || null; out.dataset.q = a.q || ''; out.innerHTML = a.html; } }
-    out.addEventListener('click', e => { if (e.target.closest('.qx')) { e.preventDefault(); out.innerHTML = ''; gravar('_aberta', null); return; }
+    tb.addEventListener('click', e => { const x = e.target.closest('[data-cx]'); if (x) { e.preventDefault(); e.stopPropagation(); fecha(x.dataset.cx); return; }
+      const b = e.target.closest('[data-cv]'); if (!b) return; ATV = b.dataset.cv && b.dataset.cv !== ATV ? b.dataset.cv : null; /* tocar na aba aberta minimiza */ salva(); render(); if (!ATV) inp.focus(); });
+    function fecha(id) { const i = CV.findIndex(c => c.id === id); if (i < 0) return; CV.splice(i, 1); if (ATV === id) ATV = CV.length ? CV[Math.min(i, CV.length - 1)].id : null; salva(); render(); }
+    oa.addEventListener('click', e => { if (e.target.closest('.qx')) { e.preventDefault(); oa.innerHTML = ''; } });
+    out.addEventListener('click', e => { const x = e.target.closest('[data-cx]'); if (x) { e.preventDefault(); fecha(x.dataset.cx); return; }
+      if (e.target.closest('[data-min]')) { e.preventDefault(); ATV = null; salva(); render(); return; }
       const qi = e.target.closest('[data-qi]'); if (qi) { e.preventDefault(); vai(qi.dataset.qi, qi.dataset.qt || ''); return; }
-      if (e.target.closest('.qnv')) { e.preventDefault(); inp.value = out.dataset.q || ''; const ev = new Event('submit', { cancelable: true }); ev.lbqNova = true; f.dispatchEvent(ev); return; }
-      if (e.target.closest('.qdb') && DOC) { e.preventDefault(); let b = ''; try { b = op.base_dados ? op.base_dados() : ''; } catch (er) { } documento(DOC, b); } });
+      const c = CV.find(y => y.id === ATV); if (!c) return;
+      const nv = e.target.closest('.qnv'); if (nv) { e.preventDefault(); const m = c.msgs[+nv.dataset.ni]; if (!m) return; c.msgs.splice(+nv.dataset.ni, 1); if (!c.msgs.length) { CV = CV.filter(y => y !== c); ATV = null; } salva(); render();
+        inp.value = m.q; const ev = new Event('submit', { cancelable: true }); ev.lbqNova = true; f.dispatchEvent(ev); return; }
+      const db = e.target.closest('.qdb'); if (db) { e.preventDefault(); const m = c.msgs[+db.dataset.di]; if (!m || !m.r || !m.r.doc) return; let b = ''; try { b = op.base_dados ? op.base_dados() : ''; } catch (er) { } documento(m.r.doc, b); } });
   }
   /* dados pessoais nunca vão para o assistente: some PIX, CPF/CNPJ, telefone, e-mail e dados de conta */
   function limpa(t) {
