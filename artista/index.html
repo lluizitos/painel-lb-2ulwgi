@@ -225,9 +225,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwjuqxbi"></script>
-<script src="../lbmetas.js?v=mwjuqxbi"></script>
-<script src="../lbchat.js?v=mwjuqxbi"></script>
+<script src="../lb.js?v=mwjv04by"></script>
+<script src="../lbmetas.js?v=mwjv04by"></script>
+<script src="../lbchat.js?v=mwjv04by"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -401,7 +401,7 @@ function renderPagar(){const pode=!!API,B={},C=[];let NAD=0;
   const pixDe=(id,nome,px)=>px||((PESS.find(p=>p.id===id)||PESS.find(p=>LB.norm(p.nome||'')===LB.norm(nome||''))||{}).pix)||'';
   const grp=b=>B[b.id]=B[b.id]||{id:b.id,show:b.show||'Show',data:b.data,it:[],tot:0};
   Object.values(D.borderos||{}).filter(b=>b.equipe).forEach(b=>b.equipe.forEach((e,i)=>{if(e.fora||e.grupo==='Comissão')return;
-    LB.pg.pend(b,e,LB.pg.agendado(b,e)?fimMes:HOJE).forEach(q=>{const x=grp(b);x.tot+=q.f;x.it.push({b,e,i,nome:e.nome,pix:pixDe(e.pessoa,e.nome,e.pix),f:q.f,ps:q.ps,d:q.d,fut:q.d>HOJE,ant:q.d<b.data})})}));
+    LB.pg.pend(b,e,HOJE).forEach(q=>{const x=grp(b);x.tot+=q.f;x.it.push({b,e,i,nome:e.nome,pix:pixDe(e.pessoa,e.nome,e.pix),f:q.f,ps:q.ps,d:q.d,fut:q.d>HOJE,ant:q.d<b.data})})}));
   Object.values(D.borderos||{}).filter(b=>b.equipe&&b.data<=HOJE).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!t.para||!(+t.valor>0))return;
     const x=grp(b);x.tot+=+t.valor;x.it.push({b,e:{funcao:'item: '+(t.desc||''),pessoa:t.pessoa},item:j,nome:t.para,pix:pixDe(t.pessoa,t.para,t.pix),f:+t.valor,ps:[{k:'item',n:t.desc||'item',v:+t.valor}],d:b.data,fut:false})}));
   PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada').forEach(g=>LB.pgx.ocorr(g,fimMes).filter(o=>!o.pago&&o.falta>0.004&&(!pAdiado(g,o.ref)||(NAD++,false))).forEach(o=>C.push({g,o,d:o.data,f:o.falta,fut:o.data>HOJE,pix:pixDe(g.pessoa,g.nome,g.pix)})));

@@ -392,10 +392,10 @@ body.emb header .wrap,body.emb #ptabs,body.emb #lbq{display:none!important}body.
 </main>
 </div>
 
-<script src="lb.js?v=mwjuqxbi"></script>
-<script src="lbmetas.js?v=mwjuqxbi"></script>
-<script src="lbchat.js?v=mwjuqxbi"></script>
-<script src="lbvendas.js?v=mwjuqxbi"></script>
+<script src="lb.js?v=mwjv04by"></script>
+<script src="lbmetas.js?v=mwjv04by"></script>
+<script src="lbchat.js?v=mwjv04by"></script>
+<script src="lbvendas.js?v=mwjv04by"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -526,7 +526,7 @@ function renderPagar(){const tp=document.getElementById('tpag');if(tp&&D.avisos)
   const FM=HJ.slice(0,8)+String(new Date(+HJ.slice(0,4),+HJ.slice(5,7),0).getDate()).padStart(2,'0');let NAD=0; // até o fim do mês
   // equipe dos borderôs: cada parte entra na data em que vence (dia do show, outra data combinada, diária/gasolina antecipada, pessoa antecipada)
   Object.values(D.borderos||{}).filter(b=>b.equipe).forEach(b=>b.equipe.forEach((e,i)=>{if(e.fora||e.grupo==='Comissão')return;
-    LB.pg.pend(b,e,LB.pg.agendado(b,e)?FM:HJ).forEach(q=>{const k=e.pessoa||LB.norm(e.nome);const x=P[k]=P[k]||{k,nome:e.nome,pix:e.pix,tot:0,it:[]};x.tot+=q.f;if(!x.pix)x.pix=e.pix;
+    LB.pg.pend(b,e,HJ).forEach(q=>{const k=e.pessoa||LB.norm(e.nome);const x=P[k]=P[k]||{k,nome:e.nome,pix:e.pix,tot:0,it:[]};x.tot+=q.f;if(!x.pix)x.pix=e.pix;
       x.it.push({b:Object.assign({},b,{data:q.d}),e,i,f:q.f,ps:q.ps,fut:q.d>HJ,ant:q.d<b.data})})}));
   Object.values(D.borderos||{}).filter(b=>b.data<=HJ).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!t.para||!(+t.valor>0))return; // itens com "pagar para"
     const k=t.pessoa||LB.norm(t.para);const x=P[k]=P[k]||{k,nome:t.para,pix:t.pix,tot:0,it:[]};x.tot+=+t.valor;if(!x.pix)x.pix=t.pix;
