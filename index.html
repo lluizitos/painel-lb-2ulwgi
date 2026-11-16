@@ -357,10 +357,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwjq4p8u"></script>
-<script src="lbmetas.js?v=mwjq4p8u"></script>
-<script src="lbchat.js?v=mwjq4p8u"></script>
-<script src="lbvendas.js?v=mwjq4p8u"></script>
+<script src="lb.js?v=mwjrlzes"></script>
+<script src="lbmetas.js?v=mwjrlzes"></script>
+<script src="lbchat.js?v=mwjrlzes"></script>
+<script src="lbvendas.js?v=mwjrlzes"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -680,7 +680,7 @@ function renderRend(){
     const med=ks.length?ks.reduce((a,x)=>a+r.meses[x].total,0)/ks.length:null;
     const ano=Object.entries(r.meses).filter(([x])=>x.startsWith(ANO)).reduce((a,[,v])=>a+v.total,0);
     const tot=Object.values(r.meses).reduce((a,v)=>a+v.total,0),desde=Object.keys(r.meses)[0];
-    const g=LB.grafico(ult12.map(x=>MES3[+x.slice(5,7)-1]),[{nome:'Fixo',cor:'#6F697D',vals:ult12.map(x=>(r.meses[x]||{}).fixo||0)},{nome:'Por show',cor:'#CF1D51',vals:ult12.map(x=>(r.meses[x]||{}).shows||0)}],{ks:ult12,hi:11,plano:true,fmt:v=>kf(v).replace(' mil','k'),tfmt:brl,nomes:ult12.map(mname)});
+    const g=LB.grafico(ult12.map(x=>MES3[+x.slice(5,7)-1]),[{nome:'Fixo',cor:'#6F697D',vals:ult12.map(x=>(r.meses[x]||{}).fixo||0)},{nome:'Por show',cor:'#CF1D51',vals:ult12.map(x=>(r.meses[x]||{}).shows||0)},{nome:'Avulsos',cor:'#F2B66B',vals:ult12.map(x=>(r.meses[x]||{}).avulso||0)}],{ks:ult12,hi:11,plano:true,fmt:v=>kf(v).replace(' mil','k'),tfmt:brl,nomes:ult12.map(mname)});
     const vd=r.vendedor&&r.vendedor.length?pv(r.nome.split(' (')[0]):null;
     return `<div class="pess"><div class="hd"><div><b>${esc(r.nome)}</b><span>${esc(r.funcao)}${r.fixo?' · fixo '+brl(r.fixo)+'/mês':''}</span></div></div>
     ${atv(r,MA)}
