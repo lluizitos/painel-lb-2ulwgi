@@ -190,7 +190,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 <body>
 <div id="pg">
 <header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
-<nav class="ptabs" id="setores"><button class="on" data-s="agenda">Agenda</button><button data-s="pags">Pagamentos</button><button data-s="equipe">Equipe</button></nav></header>
+<nav class="ptabs" id="setores"><button class="on" data-s="agenda">Agenda</button><button data-s="pags">Pagamentos</button><button data-s="equipe">Equipe</button><button data-s="fin">Financeiro</button></nav></header>
 <div class="wrap" id="main">
 <p class="eyebrow">Artista</p><h1>Lucas <em>Barros</em></h1>
 <div id="lbq"></div>
@@ -215,6 +215,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
   <div id="pgad"></div>
 </section>
 
+<section id="s_fin" hidden><iframe id="finfr" title="Financeiro" style="display:block;width:calc(100% + 32px);margin:0 -16px;border:0;height:calc(100vh - 120px);background:transparent"></iframe></section>
 <section id="s_equipe" hidden>
   <h2 class="tt">Metas da empresa</h2><div id="metas"><div class="vazio">Carregando…</div></div>
   <h2 class="tt">Equipe <small>tarefas e metas de cada um</small></h2>
@@ -224,9 +225,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwjtl7sf"></script>
-<script src="../lbmetas.js?v=mwjtl7sf"></script>
-<script src="../lbchat.js?v=mwjtl7sf"></script>
+<script src="../lb.js?v=mwjtt5zb"></script>
+<script src="../lbmetas.js?v=mwjtt5zb"></script>
+<script src="../lbchat.js?v=mwjtt5zb"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -502,7 +503,8 @@ function renderValores(){const el=document.getElementById('valores');if(!el)retu
     <h5 style="margin:16px 0 6px;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)">Equipe por mês</h5>${gr}</div>`}
 
 /* ---------- abas ---------- */
-function setor(s){if(!['agenda','pags','equipe'].includes(s))s='agenda';document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));['agenda','pags','equipe'].forEach(x=>document.getElementById('s_'+x).hidden=x!==s);ST.set('lb_art_setor',s)}
+function setor(s){if(!['agenda','pags','equipe','fin'].includes(s))s='agenda';document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));['agenda','pags','equipe','fin'].forEach(x=>document.getElementById('s_'+x).hidden=x!==s);ST.set('lb_art_setor',s);
+  if(s==='fin'){const f=document.getElementById('finfr');if(!f.src)f.src='../?embed=1';const h=document.querySelector('header');f.style.height='calc(100vh - '+((h?h.offsetHeight:110)+8)+'px)'}} // 16/11: aba Financeiro = a página do Financeiro embutida (mesmo login)
 document.getElementById('setores').onclick=e=>{const b=e.target.closest('[data-s]');if(b){setor(b.dataset.s);scrollTo({top:0,behavior:'smooth'})}};
 
 /* ---------- shows: linha do tempo (o mesmo cartão do Financeiro); tocar abre o borderô ---------- */
