@@ -147,7 +147,7 @@ label textarea{min-height:60px;resize:vertical}
     <div class="card"><div class="f">
       <label>Tipo<select id="e_tp"><option value="meta">Meta</option><option value="alerta">Alerta</option><option value="despesa">Despesa prevista</option><option value="tarefa">Tarefa da empresa</option></select></label>
       <label>Mostrar para o sócio<select id="e_so"><option value="não">Não (só administração)</option><option value="sim">Sim</option></select></label>
-      <label>Aviso no topo do painel<select id="e_pn"><option value="não">Não</option><option value="sim">Sim</option></select></label>
+      <label>Aviso no topo (Financeiro e Artista)<select id="e_pn"><option value="não">Não</option><option value="sim">Sim</option></select></label>
       <label class="w">Título<input id="e_tit" placeholder="ex.: Cachê de prefeitura em R$ 35 mil"></label>
       <label class="w">Alvo / o que é<input id="e_alvo" placeholder="ex.: R$ 35 mil por show de prefeitura"></label>
       <label>Prazo / quando<input id="e_pz" placeholder="ex.: carnaval 2027"></label>
@@ -305,8 +305,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwiq1cg3"></script>
-<script src="../lbmetas.js?v=mwiq1cg3"></script>
+<script src="../lb.js?v=mwjcag2n"></script>
+<script src="../lbmetas.js?v=mwjcag2n"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -780,7 +780,7 @@ $('duv_f').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;DUVF=b.
 $('duv_l').addEventListener('click',async e=>{const b=e.target.closest('[data-ds]');if(!b)return;const r=document.querySelector(`[data-dr="${b.dataset.ds}"]`).value.trim();if(!r){b.textContent='escreva a resposta';return}
   b.disabled=true;b.textContent='enviando…';try{DUV=(await api({acao:'responder_duvida',id:b.dataset.ds,resposta:r})).duvidas||DUV;duvRender()}catch(err){b.disabled=false;b.textContent='não enviou: '+err.message}});
 </script>
-<script src="../lbchat.js?v=mwiq1cg3"></script>
+<script src="../lbchat.js?v=mwjcag2n"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

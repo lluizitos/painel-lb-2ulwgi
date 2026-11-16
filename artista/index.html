@@ -31,7 +31,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .note{color:var(--muted);font-size:12.5px;margin:8px 0 0}
 .ic{width:16px;height:16px;flex:none;vertical-align:-3px;margin-right:6px}
 /* avisos urgentes */
-#urg{display:grid;gap:8px;margin:14px 0 4px}#urg:empty{display:none}
+#urg{display:grid;gap:8px;margin:14px 0 4px}#urg:empty{display:none}.urgh{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px;color:var(--ink)}.urgh button{background:none;border:1px solid var(--line);border-radius:99px;padding:6px 14px;font:inherit;font-size:13.5px;color:var(--sub);cursor:pointer;flex:none}
 .urg{display:flex;gap:10px;align-items:center;width:100%;text-align:left;font:inherit;color:var(--ink);background:rgba(255,143,168,.1);border:1px solid rgba(255,143,168,.5);border-radius:14px;padding:12px 14px;cursor:pointer;animation:pisca 1.4s ease-in-out infinite}
 .urg span{font-size:14.5px;font-weight:600}.urg small{display:block;font-size:12.5px;font-weight:400;color:var(--neg);margin-top:2px}.urg .ic{width:20px;height:20px;margin:0;color:var(--neg)}
 @keyframes pisca{0%,100%{border-color:rgba(255,143,168,.5)}50%{border-color:var(--neg);background:rgba(255,143,168,.2)}}
@@ -179,9 +179,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwiq1cg3"></script>
-<script src="../lbmetas.js?v=mwiq1cg3"></script>
-<script src="../lbchat.js?v=mwiq1cg3"></script>
+<script src="../lb.js?v=mwjcag2n"></script>
+<script src="../lbmetas.js?v=mwjcag2n"></script>
+<script src="../lbchat.js?v=mwjcag2n"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -215,12 +215,14 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-vm]');if(!
 /* ---------- avisos urgentes no topo ---------- */
 function urgentes(){const U=[];
   ((TAR&&TAR.metas)||[]).forEach(m=>{if(FEITO.test(m.situacao||''))return;
-    if(m.tipo==='alerta')U.push({t:m.titulo,s:[m.alvo,m.prazo?'prazo '+ddmm(m.prazo):''].filter(Boolean).join(' · '),d:ISO.test(m.prazo||'')?m.prazo:''});
+    if(m.painel==='sim')U.push({t:m.titulo,s:[m.alvo,m.prazo?'prazo '+(ISO.test(m.prazo)?ddmm(m.prazo):m.prazo):''].filter(Boolean).join(' · '),d:ISO.test(m.prazo||'')?m.prazo:'',fixo:1}); // marcado no Admin "Aviso no topo": sempre aparece
+    else if(m.tipo==='alerta')U.push({t:m.titulo,s:[m.alvo,m.prazo?'prazo '+ddmm(m.prazo):''].filter(Boolean).join(' · '),d:ISO.test(m.prazo||'')?m.prazo:''});
     else if(ISO.test(m.prazo||'')&&dias(m.prazo)<=2&&m.tipo!=='despesa')U.push({t:m.titulo,s:dias(m.prazo)<0?'atrasada desde '+ddmm(m.prazo):dias(m.prazo)===0?'é hoje':'falta '+dias(m.prazo)+' dia'+(dias(m.prazo)>1?'s':''),d:m.prazo})});
   ((MIN&&MIN.tarefas)||[]).forEach(t=>{if(t.status==='Concluída'||!ISO.test(t.prazo||''))return;const n=dias(t.prazo);
     if(n<=1)U.push({t:'Sua tarefa: '+t.titulo,s:n<0?'atrasada desde '+ddmm(t.prazo):n===0?'é hoje':'é amanhã',d:t.prazo})});
-  document.getElementById('urg').innerHTML=U.slice(0,4).map(u=>`<button class="urg" data-urd="${esc(u.d)}">${IC.al}<span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join('')}
-document.getElementById('urg').onclick=e=>{const b=e.target.closest('.urg');if(!b)return;setor('agenda');if(b.dataset.urd)diaPop(b.dataset.urd)};
+  const UF=U.filter(u=>u.fixo),UL=UF.concat(U.filter(u=>!u.fixo).slice(0,3)),min=ST.get('lb_urg_min')==='1';
+  document.getElementById('urg').innerHTML=!UL.length?'':`<div class="urgh"><span>🔔 <b>${UL.length} aviso${UL.length>1?'s':''}</b></span><button type="button" data-urgmin>${min?'ver ▾':'minimizar ▴'}</button></div>`+(min?'':UL.map(u=>`<button class="urg" data-urd="${esc(u.d)}">${IC.al}<span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join(''))}
+document.getElementById('urg').onclick=e=>{if(e.target.closest('[data-urgmin]')){ST.set('lb_urg_min',ST.get('lb_urg_min')==='1'?'0':'1');urgentes();return}const b=e.target.closest('.urg');if(!b)return;setor('agenda');if(b.dataset.urd)diaPop(b.dataset.urd)};
 
 /* ======================= AGENDA ======================= */
 const CAT={show:{n:'Shows',c:'pt-s'},pag:{n:'Pagamentos',c:'pt-c'},tar:{n:'Minhas tarefas',c:'pt-t'},emp:{n:'Empresa',c:'pt-e'}};
