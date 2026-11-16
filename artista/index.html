@@ -179,9 +179,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwjkvzyo"></script>
-<script src="../lbmetas.js?v=mwjkvzyo"></script>
-<script src="../lbchat.js?v=mwjkvzyo"></script>
+<script src="../lb.js?v=mwjl6mjq"></script>
+<script src="../lbmetas.js?v=mwjl6mjq"></script>
+<script src="../lbchat.js?v=mwjl6mjq"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -404,9 +404,7 @@ document.addEventListener('click',e=>{
 
 /* ======================= EQUIPE: um quadro por pessoa, com gráficos ======================= */
 function rendDe(nome){const n=LB.norm(nome||'');return (D.rendimento||[]).find(r=>{const q=LB.norm(r.nome);return q===n||q.startsWith(n+' ')||n.startsWith(q+' ')})}
-function barras(vals,labels,cor,fmt){const W=320,H=96,n=vals.length,mx=Math.max(1,...vals),bw=W/n;
-  return `<svg viewBox="0 0 ${W} ${H+18}" role="img">${vals.map((v,i)=>{const h=Math.round(v/mx*(H-14));const x=i*bw+bw*.18,w=bw*.64;
-    return `<rect x="${x}" y="${H-h}" width="${w}" height="${Math.max(h,1.5)}" rx="3" fill="${v?cor:'var(--line)'}"/>${v?`<text x="${x+w/2}" y="${H-h-4}" text-anchor="middle" font-size="10" fill="var(--sub)">${fmt?fmt(v):v}</text>`:''}<text x="${x+w/2}" y="${H+13}" text-anchor="middle" font-size="9.5" fill="var(--muted)">${labels[i]}</text>`}).join('')}</svg>`}
+function barras(vals,labels,cor,fmt){return LB.grafico(labels,[{nome:'',cor:String(cor).replace('var(--pos)','#7FDDA9').replace('var(--pinkl)','#F0507E'),vals}],{semLeg:true,fmt:fmt||(v=>v),h:140})}
 const kS=v=>v>=1000?(Math.round(v/100)/10).toString().replace('.',',')+'k':String(Math.round(v));
 function renderEquipe(){const el=document.getElementById('equipe');if(!TAR){el.innerHTML='<div class="vazio">Não consegui carregar agora.</div>';return}
   const P=(TAR.perfis||[]).filter(p=>p.ativo!=='não'&&!/^teste/i.test(p.nome||'')&&!/^teste/i.test(p.id||''));

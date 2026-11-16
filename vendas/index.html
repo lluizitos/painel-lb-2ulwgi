@@ -61,7 +61,7 @@ label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-t
 label input,label select,label textarea{display:block;width:100%;margin-top:5px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;letter-spacing:0;text-transform:none;font-weight:400}
 label textarea{min-height:64px;resize:vertical}
 .prev{margin-top:14px}
-.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}.rmx{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.rmx p{flex-basis:100%;margin:0 0 2px;font-size:13px;color:var(--sub)}.rmx button{flex:1 1 160px}.btn.rmc{border-color:var(--amber);color:var(--amber)}.btn.rmd{border-color:var(--neg);color:var(--neg)}.btn.rmd.ok{background:var(--neg);color:#fff}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}.rmx[hidden],.rmx [hidden]{display:none!important}.rmx{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.rmx p{flex-basis:100%;margin:0 0 2px;font-size:13px;color:var(--sub)}.rmx button{flex:1 1 160px}.btn.rmc{border-color:var(--amber);color:var(--amber)}.btn.rmd{border-color:var(--neg);color:var(--neg)}.btn.rmd.ok{background:var(--neg);color:#fff}
 #msg{min-height:20px;font-size:13px;margin-top:8px;text-align:right}
 /* senha */
 #lock{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
@@ -170,8 +170,8 @@ label textarea{min-height:64px;resize:vertical}
 </form></div>
 <div id="vw"><div class="vwc"><div id="vwb"></div><button type="button" class="btn" id="vwx">Fechar</button></div></div>
 
-<script src="../lb.js?v=mwjkvzyo"></script>
-<script src="../lbvendas.js?v=mwjkvzyo"></script>
+<script src="../lb.js?v=mwjl6mjq"></script>
+<script src="../lbvendas.js?v=mwjl6mjq"></script>
 <script>
 const TIPOS=['Show','Prefeitura','Casamento','Aniversário','Formatura','Evento corporativo','Evento de fim de ano','Réveillon','Rodeio','Exposição','Show próprio (Sem Roteiro)','Show próprio (Colab)'];
 const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
@@ -226,15 +226,7 @@ let MEU=null;
 function quemSou(){const c=[NOME,LB.login].map(x=>LB.norm(x||'')).filter(Boolean);for(const x of c)if(ALIAS[x])return ALIAS[x];
   const ns=[...new Set(SHOWS.map(nmV))];return ns.find(n=>c.some(x=>LB.norm(n).split(' ')[0]===x.split(' ')[0]))||null}
 const kfV=v=>{const a=Math.abs(v);return a>=1000?Math.round(a/1000)+'k':String(Math.round(a))};
-function grafV(labels,series,o={}){const st=o.modo!=='lado',n=labels.length,W=Math.max(320,n*(st?30:38)),H=o.h||140,T=16,B=18,cw=W/n,fmt=o.fmt||(v=>v),tf=o.tfmt||fmt,k=series.length,ph=H-B-T;
-  const V=(s,i)=>Math.max(0,s.vals[i]||0),tot=labels.map((_,i)=>series.reduce((a,s)=>a+V(s,i),0)),mx=Math.max(1,...(st?tot:labels.flatMap((_,i)=>series.map(s=>V(s,i)))));let g='';
-  labels.forEach((l,i)=>{const x0=i*cw;
-    if(st){let y=H-B;const bx=x0+cw*.2,bw=cw*.6;series.forEach(s=>{const v=V(s,i);if(!v)return;const hh=ph*v/mx;y-=hh;g+=`<rect x="${bx}" y="${y}" width="${bw}" height="${hh}" rx="2" fill="${s.cor}"/>`});
-      if(tot[i])g+=`<text x="${bx+bw/2}" y="${y-4}" text-anchor="middle" font-size="10" font-weight="700" fill="#F3F1F6">${fmt(tot[i])}</text>`}
-    else{const bw=cw*.72/k;series.forEach((s,j)=>{const v=V(s,i),hh=ph*v/mx;if(v)g+=`<rect x="${x0+cw*.14+j*bw+1}" y="${H-B-hh}" width="${Math.max(1,bw-2)}" height="${hh}" rx="2" fill="${s.cor}"/>`})}
-    g+=`<text x="${x0+cw/2}" y="${H-5}" text-anchor="middle" font-size="10" fill="${i===o.hi?'#F0507E':'#8B8697'}">${esc(l)}</text>`;
-    const ss=series.filter(s=>s.vals[i]);g+=`<rect x="${x0}" y="0" width="${cw}" height="${H}" fill="transparent" style="cursor:pointer" data-t="${esc((o.nomes?o.nomes[i]:l)+': '+(ss.length?ss.map(s=>s.nome+' '+tf(s.vals[i])).join(' · '):'nada'))}"/>`});
-  return `<div class="chart"><div class="leg">${series.map(s=>`<span><i style="background:${s.cor}"></i>${esc(s.nome)}</span>`).join('')}</div><svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:auto">${g}</svg><div class="tip">Toque numa barra para ver os valores.</div></div>`}
+function grafV(labels,series,o={}){return LB.grafico(labels,series,o)}
 const kcV=(l,v,s,c)=>`<div class="kc"><div class="l">${l}</div><div class="v"${c?` style="color:${c}"`:''}>${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`;
 const hbV=(L,fmt)=>{const mx=Math.max(1,...L.map(x=>x[1]));return `<div class="hb">${L.map(([n,v,c])=>`<div class="it"><span title="${esc(n)}">${esc(n)}</span><div class="tr"><i style="width:${Math.max(3,v/mx*100)}%;${c?'background:'+c:''}"></i></div><b>${fmt?fmt(v):v}</b></div>`).join('')||'<p class="note" style="margin:0">Nada ainda.</p>'}</div>`};
 function renderMeu(){const el=document.getElementById('tmeu'),S=SHOWS.filter(s=>s.status!=='Cancelado'&&/^\d{4}-\d{2}-\d{2}/.test(s.data||''));
@@ -255,11 +247,11 @@ function renderMeu(){const el=document.getElementById('tmeu'),S=SHOWS.filter(s=>
     kcV('Valor vendido',brl(vt),mAno.length?'médio '+brl(vt/mAno.length)+' por show':'')+
     kcV('Comissão',com!=null?brl(vt*com/100):'a definir',com!=null?com+'% do cachê (estimativa)':'% ainda não definida',com!=null?'var(--pos)':'var(--pinkl)')+
     kcV('Participação',Math.round(part*100)+'%',pos?`${pos}º de ${rk.length} em vendas no ano`:'do total da empresa')+'</div>';
-  h+=`<h3>Meus shows por mês</h3>`+grafV(mm.map(MS),[{nome:'Feitos',cor:'#7FDDA9',vals:mm.map(k=>doM(mAno,k).filter(feito).length)},{nome:'Confirmados',cor:'#F0507E',vals:mm.map(k=>doM(mAno,k).filter(s=>!feito(s)&&s.status!=='A confirmar').length)},{nome:'A confirmar',cor:'#F2B66B',vals:mm.map(k=>doM(mAno,k).filter(s=>!feito(s)&&s.status==='A confirmar').length)}],{hi:+MA.slice(5,7)-1,nomes:mm.map(k=>MS(k)+'/'+k.slice(2,4)+' · '+brl(soma(doM(mAno,k))))});
-  h+=`<h3>Valor por mês <small>eu × resto da empresa</small></h3>`+grafV(mm.map(MS),[{nome:MEU,cor:'#CF1D51',vals:mm.map(k=>soma(doM(mAno,k)))},{nome:'Resto da empresa',cor:'#4A4555',vals:mm.map(k=>soma(doM(tAno,k))-soma(doM(mAno,k)))}],{fmt:kfV,tfmt:brl,hi:+MA.slice(5,7)-1});
+  h+=`<h3>Meus shows por mês</h3>`+grafV(mm.map(MS),[{nome:'Feitos',cor:'#CF1D51',vals:mm.map(k=>doM(mAno,k).filter(feito).length)},{nome:'Marcados',cor:'#F0507E',tipo:'contorno',vals:mm.map(k=>doM(mAno,k).filter(s=>!feito(s)).length)}],{ks:mm,media:true,hi:+MA.slice(5,7)-1,nomes:mm.map(k=>{const ac=doM(mAno,k).filter(s=>!feito(s)&&s.status==='A confirmar').length;return MS(k)+'/'+k.slice(2,4)+' · '+brl(soma(doM(mAno,k)))+(ac?' · '+ac+' a confirmar':'')})});
+  h+=`<h3>Valor por mês <small>eu × resto da empresa</small></h3>`+grafV(mm.map(MS),[{nome:MEU,cor:'#CF1D51',vals:mm.map(k=>soma(doM(mAno,k)))},{nome:'Resto da empresa',cor:'#4A4555',vals:mm.map(k=>soma(doM(tAno,k))-soma(doM(mAno,k)))}],{ks:mm,fmt:kfV,tfmt:brl,hi:+MA.slice(5,7)-1});
   const cc=(t,k)=>{const l=doM(meus,k);return kcV(t,l.length+' show'+(l.length===1?'':'s'),brl(soma(l)))};
   h+=`<h3>Comparativo</h3><div class="mk3">${cc('Este mês',MA)}${cc('Mês passado',mesAnt)}${cc('Mesmo mês '+A1,A1+MA.slice(4))}</div><div style="margin-top:10px">`+
-    grafV(mm.map(MS),[{nome:A1+' ('+mA1.length+')',cor:'#6F697D',vals:mm.map(k=>doM(mA1,A1+k.slice(4)).length)},{nome:ANO+' ('+mAno.length+')',cor:'#F0507E',vals:mm.map(k=>doM(mAno,k).length)}],{modo:'lado',hi:+MA.slice(5,7)-1,tfmt:v=>v+' show'+(v===1?'':'s')})+'</div>';
+    grafV(mm.map(MS),[{nome:A1+' ('+mA1.length+')',cor:'#6F697D',vals:mm.map(k=>doM(mA1,A1+k.slice(4)).length)},{nome:ANO+' ('+mAno.length+')',cor:'#F0507E',vals:mm.map(k=>doM(mAno,k).length)}],{modo:'lado',ks:mm,hi:+MA.slice(5,7)-1,tfmt:v=>v+' show'+(v===1?'':'s')})+'</div>';
   h+=`<div class="g2"><div><h3>Cidades <small>${Object.keys(cid).length}</small></h3>${hbV(Object.entries(cid).sort((a,b)=>b[1]-a[1]).slice(0,6))}</div><div><h3>Por tipo de show</h3>${hbV(Object.entries(tip).sort((a,b)=>b[1]-a[1]).map(([n,v])=>[n,v,'#7AB8FF']),brl)}</div></div>`;
   h+=`<h3>Falta receber dos meus shows <small>${rec.length?brl(frec):''}</small></h3><div class="hb">${rec.sort((a,b)=>a.data.localeCompare(b.data)).slice(0,8).map(s=>`<div class="rl"><span>${s.data.slice(8,10)}/${s.data.slice(5,7)} · ${esc(s.evento||s.tipo||'Show')} · ${esc(s.cidade||'')}</span><b>${brl((+s.valor||0)-(+s.recebido||0))}</b></div>`).join('')||'<p class="note" style="margin:0">Nada a receber. 👏</p>'}</div>`;
   el.innerHTML=h}
@@ -443,7 +435,7 @@ ef.addEventListener('submit',async e=>{e.preventDefault();const m=document.getEl
   catch(err){m.innerHTML='<span class="neg">Não salvou ('+esc(err.message)+'). Tente de novo.</span>'}
   bt.disabled=false});
 </script>
-<script src="../lbchat.js?v=mwjkvzyo"></script>
+<script src="../lbchat.js?v=mwjl6mjq"></script>
 <script>LBCHAT.auto(document.querySelector('main.wrap').firstElementChild,{base:'../',pagina:'Vendas',exemplo:'quantos shows vendi este mês?'})</script>
 </body>
 </html>

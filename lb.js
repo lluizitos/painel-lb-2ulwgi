@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwjkvzyo';
+  const BUILD = 'mwjl6mjq';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -356,7 +356,47 @@
   async function ponteRec(u, nova, rec) { const s = crypto.getRandomValues(new Uint8Array(16)), i = crypto.getRandomValues(new Uint8Array(12));
     const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: i }, await kSenha(u, nova, s, 'encrypt'), new TextEncoder().encode(RP + rec));
     return JSON.stringify({ s: enc64(s), i: enc64(i), c: enc64(ct) }); }
-  window.LB = { ponteRec, cofreExtra, entrar, links, menuLogado, anexo, sair, perfil, norm, store, NOMES, pg, pgx };
+
+  /* ---------- gráfico padrão (formato do Vendas): barras arredondadas, número em cima, mês atual destacado, ano embaixo, linhas por cima ----------
+     series=[{nome,cor,vals,tipo}] tipo: 'barra' (padrão) · 'contorno' (só a borda: marcados/previstos) · 'linha' (ex.: saldo; hoje: texto na legenda)
+     o: modo 'lado' · ks (AAAA-MM, põe o ano) · hi (coluna destacada) · media (média de 3 meses) · est (a partir dessa coluna = estimativa) · fmt · tfmt · nomes · semLeg · h · rot:false */
+  function grafico(labels, series, o = {}) {
+    if (!document.getElementById('lbg-css')) { const st = document.createElement('style'); st.id = 'lbg-css';
+      st.textContent = '.lbg{background:var(--card,#1E1C24);border-radius:14px;padding:14px 12px 8px}.lbg svg{display:block;width:100%;max-width:620px;height:auto;margin:0 auto}.lbg-leg{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:12.5px;color:var(--sub,#B8B3C3);padding:0 4px 8px}.lbg-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}.lbg-leg b{color:var(--ink,#F3F1F6)}.lbg-tip{font-size:13px;color:var(--sub,#B8B3C3);min-height:20px;padding:4px 4px 0}';
+      document.head.appendChild(st);
+      document.addEventListener('click', e => { const t = e.target.closest && e.target.closest('[data-lbt]'); if (t) { const x = t.closest('.lbg').querySelector('.lbg-tip'); if (x) x.textContent = t.dataset.lbt; } });
+      document.addEventListener('mouseover', e => { const t = e.target.closest && e.target.closest('[data-lbt]'); if (t) { const x = t.closest('.lbg').querySelector('.lbg-tip'); if (x) x.textContent = t.dataset.lbt; } }); }
+    const es = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const n = labels.length, W = 360, H = o.h || (o.ks ? 178 : 160), pl = 8, pr = 8, pt = 18, pb = o.ks ? 30 : 20, cw = (W - pl - pr) / Math.max(1, n), fmt = o.fmt || (v => v), tf = o.tfmt || fmt, lado = o.modo === 'lado';
+    const B = series.filter(s => s.tipo !== 'linha'), L = series.filter(s => s.tipo === 'linha'), V = (s, i) => Math.max(0, +s.vals[i] || 0);
+    const tot = labels.map((_, i) => B.reduce((a, s) => a + V(s, i), 0));
+    const lv = L.flatMap(s => s.vals.filter(v => v != null && isFinite(v)).map(Number));
+    const mx = Math.max(1, ...(lado ? labels.flatMap((_, i) => B.map(s => V(s, i))) : tot), ...lv), mn = Math.min(0, ...lv), ph = H - pt - pb, y = v => pt + ph * (mx - v) / (mx - mn), y0 = y(0);
+    let g = '', tx = ''; const pass = n > 14, est = o.est != null && o.est >= 0 ? o.est : n;
+    if (est < n) g += `<rect x="${pl + est * cw}" y="${pt - 12}" width="${(n - est) * cw}" height="${ph + 12}" fill="#CF1D51" opacity=".06"/><text x="${pl + est * cw + 4}" y="${pt - 2}" font-size="9" font-weight="700" letter-spacing="1" fill="#F0507E">ESTIMATIVA</text>`;
+    labels.forEach((l, i) => { const x0 = pl + i * cw, op = i >= est ? ' opacity=".6"' : '';
+      if (i === o.hi) g += `<rect x="${x0}" y="${pt - 12}" width="${cw}" height="${ph + 12}" fill="#F3F1F6" opacity=".06"/>`;
+      if (lado) { const k = B.length, gw = cw * .8, bw = gw / k; B.forEach((s, j) => { const v = V(s, i); if (v) g += `<rect x="${x0 + cw * .1 + j * bw + .8}" y="${y(v)}" width="${Math.max(1, bw - 1.6)}" height="${y0 - y(v)}" rx="2.5" fill="${s.cor}"${op}/>`; }); }
+      else { const bw = Math.max(4, cw * .62), bx = x0 + (cw - bw) / 2;
+        const ct = B.find(s => s.tipo === 'contorno'); if (ct && tot[i]) g += `<rect x="${bx}" y="${y(tot[i])}" width="${bw}" height="${y0 - y(tot[i])}" rx="3" fill="none" stroke="${ct.cor}" stroke-width="1.3"/>`;
+        let a = 0; B.filter(s => s.tipo !== 'contorno').forEach(s => { const v = V(s, i); if (!v) return; g += `<rect x="${bx}" y="${y(a + v)}" width="${bw}" height="${y(a) - y(a + v)}" rx="3" fill="${s.cor}"${op}/>`; a += v; });
+        if (o.rot !== false && tot[i]) tx += `<text x="${bx + bw / 2}" y="${y(tot[i]) - 4}" text-anchor="middle" font-size="10.5" fill="#B8B3C3" stroke="#1E1C24" stroke-width="3" paint-order="stroke">${fmt(tot[i])}</text>`; }
+      if (!pass || i % 2 === 0 || i === o.hi) g += `<text x="${x0 + cw / 2}" y="${H - pb + 15}" text-anchor="middle" font-size="10.5" font-weight="${i === o.hi ? 700 : 400}" fill="${i === o.hi ? '#F0507E' : '#8B8697'}">${es(l)}</text>`;
+      if (o.ks && (i === 0 || String(o.ks[i]).slice(5) === '01')) g += `<text x="${x0 + cw / 2}" y="${H - 3}" text-anchor="middle" font-size="9" fill="#8B8697">${String(o.ks[i]).slice(0, 4)}</text>`; });
+    g += `<line x1="${pl}" x2="${W - pr}" y1="${y0}" y2="${y0}" stroke="#3A3644"/>`;
+    if (o.media) { const pts = []; labels.forEach((_, i) => { if (o.hi != null && o.hi >= 0 && i > o.hi) return; const j = [i, i - 1, i - 2].filter(q => q >= 0); pts.push(`${pl + i * cw + cw / 2},${y(j.reduce((a, q) => a + tot[q], 0) / j.length)}`); });
+      if (pts.length > 1) g += `<polyline points="${pts.join(' ')}" fill="none" stroke="#F2B66B" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`; }
+    L.forEach(s => { const P = labels.map((_, i) => s.vals[i] == null || !isFinite(s.vals[i]) ? null : [pl + i * cw + cw / 2, y(+s.vals[i]), i]).filter(Boolean);
+      const pp = P.map(p => p[0] + ',' + p[1]).join(' ');
+      if (P.length > 1) g += `<polyline points="${pp}" fill="none" stroke="#1E1C24" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${pp}" fill="none" stroke="${s.cor}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`;
+      P.forEach(p => g += `<circle cx="${p[0]}" cy="${p[1]}" r="3.2" fill="${+s.vals[p[2]] < 0 ? '#FF8FA8' : s.cor}" stroke="#1E1C24" stroke-width="1.5"/>`); });
+    g += tx;
+    labels.forEach((l, i) => { const ss = series.filter(s => s.vals[i] != null && (s.tipo === 'linha' || +s.vals[i])); const t = (o.nomes ? o.nomes[i] : l) + (i >= est ? ' (estimativa)' : '') + ': ' + (ss.length ? ss.map(s => s.nome + ' ' + tf(+s.vals[i])).join(' · ') : 'nada');
+      g += `<rect x="${pl + i * cw}" y="0" width="${cw}" height="${H}" fill="#F3F1F6" opacity="0" data-lbt="${es(t)}" style="cursor:pointer"/>`; });
+    const leg = `<div class="lbg-leg">${series.filter(s => s.nome).map(s => `<span><i style="${s.tipo === 'linha' ? `background:${s.cor};border-radius:99px;height:3px;vertical-align:3px;width:14px` : s.tipo === 'contorno' ? `background:transparent;border:1.5px solid ${s.cor}` : `background:${s.cor}`}"></i>${es(s.nome)}${s.hoje ? ` <b>${es(s.hoje)}</b>` : ''}</span>`).join('')}${o.media ? `<span><i style="background:#F2B66B;border-radius:99px;height:3px;vertical-align:3px;width:14px"></i>Média de 3 meses</span>` : ''}</div>`;
+    return `<div class="lbg">${o.semLeg ? '' : leg}<svg viewBox="0 0 ${W} ${H}" role="img">${g}</svg><div class="lbg-tip">${es(o.dica || 'Toque numa barra para ver os valores.')}</div></div>`;
+  }
+  window.LB = { ponteRec, cofreExtra, entrar, links, menuLogado, anexo, sair, perfil, norm, store, NOMES, pg, pgx, grafico };
 
   /* "Ver mais": toda lista longa (.list) e todo grupo de borderô (.gp) mostra só os primeiros itens.
      Limite: data-max no elemento (padrão 5 em listas, 4 em grupos). data-max="0" desliga. */
