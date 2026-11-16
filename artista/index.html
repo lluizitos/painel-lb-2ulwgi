@@ -143,6 +143,20 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .pmais{display:block;width:100%;border:0;border-top:1px solid var(--line);background:transparent;color:var(--pinkl);padding:9px 0 2px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;text-align:left}
 .pall{display:block;width:100%;border:1px solid rgba(127,221,169,.45);background:transparent;color:var(--pos);border-radius:99px;padding:7px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;margin-top:10px}
 .pcp{display:block;margin:8px auto 0;border:0;background:none;color:var(--muted);font:inherit;font-size:12px;text-decoration:underline;cursor:pointer}
+.pill.pk{background:rgba(207,29,81,.18);color:var(--pinkl)}
+/* shows (linha do tempo, igual ao Financeiro) */
+.show{background:var(--card);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden;--sc:var(--pink)}.show.sb::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--sc)}
+.show.s-ok{--sc:#3FB97A}.show.s-am{--sc:var(--amber)}.show.s-pk{--sc:var(--pink)}.show.s-fr{--sc:#FF6B6B}.show.s-cx{--sc:#5E5868}
+.show.s-ok,.show.s-am,.show.s-pk,.show.s-fr,.show.s-cx{box-shadow:0 0 0 1px color-mix(in srgb,var(--sc) 35%,transparent),0 6px 22px -8px color-mix(in srgb,var(--sc) 60%,transparent)}
+.show .hd{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.show .hd b{font-size:15px;display:block}.show .hd .pill{flex:none;overflow:visible;max-width:none}.show .hd span{font-size:12px;color:var(--muted)}
+.show .nums{display:grid;grid-template-columns:1fr 1fr;gap:8px 6px;margin-top:10px}.show .nums div{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.show .nums div b{display:block;font-size:14px;letter-spacing:0;color:var(--ink);margin-top:2px;white-space:nowrap}.show .nums b.pk{color:var(--pinkl)}.show .nums .pos{color:var(--pos)}.show .nums .neg{color:var(--neg)}
+.show .prog{height:8px;border-radius:99px;background:var(--card2);overflow:hidden;margin-top:8px}.show .prog i{display:block;height:100%;background:var(--pink);border-radius:99px}
+.show .ob{font-size:12px;color:var(--muted);margin-top:8px}.show .vb{font-size:12px;color:var(--sc);font-weight:700;margin-top:8px}.show .dt{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--sc);margin-bottom:6px}
+.fmc{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.fm{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:99px;background:var(--card2);color:var(--sub);white-space:nowrap}.fm b{color:var(--ink)}.fm.mu{background:rgba(207,29,81,.16);color:var(--pinkl)}.fm.mu b{color:#fff}
+.tlwrap{position:relative;margin:10px -16px 0}.tl{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 16px 14px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.tl .show{flex:none;width:262px;scroll-snap-align:center;cursor:pointer}.tl .show.past{opacity:.72}
+.hoje{flex:none;width:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;scroll-snap-align:center;gap:8px}.hoje i{width:2px;flex:1;background:linear-gradient(var(--pink),transparent)}.hoje b{font-size:11px;letter-spacing:.2em;color:var(--pinkl)}
+.tlnav{display:flex;gap:8px;justify-content:flex-end;margin-top:-4px}
 </style>
 </head>
 <body>
@@ -160,6 +174,10 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
   <div class="chips"><span class="seg" id="cvis"><button data-v="mes" class="on">Mês</button><button data-v="sem">Semana</button><button data-v="dia">Dia</button></span></div>
   <div class="chips" id="cfil"></div>
   <div id="cal"></div>
+  <h2 class="tt">Shows <small id="tlsub">jan/2026 em diante · arraste para o lado</small></h2>
+  <div id="tlresumo" class="grid g3"></div>
+  <div class="tlwrap"><div class="tl" id="tl"></div></div>
+  <div class="tlnav"><button class="btn" id="tlp" aria-label="Voltar">‹</button><button class="btn" id="tlh">Hoje</button><button class="btn" id="tln" aria-label="Avançar">›</button></div>
   <h2 class="tt" id="minhas_t">Minhas tarefas</h2><div class="list" id="minhas"><div class="vazio">Carregando…</div></div>
   <h2 class="tt">Metas da empresa</h2><div class="list" id="metas"><div class="vazio">Carregando…</div></div>
 </section>
@@ -178,9 +196,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwjlu6ki"></script>
-<script src="../lbmetas.js?v=mwjlu6ki"></script>
-<script src="../lbchat.js?v=mwjlu6ki"></script>
+<script src="../lb.js?v=mwjn58mi"></script>
+<script src="../lbmetas.js?v=mwjn58mi"></script>
+<script src="../lbchat.js?v=mwjn58mi"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -429,7 +447,31 @@ function renderEquipe(){const el=document.getElementById('equipe');if(!TAR){el.i
 /* ---------- abas ---------- */
 function setor(s){if(!['agenda','pags','equipe'].includes(s))s='agenda';document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));['agenda','pags','equipe'].forEach(x=>document.getElementById('s_'+x).hidden=x!==s);ST.set('lb_art_setor',s)}
 document.getElementById('setores').onclick=e=>{const b=e.target.closest('[data-s]');if(b){setor(b.dataset.s);scrollTo({top:0,behavior:'smooth'})}};
-function renderTudo(){renderFiltros();renderCal();renderMinhas();renderMetas();renderPagar();renderEquipe();urgentes()}
+
+/* ---------- shows: linha do tempo (o mesmo cartão do Financeiro); tocar abre o borderô ---------- */
+const dtxA=s=>s?+s.slice(8,10)+' de '+PGM3[+s.slice(5,7)-1]+(s.slice(0,4)!==HOJE.slice(0,4)?' '+s.slice(2,4):''):'';
+function stPillA(s){const fut=s.data>HOJE;if(s.sit==='Cancelado')return '<span class="pill">cancelado</span>';if(s.sit==='Permuta'||s.sit==='Projeto')return `<span class="pill">${s.sit==='Permuta'?'permuta':'projeto'}</span>`;
+  if(fut)return s.sit==='A confirmar'?'<span class="pill am">a confirmar</span>':'<span class="pill pk">confirmado</span>';return s.falta>0?'<span class="pill am">falta receber</span>':'<span class="pill ok">realizado</span>'}
+function corSitA(s){const fut=s.data>HOJE;if(s.sit==='Cancelado'||s.sit==='Permuta'||s.sit==='Projeto')return 's-cx';if(fut)return s.sit==='A confirmar'?'s-am':'s-pk';return s.falta>0?'s-fr':'s-ok'}
+function fmChipsA(b){const BG=['Artista','Músicos','Produção','Técnica','Outros'],ok=(b.equipe||[]).filter(e=>!e.fora&&e.grupo!=='Comissão'),r={};BG.forEach(g=>{const q=new Set(ok.filter(e=>e.grupo===g).map(e=>e.pessoa||e.nome)).size;if(q)r[g]=q});const n=new Set(ok.map(e=>e.pessoa||e.nome)).size;if(!n)return '';
+  const nm={'Artista':['artista','artistas'],'Músicos':['músico','músicos'],'Produção':['produção','produção'],'Técnica':['técnica','técnica'],'Outros':['outro','outros']};
+  return `<div class="fmc">${Object.entries(r).map(([g,q])=>`<span class="fm${g==='Músicos'?' mu':''}"><b>${q}</b> ${nm[g][q>1?1:0]}</span>`).join('')}<span class="fm"><b>${n}</b> na equipe</span></div>`}
+function showCardA(s){const fut=s.data>HOJE,d=new Date(s.data+'T12:00'),pr=s.valor?Math.min(100,(s.rec||0)/s.valor*100):0,b=bordDe(s),ip=D.shows.indexOf(s);
+  const luc=s.lucro==null?'—':`<span class="${s.lucro<0?'neg':'pos'}">${brl(s.lucro)}</span>`;
+  return `<div class="show sb ${corSitA(s)}${!fut?' past':''}" data-tls="${ip}"><div class="dt">${['dom','seg','ter','qua','qui','sex','sáb'][d.getDay()]} · ${dtxA(s.data)}</div>
+  <div class="hd"><div><b>${esc(s.nome)}</b><span>${esc(s.local||'')}</span></div>${stPillA(s)}</div>
+  <div class="nums"><div>Cachê<b>${s.valor?brl(s.valor):'a definir'}</b></div><div>Recebido<b>${brl(s.rec||0)}</b></div><div>Falta<b class="${s.falta>0?'pk':''}">${s.falta==null?'—':brl(s.falta)}</b></div><div>${fut?'Lucro prev.':'Lucro'}<b>${luc}</b></div></div>
+  ${s.valor?`<div class="prog"><i style="width:${pr}%"></i></div>`:''}${s.obs?`<div class="ob">${esc(s.obs)}</div>`:''}${b?fmChipsA(b):''}<div class="vb">${b?(fut?'Ver prévia e equipe ›':'Ver borderô ›'):'Ver detalhes ›'}</div></div>`}
+function renderTL(){const el=document.getElementById('tl');if(!el||!D||!D.shows)return;
+  const ss=D.shows.filter(s=>s.data>='2026-01-01'),fut=ss.filter(s=>s.data>HOJE&&s.sit!=='Cancelado'),prox=fut[0],realiz=ss.filter(s=>s.data<=HOJE&&s.sit==='Realizado'),luc=realiz.reduce((a,s)=>a+(s.lucro||0),0);
+  document.getElementById('tlresumo').innerHTML=k4('Próximo show',prox?ddmm(prox.data):'—',prox?esc(prox.nome)+' · '+esc(prox.local||''):'')+k4('Shows marcados',fut.length,'a receber '+brl(fut.reduce((a,s)=>a+(s.falta||0),0)))+k4('Lucro dos shows em 2026',brl(luc),realiz.length+' shows realizados',luc<0?'neg':'pos');
+  let h='',pos=false;ss.forEach(s=>{if(!pos&&s.data>HOJE){h+=`<div class="hoje" id="hojemk"><b>HOJE</b><i></i><b>${ddmm(HOJE)}</b></div>`;pos=true}h+=showCardA(s)});
+  if(!pos)h+='<div class="hoje" id="hojemk"><b>HOJE</b><i></i></div>';el.innerHTML=h;
+  const go=sm=>{const mk=document.getElementById('hojemk');if(mk&&el.clientWidth)el.scrollTo({left:mk.offsetLeft+mk.offsetWidth/2-el.clientWidth/2,behavior:sm?'smooth':'auto'})};
+  requestAnimationFrame(()=>go(false));if(!el._ro&&window.ResizeObserver){let w0=0;el._ro=new ResizeObserver(()=>{const w=el.clientWidth;if(w&&!w0)go(false);w0=w});el._ro.observe(el)}
+  document.getElementById('tlp').onclick=()=>el.scrollBy({left:-274,behavior:'smooth'});document.getElementById('tln').onclick=()=>el.scrollBy({left:274,behavior:'smooth'});document.getElementById('tlh').onclick=()=>go(true);
+  el.onclick=e=>{const c=e.target.closest('[data-tls]');if(c)detalhe('s|'+c.dataset.tls)}}
+function renderTudo(){renderFiltros();renderCal();renderTL();renderMinhas();renderMetas();renderPagar();renderEquipe();urgentes()}
 
 /* ---------- dados ao vivo ---------- */
 async function carregar(){

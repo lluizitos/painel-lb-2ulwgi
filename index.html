@@ -9,7 +9,7 @@
 <link rel="icon" href="icone.png">
 <link rel="apple-touch-icon" href="icone.png">
 <style>
-#bds.sempix .pe .px{display:none}.pxb{margin:10px 0 0;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card2);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+#bds.sempix .pe .px{display:none}#bds.sempix .pe.vpx .px{display:block}#bds .pe{cursor:pointer}.pxb{margin:10px 0 0;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card2);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
 .atv .fz{display:flex;justify-content:space-between;align-items:center;gap:10px;border:0;border-left:3px solid var(--line);border-radius:10px;padding:9px 12px;margin:6px 0;background:var(--card2);font-size:13.5px;color:var(--ink)}
 .atv .fz.f0{border-left-color:#7FDDA9;background:rgba(127,221,169,.13)}.atv .fz.f1{border-left-color:#6FA8FF;background:rgba(111,168,255,.09)}.atv .fz.f2{color:var(--sub)}
 .atv .fz b{flex:none;font-size:11.5px;font-weight:700;border-radius:99px;padding:3px 9px;background:rgba(255,255,255,.06);color:var(--sub);white-space:nowrap}.atv .fz.f0 b{background:#7FDDA9;color:#141218}.atv .fz.f1 b{background:rgba(111,168,255,.22);color:#BFD8FF}
@@ -357,10 +357,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwjlu6ki"></script>
-<script src="lbmetas.js?v=mwjlu6ki"></script>
-<script src="lbchat.js?v=mwjlu6ki"></script>
-<script src="lbvendas.js?v=mwjlu6ki"></script>
+<script src="lb.js?v=mwjn58mi"></script>
+<script src="lbmetas.js?v=mwjn58mi"></script>
+<script src="lbchat.js?v=mwjn58mi"></script>
+<script src="lbvendas.js?v=mwjn58mi"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -421,6 +421,8 @@ function fmChips(b){const ok=b.equipe.filter(e=>!e.fora&&e.grupo!=='Comissão'),
 function copiar(t,btn){const ok=()=>{if(btn){const o=btn.textContent;btn.textContent='copiado';btn.classList.add('ok');setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok')},1500)}};
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,()=>{fb();ok()});else{fb();ok()}
   function fb(){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove()}}
+/* borderô: tocar no nome mostra o PIX dessa pessoa */
+document.addEventListener('click',e=>{const pe=e.target.closest('#bds .pe');if(pe&&!e.target.closest('button'))pe.classList.toggle('vpx')});
 document.addEventListener('click',e=>{const c=e.target.closest('[data-cp]');if(c){e.stopPropagation();copiar(c.dataset.cp,c);return}
   if(e.target.closest('#bd'))return;
   const k=e.target.closest('[data-bord]');if(k){abrirBord(k.dataset.bord);return}
@@ -443,7 +445,7 @@ const pxBtn=x=>x?`<span style="overflow-wrap:anywhere">PIX ${esc(x)}</span><butt
 function abrirBord(id){const b=(D.borderos||{})[id];if(!b)return;document.getElementById('bds').classList.add('sempix');const t=b.totais||{};
   const extras=e=>[['diaria','diária'],['gasolina','gasolina'],['ajuda','ajuda de custo'],['estacionamento','estacionamento']].filter(([k])=>e[k]).map(([k,n])=>n+' '+brl(e[k])).join(' + ');
   const gr=BG.map(g=>{const l=b.equipe.filter(e=>e.grupo===g);if(!l.length)return '';const tot=l.reduce((a,e)=>a+(e.fora?0:e.total),0);
-    return `<div class="gp"><h4>${g} <span>${l.length} · ${brl(tot)}</span></h4>${l.map(e=>`<div class="pe"><div class="t"><b>${esc(e.nome)}</b><span>${esc(e.funcao)}${extras(e)?' · '+brl(e.valor)+' + '+extras(e):''}${e.fora?' · fora do custo do show':''}</span><div class="px" style="font-size:12px;color:var(--sub);margin-top:3px">${pxBtn(e.pix)}</div></div><div class="v">${brl(e.fora?e.valor:e.total)}<small><span class="pill ${e.status==='Pago'?'ok':'am'}">${esc(e.status||'—').toLowerCase()}</span>${e.status==='Parcial'?`<span style="display:block;font-size:11px;color:var(--muted);margin-top:3px">${LB.pg.partes(e).map(p=>(p.pago?'✓ ':'○ ')+p.n).join(' · ')}</span>`:''}</small></div></div>`).join('')}</div>`}).join('');
+    return `<div class="gp"><h4>${g} <span>${l.length} · ${brl(tot)}</span></h4>${l.map(e=>`<div class="pe"><div class="t"><b>${esc(e.nome)}</b><span>${esc(e.funcao)}${e.pix?' · toque para ver o PIX':''}${extras(e)?' · '+brl(e.valor)+' + '+extras(e):''}${e.fora?' · fora do custo do show':''}</span><div class="px" style="font-size:12px;color:var(--sub);margin-top:3px">${pxBtn(e.pix)}</div></div><div class="v">${brl(e.fora?e.valor:e.total)}<small><span class="pill ${e.status==='Pago'?'ok':'am'}">${esc(e.status||'—').toLowerCase()}</span>${e.status==='Parcial'?`<span style="display:block;font-size:11px;color:var(--muted);margin-top:3px">${LB.pg.partes(e).map(p=>(p.pago?'✓ ':'○ ')+p.n).join(' · ')}</span>`:''}</small></div></div>`).join('')}</div>`}).join('');
   const dz=b.diesel||{};
   const dzt=dz.km?`Ônibus: ${dz.km_ida} km ida + ${dz.km_volta} km volta + ${dz.km_adic} km adicional = <b>${dz.km} km</b> ÷ ${String(dz.kml).replace('.',',')} km/L = <b>${String(dz.litros).replace('.',',')} L</b> × R$ ${dz.preco.toFixed(2).replace('.',',')} = <b>${brl(dz.litros*dz.preco)}</b>${dz.abastecido?` · abastecido de fato: <b>${brl(dz.abastecido)}</b>`:''}${dz.litros_abast?` · ${dz.litros_abast} L abastecidos`:''}`:(t.diesel?`Diesel: <b>${brl(t.diesel)}</b>`:'Sem diesel neste show (sem ônibus ou sem cálculo na planilha).');
   const it=(b.itens||[]).map(i=>`<div class="pe"><div class="t"><b>${esc(i.desc)}</b>${i.qtd>1?`<span>${i.qtd} ×</span>`:''}</div><div class="v">${brl(i.valor)}</div></div>`).join('');
