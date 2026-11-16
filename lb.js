@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwjvhjag';
+  const BUILD = 'mwjvq1p7';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -451,7 +451,7 @@
   LB.financeiro = async function (box, r, o) {
     o = o || {}; box.innerHTML = '<div style="padding:20px;color:#8B8697">Abrindo o financeiro…</div>';
     const sv = (document.querySelector('script[src*="lb.js"]') || { getAttribute: () => '' }).getAttribute('src') || '', v = sv.split('?v=')[1] || '';
-    const html = await (await fetch('../index.html' + (v ? '?v=' + v : ''), { cache: 'no-store' })).text();
+    const html = await (await fetch((o.pagina || '../index.html') + (v ? '?v=' + v : ''), { cache: 'no-store' })).text(); // o.pagina: outra página do site (ex.: ../socio/index.html para a aba Vendas do Artista)
     const doc = new DOMParser().parseFromString(html, 'text/html');
     const ajusta = t => t.replace(/href="(vendas|metas|tarefas|agenda|borderos|admin|artista|socio)\//g, 'href="../$1/')
       .replace(/onclick="fecharBord\(\)"/g, 'onclick="window.__finFecha&&window.__finFecha()"')

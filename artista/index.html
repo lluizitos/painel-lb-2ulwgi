@@ -190,7 +190,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 <body>
 <div id="pg">
 <header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
-<nav class="ptabs" id="setores"><button class="on" data-s="agenda">Agenda</button><button data-s="pags">Pagamentos</button><button data-s="equipe">Equipe</button><button data-s="fin">Financeiro</button></nav></header>
+<nav class="ptabs" id="setores"><button class="on" data-s="agenda">Agenda</button><button data-s="pags">Pagamentos</button><button data-s="equipe">Equipe</button><button data-s="fin">Financeiro</button><button data-s="ven">Vendas</button></nav></header>
 <div class="wrap" id="main">
 <p class="eyebrow">Artista</p><h1>Lucas <em>Barros</em></h1>
 <div id="lbq"></div>
@@ -216,6 +216,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </section>
 
 <section id="s_fin" hidden></section>
+<section id="s_ven" hidden></section>
 <section id="s_equipe" hidden>
   <h2 class="tt">Metas da empresa</h2><div id="metas"><div class="vazio">Carregando…</div></div>
   <h2 class="tt">Equipe <small>tarefas e metas de cada um</small></h2>
@@ -225,9 +226,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwjvhjag"></script>
-<script src="../lbmetas.js?v=mwjvhjag"></script>
-<script src="../lbchat.js?v=mwjvhjag"></script>
+<script src="../lb.js?v=mwjvq1p7"></script>
+<script src="../lbmetas.js?v=mwjvq1p7"></script>
+<script src="../lbchat.js?v=mwjvq1p7"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -506,11 +507,19 @@ function renderValores(){const el=document.getElementById('valores');if(!el)retu
 
 /* 16/11: aba Financeiro — o Financeiro inteiro dentro desta página (LB.financeiro, em lb.js), com os dados que esta página já abriu */
 let FINOK=false;
+/* 16/11: aba Vendas — a aba Vendas da página do sócio inteira (mesmo código e visual), com as vendas que esta página já abriu */
+let VENOK=false;
+async function abreVen(){if(VENOK)return;VENOK=true;const box=document.getElementById('s_ven');
+  try{if(!window.__ART_R)throw new Error('dados ainda não carregados');const d=window.__ART_R.dados||{};
+    if(!d.vendas||!(d.vendas.shows||[]).length){box.innerHTML='<div class="vazio">Ainda não há vendas para mostrar.</div>';return}
+    await LB.financeiro(box,{dados:{atualizado:d.atualizado,extrato_ate:d.extrato_ate,vendas:d.vendas},paginas:['artista']},
+      {pagina:'../socio/index.html',api:()=>null,css:'.fbody #ptabs,.fbody .aba{display:none!important}.fbody .aba[data-a="ven"]{display:block!important}.fbody #upd{display:none!important}'})}
+  catch(e){VENOK=false;box.innerHTML='<div class="vazio">Não consegui abrir as vendas agora ('+esc(String(e.message||e))+'). Tente de novo.</div>';console.error(e)}}
 async function abreFin(){if(FINOK)return;FINOK=true;const box=document.getElementById('s_fin');
   try{if(!window.__ART_R)throw new Error('dados ainda não carregados');await LB.financeiro(box,window.__ART_R)}
   catch(e){FINOK=false;box.innerHTML='<div class="vazio">Não consegui abrir o financeiro agora ('+esc(String(e.message||e))+'). Tente de novo.</div>';console.error(e)}}
-function setor(s){if(!['agenda','pags','equipe','fin'].includes(s))s='agenda';document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));['agenda','pags','equipe','fin'].forEach(x=>document.getElementById('s_'+x).hidden=x!==s);ST.set('lb_art_setor',s);
-  if(s==='fin')abreFin()}
+function setor(s){if(!['agenda','pags','equipe','fin','ven'].includes(s))s='agenda';document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));['agenda','pags','equipe','fin','ven'].forEach(x=>document.getElementById('s_'+x).hidden=x!==s);ST.set('lb_art_setor',s);
+  if(s==='fin')abreFin();if(s==='ven')abreVen()}
 document.getElementById('setores').onclick=e=>{const b=e.target.closest('[data-s]');if(b){setor(b.dataset.s);scrollTo({top:0,behavior:'smooth'})}};
 
 /* ---------- shows: linha do tempo (o mesmo cartão do Financeiro); tocar abre o borderô ---------- */
