@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwjv04by';
+  const BUILD = 'mwjv6hww';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -400,7 +400,7 @@
 
   /* "Ver mais": toda lista longa (.list) e todo grupo de borderô (.gp) mostra só os primeiros itens.
      Limite: data-max no elemento (padrão 5 em listas, 4 em grupos). data-max="0" desliga. */
-  const st = document.createElement('style');
+  const st = document.createElement('style'); st.id = 'lbvm';
   st.textContent = '.vmh{display:none!important}.vmb{display:block;width:100%;margin:8px 0 0;padding:10px;border:1px dashed var(--line,#2E2B36);border-radius:10px;background:transparent;color:var(--pinkl,#F0507E);font:inherit;font-size:13px;font-weight:600;cursor:pointer}';
   document.head.appendChild(st);
   function colapsa(l) {
@@ -440,7 +440,7 @@
   ok:'<circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7 5.3-5.6"/>',
   caixa:'<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18M16 14.5h2"/>'};
   LB.ic=(n,c)=>P[n]?`<svg class="ico${c?' '+c:''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`:'';
-  const st=document.createElement('style');st.textContent='.ico{width:1em;height:1em;display:inline-block;vertical-align:-.15em;flex:none}';document.head.appendChild(st)})();
+  const st=document.createElement('style');st.id='lbico';st.textContent='.ico{width:1em;height:1em;display:inline-block;vertical-align:-.15em;flex:none}';document.head.appendChild(st)})();
 
 /* 16/11: Financeiro embutido (aba Financeiro do Artista e aba Gestão do sócio).
    Lê as telas e o código da página do Financeiro publicada (../index.html) e roda dentro de box, isolado (shadow DOM),
@@ -468,6 +468,10 @@
 .fbody header .wrap,.fbody #lbq{display:none!important}.fbody header{position:static!important;top:auto!important;background:transparent!important;border:0!important}
 .fbody main.wrap{padding-left:0!important;padding-right:0!important}` + (o.css || '');
     root.append(st, fb);
+    /* estilos que o lb.js (e lbmetas/lbvendas) põem no <head> da página — ícones, gráficos, "ver mais"... — também valem aqui dentro
+       (o bloco isolado não enxerga o <head>); os que forem criados depois também são copiados */
+    const copiados = new Set(), copia = () => document.head.querySelectorAll('style[id^="lb"]').forEach(x => { if (copiados.has(x.id)) return; copiados.add(x.id); const c = document.createElement('style'); c.textContent = x.textContent; root.insertBefore(c, fb); });
+    copia(); new MutationObserver(copia).observe(document.head, { childList: true });
     const doDoc = new Set(['keydown', 'keyup', 'visibilitychange']);
     const corpo = new Proxy(fb, { get: (t, k) => k === 'style' ? document.body.style : (typeof t[k] === 'function' ? t[k].bind(t) : t[k]) });
     const fd = { getElementById: id => root.getElementById(id), querySelector: q => root.querySelector(q), querySelectorAll: q => root.querySelectorAll(q),
