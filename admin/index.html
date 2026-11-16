@@ -340,8 +340,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwjsvzud"></script>
-<script src="../lbmetas.js?v=mwjsvzud"></script>
+<script src="../lb.js?v=mwjszopm"></script>
+<script src="../lbmetas.js?v=mwjszopm"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -854,7 +854,7 @@ function aoEditar(btn,fn){new MutationObserver(()=>{if($(btn).style.display!=='n
   $('ia_novo').onclick=()=>{iaLimpa();$('ia_msg').textContent='';popAbre('pia','Novo contexto da IA')};aoEditar('ia_cancel',()=>popAbre('pia','Editar contexto'));$('ia_cancel').addEventListener('click',()=>popFecha('pia'));autoFecha('pia','ia_msg');
 }
 /* ---------- METAS E TAREFAS: um pop-up só; escolhe o que é e para quem ---------- */
-let MTV='todos',MTMODO='';
+let MTV='emp',MTMODO='';
 {const gC=$('g_tit').closest('.card'),iC=cardDe('i_h'),rC=$('r_tit').closest('.card'),eC=cardDe('e_h');
   const q=document.createElement('div');q.className='mtq';q.id='mt_q';q.innerHTML=`<label>O que é<select id="mt_tp"><option value="tarefa">Tarefa</option><option value="meta">Meta</option></select></label><label>Para quem<select id="mt_pq"></select></label><p class="note w" id="mt_qn" style="grid-column:1/-1;margin:0"></p>`;
   fazPop('pmt',[q,gC,iC,rC,eC]);POP.pmt.c={g:gC,i:iC,r:rC,e:eC};[$('i_h'),$('e_h')].forEach(h=>h.style.display='none');
@@ -886,7 +886,7 @@ function mtForm(f,edit,tit){const P=POP.pmt;Object.entries(P.c).forEach(([k,c])=
 /* chips da aba: Toda a equipe · Empresa · cada pessoa */
 function mtChips(){const A=ativos();if(MTV!=='todos'&&MTV!=='emp'&&!A.some(p=>p.id===MTV))MTV='todos';
   const nG=new Set(TF.filter(t=>t.grupo&&t.status!=='Concluída').map(t=>t.grupo)).size,nE=MT.filter(x=>['meta','tarefa'].includes(x.tipo||'meta')&&!fechado(x)).length;
-  $('mt_chips').innerHTML=`<button class="chip${MTV==='todos'?' on':''}" data-v="todos">👥 Toda a equipe${nG?`<small>${nG}</small>`:''}</button><button class="chip${MTV==='emp'?' on':''}" data-v="emp">🏢 Empresa${nE?`<small>${nE}</small>`:''}</button>`+A.map(p=>{const n=TF.filter(t=>t.pessoa===p.id&&t.status!=='Concluída').length;return `<button class="chip${p.id===MTV?' on':''}" data-v="${esc(p.id)}">${esc(p.nome)}${n?`<small>${n}</small>`:''}</button>`}).join('')}
+  $('mt_chips').innerHTML=`<button class="chip${MTV==='emp'?' on':''}" data-v="emp">${LB.ic('emp')} Empresa${nE?`<small>${nE}</small>`:''}</button>`+A.map(p=>{const n=TF.filter(t=>t.pessoa===p.id&&t.status!=='Concluída').length;return `<button class="chip${p.id===MTV?' on':''}" data-v="${esc(p.id)}">${esc(p.nome)}${n?`<small>${n}</small>`:''}</button>`}).join('')+`<button class="chip${MTV==='todos'?' on':''}" data-v="todos">Toda a equipe${nG?`<small>${nG}</small>`:''}</button>`}
 function mtVer(){mtChips();$('mt_todos').style.display=MTV==='todos'?'':'none';$('mt_emp').style.display=MTV==='emp'?'':'none';$('mt_pes').style.display=MTV!=='todos'&&MTV!=='emp'?'':'none';
   if(MTV==='emp'){$('mt_emp').appendChild($('e_lista'));EFIL='meta,tarefa';renderEmp()}
   else if(MTV!=='todos'){SEL=MTV;renderInd();renderRot()}}
@@ -924,7 +924,7 @@ function xtRender(){const el=$('xt_res');if(!XT.length){el.innerHTML='';return}c
     if(d){e.preventDefault();if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent='toque de novo para apagar';return}try{XT=(await api({acao:'excluir_extrato',id:d.dataset.xdel})).extratos||[];xtRender()}catch(er){d.textContent='erro'}}}}
 {const a0=lnAbre;lnAbre=async function(){await a0();xtCarrega()};const r0=lnRender;lnRender=function(){r0();if(XTOK)xtRender()}}
 </script>
-<script src="../lbchat.js?v=mwjsvzud"></script>
+<script src="../lbchat.js?v=mwjszopm"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>
