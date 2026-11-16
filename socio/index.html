@@ -174,16 +174,12 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <h3>Notícias <small id="jsub"></small></h3>
   <div class="jw"><div class="jn" id="jornal"></div></div>
   <div class="jnav"><button class="nvb" id="jprev" aria-label="Anterior">‹</button><button class="nvb" id="jnext" aria-label="Próxima">›</button></div>
+  <!-- 16/11: depois das notícias, todo o financeiro; depois a agenda nova; no fim os documentos -->
   <h3 id="fmesh"></h3>
   <div class="grid g3" id="fmesk"></div>
   <div id="fmesg" style="margin-top:10px"></div>
   <div class="g2d" style="margin-top:10px"><div id="entt"></div><div id="gastos"></div></div>
   <div id="sinais" style="margin-top:10px"></div>
-  <h3>Agenda</h3>
-  <div class="acb"><button class="nvb" id="cprev" aria-label="Anterior">‹</button><div class="tit" id="ctit"></div><button class="nvb" id="cnext" aria-label="Próximo">›</button><button class="achip" id="choje">Hoje</button></div>
-  <div class="achips"><span class="aseg" id="cvis"><button data-v="mes" class="on">Mês</button><button data-v="sem">Semana</button><button data-v="dia">Dia</button></span></div>
-  <div class="achips" id="cfil"></div>
-  <div id="acal"></div>
   <div id="alertas" hidden></div>
   <h3>Visão geral <small id="fano"></small></h3>
   <div class="grid g4" id="fkpi"></div>
@@ -192,16 +188,15 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <div id="fch"></div>
   <h3>Entrou e saiu <small>meses fechados</small></h3>
   <div id="ffech"></div>
-  <details class="det"><summary>Todos os acontecimentos</summary><div class="list" id="ocall" style="margin-top:10px"></div></details>
-  <details class="det"><summary>Shows e movimentações do mês</summary>
-    <h3>Shows do mês</h3><div class="list" id="smes"></div>
-    <h3>Movimentações <small id="mvsub"></small></h3><div class="list" id="mvl"></div>
-  </details>
-  <details class="det"><summary>Contas fixas e investimento</summary>
-    <h3>Contas fixas por mês <small id="fixs"></small></h3><div class="gb" id="fixos" style="background:var(--card2)"></div><p class="note" id="apnota"></p>
-    <h3>Investimento do sócio</h3><div class="list" id="aportes"></div>
-    <h3>Últimos shows</h3><div class="list" id="ult"></div>
-  </details>
+  <h3>Contas fixas por mês <small id="fixs"></small></h3><div class="gb" id="fixos" style="background:var(--card2)"></div><p class="note" id="apnota"></p>
+  <h3>Investimento do sócio</h3><div class="list" id="aportes"></div>
+  <details class="det"><summary>Movimentações do mês <small id="mvsub"></small></summary><div class="list" id="mvl" style="margin-top:10px"></div></details>
+  <h3>Agenda</h3>
+  <div class="acb"><button class="nvb" id="cprev" aria-label="Anterior">‹</button><div class="tit" id="ctit"></div><button class="nvb" id="cnext" aria-label="Próximo">›</button><button class="achip" id="choje">Hoje</button></div>
+  <div class="achips"><span class="aseg" id="cvis"><button data-v="mes" class="on">Mês</button><button data-v="sem">Semana</button><button data-v="dia">Dia</button></span></div>
+  <div class="achips" id="cfil"></div>
+  <div id="acal"></div>
+  <div hidden><div id="ocall"></div><div id="smes"></div><div id="ult"></div></div>
   <h3>Documentos</h3>
   <div class="list" id="docs"></div>
   </section>
@@ -241,9 +236,9 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 <div class="jp" id="jp"><div class="bk"></div><div class="bx" id="jpb"></div></div>
-<script src="../lb.js?v=mwjtfaw4"></script>
-<script src="../lbchat.js?v=mwjtfaw4"></script>
-<script src="../lbvendas.js?v=mwjtfaw4"></script>
+<script src="../lb.js?v=mwjtl7sf"></script>
+<script src="../lbchat.js?v=mwjtl7sf"></script>
+<script src="../lbvendas.js?v=mwjtl7sf"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
