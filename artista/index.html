@@ -215,7 +215,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
   <div id="pgad"></div>
 </section>
 
-<section id="s_fin" hidden><iframe id="finfr" title="Financeiro" style="display:block;width:calc(100% + 32px);margin:0 -16px;border:0;height:calc(100vh - 120px);background:transparent"></iframe></section>
+<section id="s_fin" hidden></section>
 <section id="s_equipe" hidden>
   <h2 class="tt">Metas da empresa</h2><div id="metas"><div class="vazio">Carregando…</div></div>
   <h2 class="tt">Equipe <small>tarefas e metas de cada um</small></h2>
@@ -225,9 +225,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwjtt5zb"></script>
-<script src="../lbmetas.js?v=mwjtt5zb"></script>
-<script src="../lbchat.js?v=mwjtt5zb"></script>
+<script src="../lb.js?v=mwju43qe"></script>
+<script src="../lbmetas.js?v=mwju43qe"></script>
+<script src="../lbchat.js?v=mwju43qe"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -503,8 +503,43 @@ function renderValores(){const el=document.getElementById('valores');if(!el)retu
     <h5 style="margin:16px 0 6px;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)">Equipe por mês</h5>${gr}</div>`}
 
 /* ---------- abas ---------- */
+
+/* ===================== 16/11: aba Financeiro — o Financeiro inteiro dentro desta página =====================
+   Lê as telas e o código da página do Financeiro (../index.html, o mesmo site publicado) e roda aqui, num bloco isolado
+   (shadow DOM: os nomes e estilos de lá não se misturam com os daqui), com os dados que esta página já abriu (mesmo login). */
+let FINOK=false;
+const carregaJs=src=>new Promise((ok,no)=>{const e=document.createElement('script');e.src=src;e.onload=ok;e.onerror=no;document.head.appendChild(e)});
+async function abreFin(){if(FINOK)return;FINOK=true;const box=document.getElementById('s_fin');box.innerHTML='<div class="vazio">Abrindo o financeiro…</div>';
+  try{if(!window.__ART_R)throw new Error('dados ainda não carregados');
+    const sv=(document.querySelector('script[src*="lb.js"]')||{}).getAttribute?.('src')||'',v=(sv.split('?v=')[1]||'');
+    const html=await (await fetch('../index.html'+(v?'?v='+v:''),{cache:'no-store'})).text();
+    const doc=new DOMParser().parseFromString(html,'text/html');
+    const ajusta=t=>t.replace(/href="(vendas|metas|tarefas|agenda|borderos|admin|artista|socio)\//g,'href="../$1/')
+      .replace(/onclick="fecharBord\(\)"/g,'onclick="window.__finFecha&&window.__finFecha()"')
+      .replace(/onclick="const s=document\.getElementById\('bds'\)/g,'onclick="const s=this.getRootNode().getElementById(\'bds\')"'.slice(0,-1));
+    const css=[...doc.querySelectorAll('style')].map(x=>x.textContent).join('\n').replace(/:root/g,':host').replace(/(^|[^\w.#-])html\b/g,'$1:host').replace(/(^|[^\w.#-])body\b/g,'$1.fbody');
+    const code=ajusta([...doc.querySelectorAll('script:not([src])')].map(x=>x.textContent).join('\n;\n'))+'\n;try{window.__finFecha=fecharBord}catch(e){}';
+    doc.querySelectorAll('script').forEach(x=>x.remove());
+    if(!window.LBV)await carregaJs('../lbvendas.js'+(v?'?v='+v:''));
+    const host=document.createElement('div');box.innerHTML='';box.appendChild(host);
+    const root=host.attachShadow({mode:'open'}),fb=document.createElement('div');fb.className='fbody';fb.innerHTML=ajusta(doc.body.innerHTML);
+    const st=document.createElement('style');st.textContent=css+`
+.fbody{min-height:0!important;padding-top:0!important;background:transparent!important}
+.fbody header .wrap,.fbody #lbq{display:none!important}.fbody header{position:static!important;top:auto!important;background:transparent!important;border:0!important}
+.fbody main.wrap{padding-left:0!important;padding-right:0!important}`;
+    root.append(st,fb);
+    const doDoc=new Set(['keydown','keyup','visibilitychange']);
+    const corpo=new Proxy(fb,{get:(t,k)=>k==='style'?document.body.style:(typeof t[k]==='function'?t[k].bind(t):t[k])});
+    const fd={getElementById:id=>root.getElementById(id),querySelector:q=>root.querySelector(q),querySelectorAll:q=>root.querySelectorAll(q),
+      createElement:(...a)=>document.createElement(...a),execCommand:(...a)=>document.execCommand(...a),body:corpo,head:document.head,documentElement:document.documentElement,
+      addEventListener:(t,f,o)=>(doDoc.has(t)?document:root).addEventListener(t,f,o),removeEventListener:(t,f,o)=>(doDoc.has(t)?document:root).removeEventListener(t,f,o),
+      get activeElement(){return root.activeElement||document.activeElement},set title(x){},get title(){return document.title},get hidden(){return document.hidden},get visibilityState(){return document.visibilityState}};
+    const fLB=Object.assign(Object.create(LB),{entrar:o=>setTimeout(()=>o.ok(window.__ART_R),0),links:()=>''});
+    const fFetch=(u,o)=>fetch(typeof u==='string'&&!/^(https?:|\/|\.\.\/)/.test(u)?'../'+u:u,o);
+    new Function('document','LB','fetch',code)(fd,fLB,fFetch);
+  }catch(e){FINOK=false;box.innerHTML='<div class="vazio">Não consegui abrir o financeiro agora ('+esc(String(e.message||e))+'). Tente de novo.</div>';console.error(e)}}
 function setor(s){if(!['agenda','pags','equipe','fin'].includes(s))s='agenda';document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));['agenda','pags','equipe','fin'].forEach(x=>document.getElementById('s_'+x).hidden=x!==s);ST.set('lb_art_setor',s);
-  if(s==='fin'){const f=document.getElementById('finfr');if(!f.src)f.src='../?embed=1';const h=document.querySelector('header');f.style.height='calc(100vh - '+((h?h.offsetHeight:110)+8)+'px)'}} // 16/11: aba Financeiro = a página do Financeiro embutida (mesmo login)
+  if(s==='fin')abreFin()}
 document.getElementById('setores').onclick=e=>{const b=e.target.closest('[data-s]');if(b){setor(b.dataset.s);scrollTo({top:0,behavior:'smooth'})}};
 
 /* ---------- shows: linha do tempo (o mesmo cartão do Financeiro); tocar abre o borderô ---------- */
@@ -541,7 +576,7 @@ async function carregar(){
   if(b.status==='fulfilled'){const r=b.value;PESS=r.pessoas||[];const px={};PESS.forEach(q=>px[q.id]=q.pix);Object.entries(r.borderos||{}).forEach(([k,x])=>{if(x.tipo==='despesa'||!x.equipe)return;x.equipe.forEach(e=>{if(e.pessoa&&px[e.pessoa])e.pix=px[e.pessoa];delete e.doc});D.borderos[k]=x})}
   renderTudo()}
 
-LB.entrar({pagina:'artista',base:'../',titulo:'Artista',ok:r=>{D=r.dados;D.borderos=D.borderos||{};
+LB.entrar({pagina:'artista',base:'../',titulo:'Artista',ok:r=>{try{window.__ART_R=structuredClone(r)}catch(e){window.__ART_R=JSON.parse(JSON.stringify(r))}D=r.dados;D.borderos=D.borderos||{};
   document.getElementById('pg').style.display='block';
   document.getElementById('links').innerHTML=LB.links(r.paginas||['artista'],'artista','../');
   setor(ST.get('lb_art_setor')||'agenda');renderFiltros();renderCal();

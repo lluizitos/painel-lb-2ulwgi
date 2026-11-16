@@ -236,9 +236,9 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 <div class="jp" id="jp"><div class="bk"></div><div class="bx" id="jpb"></div></div>
-<script src="../lb.js?v=mwjtt5zb"></script>
-<script src="../lbchat.js?v=mwjtt5zb"></script>
-<script src="../lbvendas.js?v=mwjtt5zb"></script>
+<script src="../lb.js?v=mwju43qe"></script>
+<script src="../lbchat.js?v=mwju43qe"></script>
+<script src="../lbvendas.js?v=mwju43qe"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -441,11 +441,12 @@ function renderVendas(){const V=D.vendas;if(!V||!V.shows||!V.shows.length){docum
   const COR=['#F0507E','#6FA8FF','#7FDDA9','#FFBE5A','#B48CFF','#8B8697'];
   // 16/11: meses = só shows COM data da venda (mês em que foi fechado); shows sem data da venda numa barra separada no fim
   const sd=S.filter(s=>!/^\d{4}-\d{2}-\d{2}$/.test(s.data_venda||'')),todos=[...new Set(S.map(nmV))].sort((a,b)=>soma(S.filter(s=>nmV(s)===b))-soma(S.filter(s=>nmV(s)===a)));
-  const ks=ult.concat(sd.length?['sem']:[]);
-  document.getElementById('vvh').textContent='por vendedor · pelo mês em que o show foi fechado'+(sd.length?' · última barra: sem data da venda':'');
-  document.getElementById('vvg').innerHTML=grafico(ks.map(k=>k==='sem'?'sem data':MES3[+k.slice(5,7)-1]),todos.map((n,i)=>({nome:n,cor:COR[Math.min(i,COR.length-1)],vals:ks.map(k=>k==='sem'?sd.filter(s=>nmV(s)===n).length:cv.filter(s=>nmV(s)===n&&s.data_venda.startsWith(k)).length)})),
-    {ks,hi:11,nomes:ks.map(k=>k==='sem'?'Sem data da venda · '+sd.length+' show'+(sd.length===1?'':'s')+' · '+brl(soma(sd)):nomeMes(k)+' · '+brl(soma(cv.filter(s=>s.data_venda.startsWith(k)))))})+
-    `<p class="note">${cv.length} show${cv.length===1?'':'s'} com data da venda (nos meses) · ${sd.length} sem data (barra "sem data").</p>`;
+  document.getElementById('vvh').textContent='por vendedor · pelo mês em que o show foi fechado';
+  const tsd=sd.length||1,barSem=sd.length?`<div style="margin-top:14px"><div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--sub);margin-bottom:6px"><span>Sem data da venda</span><b style="color:var(--ink)">${sd.length} show${sd.length===1?'':'s'} · ${brl(soma(sd))}</b></div>
+    <div style="display:flex;height:12px;border-radius:99px;overflow:hidden;background:var(--card2)">${todos.map((n,i)=>{const q=sd.filter(s=>nmV(s)===n).length;return q?`<i title="${esc(n)}: ${q}" style="width:${q/tsd*100}%;background:${COR[Math.min(i,COR.length-1)]}"></i>`:''}).join('')}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11.5px;color:var(--muted);margin-top:6px">${todos.map((n,i)=>{const q=sd.filter(s=>nmV(s)===n).length;return q?`<span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;background:${COR[Math.min(i,COR.length-1)]}"></i>${esc(n)} ${q}</span>`:''}).join('')}</div></div>`:'';
+  document.getElementById('vvg').innerHTML=grafico(ult.map(k=>MES3[+k.slice(5,7)-1]),todos.map((n,i)=>({nome:n,cor:COR[Math.min(i,COR.length-1)],vals:ult.map(k=>cv.filter(s=>nmV(s)===n&&s.data_venda.startsWith(k)).length)})),
+    {ks:ult,hi:11,nomes:ult.map(k=>nomeMes(k)+' · '+brl(soma(cv.filter(s=>s.data_venda.startsWith(k)))))})+barSem;
   // comparativo
   const mp=mesAdd(MA,-1),ma1=(+ANO-1)+MA.slice(4),cc=(t,k)=>{const l=doMes(k);return k4(t,l.length+' show'+(l.length===1?'':'s'),nomeMes(k)+' · '+brl(soma(l)))};
   document.getElementById('vcmp').innerHTML=cc('Este mês',MA)+cc('Mês passado',mp)+cc('Mesmo mês, ano passado',ma1);
