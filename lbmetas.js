@@ -132,6 +132,10 @@
 .lbpc{background:var(--bg,#141218);color:var(--ink,#F3F1F6);border:1px solid var(--line);border-radius:18px 18px 0 0;width:100%;max-width:520px;max-height:82vh;overflow:auto;padding:16px 16px 26px;box-sizing:border-box}
 @media(min-width:600px){.lbpop{align-items:center}.lbpc{border-radius:18px}}
 .lbph{display:flex;justify-content:space-between;align-items:center;gap:10px}.lbph b{font-size:17px}.lbph button{border:0;background:var(--card2);color:var(--ink,#fff);border-radius:99px;width:36px;height:36px;font-size:15px;cursor:pointer;flex:none}
+.nvq{display:flex;gap:8px;margin:18px 0 4px}.nvq input{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;background:var(--card);color:inherit;font:inherit;font-size:15px;padding:11px 14px}
+.nvq button{border:0;background:var(--pink,#CF1D51);color:#fff;border-radius:12px;padding:0 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
+.nvr{margin-top:8px}.nvr .nvn{font-size:12.5px;color:var(--muted);margin:6px 2px}
+.pcria{display:block;width:100%;margin-top:16px;border:1px dashed var(--pinkl,#F0507E);background:transparent;color:var(--pinkl,#F0507E);border-radius:12px;padding:11px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
 .lbpc h4{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--pinkl);margin:16px 0 6px}
 .pdl{background:var(--card);border-radius:12px;padding:10px 12px;margin-top:6px}.pdl b{display:block;font-size:15px}.pdl small{display:block;font-size:13px;color:var(--sub);margin-top:2px}.pdl .bt{margin-top:8px}
 .tf .pz a{color:var(--pinkl)}.cdf{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.cdf input{border:1px solid var(--line);border-radius:10px;background:var(--bg,#141218);color:inherit;font:inherit;padding:7px}
@@ -334,12 +338,14 @@
       if (it.metas.length) h += `<h4>Metas</h4>${it.metas.map(x => { const pode = !!app.querySelector(`[data-rid="${qs_(x.r.id)}"][data-rf="${d}"]`);
         return `<div class="pdl"><b>${esc(x.r.titulo)}</b><small>${x.n ? `<span class="pos">✓ feito${x.n > 1 ? ' ' + x.n + '×' : ''}</span>` : x.js ? '<span class="jtx">não feito · justificado</span>' : x.falta ? '<span class="neg">não marcado</span>' : 'falta marcar hoje'}${x.nt ? ' · ' + esc(String(x.nt).replace(/^✗\s*/, '')) : ''}</small>${pode ? `<button class="bt" data-pmk="${esc(x.r.id)}" data-pd="${d}">${x.n || x.js ? 'Corrigir' : 'Marcar'}</button>` : ''}</div>`; }).join('')}`;
       if (!h) h = '<p class="clt" style="font-size:14px">Nada neste dia.</p>';
+      h += `<button class="pcria" data-pcria="${d}">＋ Criar tarefa para ${+d.slice(8)}/${d.slice(5, 7)}</button>`;
       const box = document.createElement('div'); box.className = 'lbpop';
       box.innerHTML = `<div class="lbpc" role="dialog" aria-modal="true" aria-label="Dia ${ddmm(d)}"><div class="lbph"><b>${DSN[dt.getDay()][0].toUpperCase() + DSN[dt.getDay()].slice(1)}, ${+d.slice(8)} de ${MESES[+d.slice(5, 7) - 1]}${d === HJ ? ' · hoje' : ''}</b><button data-px aria-label="fechar">✕</button></div>${h}</div>`;
       const fecha = () => { box.remove(); document.removeEventListener('keydown', esc_); }, esc_ = e => { if (e.key === 'Escape') fecha(); };
       document.addEventListener('keydown', esc_);
       box.addEventListener('click', e => {
         if (e.target === box || e.target.closest('[data-px]')) { fecha(); return; }
+        const pc = e.target.closest('[data-pcria]'); if (pc) { fecha(); abreNova('', pc.dataset.pcria); return; }
         const mk = e.target.closest('[data-pmk]'); if (!mk) return; fecha();
         const b = app.querySelector(`[data-rid="${qs_(mk.dataset.pmk)}"][data-rf="${mk.dataset.pd}"]`); if (!b) return;
         const det = b.closest('details'); if (det) det.open = true; b.closest('.rt').scrollIntoView({ block: 'center', behavior: 'smooth' }); b.click();
@@ -383,24 +389,45 @@
       const ALI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg>';
       app.innerHTML = `<h1>${esc(P.nome)}</h1><p class="fn">${esc(P.funcao || '')}</p>
     ${U.length ? `<div class="urgs"><div class="urgh"><span>🔔 <b>${Math.min(U.length, 4)} aviso${U.length > 1 ? 's' : ''}</b></span><button type="button" data-urgmin>${URGMIN ? 'ver ▾' : 'minimizar ▴'}</button></div>${(URGMIN ? [] : U.slice(0, 4)).map(u => `<button class="urg" data-dia="${u.d}">${ALI}<span>${esc(u.t)}<small>${esc(u.s)}</small></span></button>`).join('')}</div>` : ''}
-    ${hojeBox(HJ)}
     <h3>Minha agenda</h3><div id="lbcal">${calendario(HJ)}</div>
-    ${P.meta ? `<div class="meta"><span>Minha meta</span>${esc(P.meta)}</div>` : ''}
+    <div class="nvq"><input id="nv_q" type="search" placeholder="Buscar ou criar tarefa…" autocomplete="off" value="${esc(QQ)}"><button type="button" data-nvq>＋ Criar</button></div><div class="nvr" id="nv_res"></div>
     <div class="nv"><button data-nv="tarefa"${NV === 'tarefa' ? ' class="on"' : ''}>＋ Nova tarefa</button><button data-nv="meta"${NV === 'meta' ? ' class="on"' : ''}>＋ Nova meta</button></div><div id="nvbox">${form()}</div>
     ${R.length ? `<h3>Metas de ${MESES[+MES.slice(5, 7) - 1]}</h3><div class="list" data-max="0">${R.map(x => cardRot(x, HJ)).join('')}</div>` : ''}
     ${rAnt.length ? `<details><summary>Resultado de ${MESES[ant.getMonth()]}</summary><div class="list" data-max="0">${rAnt.map(x => cardRot(x, HJ, MA)).join('')}</div></details>` : ''}
+    <h3>Tarefas em aberto</h3>
     <div class="res"><div>A fazer<b>${ab.length}</b></div><div>Atrasadas<b style="${ab.some(t => t.prazo && t.prazo < HJ) ? 'color:var(--neg)' : ''}">${ab.filter(t => t.prazo && t.prazo < HJ).length}</b></div><div>Feitas no mês<b style="color:var(--pos)">${okm.length}</b></div></div>
-    <h3>Tarefas em aberto</h3>${!ab.length ? '<div class="empty">Nada pendente.</div>' : comCat
+    ${!ab.length ? '<div class="empty">Nada pendente.</div>' : comCat
           ? `<div data-semvm>${grupos.map(([c, l]) => `<details class="cat" open><summary>${esc(c || 'Outras')} <small>${TMAIS ? l.length : ab.filter(t => (t.categoria || '') === (c || '')).length}</small></summary><div class="list">${l.map(t => card(t, HJ)).join('')}</div></details>`).join('')}${tMais}</div>`
           : `<div data-semvm><div class="list">${abV.map(t => card(t, HJ)).join('')}</div>${tMais}</div>`}
+    <h3>Resumo</h3>${hojeBox(HJ)}
+    ${P.meta ? `<div class="meta"><span>Minha meta</span>${esc(P.meta)}</div>` : ''}
     <h3>Meu rendimento</h3>${graficos(HJ)}
-    ${ok.length ? `<details${ok.length <= 3 ? ' open' : ''}><summary>Concluídas (${ok.length})</summary><div class="list">${ok.slice(0, 30).map(t => card(t, HJ)).join('')}</div></details>` : ''}`;
+    ${ok.length ? `<details><summary>Concluídas (${ok.length})</summary><div class="list">${ok.slice(0, 30).map(t => card(t, HJ)).join('')}</div></details>` : ''}`;
+      busca();
     }
+    /* busca: mostra as tarefas que batem (abertas e concluídas); se não achar, oferece criar com esse nome */
+    let QQ = '', NVPRE = { t: '', p: '' };
+    const sa = x => String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    function busca() {
+      const el = app.querySelector('#nv_res'); if (!el) return; const q = sa(QQ.trim());
+      if (!q) { el.innerHTML = ''; return; }
+      const HJ = hoje(), L = ST.T.filter(t => sa(t.titulo + ' ' + (t.descricao || '') + ' ' + (t.categoria || '')).includes(q)).sort((a, b) => (a.status === 'Concluída') - (b.status === 'Concluída') || (a.prazo || '9').localeCompare(b.prazo || '9'));
+      el.innerHTML = `<div class="nvn">${L.length ? L.length + ' tarefa' + (L.length > 1 ? 's' : '') + ' com “' + esc(QQ.trim()) + '”' : 'Nenhuma tarefa com “' + esc(QQ.trim()) + '”. Toque em ＋ Criar para criar.'}</div><div class="list">${L.slice(0, 8).map(t => card(t, HJ)).join('')}</div>`;
+    }
+    function abreNova(t, p) {
+      NV = 'tarefa'; NVPRE = { t: t || '', p: p || '' };
+      app.querySelectorAll('.nv button').forEach(b => b.classList.toggle('on', b.dataset.nv === NV));
+      const bx = app.querySelector('#nvbox'); bx.innerHTML = form(); NVPRE = { t: '', p: '' };
+      bx.scrollIntoView({ block: 'center', behavior: 'smooth' }); const i = app.querySelector(t ? '#nv_p' : '#nv_t'); if (i) setTimeout(() => i.focus({ preventScroll: true }), 300);
+    }
+    app.addEventListener('input', e => { if (e.target.id !== 'nv_q') return; QQ = e.target.value; busca(); });
+    app.addEventListener('keydown', e => { if (e.target.id === 'nv_q' && e.key === 'Enter') { e.preventDefault(); const v = e.target.value.trim(); if (v) abreNova(v, ''); } });
+    app.addEventListener('click', e => { if (!e.target.closest('[data-nvq]')) return; e.preventDefault(); abreNova((app.querySelector('#nv_q') || {}).value.trim(), ''); });
     let NV = '';
     function form() {
-      if (NV === 'tarefa') return `<div class="nvf"><label>Tarefa</label><input id="nv_t" maxlength="200" placeholder="ex.: mandar o orçamento do figurino">
+      if (NV === 'tarefa') return `<div class="nvf"><label>Tarefa</label><input id="nv_t" maxlength="200" placeholder="ex.: mandar o orçamento do figurino" value="${esc(NVPRE.t)}">
         <label>Detalhes (opcional)</label><textarea id="nv_d" maxlength="2000"></textarea>
-        <label>Prazo (opcional)</label><input id="nv_p" type="date">
+        <label>Prazo (opcional)</label><input id="nv_p" type="date" value="${esc(NVPRE.p)}">
         <label>Repetir</label><select id="nv_r"><option value="">Não repete</option><option value="semanal">Toda semana</option><option value="mensal">Todo mês</option></select>
         <label>Categoria (opcional)</label><input id="nv_c" maxlength="40" placeholder="Pessoal">
         <div class="msg" id="nv_m"></div><div class="rkb"><button class="ok" data-nvs="tarefa">Criar tarefa</button><button data-nv="">Cancelar</button></div></div>`;
@@ -422,7 +449,7 @@
         s.disabled = true; s.textContent = 'salvando…';
         try { const r = await chamar(s.dataset.nvs === 'tarefa' ? { acao: 'nova_tarefa', tarefa: { titulo: v('nv_t'), descricao: v('nv_d'), prazo: v('nv_p'), categoria: v('nv_c'), recorrencia: v('nv_r') } }
             : { acao: 'nova_meta', rotina: { titulo: v('nv_t'), freq: v('nv_f'), alvo: v('nv_a'), fim: v('nv_fim') } });
-          NV = ''; aplica(r); } catch (err) { s.disabled = false; s.textContent = 'Tentar de novo'; m.textContent = 'Não salvou. Confira a internet e tente de novo.'; } return; }
+          NV = ''; QQ = ''; aplica(r); } catch (err) { s.disabled = false; s.textContent = 'Tentar de novo'; m.textContent = 'Não salvou. Confira a internet e tente de novo.'; } return; }
       const d = e.target.closest('[data-del]');
       if (d) { e.preventDefault(); if (d.dataset.ok !== '1') { d.dataset.ok = '1'; d.textContent = 'Toque de novo para apagar'; return; }
         d.disabled = true; d.textContent = 'apagando…';
@@ -481,5 +508,22 @@
     render();
     if (doCache) fresco.then(aplica).catch(() => { });
   }
-  window.LBROT = { pct, pend, checks, notas, diasMes, porCat, FREQ, MESES, pagina, P100, cor, card: cardRot, css, liga, popup, andL, andTxt, andTit, ANDT, agendaDe };
+  /* meta da empresa atrasada: passou do término (ou do prazo em data) sem ser cumprida, ou alguma meta individual ligada falhou num dia/semana que já passou */
+  const FREQN = { uma: 'Uma vez', dia: 'Diariamente', util: 'Dias úteis', semana: 'Semanalmente', mes: 'Mensalmente', ano: 'Anualmente', outro: 'Outro' };
+  function metaAtr(m, rot, hj) {
+    hj = hj || hoje(); if (/Atingida|Concluída|Não atingida|Pago|Resolvido/.test(m.situacao || '')) return '';
+    if (m.inicio && m.inicio > hj) return '';
+    const fim = m.termino || (/^\d{4}-\d{2}-\d{2}$/.test(m.prazo || '') ? m.prazo.slice(0, 10) : '');
+    if (fim && fim < hj) return 'passou do término (' + ddmm(fim) + ')';
+    const ids = String(m.rotinas || '').split(',').filter(Boolean), R = (rot || []).filter(r => ids.includes(r.id) && r.ativo !== 'não' && r.freq !== 'mes');
+    const atr = R.filter(r => { const x = pct(r, hj.slice(0, 7), hj); return x.ritmo != null && x.ritmo < 1; });
+    return atr.length ? 'atrasada em ' + atr.map(r => r.titulo).join(', ') : '';
+  }
+  function prazoTxt(m) { // texto curto do período
+    const d = x => x ? x.slice(8, 10) + '/' + x.slice(5, 7) + '/' + x.slice(2, 4) : '';
+    if (!m.freq || m.freq === 'outro') return /^\d{4}-\d{2}-\d{2}$/.test(m.prazo || '') ? 'até ' + d(m.prazo) : (m.prazo || '');
+    if (m.freq === 'uma') return m.termino ? 'até ' + d(m.termino) : '';
+    return FREQN[m.freq] + (m.inicio || m.termino ? ' · ' + (m.inicio ? d(m.inicio) : '') + (m.termino ? ' a ' + d(m.termino) : ' em diante') : '');
+  }
+  window.LBROT = { metaAtr, prazoTxt, FREQN, pct, pend, checks, notas, diasMes, porCat, FREQ, MESES, pagina, P100, cor, card: cardRot, css, liga, popup, andL, andTxt, andTit, ANDT, agendaDe };
 })();

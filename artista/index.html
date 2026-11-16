@@ -224,9 +224,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwjs6jc0"></script>
-<script src="../lbmetas.js?v=mwjs6jc0"></script>
-<script src="../lbchat.js?v=mwjs6jc0"></script>
+<script src="../lb.js?v=mwjso3vn"></script>
+<script src="../lbmetas.js?v=mwjso3vn"></script>
+<script src="../lbchat.js?v=mwjso3vn"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -450,7 +450,7 @@ function rendDe(nome){const n=LB.norm(nome||'');return (D.rendimento||[]).find(r
 const kS=v=>v>=1000?(Math.round(v/100)/10).toString().replace('.',',')+'k':String(Math.round(v));
 const MS6=()=>[...Array(6)].map((_,i)=>{const d=new Date(+MA.slice(0,4),+MA.slice(5,7)-1-(5-i),1);return isoD(d).slice(0,7)});
 const ligadas=m=>String(m.tarefas||'').split(',').filter(Boolean).map(i=>((TAR&&TAR.tarefas)||[]).find(t=>t.id===i)).filter(Boolean);
-const stMeta=m=>{const ok=FEITO.test(m.situacao||'');return ok?'ok':!ok&&ISO.test(m.prazo||'')&&m.prazo<HOJE?'atr':'and'};
+const stMeta=m=>{const ok=FEITO.test(m.situacao||'');if(ok)return 'ok';try{if(LBROT.metaAtr(m,(TAR&&TAR.rotinas)||[],HOJE))return 'atr'}catch(e){if(ISO.test(m.prazo||'')&&m.prazo<HOJE)return 'atr'}return 'and'};
 function pctMeta(m){if(FEITO.test(m.situacao||''))return 1;if(+m.meta_num>0)return Math.min(1,(+m.atual||0)/(+m.meta_num));const ts=ligadas(m);return ts.length?ts.filter(t=>t.status==='Concluída'||t.justificativa).length/ts.length:0}
 /* metas da empresa: resumo em barra + cada meta com progresso e quem justificou (ou não) */
 function renderMetas(){const el=document.getElementById('metas');if(!el)return;if(!TAR){el.innerHTML='<div class="vazio">Não consegui carregar agora.</div>';return}
@@ -462,7 +462,7 @@ function renderMetas(){const el=document.getElementById('metas');if(!el)return;i
   el.innerHTML=R+vm('metas',L.map(m=>{const s=stMeta(m),p=pctMeta(m),fal=ligadas(m).filter(t=>t.status!=='Concluída');
     const just=fal.map(t=>`<div class="mj"><b>${esc(NM[t.pessoa]||t.pessoa)}</b> ${t.justificativa?'· justificou: '+esc(t.justificativa):`<i>· ${s==='atr'?'não fez e não justificou':'ainda não fez'}</i>`}</div>`).join('');
     return `<div class="mt ${s}"><div class="top"><b>${esc(m.titulo)}</b><span class="tag ${s==='ok'?'ok':s==='atr'?'ruim':'am'}">${s==='ok'?'cumprida':s==='atr'?'atrasada':esc((m.situacao||'em andamento').toLowerCase())}</span></div>${m.alvo?`<div class="d">${esc(m.alvo)}</div>`:''}
-      <div class="tr"><i style="width:${Math.round(p*100)}%"></i></div><div class="d">${Math.round(p*100)}%${m.prazo?' · '+(ISO.test(m.prazo)?'até '+ddmm(m.prazo):esc(m.prazo)):''}</div>${just}</div>`}),5)}
+      <div class="tr"><i style="width:${Math.round(p*100)}%"></i></div><div class="d">${Math.round(p*100)}%${(t=>t?' · '+esc(t):'')(window.LBROT?LBROT.prazoTxt(m):m.prazo)}${s==='atr'?(a=>a?' · <span style="color:var(--neg)">'+esc(a)+'</span>':'')(window.LBROT?LBROT.metaAtr(m,TAR.rotinas||[],HOJE):''):''}</div>${just}</div>`}),5)}
 /* tarefa em aberto: barra de status pelo andamento */
 function stTar(t){let a=[];try{a=JSON.parse(t.andamento||'[]')||[]}catch(e){}const u=a.length?a[a.length-1]:null,tp=u&&u.tp;
   if(tp==='travado')return{p:25,c:'p4',l:'travada'+(u.tx?': '+u.tx:'')};if(tp==='aguardando')return{p:45,c:'p2',l:'aguardando'+(u.q?' '+u.q:'')+(u.tx?': '+u.tx:'')};
