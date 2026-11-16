@@ -335,10 +335,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwioy28g"></script>
-<script src="lbmetas.js?v=mwioy28g"></script>
-<script src="lbchat.js?v=mwioy28g"></script>
-<script src="lbvendas.js?v=mwioy28g"></script>
+<script src="lb.js?v=mwipea11"></script>
+<script src="lbmetas.js?v=mwipea11"></script>
+<script src="lbchat.js?v=mwipea11"></script>
+<script src="lbvendas.js?v=mwipea11"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -442,13 +442,15 @@ addEventListener('keydown',e=>{if(e.key==='Escape')fecharBord()});
 /* assistente de pagamento: pendentes de todos os borderôs, somados por pessoa */
 function renderPagar(){const tp=document.getElementById('tpag');if(tp&&D.avisos)tp.textContent=D.avisos.pag; // pendências por parte (cachê, diária, gasolina...), somadas por pessoa
   const P={},HJ=new Date(Date.now()-3*3600e3).toISOString().slice(0,10); // data real (Brasília): show só entra depois que acontece
-  Object.values(D.borderos||{}).filter(b=>b.data<=HJ).forEach(b=>b.equipe.forEach((e,i)=>{if(e.fora||e.grupo==='Comissão')return;const f=LB.pg.falta(e);if(!f)return;
-    const k=e.pessoa||LB.norm(e.nome);const x=P[k]=P[k]||{k,nome:e.nome,pix:e.pix,tot:0,it:[]};x.tot+=f;if(!x.pix)x.pix=e.pix;x.it.push({b,e,i,f,ps:LB.pg.partes(e).filter(p=>!p.pago)})}));
+  const FM=HJ.slice(0,8)+String(new Date(+HJ.slice(0,4),+HJ.slice(5,7),0).getDate()).padStart(2,'0');let NAD=0; // até o fim do mês
+  // equipe dos borderôs: cada parte entra na data em que vence (dia do show, outra data combinada, diária/gasolina antecipada, pessoa antecipada)
+  Object.values(D.borderos||{}).filter(b=>b.equipe).forEach(b=>b.equipe.forEach((e,i)=>{if(e.fora||e.grupo==='Comissão')return;
+    LB.pg.pend(b,e,LB.pg.agendado(b,e)?FM:HJ).forEach(q=>{const k=e.pessoa||LB.norm(e.nome);const x=P[k]=P[k]||{k,nome:e.nome,pix:e.pix,tot:0,it:[]};x.tot+=q.f;if(!x.pix)x.pix=e.pix;
+      x.it.push({b:Object.assign({},b,{data:q.d}),e,i,f:q.f,ps:q.ps,fut:q.d>HJ,ant:q.d<b.data})})}));
   Object.values(D.borderos||{}).filter(b=>b.data<=HJ).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!t.para||!(+t.valor>0))return; // itens com "pagar para"
     const k=t.pessoa||LB.norm(t.para);const x=P[k]=P[k]||{k,nome:t.para,pix:t.pix,tot:0,it:[]};x.tot+=+t.valor;if(!x.pix)x.pix=t.pix;
     x.it.push({b,e:{funcao:'item: '+(t.desc||'')},item:j,f:+t.valor,ps:[{k:'item',n:t.desc||'item',v:+t.valor}]})}));
   // pagamentos avulsos e fixos (página Admin): entram na data, até marcar pago
-  const FM=HJ.slice(0,8)+String(new Date(+HJ.slice(0,4),+HJ.slice(5,7),0).getDate()).padStart(2,'0');let NAD=0; // até o fim do mês
   PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada').forEach(g=>LB.pgx.ocorr(g,FM).filter(o=>!o.pago&&o.falta>0.004&&(!pAdiado(g,o.ref)||(NAD++,false))).forEach(o=>{const k=g.pessoa||LB.norm(g.nome);const x=P[k]=P[k]||{k,nome:g.nome,pix:g.pix,tot:0,it:[]};x.tot+=o.falta;if(!x.pix)x.pix=g.pix;
     x.it.push({b:{id:'pg-'+g.id,data:o.data,show:g.descricao||(g.tipo==='fixo'?'fixo mensal':'pagamento avulso')},e:{funcao:g.tipo==='fixo'?'fixo de '+MES3P[+o.ref.slice(5,7)-1]:'avulso'},g,o,fut:o.data>HJ,f:o.falta,ps:[{k:'pg',n:(g.meio==='Pix'?'pagamento':g.meio.toLowerCase())+(o.pg?' · falta (já pago '+brl(o.pg)+')':''),v:o.falta}]})}));
   const l=Object.values(P).sort((a,b)=>b.tot-a.tot),tot=l.reduce((a,x)=>a+x.tot,0),nsh=new Set(l.flatMap(x=>x.it.filter(i=>!i.g).map(i=>i.b.id))).size;
@@ -456,10 +458,10 @@ function renderPagar(){const tp=document.getElementById('tpag');if(tp&&D.avisos)
   PAGP=P;const pode=!!API_URL;PEND={tot,n:l.length};try{renderInfo()}catch(e){}
   document.getElementById('pgk').innerHTML=k4('Falta pagar',brl(tot),(vtot<tot-0.5?brl(vtot)+' já venceu · o resto vence até '+ddmm(FM):'shows que já aconteceram e contas vencidas')+(NAD?' · '+NAD+' adiada'+(NAD>1?'s':''):''),'pk')+k4('Pessoas',l.length,'com pagamento pendente')+k4('Shows',nsh,'com alguém a pagar');
   document.getElementById('pgl').innerHTML=l.length?l.map(x=>`<div class="pg2"><div class="hd"><div><b>${esc(x.nome)}</b><span>${x.it.length} pagamento${x.it.length>1?'s':''}${new Set(x.it.filter(i=>!i.g).map(i=>i.b.id)).size>1?' · '+new Set(x.it.filter(i=>!i.g).map(i=>i.b.id)).size+' shows somados':''}</span></div><div class="tt">${brl(x.tot)}</div></div>
-    ${x.it.map(i=>`<div class="ln"><span>${i.fut?'<b class="am2">vence '+ddmm(i.b.data)+'</b>':ddmm(i.b.data)} · ${esc(i.b.show)} · ${esc(i.e.funcao)}${i.e.status==='Parcial'?' · <b class="am2">parte já paga</b>':''}${i.g&&i.g.meio!=='Pix'?' · '+esc(i.g.meio)+(i.g.dados?': '+esc(i.g.dados):''):''}</span><b>${brl(i.f)}</b></div>
+    ${x.it.map(i=>`<div class="ln"><span>${i.fut?'<b class="am2">vence '+ddmm(i.b.data)+'</b>':ddmm(i.b.data)} · ${esc(i.b.show)} · ${esc(i.e.funcao)}${i.ant?' · <b class="am2">antecipado</b>':''}${i.e.status==='Parcial'?' · <b class="am2">parte já paga</b>':''}${i.g&&i.g.meio!=='Pix'?' · '+esc(i.g.meio)+(i.g.dados?': '+esc(i.g.dados):''):''}</span><b>${brl(i.f)}</b></div>
       <div class="pts">${i.ps.map(p=>pode&&i.g?`<button class="pt" data-pga="${esc(i.g.id+'|'+i.o.ref)}" title="Marcar como pago">${p.n} ${brl(p.v)} <i>✓ pago</i></button><button class="pt ad" data-pgad="${esc(i.g.id+'|'+i.o.ref)}" title="Tira do assistente (a conta continua na lista, em Adiadas)">adiar</button>`:pode?`<button class="pt" data-pgk="${esc(i.b.id)}|${i.item!=null?'it'+i.item:i.i}|${p.k}" title="Marcar só esta parte como paga">${p.n} ${brl(p.v)} <i>✓ pago</i></button>`:`<span class="pt">${p.n} ${brl(p.v)}</span>`).join('')}</div>`).join('')}
     <div class="px">${pxBtn(x.pix)}<button class="cp" data-cp="${esc(x.nome+' — '+brl(x.tot)+(x.pix?' — PIX '+x.pix:''))}">copiar resumo</button>${pode?`<button class="cp pgall" data-pgp="${esc(x.k)}">marcar tudo pago${x.it.some(i=>i.fut)?' (só o vencido)':''}</button>`:''}</div></div>`).join('')
-    :'<div class="empty">Nenhum pagamento pendente. Show só entra aqui depois que acontece; contas e fixos do mês (página Admin) entram todos, menos os adiados.</div>';
+    :'<div class="empty">Nenhum pagamento pendente. Show só entra aqui depois que acontece (ou na data combinada no borderô); contas e fixos do mês (página Admin) entram todos, menos os adiados.</div>';
   renderAdiados(pode);
 }
 let ADV=false; // lista de adiados aberta?
@@ -524,7 +526,7 @@ document.addEventListener('click',e=>{
   const g=e.target.closest('[data-pga]');if(g){const[id,ref]=g.dataset.pga.split('|'),pg=PAGS.find(x=>x.id===id);
     if(pg&&pg.varia==='sim'){const t=prompt(`${pg.descricao||pg.nome}: valor da conta (média ${brl(+pg.valor)})`);if(t==null)return;const v=+String(t).trim().replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');if(!(v>0))return alert('Valor inválido');marcarPago([],g,[{id,ref,valor:v}]);return}
     marcarPago([],g,[{id,ref}]);return}
-  const b=e.target.closest('[data-pgp]');if(b){const x=PAGP[b.dataset.pgp];if(x)marcarPago(x.it.filter(i=>!i.g&&!i.fut).map(i=>i.item!=null?{id:i.b.id,it:i.item,data:HOJE}:{id:i.b.id,i:i.i,partes:'tudo',data:HOJE}),b,x.it.filter(i=>i.g&&!i.fut).map(i=>({id:i.g.id,ref:i.o.ref})))}});
+  const b=e.target.closest('[data-pgp]');if(b){const x=PAGP[b.dataset.pgp];if(x)marcarPago(x.it.filter(i=>!i.g&&!i.fut).map(i=>i.item!=null?{id:i.b.id,it:i.item,data:HOJE}:{id:i.b.id,i:i.i,partes:i.ps.map(p=>p.k),data:HOJE}),b,x.it.filter(i=>i.g&&!i.fut).map(i=>({id:i.g.id,ref:i.o.ref})))}});
 async function metasAlerta(url){ // metas com check da própria pessoa (Luiz, Lucas): o que falta marcar hoje / nesta semana
   try{const r=await (await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'minhas_tarefas',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
     if(!r.ok||!window.LBROT)return;const PD=(r.rotinas||[]).map(x=>[x,LBROT.pend(x)]).filter(y=>y[1]);

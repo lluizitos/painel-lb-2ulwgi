@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwioy28g';
+  const BUILD = 'mwipea11';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -297,6 +297,16 @@
     PARTES,
     partes: e => PARTES.filter(([k]) => nb(e[k]) > 0).map(([k, n]) => ({ k, n, v: nb(e[k]), pago: e.status === 'Pago' && !(e.pagos && Object.keys(e.pagos).length) ? true : !!(e.pagos && e.pagos[k]), em: e.pagos && e.pagos[k] })),
     falta: e => e.fora ? 0 : pg.partes(e).filter(p => !p.pago).reduce((a, p) => a + p.v, 0),
+    /* quando pagar (borderô → "Quando pagar"): b.pag = {show, diaria, gasolina} (datas; vazio = junto com o cachê / no dia do show);
+       e.pag_em = pagamento antecipado (ou em outra data) só daquela pessoa, vale para todas as partes dela */
+    venc: (b, e, k) => (e && e.pag_em) || ((b.pag || {})[k === 'diaria' || k === 'gasolina' ? k : 'show']) || (b.pag || {}).show || b.data,
+    agendado: (b, e) => !!((e && e.pag_em) || (b.pag && (b.pag.show || b.pag.diaria || b.pag.gasolina))),
+    // partes ainda não pagas, agrupadas pela data em que vencem (até "ate", se vier): [{d, ps, f}]
+    pend(b, e, ate) { if (e.fora) return []; const G = {}; pg.partes(e).filter(p => !p.pago).forEach(p => { const d = pg.venc(b, e, p.k); if (ate && d > ate) return; (G[d] = G[d] || []).push(p); });
+      return Object.keys(G).sort().map(d => ({ d, ps: G[d], f: G[d].reduce((a, p) => a + p.v, 0) })); },
+    // pagamentos da equipe do borderô por data de vencimento (calendário): [{d, tot, falta}]
+    porData(b) { const G = {}; (b.equipe || []).forEach(e => { if (e.fora || e.grupo === 'Comissão') return; pg.partes(e).forEach(p => { const d = pg.venc(b, e, p.k), x = G[d] = G[d] || { d, tot: 0, falta: 0 }; x.tot += p.v; if (!p.pago) x.falta += p.v; }); });
+      return Object.values(G).sort((x, y) => x.d < y.d ? -1 : 1); },
     marca(e, ks, data, pago = true) {  // ks: lista de partes ou 'tudo'
       if (e.status === 'Pago' && !(e.pagos && Object.keys(e.pagos).length)) { e.pagos = {}; pg.partes({ ...e, status: '' }).forEach(p => e.pagos[p.k] = e.pago_em || data); }
       e.pagos = e.pagos || {};

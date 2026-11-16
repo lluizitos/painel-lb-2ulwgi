@@ -105,6 +105,9 @@
 .gb{display:flex;gap:8px;height:150px;margin-top:10px}.gb>div{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px}.gb span{font-size:11.5px;font-weight:700;color:var(--sub);min-height:15px}.gb small{font-size:11px;color:var(--muted)}
 .gbw{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}.gbw i{display:flex;flex-direction:column;width:100%;max-width:36px;border-radius:6px 6px 2px 2px;overflow:hidden}.gbw i u{display:block;min-height:0}
 .ghl{display:flex;align-items:center;gap:8px;margin-top:9px;font-size:13.5px}.ghl span{flex:0 0 40%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ghl i{flex:1;height:8px;background:var(--card2);border-radius:99px;overflow:hidden}.ghl i u{display:block;height:100%;border-radius:99px}.ghl b{width:42px;text-align:right;font-size:13px}
+.urgs{display:flex;flex-direction:column;gap:8px;margin:14px 0 4px}.urg{display:flex;gap:10px;align-items:center;width:100%;text-align:left;font:inherit;color:var(--ink);background:rgba(255,143,168,.1);border:1px solid rgba(255,143,168,.5);border-radius:14px;padding:12px 14px;cursor:pointer;animation:lbpisca 1.4s ease-in-out infinite}.urg svg{flex:none;width:20px;height:20px;color:var(--neg)}.urg span{font-size:14.5px;font-weight:600}.urg small{display:block;font-size:12.5px;font-weight:400;color:var(--neg);margin-top:2px}@keyframes lbpisca{0%,100%{border-color:rgba(255,143,168,.5)}50%{border-color:var(--neg);background:rgba(255,143,168,.2)}}@media (prefers-reduced-motion:reduce){.urg{animation:none}}
+.lbcb{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}.lbcb b{flex:1;font-size:15px;min-width:130px}.lbcb .nvb{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:99px;min-width:34px;height:34px;padding:0 10px;font-size:14px;cursor:pointer;font-family:inherit}.lbseg{display:inline-flex;border:1px solid var(--line);border-radius:99px;overflow:hidden}.lbseg button{border:0;background:none;color:var(--muted);font:inherit;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:7px 11px;cursor:pointer}.lbseg button.on{background:var(--card2);color:var(--ink)}.cfl{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}.cfl button{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:99px;padding:5px 10px;font:inherit;font-size:12px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}.cfl button.off{opacity:.45;text-decoration:line-through}.cfl em{display:inline-block;width:8px;height:8px;border-radius:3px}
+.ldia>.dh{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:14px 2px 6px;cursor:pointer;background:none;border:0;width:100%;padding:0;font-family:inherit}.ldia>.dh.hj{color:var(--pinkl)}.lev{display:flex;gap:10px;align-items:center;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--card2);border:0;border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer}.lev>em{flex:none;width:4px;align-self:stretch;border-radius:4px}.lev .t{flex:1;min-width:0}.lev .t b{display:block;font-size:14px;font-weight:600}.lev .t span{font-size:12px;color:var(--muted)}.lev.fe .t b{text-decoration:line-through;color:var(--muted)}.lvz{color:var(--muted);font-size:13px;text-align:center;padding:16px}.pt-m{background:#F2B66B}
 .lbc{background:var(--card);border-radius:14px;padding:10px}.lbch{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.lbch b{font-size:15px;text-transform:capitalize}.lbch button{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:10px;width:40px;height:36px;font-size:18px;cursor:pointer}
 .lbc .cw,.lbc .cg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}.lbc .cw span{text-align:center;font-size:10.5px;color:var(--muted);font-weight:700;padding-bottom:4px}
 .lbc .cd{min-height:70px;min-width:0;border:0;border-top:1px solid var(--line);border-radius:6px;background:none;color:var(--sub);display:flex;flex-direction:column;align-items:stretch;gap:2px;cursor:pointer;padding:4px 2px 3px;font:inherit;overflow:hidden}.lbc .cd>b{align-self:center;font-size:13px;font-weight:600}.lbc .cd:hover{background:var(--card2)}
@@ -274,22 +277,51 @@
       const shows = (ST.S || []).filter(s => s.data === d);
       return { prazo, feitas, metas, agend, shows };
     }
-    let CM = '';
-    function calendario(HJ) {
-      if (!CM) CM = HJ.slice(0, 7);
-      const y = +CM.slice(0, 4), mo = +CM.slice(5, 7) - 1, n = new Date(y, mo + 1, 0).getDate(), off = (new Date(y, mo, 1).getDay() + 6) % 7;
-      let c = `<div class="lbc"><div class="lbch"><button data-cm="-1" aria-label="mês anterior">‹</button><b>${MESES[mo]} ${y}</b><button data-cm="1" aria-label="próximo mês">›</button></div><div class="cw">${['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map(x => `<span>${x}</span>`).join('')}</div><div class="cg">` + '<i></i>'.repeat(off);
-      for (let d = 1; d <= n; d++) {
-        const k = CM + '-' + String(d).padStart(2, '0'), it = itensDia(k, HJ), ch = [];
-        it.shows.forEach(s => ch.push(`<i class="ce pt-sh">🎤 ${esc(s.local || s.show)}</i>`));
-        it.prazo.forEach(t => ch.push(`<i class="ce ${t.status === 'Concluída' ? 'pt-ok fe' : t.prazo < HJ ? 'pt-a' : 'pt-t'}">${esc(t.titulo)}</i>`));
-        it.agend.forEach(t => ch.push(`<i class="ce pt-g">📅 ${esc(t.titulo)}</i>`));
-        if (it.feitas.length) ch.push(`<i class="ce pt-ok">✓${it.feitas.length}</i>`);
-        const mk = it.metas.filter(x => x.n).length, mf = it.metas.filter(x => x.falta).length, MX = 2;
-        c += `<button class="cd${k === HJ ? ' hj' : ''}" data-dia="${k}" aria-label="${d} de ${MESES[mo]}"><b>${d}</b>${ch.slice(0, ch.length > MX ? MX - 1 : MX).join('')}${ch.length > MX ? `<i class="cm">+${ch.length - MX + 1}</i>` : ''}${mk || mf ? `<span class="dts">${mk ? `<em class="dk">✓${mk}</em>` : ''}${mf ? `<em class="dx">✗${mf}</em>` : ''}</span>` : ''}</button>`;
-      }
-      return c + `</div><div class="clg"><span><em class="pt-t"></em>prazo</span><span><em class="pt-a"></em>atrasada</span><span><em class="pt-ok"></em>feita</span><span><em class="pt-g"></em>agendado</span>${(ST.S || []).length ? '<span><em class="pt-sh"></em>show</span>' : ''}<span><b class="dk">✓</b> metas feitas · <b class="dx">✗</b> não feitas</span></div><p class="clt">Toque num dia para ver tudo dele.</p></div>`;
+    /* agenda igual à do Lucas: Mês / Semana / Dia, ‹ › Hoje, botões para ocultar blocos; tocar no dia abre o pop-up do dia */
+    const ls = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { } } };
+    let CR = '', CV = ls.get('lbm_vis') || 'mes'; const OC = new Set(String(ls.get('lbm_oculto') || '').split(',').filter(Boolean));
+    const CATS = { show: ['Shows', 'pt-sh'], tar: ['Prazos', 'pt-t'], ag: ['Agendado', 'pt-g'], feita: ['Feitas', 'pt-ok'], meta: ['Metas', 'pt-m'] };
+    const MS3 = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'], DSL = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    function evDia(d, HJ) {
+      const it = itensDia(d, HJ), E = [];
+      it.shows.forEach(s => E.push({ cat: 'show', cls: 'pt-sh', txt: 'Show · ' + (s.local || s.show || ''), sub: s.funcao ? 'você vai como ' + s.funcao : 'você está no borderô' }));
+      it.prazo.forEach(t => { const ok = t.status === 'Concluída', atr = !ok && t.prazo < HJ; E.push({ cat: 'tar', cls: ok ? 'pt-ok' : atr ? 'pt-a' : 'pt-t', txt: t.titulo, sub: ok ? 'feita' : atr ? 'atrasada' : t.status === 'Em andamento' ? 'fazendo' : 'prazo', fe: ok }); });
+      it.agend.forEach(t => E.push({ cat: 'ag', cls: 'pt-g', txt: t.titulo, sub: 'agendado para este dia' }));
+      it.feitas.forEach(t => E.push({ cat: 'feita', cls: 'pt-ok', txt: t.titulo, sub: 'feita neste dia', fe: true }));
+      it.metas.forEach(x => E.push({ cat: 'meta', cls: x.n ? 'pt-ok' : x.falta ? 'pt-a' : 'pt-m', txt: x.r.titulo, sub: x.n ? 'meta feita' : x.js ? 'justificada' : x.falta ? 'meta não feita' : 'marcar hoje', meta: 1, ok: !!x.n, falta: !!x.falta }));
+      return E.filter(x => !OC.has(x.cat));
     }
+    const addD = (d, n) => { const x = new Date(d + 'T12:00:00'); x.setDate(x.getDate() + n); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
+    const levH = (x, d) => `<button class="lev${x.fe ? ' fe' : ''}" data-dia="${d}"><em class="${x.cls}"></em><div class="t"><b>${esc(x.txt)}</b><span>${esc(x.sub || '')}</span></div></button>`;
+    function calendario(HJ) {
+      if (!CR) CR = HJ;
+      const y = +CR.slice(0, 4), mo = +CR.slice(5, 7) - 1;
+      let tit = '', corpo = '';
+      if (CV === 'mes') {
+        const m0 = CR.slice(0, 7) + '-01', n = new Date(y, mo + 1, 0).getDate(), off = (new Date(y, mo, 1).getDay() + 6) % 7; tit = MESES[mo] + ' ' + y;
+        corpo = `<div class="cw">${['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map(x => `<span>${x}</span>`).join('')}</div><div class="cg">` + '<i></i>'.repeat(off);
+        for (let d = 1; d <= n; d++) {
+          const k = CR.slice(0, 7) + '-' + String(d).padStart(2, '0'), E = evDia(k, HJ), ch = E.filter(x => !x.meta), MX = 3;
+          const mk = E.filter(x => x.meta && x.ok).length, mf = E.filter(x => x.meta && x.falta).length;
+          corpo += `<button class="cd${k === HJ ? ' hj' : ''}" data-dia="${k}" aria-label="${d} de ${MESES[mo]}"><b>${d}</b>${ch.slice(0, ch.length > MX ? MX - 1 : MX).map(x => `<i class="ce ${x.cls}${x.fe ? ' fe' : ''}">${esc(x.cat === 'show' ? x.txt.replace('Show · ', '') : x.txt)}</i>`).join('')}${ch.length > MX ? `<i class="cm">+${ch.length - MX + 1}</i>` : ''}${mk || mf ? `<span class="dts">${mk ? `<em class="dk">✓${mk}</em>` : ''}${mf ? `<em class="dx">✗${mf}</em>` : ''}</span>` : ''}</button>`;
+        }
+        corpo += '</div>';
+      } else if (CV === 'sem') {
+        const ini = addD(CR, -((new Date(CR + 'T12:00:00').getDay() + 6) % 7)), fim = addD(ini, 6);
+        tit = +ini.slice(8) + ' ' + MS3[+ini.slice(5, 7) - 1] + ' – ' + (+fim.slice(8)) + ' ' + MS3[+fim.slice(5, 7) - 1];
+        for (let i = 0; i < 7; i++) { const d = addD(ini, i), E = evDia(d, HJ);
+          corpo += `<div class="ldia"><button class="dh${d === HJ ? ' hj' : ''}" data-dia="${d}"><span>${DSL[new Date(d + 'T12:00:00').getDay()].slice(0, 3)} · ${+d.slice(8)}${d === HJ ? ' · hoje' : ''}</span><span>${E.length || ''}</span></button>${E.map(x => levH(x, d)).join('')}</div>`; }
+      } else {
+        tit = DSL[new Date(CR + 'T12:00:00').getDay()] + ', ' + (+CR.slice(8)) + ' de ' + MESES[mo];
+        const E = evDia(CR, HJ); corpo = E.map(x => levH(x, CR)).join('') || '<div class="lvz">Nada neste dia.</div>';
+      }
+      tit = tit.charAt(0).toUpperCase() + tit.slice(1);
+      return `<div class="lbc"><div class="lbcb"><button class="nvb" data-cn="-1" aria-label="anterior">‹</button><b>${tit}</b><button class="nvb" data-cn="1" aria-label="próximo">›</button><button class="nvb" data-choje>Hoje</button></div>
+        <div class="lbcb"><div class="lbseg">${[['mes', 'Mês'], ['sem', 'Semana'], ['dia', 'Dia']].map(([k, n]) => `<button data-cv="${k}" class="${CV === k ? 'on' : ''}">${n}</button>`).join('')}</div></div>
+        <div class="cfl">${Object.entries(CATS).map(([k, c]) => `<button data-cf="${k}" class="${OC.has(k) ? 'off' : ''}" title="${OC.has(k) ? 'Mostrar' : 'Ocultar'} ${c[0].toLowerCase()}"><em class="${c[1]}"></em>${c[0]}</button>`).join('')}</div>
+        ${corpo}<div class="clg"><span><em class="pt-sh"></em>show</span><span><em class="pt-t"></em>prazo</span><span><em class="pt-a"></em>atrasada</span><span><em class="pt-ok"></em>feita</span><span><em class="pt-g"></em>agendado</span><span><b class="dk">✓</b> metas feitas · <b class="dx">✗</b> não feitas</span></div><p class="clt">Toque num dia para ver tudo dele.</p></div>`;
+    }
+    function navCal(n) { if (CV === 'mes') { const x = new Date(+CR.slice(0, 4), +CR.slice(5, 7) - 1 + n, 1); CR = x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-01'; } else CR = addD(CR, CV === 'sem' ? 7 * n : n); }
     const qs_ = v => String(v).replace(/["\\]/g, '\\$&'); // CSS é o nome do texto de estilos aqui
     function popDia(d) {
       const HJ = hoje(), it = itensDia(d, HJ), dt = new Date(d + 'T12:00:00');
@@ -343,8 +375,13 @@
       const abV = TMAIS ? ab : ab.slice(0, TMAX), grupos = porCat(abV), comCat = porCat(ab).some(g => g[0]);
       const tMais = ab.length > TMAX ? `<button class="vmb" type="button" data-tmais>${TMAIS ? 'Mostrar menos' : 'Mostrar mais (' + (ab.length - TMAX) + ')'}</button>` : '';
       document.title = P.nome + ' · ' + titulo;
+      const U = []; ab.forEach(t => { if (!t.prazo) return; const n = dias(HJ, t.prazo); if (n <= 1) U.push({ t: t.titulo, s: n < 0 ? 'atrasada desde ' + ddmm(t.prazo) : n === 0 ? 'é hoje' : 'é amanhã', d: n < 0 ? HJ : t.prazo }); });
+      T.filter(t => agendaDe(t, HJ) && !U.some(u => u.t === t.titulo)).forEach(t => U.push({ t: t.titulo, s: 'agendado para hoje', d: HJ }));
+      const ALI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg>';
       app.innerHTML = `<h1>${esc(P.nome)}</h1><p class="fn">${esc(P.funcao || '')}</p>
+    ${U.length ? `<div class="urgs">${U.slice(0, 4).map(u => `<button class="urg" data-dia="${u.d}">${ALI}<span>${esc(u.t)}<small>${esc(u.s)}</small></span></button>`).join('')}</div>` : ''}
     ${hojeBox(HJ)}
+    <h3>Minha agenda</h3><div id="lbcal">${calendario(HJ)}</div>
     ${P.meta ? `<div class="meta"><span>Minha meta</span>${esc(P.meta)}</div>` : ''}
     <div class="nv"><button data-nv="tarefa"${NV === 'tarefa' ? ' class="on"' : ''}>＋ Nova tarefa</button><button data-nv="meta"${NV === 'meta' ? ' class="on"' : ''}>＋ Nova meta</button></div><div id="nvbox">${form()}</div>
     ${R.length ? `<h3>Metas de ${MESES[+MES.slice(5, 7) - 1]}</h3><div class="list" data-max="0">${R.map(x => cardRot(x, HJ)).join('')}</div>` : ''}
@@ -353,7 +390,6 @@
     <h3>Tarefas em aberto</h3>${!ab.length ? '<div class="empty">Nada pendente. 👏</div>' : comCat
           ? `<div data-semvm>${grupos.map(([c, l]) => `<details class="cat" open><summary>${esc(c || 'Outras')} <small>${TMAIS ? l.length : ab.filter(t => (t.categoria || '') === (c || '')).length}</small></summary><div class="list">${l.map(t => card(t, HJ)).join('')}</div></details>`).join('')}${tMais}</div>`
           : `<div data-semvm><div class="list">${abV.map(t => card(t, HJ)).join('')}</div>${tMais}</div>`}
-    <h3>Calendário</h3><div id="lbcal">${calendario(HJ)}</div>
     <h3>Meu rendimento</h3>${graficos(HJ)}
     ${ok.length ? `<details${ok.length <= 3 ? ' open' : ''}><summary>Concluídas (${ok.length})</summary><div class="list">${ok.slice(0, 30).map(t => card(t, HJ)).join('')}</div></details>` : ''}`;
     }
@@ -426,8 +462,10 @@
     });
     // calendário (mudar de mês, abrir o dia) e corrigir a data de conclusão
     app.addEventListener('click', async e => {
-      const m = e.target.closest('[data-cm]');
-      if (m) { e.preventDefault(); const x = new Date(+CM.slice(0, 4), +CM.slice(5, 7) - 1 + (+m.dataset.cm), 1); CM = x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0'); app.querySelector('#lbcal').innerHTML = calendario(hoje()); return; }
+      const cb = e.target.closest('[data-cn],[data-choje],[data-cv],[data-cf]');
+      if (cb && cb.closest('#lbcal')) { e.preventDefault(); const q = cb.dataset;
+        if (q.cn) navCal(+q.cn); else if (q.cv) { CV = q.cv; ls.set('lbm_vis', CV); } else if (q.cf) { OC.has(q.cf) ? OC.delete(q.cf) : OC.add(q.cf); ls.set('lbm_oculto', [...OC].join(',')); } else CR = hoje();
+        app.querySelector('#lbcal').innerHTML = calendario(hoje()); return; }
       const d = e.target.closest('[data-dia]'); if (d) { e.preventDefault(); popDia(d.dataset.dia); return; }
       const cd = e.target.closest('[data-cd]');
       if (cd) { e.preventDefault(); const t = ST.T.find(x => x.id === cd.dataset.cd), box = app.querySelector(`[data-tjf="${cd.dataset.cd}"]`); if (!t || !box) return;

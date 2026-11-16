@@ -37,6 +37,7 @@ h3{font-size:11px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;
 .empty{color:var(--muted);font-size:13.5px;text-align:center;padding:22px;background:var(--card);border-radius:14px}
 .err{color:var(--neg);text-align:center;margin-top:40px}
 details summary{cursor:pointer;color:var(--sub);font-size:13px;margin:20px 2px 8px}
+.mpg{display:flex;flex-direction:column;gap:8px}.mpg a{display:flex;justify-content:space-between;align-items:center;gap:10px;text-decoration:none;color:var(--ink);background:var(--card);border-radius:14px;padding:14px 16px;border-left:4px solid var(--pink)}.mpg a b{display:block;font-size:16px}.mpg a span{font-size:12.5px;color:var(--muted)}.mpg a i{font-style:normal;color:var(--pinkl);font-size:20px}
 </style>
 </head>
 <body>
@@ -45,10 +46,11 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px;margin:20px 2px 8
 <div class="wrap">
 <p class="eyebrow">Minhas metas e tarefas</p>
 <div id="app"><p class="fn">Carregando…</p></div>
+<div id="mpgs"></div>
 </div>
 </div>
-<script src="../lb.js?v=mwioy28g"></script>
-<script src="../lbmetas.js?v=mwioy28g"></script>
+<script src="../lb.js?v=mwipea11"></script>
+<script src="../lbmetas.js?v=mwipea11"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),MES=HOJE.slice(0,7);
@@ -57,10 +59,13 @@ let API='',P=null,T=[];
 async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({usuario:LB.login,senha:LB.senha,nome:LB.usuario},c))})).json();if(!r.ok)throw new Error(r.erro||'erro');P=r.perfil;T=r.tarefas;return r}
 LB.entrar({pagina:'metas',base:'../',titulo:'Metas',ok:async r=>{document.getElementById('pg').style.display='block';document.getElementById('links').innerHTML=LB.links(r.paginas,'metas','../');
   const app=document.getElementById('app');
+  // no fim: as outras páginas que este login abre (ex.: Vendas para quem vende)
+  const PGS={vendas:['Vendas','vendas/','shows, agenda e as minhas vendas'],bordero:['Borderôs','borderos/','custos e equipe de cada show'],painel:['Financeiro','','pagamentos, mês e shows'],artista:['Artista','artista/','página do Lucas'],socio:['Sócio','socio/','prestação de contas'],admin:['Admin','admin/','logins, tarefas e parâmetros']};
+  const meus=(r.paginas||[]).filter(p=>PGS[p]);if(meus.length)document.getElementById('mpgs').innerHTML='<h3>Minhas páginas</h3><div class="mpg">'+meus.map(p=>`<a href="../${PGS[p][1]}"><div><b>${PGS[p][0]}</b><span>${PGS[p][2]}</span></div><i>›</i></a>`).join('')+'</div>';
   try{API=(await (await fetch('../config.json',{cache:'no-store'})).json()).api_url;await LBROT.pagina(app,api,'metas LB')}
   catch(e){app.innerHTML=`<p class="err">${e.message==='sem_perfil'?'Seu login ainda não está ligado a uma pessoa da equipe. Peça ao Luiz.':'Não consegui abrir agora. Tente de novo em instantes.'}</p>`}}});
 </script>
-<script src="../lbchat.js?v=mwioy28g"></script>
+<script src="../lbchat.js?v=mwipea11"></script>
 <script>LBCHAT.auto(document.getElementById('app'),{base:'../',pagina:'Metas',exemplo:'o que falta eu fazer esta semana?'})</script>
 </body>
 </html>

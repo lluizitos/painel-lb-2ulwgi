@@ -89,6 +89,10 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
 @media(min-width:700px){#pm{align-items:center}#pm form{border-radius:18px}}
 #pm h2{font-size:19px;font-weight:900;text-transform:uppercase;margin:0 0 12px}
 .pts{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}.pt{border:1px solid var(--line);background:var(--card2);color:var(--sub);border-radius:999px;padding:5px 10px;font:inherit;font-size:12px;cursor:pointer}.pt.ok{border-color:var(--pos);color:var(--pos)}.st.parc{border-color:var(--amber);color:var(--amber)}
+.qpl{display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center;margin-top:10px;font-size:13px}.qpl>span{color:var(--sub)}.qpl .pts{margin:0}.qpl input[type=date],.pa input{max-width:160px;padding:5px 8px;font-size:12.5px;background:var(--card2);color:var(--ink);border:1px solid var(--line);border-radius:8px;color-scheme:dark}
+@media(max-width:520px){.qpl{grid-template-columns:1fr;gap:4px}}
+.qlote{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.qres{font-size:12.5px;color:var(--sub);margin-top:8px}.qres b{color:var(--ink)}
+.pa{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}.pa input{max-width:150px;padding:4px 8px;font-size:12.5px}.pa .tg{color:var(--amber);font-weight:700}
 .massa{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}.massa summary{cursor:pointer;font-weight:700;color:var(--pinkl)}
 .pp.flash{outline:2px solid var(--pinkl);outline-offset:2px;transition:outline .3s}
 .ipara{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;font-size:13px;color:var(--sub)}.ipara b{color:var(--ink)}
@@ -160,6 +164,7 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
     </details>
     <div class="res"><input class="search" id="e_busca" placeholder="Adicionar pessoa: digite o nome ou apelido" autocomplete="off"><div class="dd" id="e_dd"></div></div>
     <div id="e_eq" style="margin-top:10px"></div>
+    <details class="massa" id="e_qpw"><summary>Quando pagar <small id="e_qps" style="font-weight:400;color:var(--muted)"></small></summary><div id="e_qp"></div></details>
     <details class="massa"><summary>Pagamento em massa</summary>
       <p class="note">Ex.: pagou a diária de todo mundo num dia. Escolha as partes, quem e a data; depois salve o borderô.</p>
       <div class="pts" id="m_partes"></div>
@@ -227,7 +232,7 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
   <div class="acts" style="justify-content:space-between"><button type="button" class="btn dg" id="pm_del">Excluir</button><span style="display:flex;gap:8px"><button type="button" class="btn" id="pm_x">Cancelar</button><button type="submit" class="btn pkb">Salvar</button></span></div>
 </form></div>
 
-<script src="../lb.js?v=mwioy28g"></script>
+<script src="../lb.js?v=mwipea11"></script>
 <script>
 const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
 const brl2=v=>v==null||isNaN(v)?'—':'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -324,11 +329,11 @@ function abrir(b,isNovo){ED=b;$('d_mres').textContent='';ED._novo=!!isNovo;ED.di
   $('e_show').value=b.show_id||'';$('e_nome').value=b.show||'';$('e_data').value=b.data;$('e_local').value=b.local||'';$('e_valor').value=nf(b.valor);$('e_com').value=nf(b.comissao);$('e_obs').value=b.obs||'';
   $('d_ida').value=nf(ED.diesel.km_ida);$('d_volta').value=nf(ED.diesel.km_volta);$('d_ad').value=ED.diesel.km_adic===''?'':nf(ED.diesel.km_adic);$('d_kml').value=nf(ED.diesel.kml);$('d_pr').value=nf(ED.diesel.preco);$('d_ab').value=nf(ED.diesel.abastecido);
   $('ed_t').textContent=(b.show||'Novo borderô');$('msg').textContent='';$('e_del').style.display=BORD[b.id]?'':'none';
-  ED.fonte='app';renderEq();renderIt();calcTot();$('ed').classList.add('open');$('ed').scrollTop=0;document.body.style.overflow='hidden'}
+  ED.fonte='app';$('e_qpw').open=false;renderEq();renderIt();calcTot();$('ed').classList.add('open');$('ed').scrollTop=0;document.body.style.overflow='hidden'}
 function fechar(){if(ED&&ED._sujo&&!confirm('Sair sem salvar as mudanças?'))return;$('ed').classList.remove('open');document.body.style.overflow='';ED=null}
 $('ed_x').onclick=fechar;
 $('e_show').onchange=()=>{const s=D.shows.find(x=>x.id===$('e_show').value);ED.show_id=s?s.id:null;if(s){$('e_nome').value=s.evento;$('e_data').value=s.data;$('e_local').value=s.local||s.cidade;$('e_valor').value=nf(s.valor)}lerCab();calcTot()};
-['e_nome','e_data','e_local','e_valor','e_com','e_obs'].forEach(id=>$(id).addEventListener('input',()=>{lerCab();calcTot()}));
+['e_nome','e_data','e_local','e_valor','e_com','e_obs'].forEach(id=>$(id).addEventListener('input',()=>{lerCab();calcTot();if(id==='e_data')renderQP()}));
 function lerCab(){ED.show=$('e_nome').value.trim();ED.data=$('e_data').value;ED.local=$('e_local').value.trim();ED.valor=num($('e_valor').value)||null;ED.comissao=num($('e_com').value)||'';ED.obs=$('e_obs').value;ED._sujo=true;$('ed_t').textContent=ED.show||'Novo borderô'}
 ['d_ida','d_volta','d_ad','d_kml','d_pr','d_ab'].forEach(id=>$(id).addEventListener('input',()=>{const d=ED.diesel;d.km_ida=num($('d_ida').value);d.km_volta=num($('d_volta').value);d.km_adic=$('d_ad').value===''?'':num($('d_ad').value);d.kml=num($('d_kml').value);d.preco=num($('d_pr').value);d.abastecido=num($('d_ab').value)||'';ED._sujo=true;calcTot()}));
 
@@ -367,7 +372,30 @@ function massa(pago){const ks=[...document.querySelectorAll('#m_partes [data-mk]
   ED._sujo=true;renderEq();calcTot();$('m_res').textContent=n?`${n} pessoa${n>1?'s':''} ${pago?(n>1?'marcadas como pagas':'marcada como paga'):(n>1?'desmarcadas':'desmarcada')} · salve o borderô`:'Ninguém com essas partes.'}
 $('m_partes').addEventListener('click',e=>{const b=e.target.closest('[data-mk]');if(!b)return;b.classList.toggle('ok');b.textContent=(b.classList.contains('ok')?'✓ ':'○ ')+b.textContent.slice(2)});
 $('m_pagar').onclick=()=>massa(true);$('m_desf').onclick=()=>massa(false);
-function renderEq(){const r=resumo(ED);$('e_fm').textContent=fmTxt(r);renderMassa();
+/* quando pagar: data do cachê (no dia / segunda / outra), diárias e combustível antecipados, e lote "pagar de todos" */
+function addDia(d,n){const x=new Date(d+'T12:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)}
+function proxSeg(d){const x=new Date(d+'T12:00');return addDia(d,((8-x.getDay())%7)||7)}
+const QPN={show:'cachê',diaria:'diárias',gasolina:'combustível'};
+function renderQP(){const P=ED.pag=ED.pag||{},d=ED.data||HOJE,tem=k=>ED.equipe.some(e=>!e.fora&&num(e[k])>0);
+  const lin=(k,lbl,ops)=>{const v=P[k]||'',dentro=ops.some(o=>o[0]===v);
+    return `<div class="qpl"><span>${lbl}</span><div class="pts">${ops.map(([x,t])=>`<button type="button" class="pt${v===x?' ok':''}" data-qk="${k}" data-qv="${x}">${t}</button>`).join('')}<input type="date" data-qd="${k}" value="${!dentro?v:''}" title="outra data"></div></div>`};
+  const sg=proxSeg(d),vs=addDia(d,-1);
+  const lote=k=>{const l=ED.equipe.filter(e=>!e.fora&&num(e[k])>0);if(!l.length)return '';const fal=l.filter(e=>!LB.pg.partes(e).find(p=>p.k===k&&p.pago)),tot=l.reduce((a,e)=>a+num(e[k]),0),ft=fal.reduce((a,e)=>a+num(e[k]),0);
+    return `<div class="qres">${QPN[k][0].toUpperCase()+QPN[k].slice(1)}: <b>${brl2(tot)}</b> de ${l.length} pessoa${l.length>1?'s':''} · ${ft>0.004?`falta <b class="pk">${brl2(ft)}</b> (${fal.length})`:'<span class="pos">tudo pago</span>'}</div>`};
+  $('e_qp').innerHTML=`<p class="note">Muda em que dia cada pagamento aparece no Financeiro, no calendário e na página do Lucas. Vazio = no dia do show.</p>`+
+    lin('show','Cachê da equipe',[['','no dia do show'],[sg,'segunda '+ddmm(sg)]])+
+    (tem('diaria')?lin('diaria','Diárias',[['','junto com o cachê'],[vs,'véspera '+ddmm(vs)],[HOJE,'hoje']]):'')+
+    (tem('gasolina')?lin('gasolina','Combustível',[['','junto com o cachê'],[vs,'véspera '+ddmm(vs)],[HOJE,'hoje']]):'')+
+    lote('diaria')+lote('gasolina')+
+    `<div class="qlote">${tem('diaria')?'<button type="button" class="btn sm pkb" data-ql="diaria">✓ Pagar as diárias de todos</button>':''}${tem('gasolina')?'<button type="button" class="btn sm pkb" data-ql="gasolina">✓ Pagar o combustível de todos</button>':''}</div>`+
+    `<p class="note">Antecipar só uma pessoa: use "Pagar esta pessoa em" no quadro dela. Os botões marcam como pago com a data de hoje; depois salve o borderô.</p>`;
+  const ant=ED.equipe.filter(e=>e.pag_em).length,res=[P.show&&'cachê '+ddmm(P.show),P.diaria&&'diárias '+ddmm(P.diaria),P.gasolina&&'combustível '+ddmm(P.gasolina),ant&&ant+' pessoa'+(ant>1?'s':'')+' em outra data'].filter(Boolean);
+  $('e_qps').textContent=res.length?'· '+res.join(' · '):'· tudo no dia do show';if(res.length)$('e_qpw').open=true}
+$('e_qp').addEventListener('click',e=>{const b=e.target.closest('[data-qk]');if(b){ED.pag=ED.pag||{};ED.pag[b.dataset.qk]=b.dataset.qv;ED._sujo=true;renderEq();calcTot();return}
+  const l=e.target.closest('[data-ql]');if(l){const k=l.dataset.ql;let n=0;ED.equipe.forEach(x=>{if(x.fora||!(num(x[k])>0))return;LB.pg.marca(x,[k],HOJE,true);n++});ED._sujo=true;renderEq();calcTot();
+    const r=document.createElement('div');r.className='qres';r.innerHTML=`<span class="pos">${QPN[k]} de ${n} pessoa${n>1?'s':''} marcad${k==='gasolina'?'o':'as'} como pag${k==='gasolina'?'o':'as'}</span> · salve o borderô`;$('e_qp').appendChild(r)}});
+$('e_qp').addEventListener('change',e=>{const t=e.target.closest('[data-qd]');if(!t)return;ED.pag=ED.pag||{};ED.pag[t.dataset.qd]=t.value;ED._sujo=true;renderEq();calcTot()});
+function renderEq(){const r=resumo(ED);$('e_fm').textContent=fmTxt(r);renderMassa();renderQP();
   $('e_eq').innerHTML=ED.equipe.length?GR.map(g=>{const l=ED.equipe.map((e,i)=>({e,i})).filter(x=>x.e.grupo===g);if(!l.length)return '';
     return `<div class="note" style="margin:10px 2px 6px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;font-size:10.5px;color:var(--pinkl)">${g} · ${l.length}</div>`+l.map(({e,i})=>`<div class="pp" data-i="${i}">
     <div class="top"><div><b>${esc(e.nome)}</b><span>${e.doc?'CPF/doc '+esc(doc11(e.doc))+' · ':''}${e.pix?'PIX '+esc(e.pix):'<span class="pk">sem PIX</span>'}</span></div>
@@ -377,13 +405,13 @@ function renderEq(){const r=resumo(ED);$('e_fm').textContent=fmTxt(r);renderMass
     <label>Gasolina (R$) <a href="#" data-gas style="color:var(--pinkl);text-transform:none;letter-spacing:0">calcular</a><input data-k="gasolina" inputmode="decimal" value="${nf(e.gasolina)}"></label>
     <label>Diária (R$)<input data-k="diaria" inputmode="decimal" value="${nf(e.diaria)}"></label><label>Ajuda de custo<input data-k="ajuda" inputmode="decimal" value="${nf(e.ajuda)}"></label><label>Estacionamento<input data-k="estacionamento" inputmode="decimal" value="${nf(e.estacionamento)}"></label>
     <div style="align-self:end;text-align:right;font-weight:800;padding-bottom:9px">${brl2(totP(e))}</div></div>
-    ${LB.pg.partes(e).length>1||e.status==='Parcial'?`<div class="pts">${LB.pg.partes(e).map(p=>`<button type="button" class="pt${p.pago?' ok':''}" data-pt="${p.k}" title="${p.pago?'Pago em '+(p.em?ddmm(p.em):'—')+' · toque para desmarcar':'Toque para marcar como pago'}">${p.pago?'✓':'○'} ${p.n} ${brl2(p.v)}</button>`).join('')}</div>`:''}<div data-gc></div></div>`).join('')}).join('')
+    ${LB.pg.partes(e).length>1||e.status==='Parcial'?`<div class="pts">${LB.pg.partes(e).map(p=>`<button type="button" class="pt${p.pago?' ok':''}" data-pt="${p.k}" title="${p.pago?'Pago em '+(p.em?ddmm(p.em):'—')+' · toque para desmarcar':'Toque para marcar como pago'}">${p.pago?'✓':'○'} ${p.n} ${brl2(p.v)}</button>`).join('')}</div>`:''}<div class="pa">Pagar esta pessoa em <input type="date" data-k="pag_em" value="${esc(e.pag_em||'')}">${e.pag_em?`<span class="tg">${e.pag_em<(ED.data||'')?'antecipado':e.pag_em>(ED.data||'')?'depois do show':'no dia do show'}</span>`:'<span>(vazio = igual aos outros)</span>'}</div><div data-gc></div></div>`).join('')}).join('')
     :'<div class="empty">Ninguém ainda. Busque pelo nome acima (ou comece com a equipe do último show ao criar).</div>'}
 $('e_eq').addEventListener('input',e=>{const t=e.target,c=t.closest('[data-i]');if(!c||!t.dataset.k)return;const p=ED.equipe[+c.dataset.i];
   p[t.dataset.k]=['valor','gasolina','diaria','ajuda','estacionamento'].includes(t.dataset.k)?num(t.value):t.value;
   if(t.dataset.k==='funcao'){const f=D.funcoes.find(x=>LB.norm(x.funcao)===LB.norm(t.value));if(f&&!p.valor){p.valor=f.valor;c.querySelector('[data-k=valor]').value=nf(f.valor)}}
   ED._sujo=true;c.querySelector('.ex>div:last-child').textContent=brl2(totP(p));calcTot()});
-$('e_eq').addEventListener('change',e=>{const t=e.target;if(t.dataset.k==='grupo'){renderEq();calcTot();return}
+$('e_eq').addEventListener('change',e=>{const t=e.target;if(t.dataset.k==='grupo'||t.dataset.k==='pag_em'){renderEq();calcTot();return}
   if(t.dataset.k==='funcao'){const c=t.closest('[data-i]'),i=+c.dataset.i,p=ED.equipe[i];const f=D.funcoes.find(x=>LB.norm(x.funcao)===LB.norm(t.value));
     if(f&&f.grupo&&f.grupo!==p.grupo&&GR.includes(f.grupo)){p.grupo=f.grupo;ED._sujo=true;renderEq();calcTot();
       const n=document.querySelector(`#e_eq [data-i="${i}"]`);if(n){n.scrollIntoView({block:'center'});n.classList.add('flash');setTimeout(()=>n.classList.remove('flash'),1600)}}}});
@@ -560,7 +588,7 @@ $('cj_salvar').onclick=()=>{CFG.base=$('cj_base').value.trim()||'Divinópolis, M
   store.set('lb_bord_cfg',JSON.stringify({base:CFG.base,onibus_kml:CFG.onibus_kml,diesel_preco:CFG.diesel_preco,adicional_pct:CFG.adicional_pct,gasolina_preco:CFG.gasolina_preco,veiculos:CFG.veiculos}));
   $('cj_msg').textContent='Salvo neste aparelho.';setTimeout(()=>$('cj_msg').textContent='',2500)};
 </script>
-<script src="../lbchat.js?v=mwioy28g"></script>
+<script src="../lbchat.js?v=mwipea11"></script>
 <script>LBCHAT.auto(document.querySelector('main.wrap').firstElementChild,{base:'../',pagina:'Borderôs',exemplo:'quanto gastei de diesel em outubro?'})</script>
 </body>
 </html>
