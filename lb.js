@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwjvq1p7';
+  const BUILD = 'mwjw1py0';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -183,6 +183,7 @@
         const r = velha.startsWith(RP) ? await abrir(base, pagina, u, velha.slice(RP.length), true) : await abrir(base, pagina, u, velha); LB.senhaCofre = velha; return r;
       }
       const x = chaves[pagina]; if (!x) throw e; // sem acesso mesmo
+      try { const r = await abrir(base, pagina, u, p, false, x); LB.senhaCofre = p; return r; } catch (e6) { } // 16/11: login novo — o Admin fez o cofre com a senha dela (vale na hora)
       let rec = velha.startsWith(RP) ? velha.slice(RP.length) : '';
       if (!rec) { try { const c = JSON.parse(store.get('lb_rec') || 'null'); if (c && c.u === norm(u)) rec = c.r; } catch (e3) { } }
       if (!rec) for (const pg of ORDEM.filter(y => y !== pagina)) { // a chave reserva vem guardada no cofre de outra página da pessoa

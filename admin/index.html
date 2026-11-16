@@ -343,8 +343,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwjvq1p7"></script>
-<script src="../lbmetas.js?v=mwjvq1p7"></script>
+<script src="../lb.js?v=mwjw1py0"></script>
+<script src="../lbmetas.js?v=mwjw1py0"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -454,7 +454,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-cp]');if(!
 
 /* equipe e logins */
 let US=[],PAPS=[],PES=[],PAGS=[],PUB='',EDL=null,PESID='',PESK={};
-const PAPN={admin:'Admin — acesso a tudo',artista:'Artista — só o painel',socio:'Sócio — prestação de contas',vendedor:'Vendedor — página Vendas',contador:'Contador — prestação completa',funcionario:'Funcionário — página Metas'};
+const PAPN={admin:'Admin — acesso a tudo',artista:'Artista — página Artista (com Financeiro e Vendas) e Metas',socio:'Sócio — prestação de contas',vendedor:'Vendedor — página Vendas',contador:'Contador — prestação completa',funcionario:'Funcionário — página Metas'};
 const PAPC={admin:'Admin',artista:'Artista',socio:'Sócio',vendedor:'Vendedor',contador:'Contador',funcionario:'Funcionário'};
 const eu=u=>LB.norm(u)===LB.norm(LB.login);
 async function carregaExtra(){
@@ -482,11 +482,11 @@ $('l_ok').onclick=async()=>{const m=$('l_msg'),u=$('l_u').value.trim(),s=$('l_s'
   m.textContent='Salvando…';
   const R0=EDL&&AD.rec&&LB.norm(EDL)===LB.norm(u)?AD.rec[EDL]||'':'',rec=s?R0:'',ponte=rec?await LB.ponteRec(u,s,rec):''; // senha vale na hora (sem esperar publicar)
   /* páginas liberadas agora: cofre extra com a chave reserva da pessoa (vale na hora; a próxima publicação já inclui a pessoa) */
-  const PPG={admin:['painel','admin','bordero','vendas','socio','contador','metas'],artista:['painel','metas'],socio:['socio'],vendedor:['vendas'],contador:['contador'],funcionario:['metas']};
-  const chaves={};let semRec=false;for(const pg of [...new Set(ps.flatMap(x=>PPG[x]||[]))]){if(pg==='contador')continue;if(!R0){semRec=true;continue}try{const c=await LB.cofreExtra(pg,u,R0);if(c)chaves[pg]=c}catch(e){}}
+  const PPG={admin:['painel','admin','bordero','vendas','socio','contador','metas'],artista:['artista','metas'],socio:['socio'],vendedor:['vendas'],contador:['contador'],funcionario:['metas']};
+  const chaves={};let semRec=false;for(const pg of [...new Set(ps.flatMap(x=>PPG[x]||[]))]){if(pg==='contador')continue;const cr=R0||s;if(!cr){semRec=true;continue}try{const c=await LB.cofreExtra(pg,u,cr);if(c)chaves[pg]=c}catch(e){}}
   try{const r=await api({acao:'salvar_usuario',login:{de:EDL||u,usuario:u,senha:s,senha_rsa:s?await cifra(s):'',ponte,chaves,papeis:ps,perfil:$('l_pf').value,ativo:$('l_at').value}});
     if(s&&eu(EDL||u))LB.senha=s;US=r.usuarios;limpaL();
-    m.innerHTML='<span class="pos">Salvo ✓</span>'+(semRec&&!s?' <span>· login novo ou nome trocado: as páginas abrem depois da próxima atualização do site</span>':'')+(s?` <span>· senha de <b>${esc(u)}</b>: <b>${esc(s)}</b> (anote e mande para a pessoa; ${rec?'já vale agora':'as páginas abrem com ela depois da próxima atualização do site'})</span>`:'');render()}
+    m.innerHTML='<span class="pos">Salvo ✓</span>'+(semRec&&!s?' <span>· login novo ou nome trocado: as páginas abrem depois da próxima atualização do site</span>':'')+(s?` <span>· senha de <b>${esc(u)}</b>: <b>${esc(s)}</b> (anote e mande para a pessoa; ${rec||(!R0&&Object.keys(chaves).length)?'já vale agora':'as páginas abrem com ela depois da próxima atualização do site'})</span>`:'');render()}
   catch(e){er('Não salvou ('+esc(e.message)+')')}};
 $('l_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data-el]'),x=e.target.closest('[data-xl]');if(!ed&&!x)return;e.preventDefault();
   if(ed){const u=US.find(y=>y.usuario===ed.dataset.el);EDL=u.usuario;$('l_u').value=u.usuario;$('l_s').value='';$('l_s').placeholder='vazio = manter a senha atual';$('l_pf').value=u.perfil||'';$('l_at').value=u.ativo==='não'?'não':'sim';
@@ -937,7 +937,7 @@ function xtRender(){const el=$('xt_res');if(!XT.length){el.innerHTML='';return}c
     if(d){e.preventDefault();if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent='toque de novo para apagar';return}try{XT=(await api({acao:'excluir_extrato',id:d.dataset.xdel})).extratos||[];xtRender()}catch(er){d.textContent='erro'}}}}
 {const a0=lnAbre;lnAbre=async function(){await a0();xtCarrega()};const r0=lnRender;lnRender=function(){r0();if(XTOK)xtRender()}}
 </script>
-<script src="../lbchat.js?v=mwjvq1p7"></script>
+<script src="../lbchat.js?v=mwjw1py0"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>
