@@ -16,6 +16,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .wrap{max-width:640px;margin:0 auto;padding:0 16px}
 header{padding:22px 0 6px;text-align:center}
 header img{height:30px}
+header{position:relative}header>a.lbav{position:absolute;top:18px;right:0}
+.links{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:12px;margin-left:0!important}.links:empty{display:none}.links a{flex:none;text-decoration:none;color:var(--sub);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:7px 11px;border:1px solid var(--line);border-radius:99px}.links a.on{background:var(--pink);border-color:var(--pink);color:#fff}
+@media(max-width:480px){.links{gap:4px}.links a{font-size:10px;letter-spacing:.08em;padding:6px 8px}}
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--pinkl);margin:18px 0 4px;text-align:center}
 h1{font-size:34px;font-weight:900;text-transform:uppercase;margin:0;text-align:center;line-height:1}h1 em{font-style:normal;color:var(--pink)}
 .upd{text-align:center;color:var(--muted);font-size:12px;margin-top:6px}
@@ -49,7 +52,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:30px}
 </head>
 <body>
 <div class="wrap">
-<header><img src="../logo.png" alt="Lucas Barros"></header>
+<header><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></header>
 <p class="eyebrow">Equipe e músicos</p>
 <h1>Agen<em>da</em></h1>
 <div class="upd" id="upd">Carregando…</div>
@@ -63,6 +66,8 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:30px}
 <button class="btn" id="ant" hidden>Ver shows anteriores</button>
 <footer>Horários previstos podem mudar. Confirme com a produção antes de sair.</footer>
 </div>
+<script src="../lb.js?v=mwiiicdz"></script>
+<script>try{LB.menuLogado(document.getElementById('links'),'agenda','../')}catch(e){}</script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const SEM=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];

@@ -17,7 +17,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwii3s8n';
+  const BUILD = 'mwiiicdz';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -67,6 +67,19 @@
     return (ps.length > 1 ? ps.concat('agenda') : []).map(p =>
       `<a href="${base}${ROTAS[p]}" class="${p === atual ? 'on' : ''}">${NOMES[p]}</a>`).join('') +
       `<a href="#" class="lbav" onclick="LB.perfil();return false" title="Meu perfil" aria-label="Meu perfil"></a>` + (setTimeout(carregar, 0), '');
+  }
+  /* página pública (Agenda): se a pessoa já entrou neste aparelho, mostra o menu das páginas dela */
+  async function menuLogado(el, atual, base) {
+    let c = null; try { c = JSON.parse(store.get('lb_cred') || 'null'); } catch (e) { }
+    if (!el || !c || !c.u || !c.p) return;
+    LB.base = base; LB.login = c.u; LB.senha = c.p;
+    let r = null; try { r = await api({ acao: 'meu_perfil' }); } catch (e) { return; }
+    if (!r || !r.ok || !Array.isArray(r.paginas)) return;
+    LB.usuario = r.nome || r.usuario || c.u;
+    const ps = r.paginas.filter(x => ROTAS[x] != null && x !== 'contador' && x !== 'agenda');
+    if (!ps.length) return;
+    el.innerHTML = ps.length > 1 ? links(ps, atual, base) : ps.concat('agenda').map(p => `<a href="${base}${ROTAS[p]}" class="${p === atual ? 'on' : ''}">${NOMES[p]}</a>`).join('') +
+      `<a href="#" class="lbav" onclick="LB.perfil();return false" title="Meu perfil" aria-label="Meu perfil"></a>` + (MENU = { paginas: ps.slice(), atual, base }, setTimeout(carregar, 0), '');
   }
   /* Monta a tela de login e chama ok({dados, paginas, nome}) quando abrir. */
   function entrar(opc) {
@@ -312,7 +325,7 @@
   async function ponteRec(u, nova, rec) { const s = crypto.getRandomValues(new Uint8Array(16)), i = crypto.getRandomValues(new Uint8Array(12));
     const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: i }, await kSenha(u, nova, s, 'encrypt'), new TextEncoder().encode(RP + rec));
     return JSON.stringify({ s: enc64(s), i: enc64(i), c: enc64(ct) }); }
-  window.LB = { ponteRec, cofreExtra, entrar, links, anexo, sair, perfil, norm, store, NOMES, pg, pgx };
+  window.LB = { ponteRec, cofreExtra, entrar, links, menuLogado, anexo, sair, perfil, norm, store, NOMES, pg, pgx };
 
   /* "Ver mais": toda lista longa (.list) e todo grupo de borderô (.gp) mostra só os primeiros itens.
      Limite: data-max no elemento (padrão 5 em listas, 4 em grupos). data-max="0" desliga. */

@@ -169,6 +169,7 @@ label textarea{min-height:60px;resize:vertical}
   <!-- EQUIPE E LOGINS -->
   <div id="t_equipe">
     <h3>Logins <small style="letter-spacing:0;text-transform:none;color:var(--muted);font-weight:400">quem entra no app e o que vê</small></h3>
+    <div class="lk" id="l_univ" style="margin:4px 0 10px"></div>
     <div class="list" id="l_lista" data-max="0"></div>
     <h3 id="l_h">Novo login</h3>
     <div class="card"><div class="f">
@@ -294,8 +295,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwii3s8n"></script>
-<script src="../lbmetas.js?v=mwii3s8n"></script>
+<script src="../lb.js?v=mwiiicdz"></script>
+<script src="../lbmetas.js?v=mwiiicdz"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -400,6 +401,7 @@ $('i_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data
   if(ed){const t=TF.find(x=>x.id===ed.dataset.ed);EDT=t.id;$('i_tit').value=t.titulo;$('i_cat').value=t.categoria||'';$('i_des').value=t.descricao;$('i_pz').value=t.prazo;$('i_st').value=t.status;$('i_rec').value=t.recorrencia||'';$('i_cd').value=t.concluido_em||'';$('i_cdl').style.display=t.status==='Concluída'?'':'none';$('i_can').style.display='';$('i_h').textContent='Editar tarefa';$('i_tit').focus();return}
   if(del.dataset.ok!=='1'){del.dataset.ok='1';del.textContent='toque de novo para excluir';return}
   try{await api({acao:'excluir_tarefa',id:del.dataset.del});render()}catch(err){del.textContent='erro'}});
+{const U=new URL('../',location.href).href,el=document.getElementById('l_univ');if(el)el.innerHTML=`<span class="note">Link de login para todos (cada um entra com o próprio usuário e cai direto na página dele):</span> <code>${U}</code><button class="btn sm" data-cp="${U}">copiar link universal</button>`;}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-cp]');if(!b)return;e.preventDefault();if(!b.dataset.lb)b.dataset.lb=b.textContent;try{navigator.clipboard.writeText(b.dataset.cp)}catch(x){}b.textContent='copiado ✓';setTimeout(()=>b.textContent=b.dataset.lb||'copiar link',1800)});
 
 /* equipe e logins */
@@ -755,7 +757,7 @@ $('duv_f').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;DUVF=b.
 $('duv_l').addEventListener('click',async e=>{const b=e.target.closest('[data-ds]');if(!b)return;const r=document.querySelector(`[data-dr="${b.dataset.ds}"]`).value.trim();if(!r){b.textContent='escreva a resposta';return}
   b.disabled=true;b.textContent='enviando…';try{DUV=(await api({acao:'responder_duvida',id:b.dataset.ds,resposta:r})).duvidas||DUV;duvRender()}catch(err){b.disabled=false;b.textContent='não enviou: '+err.message}});
 </script>
-<script src="../lbchat.js?v=mwii3s8n"></script>
+<script src="../lbchat.js?v=mwiiicdz"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>
