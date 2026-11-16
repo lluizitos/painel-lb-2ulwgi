@@ -7,7 +7,10 @@
   const ROTAS = { artista: 'artista/', painel: '', vendas: 'vendas/', agenda: 'agenda/', socio: 'socio/', contador: 'contador/', bordero: 'borderos/', admin: 'admin/', metas: 'metas/' };
   const ORDEM = ['painel', 'artista', 'admin', 'bordero', 'vendas', 'metas', 'socio', 'contador'];
   /* Lucas e sócio: página única e simples, sem menu de páginas (o Financeiro do Lucas é um link separado) */
-  const semMenu = ps => !ps.includes('admin') && (ps.includes('artista') || ps.includes('socio'));
+  const semMenu = ps => !ps.includes('admin') && !ps.includes('artista') && ps.includes('socio'); // só o sócio fica sem menu
+  /* Lucas (artista sem admin): menu normal, mas a Agenda só aparece se o Luiz ligar em Admin → Parâmetros; o Financeiro dele abre com #financeiro */
+  const ehArt = ps => ps.includes('artista') && !ps.includes('admin');
+  const hrefPg = (p, ps, base) => base + ROTAS[p] + (p === 'painel' && ehArt(ps) ? '#financeiro' : '');
   /* a raiz do site é o Financeiro; o Lucas entrando pela raiz vai para a página Artista (o link do Financeiro dele leva #financeiro) */
   const vaiArtista = (pagina, ps) => pagina === 'painel' && ps.includes('artista') && !ps.includes('admin') && !/financeiro/i.test(location.hash + location.search);
   const norm = u => String(u || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
@@ -21,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwim83tm';
+  const BUILD = 'mwioh56e';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -68,10 +71,13 @@
     // menu só com as páginas do login; quem tem uma página só (ex.: artista) não vê menu, só o Sair
     MENU = { paginas: paginas.slice(), atual, base };
     const ps = semMenu(paginas) ? [] : ORDEM.filter(p => paginas.includes(p));
-    return (ps.length > 1 ? ps.concat('agenda') : []).map(p =>
-      `<a href="${base}${ROTAS[p]}" class="${p === atual ? 'on' : ''}">${NOMES[p]}</a>`).join('') +
+    const ag = !ehArt(paginas) || store.get('lb_menu_ag') === '1'; if (ehArt(paginas)) setTimeout(menuAg, 0);
+    return (ps.length > 1 ? (ag ? ps.concat('agenda') : ps) : []).map(p =>
+      `<a href="${hrefPg(p, paginas, base)}" class="${p === atual ? 'on' : ''}">${NOMES[p]}</a>`).join('') +
       `<a href="#" class="lbav" onclick="LB.perfil();return false" title="Meu perfil" aria-label="Meu perfil"></a>` + (setTimeout(carregar, 0), '');
   }
+  /* opção do Admin: Agenda no menu do Lucas (vale a partir da próxima página aberta) */
+  async function menuAg() { try { const r = await api({ acao: 'config_site' }); if (r.ok) store.set('lb_menu_ag', r.menu_agenda ? '1' : '0'); } catch (e) { } }
   /* página pública (Agenda): se a pessoa já entrou neste aparelho, mostra o menu das páginas dela */
   async function menuLogado(el, atual, base) {
     let c = null; try { c = JSON.parse(store.get('lb_cred') || 'null'); } catch (e) { }

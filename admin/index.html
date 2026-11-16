@@ -253,6 +253,7 @@ label textarea{min-height:60px;resize:vertical}
       <label>Expectativa de bilheteria do show próprio (R$)<input id="cf_meta_bilheteria" inputmode="decimal" placeholder="ex.: 10000"></label>
       <label>Alíquota de imposto (%)<input id="cf_aliquota" inputmode="decimal" placeholder="vazio = a definir"></label>
       <label>Comissão padrão de venda (%)<input id="cf_comissao" inputmode="decimal" placeholder="vazio = a definir"></label>
+      <label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="cf_menu_agenda" style="width:auto"> Mostrar a Agenda no menu do Lucas (página Artista) — vale na hora</label>
     </div>
     <p class="note">Custo do show: vale quando o show ainda não tem borderô (com borderô, entra o gasto dele). Bilheteria: show próprio sem nada recebido entra com esse valor; se só pagar a banda, o saldo fica menor (aparece em Atenção).</p>
     <div class="acts"><button class="btn pkb" id="cf_salvar">Salvar parâmetros</button><span class="note" id="cf_msg"></span></div></div>
@@ -304,8 +305,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwim83tm"></script>
-<script src="../lbmetas.js?v=mwim83tm"></script>
+<script src="../lb.js?v=mwioh56e"></script>
+<script src="../lbmetas.js?v=mwioh56e"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -314,8 +315,8 @@ const $=id=>document.getElementById(id);
 let API='',PF=[],TF=[],MT=[],EFIL='',EDE=null,SEL=null,FIL='abertas',EDT=null,EDP=null;
 const linkDe=p=>new URL('../tarefas/eu/#k='+p.token,location.href).href;
 const CFGK=['custo_padrao','custo_colab','meta_bilheteria','aliquota','comissao'];
-async function cfgAbre(){$('cf_msg').textContent='carregando…';try{const r=await api({acao:'listar'});CFGK.forEach(k=>{const v=(r.config||{})[k];$('cf_'+k).value=v==null?'':String(v).replace('.',',')});$('cf_msg').textContent=''}catch(e){$('cf_msg').textContent='erro: '+e.message}}
-document.addEventListener('click',async e=>{if(e.target.id!=='cf_salvar')return;const b=e.target,c={};CFGK.forEach(k=>c[k]=$('cf_'+k).value.trim().replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'));
+async function cfgAbre(){$('cf_msg').textContent='carregando…';try{const r=await api({acao:'listar'});CFGK.forEach(k=>{const v=(r.config||{})[k];$('cf_'+k).value=v==null?'':String(v).replace('.',',')});$('cf_menu_agenda').checked=(r.config||{}).menu_agenda===1;$('cf_msg').textContent=''}catch(e){$('cf_msg').textContent='erro: '+e.message}}
+document.addEventListener('click',async e=>{if(e.target.id!=='cf_salvar')return;const b=e.target,c={};CFGK.forEach(k=>c[k]=$('cf_'+k).value.trim().replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'));c.menu_agenda=$('cf_menu_agenda').checked?1:0;
   b.disabled=true;$('cf_msg').textContent='salvando…';try{await api({acao:'salvar_config',config:c});$('cf_msg').textContent='salvo ✓ (vale na próxima atualização do site)'}catch(err){$('cf_msg').textContent='não salvou: '+err.message}b.disabled=false});
 async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({usuario:LB.login,senha:LB.senha,nome:LB.usuario},c))})).json();
   if(!r.ok)throw new Error(r.erro||'erro');if(r.perfis){PF=r.perfis;TF=r.tarefas;MT=r.metas||[];RT=r.rotinas||[]}return r}
@@ -779,7 +780,7 @@ $('duv_f').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;DUVF=b.
 $('duv_l').addEventListener('click',async e=>{const b=e.target.closest('[data-ds]');if(!b)return;const r=document.querySelector(`[data-dr="${b.dataset.ds}"]`).value.trim();if(!r){b.textContent='escreva a resposta';return}
   b.disabled=true;b.textContent='enviando…';try{DUV=(await api({acao:'responder_duvida',id:b.dataset.ds,resposta:r})).duvidas||DUV;duvRender()}catch(err){b.disabled=false;b.textContent='não enviou: '+err.message}});
 </script>
-<script src="../lbchat.js?v=mwim83tm"></script>
+<script src="../lbchat.js?v=mwioh56e"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>
