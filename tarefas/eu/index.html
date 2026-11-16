@@ -47,8 +47,8 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px;margin:20px 2px 8
 <div id="app"><p class="fn">Carregando…</p></div>
 <button type="button" class="sair" id="sair" hidden>Sair deste aparelho</button>
 </div>
-<script src="../../lbmetas.js?v=mwjkpma7"></script>
-<script src="../../lbchat.js?v=mwjkpma7"></script>
+<script src="../../lbmetas.js?v=mwjkvzyo"></script>
+<script src="../../lbchat.js?v=mwjkvzyo"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),MES=HOJE.slice(0,7);
@@ -65,7 +65,8 @@ function login(m){const app=document.getElementById('app');
   app.innerHTML=`<form class="lg" autocomplete="on"><p>Digite sua senha para abrir suas tarefas.</p>    <div class="pw"><input type="password" id="ks" placeholder="Senha" autocomplete="current-password" aria-label="Senha"><button type="button" class="olho" aria-label="Mostrar senha" title="Mostrar senha">👁</button></div>
     <button type="submit" class="ent">Entrar</button><div class="em">${esc(m||'')}</div></form>`;
   const f=app.querySelector('form'),i=f.querySelector('#ks'),o=f.querySelector('.olho');i.focus();
-  o.onclick=()=>{const v=i.type==='password';i.type=v?'text':'password';o.textContent=v?'🙈':'👁';o.setAttribute('aria-label',v?'Esconder senha':'Mostrar senha');i.focus()};
+  const IC_OLHO='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>',IC_RISC='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-2.6 3.5M6.6 6.6C3.9 8.3 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/></svg>';o.innerHTML=IC_OLHO;
+  o.onclick=()=>{const v=i.type==='password';i.type=v?'text':'password';o.innerHTML=v?IC_RISC:IC_OLHO;o.setAttribute('aria-label',v?'Esconder senha':'Mostrar senha');i.focus()};
   f.onsubmit=async e=>{e.preventDefault();const v=i.value.trim();if(!v)return;f.querySelector('.em').textContent='Abrindo…';KS=v;limpa();
     try{await abre();try{localStorage.setItem(SK,v)}catch(e2){}}catch(er){KS='';f.querySelector('.em').textContent=MSG[er.message]||'Não consegui abrir agora. Tente de novo.'}}}
 async function abre(){const app=document.getElementById('app');

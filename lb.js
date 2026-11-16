@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwjkpma7';
+  const BUILD = 'mwjkvzyo';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -110,13 +110,14 @@
     }
     const lock = document.createElement('div');
     lock.id = 'lock';
-    lock.innerHTML = `<form autocomplete="on"><img src="${base}logo.png" alt="Lucas Barros"><p>${titulo}</p>
+    lock.innerHTML = `<form autocomplete="on"><img src="${base}logo.png" alt="Lucas Barros"><p>${pagina === 'painel' ? 'Entrar' : titulo}</p>
       <input name="u" placeholder="Usuário" autocomplete="username" autocapitalize="words" aria-label="Usuário">
       <div class="pw"><input name="p" type="password" placeholder="Senha" autocomplete="current-password" aria-label="Senha"><button type="button" class="olho" aria-label="Mostrar senha" title="Mostrar senha">👁</button></div>
       <button type="submit">Entrar</button><div class="err"></div><div class="spl" aria-label="Abrindo"></div></form>`;
     document.body.appendChild(lock);
     const f = lock.querySelector('form'), err = lock.querySelector('.err'), olho = lock.querySelector('.olho');
-    olho.onclick = () => { const v = f.p.type === 'password'; f.p.type = v ? 'text' : 'password'; olho.textContent = v ? '🙈' : '👁'; olho.setAttribute('aria-label', v ? 'Esconder senha' : 'Mostrar senha'); f.p.focus(); };
+    const IC_OLHO = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>', IC_RISC = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-2.6 3.5M6.6 6.6C3.9 8.3 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/></svg>'; olho.innerHTML = IC_OLHO;
+    olho.onclick = () => { const v = f.p.type === 'password'; f.p.type = v ? 'text' : 'password'; olho.innerHTML = v ? IC_RISC : IC_OLHO; olho.setAttribute('aria-label', v ? 'Esconder senha' : 'Mostrar senha'); f.p.focus(); };
     const lu = new URLSearchParams(location.hash.slice(1)).get('u'); if (lu) { f.u.value = lu; setTimeout(() => f.p.focus(), 50); } // link de login: já vem com o usuário
     const tentar = async (u, p, auto) => {
       if (!auto) err.textContent = 'Abrindo…';
@@ -129,7 +130,10 @@
         ok(r);
       } catch (e) {
         if (e.message === 'acesso') { // link único: manda para a primeira página que esse login abre
-          for (const pg of ORDEM.filter(x => x !== pagina)) {
+          if (!auto) err.textContent = 'Abrindo a sua página…';
+          // primeiro as páginas em que o login está no arquivo do site (rápido); depois as outras (liberadas pelo Admin depois da última publicação)
+          const tem = []; for (const pg of ORDEM.filter(x => x !== pagina)) { try { const j = await (await fetch(base + pg + '.enc.json', { cache: 'no-store' })).json(); if (j.chaves && j.chaves[await slotId(pg, u)]) tem.push(pg); } catch (e3) { } }
+          for (const pg of tem.concat(ORDEM.filter(x => x !== pagina && !tem.includes(x)))) {
             try { await abrir2(base, pg, u, p); store.set('lb_cred', JSON.stringify({ u, p })); location.replace(base + ROTAS[pg]); return; } catch (e2) { if (e2.message === 'senha') break; }
           }
         }

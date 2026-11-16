@@ -61,7 +61,7 @@ label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-t
 label input,label select,label textarea{display:block;width:100%;margin-top:5px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;letter-spacing:0;text-transform:none;font-weight:400}
 label textarea{min-height:64px;resize:vertical}
 .prev{margin-top:14px}
-.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}.rmx{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.rmx p{flex-basis:100%;margin:0 0 2px;font-size:13px;color:var(--sub)}.rmx button{flex:1 1 160px}.btn.rmc{border-color:var(--amber);color:var(--amber)}.btn.rmd{border-color:var(--neg);color:var(--neg)}.btn.rmd.ok{background:var(--neg);color:#fff}
 #msg{min-height:20px;font-size:13px;margin-top:8px;text-align:right}
 /* senha */
 #lock{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
@@ -166,11 +166,12 @@ label textarea{min-height:64px;resize:vertical}
   <div class="card prev" id="prev"></div>
   <div id="msg"></div>
   <div class="acts"><button type="button" class="btn" id="cancel">Cancelar</button><button type="submit" class="btn pkb" id="salvar">Salvar</button></div>
+  <div class="rmx" id="rmx" hidden><p>Remover esta data</p><button type="button" class="btn rmc" id="rmcai">Show caiu (marcar Cancelado)</button><button type="button" class="btn rmd" id="rmdel">Apagar data (criada errado)</button></div>
 </form></div>
 <div id="vw"><div class="vwc"><div id="vwb"></div><button type="button" class="btn" id="vwx">Fechar</button></div></div>
 
-<script src="../lb.js?v=mwjkpma7"></script>
-<script src="../lbvendas.js?v=mwjkpma7"></script>
+<script src="../lb.js?v=mwjkvzyo"></script>
+<script src="../lbvendas.js?v=mwjkvzyo"></script>
 <script>
 const TIPOS=['Show','Prefeitura','Casamento','Aniversário','Formatura','Evento corporativo','Evento de fim de ano','Réveillon','Rodeio','Exposição','Show próprio (Sem Roteiro)','Show próprio (Colab)'];
 const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
@@ -406,6 +407,7 @@ function abrirEd(s){editId=s?s.id:null;document.getElementById('edt').textConten
   ef.classList.toggle('ro',RO);[...ef.elements].forEach(el=>{if(el.name)el.disabled=RO});document.getElementById('salvar').style.display=RO?'none':'';document.getElementById('cancel').textContent=RO?'Fechar':'Cancelar';
   const d=s||{status:'Confirmado',contrato:'Não informado',nota:'Não informado',tipo:'Show',uf:'MG',vendedor:ALIAS[LB.norm(NOME)]||NOME,data_venda:HOJE};
   [...ef.elements].forEach(el=>{if(el.name&&d[el.name]!=null)el.value=d[el.name]});
+  {const rx=document.getElementById('rmx');rx.hidden=RO||!s;const d2=document.getElementById('rmdel');d2.classList.remove('ok');d2.textContent='Apagar data (criada errado)';document.getElementById('rmcai').hidden=!!(s&&s.status==='Cancelado')}
   const adm=PAPEL==='admin';['vendedor','comissao_pct'].forEach(k=>{ef[k].readOnly=!adm;ef[k].title=adm?'':'Só a administração muda'});if(!adm&&!s)ef.vendedor.value=ALIAS[LB.norm(NOME)]||NOME;
   PL=jp(d.plano)||{tipo:'',parcelas:[]};PL.parcelas=PL.parcelas||[];RC=jp(d.recebimentos)||[];if(!RC.length&&+d.recebido>0)RC=[{data:'',valor:+d.recebido,obs:'total lançado antes, sem detalhe'}];RCED=null; // não some o que já tinha sido lançado só como total
   if(!PL.tipo&&num(d.sinal)>0){PL={tipo:'sinal',parcelas:[{v:num(d.sinal),venc:''},{v:Math.max(0,(num(d.valor)||0)-num(d.sinal)),venc:d.venc_restante||''}]}} // shows antigos com sinal
@@ -421,6 +423,17 @@ document.getElementById('cancel').onclick=()=>ed.classList.remove('open');
 document.getElementById('arec').onclick=e=>{const b=e.target.closest('[data-ed]');if(b)abrirEd(SHOWS.find(s=>String(s.id)===b.dataset.ed))};
 document.getElementById('lista').onclick=e=>{const b=e.target.closest('[data-ed]');if(b)abrirEd(SHOWS.find(s=>String(s.id)===b.dataset.ed));
   const p=e.target.closest('[data-pg]');if(p){abrirEd(SHOWS.find(s=>String(s.id)===p.dataset.pg));RCED={};renderPg();const x=document.getElementById('pgx');x.scrollIntoView({block:'start'});setTimeout(()=>{const v=document.getElementById('r_v');v&&v.focus()},300)}};
+/* remover data: "caiu" = Cancelado (fica no histórico); "apagar" = some da planilha (cópia na aba Lixeira shows) */
+document.getElementById('rmcai').onclick=async()=>{const m=document.getElementById('msg'),s=SHOWS.find(x=>String(x.id)===String(editId));if(!s)return;
+  m.textContent='Marcando como cancelado…';
+  try{const r=await api({acao:'salvar',show:{id:s.id,data:s.data,status:'Cancelado'}});if(!r.ok)throw new Error(r.erro);const d=await api({acao:'listar'});SHOWS=d.shows;render();ed.classList.remove('open')}
+  catch(err){m.innerHTML='<span class="neg">Não marcou ('+esc(err.message)+'). Tente de novo.</span>'}};
+document.getElementById('rmdel').onclick=async e=>{const b=e.currentTarget,m=document.getElementById('msg'),s=SHOWS.find(x=>String(x.id)===String(editId));if(!s)return;
+  if(!b.classList.contains('ok')){b.classList.add('ok');b.textContent='Toque de novo para apagar '+s.data.split('-').reverse().join('/');return}
+  b.disabled=true;m.textContent='Apagando…';
+  try{const r=await api({acao:'excluir_show',id:s.id});if(!r.ok)throw new Error(r.erro==='ação'?'servidor ainda sem essa função':r.erro);SHOWS=SHOWS.filter(x=>String(x.id)!==String(s.id));render();ed.classList.remove('open')}
+  catch(err){m.innerHTML='<span class="neg">Não apagou ('+esc(err.message)+').</span>'}
+  b.disabled=false};
 ef.addEventListener('submit',async e=>{e.preventDefault();const m=document.getElementById('msg'),bt=document.getElementById('salvar');
   const o=lerForm();if(PAPEL!=='admin'){delete o.vendedor;delete o.comissao_pct}if(!o.data||!o.cidade){m.innerHTML='<span class="neg">Preencha data e cidade.</span>';return}
   if(RCED){m.innerHTML='<span class="neg">Termine (Adicionar) ou cancele o pagamento que está lançando.</span>';return}
@@ -430,7 +443,7 @@ ef.addEventListener('submit',async e=>{e.preventDefault();const m=document.getEl
   catch(err){m.innerHTML='<span class="neg">Não salvou ('+esc(err.message)+'). Tente de novo.</span>'}
   bt.disabled=false});
 </script>
-<script src="../lbchat.js?v=mwjkpma7"></script>
+<script src="../lbchat.js?v=mwjkvzyo"></script>
 <script>LBCHAT.auto(document.querySelector('main.wrap').firstElementChild,{base:'../',pagina:'Vendas',exemplo:'quantos shows vendi este mês?'})</script>
 </body>
 </html>
