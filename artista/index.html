@@ -4,42 +4,42 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#141218">
 <title>Artista · Lucas Barros</title>
 <link rel="icon" href="../icone.png"><link rel="apple-touch-icon" href="../icone.png">
-<!-- Página do Lucas: o mínimo de informação, tudo grande, fundo branco. Metas (empresa, minhas tarefas, equipe, pagamentos) e Shows (agenda + borderô de cada show). -->
+<!-- Página do Lucas: o mínimo de informação, tudo grande, no tema escuro do site. Metas (empresa, minhas tarefas, equipe, pagamentos) e Shows (agenda + borderô de cada show). -->
 <style>
-:root{--bg:#fff;--card:#F6F4F8;--card2:#EEEAF2;--line:#E2DDE8;--ink:#1B1820;--sub:#4A4553;--muted:#8A8494;--pink:#E0115F;--pinkl:#E0115F;--hot:#FF5A1F;--neg:#D7263D;--pos:#14945A;--amber:#E08A00;--blue:#2F6FE0}
+:root{--bg:#141218;--card:#1E1C24;--card2:#26232D;--line:#2E2B36;--ink:#F3F1F6;--sub:#B8B3C3;--muted:#8B8697;--pink:#CF1D51;--pinkl:#F0507E;--neg:#FF8FA8;--pos:#7FDDA9;--amber:#F2B66B;--red:#D7263D;--green:#1F9D62}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
 .wrap{max-width:760px;margin:0 auto;padding:0 16px 120px}
 header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0 6px}
 header.top img{height:30px}header.top .links{display:flex;align-items:center;gap:8px}header.top .sair{color:var(--muted);font-size:14px;text-decoration:none;padding:8px 4px}
-.ola{font-size:30px;font-weight:900;margin:10px 0 4px;letter-spacing:-.01em}.ola em{font-style:normal;color:var(--pink)}
+.ola{font-size:30px;font-weight:900;margin:10px 0 4px;letter-spacing:-.01em}.ola em{font-style:normal;color:var(--pinkl)}
 /* avisos urgentes (piscando) */
 #urg{display:grid;gap:10px;margin:12px 0 4px}#urg:empty{display:none}
-.urg{display:flex;gap:12px;align-items:center;background:var(--neg);color:#fff;border-radius:18px;padding:14px 16px;font-size:18px;font-weight:800;line-height:1.25;animation:pisca 1.2s ease-in-out infinite;cursor:pointer;border:0;text-align:left;width:100%;font-family:inherit}
+.urg{display:flex;gap:12px;align-items:center;background:var(--red);color:#fff;border-radius:18px;padding:14px 16px;font-size:18px;font-weight:800;line-height:1.25;animation:pisca 1.2s ease-in-out infinite;cursor:pointer;border:0;text-align:left;width:100%;font-family:inherit}
 .urg small{display:block;font-size:14px;font-weight:600;opacity:.92;margin-top:3px}.urg i{font-style:normal;font-size:28px}
 @keyframes pisca{0%,100%{box-shadow:0 0 0 0 rgba(215,38,61,.55);transform:scale(1)}50%{box-shadow:0 0 0 8px rgba(215,38,61,0);transform:scale(1.015)}}
 @media (prefers-reduced-motion:reduce){.urg{animation:none}}
 /* duas abas grandes */
 .setores{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 8px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
-.setores button{border:3px solid var(--line);background:#fff;color:var(--ink);border-radius:20px;padding:18px 10px;font:inherit;font-size:24px;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.setores button{border:3px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:18px 10px;font:inherit;font-size:24px;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
 .setores button span{font-size:34px;line-height:1}.setores button.on{border-color:var(--pink);background:var(--pink);color:#fff}
-h2.tt{font-size:30px;font-weight:900;color:var(--pink);margin:30px 0 2px;letter-spacing:-.01em;line-height:1.1}h2.tt+.sub{margin-top:0}
+h2.tt{font-size:30px;font-weight:900;color:var(--pinkl);margin:30px 0 2px;letter-spacing:-.01em;line-height:1.1}h2.tt+.sub{margin-top:0}
 .sub{font-size:16px;color:var(--sub);margin:4px 0 12px}
 .lista{display:grid;gap:10px}
-.c{background:#fff;border:2px solid var(--line);border-radius:18px;padding:14px 16px}
+.c{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px 16px}
 .c .n{font-size:21px;font-weight:800;line-height:1.25}.c .d{font-size:15px;color:var(--sub);margin-top:4px;line-height:1.4}
-.c.ok{border-color:var(--pos);background:#F0FAF4}.c.ok .n{color:var(--pos)}.c.ruim{border-color:var(--neg);background:#FFF2F3}.c.ruim .n{color:var(--neg)}
+.c.ok{border-color:var(--pos);background:rgba(127,221,169,.08)}.c.ok .n{color:var(--pos)}.c.ruim{border-color:var(--neg);background:rgba(255,143,168,.09)}.c.ruim .n{color:var(--neg)}
 .tag{display:inline-block;font-size:13px;font-weight:800;border-radius:99px;padding:4px 10px;margin:8px 6px 0 0;background:var(--card2);color:var(--sub);letter-spacing:.02em}
-.tag.ok{background:var(--pos);color:#fff}.tag.ruim{background:var(--neg);color:#fff}.tag.am{background:#FFF1D6;color:#8A5300}
+.tag.ok{background:var(--green);color:#fff}.tag.ruim{background:var(--red);color:#fff}.tag.am{background:rgba(242,182,107,.18);color:var(--amber)}
 .bar{height:12px;background:var(--card2);border-radius:99px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;background:var(--pink);border-radius:99px}.c.ok .bar i{background:var(--pos)}
 .row{display:flex;gap:12px;align-items:center;justify-content:space-between}
 .btn{border:0;border-radius:14px;padding:12px 16px;font:inherit;font-size:17px;font-weight:800;cursor:pointer;white-space:nowrap}
-.btn.fiz{background:var(--pos);color:#fff}.btn.leve{background:var(--card2);color:var(--ink)}.btn:disabled{opacity:.5}
+.btn.fiz{background:var(--green);color:#fff}.btn.leve{background:var(--card2);color:var(--ink)}.btn:disabled{opacity:.5}
 .v{font-size:22px;font-weight:900;white-space:nowrap}.v.ruim{color:var(--neg)}
-.pix{display:flex;gap:8px;align-items:center;margin-top:10px;background:var(--card);border-radius:12px;padding:8px 10px;font-size:15px}.pix code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:16px;font-weight:700;color:var(--ink)}
-.vazio{font-size:17px;color:var(--muted);background:var(--card);border-radius:16px;padding:16px;text-align:center}
+.pix{display:flex;gap:8px;align-items:center;margin-top:10px;background:var(--card2);border-radius:12px;padding:8px 10px;font-size:15px}.pix code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:16px;font-weight:700;color:var(--ink)}
+.vazio{font-size:17px;color:var(--muted);background:var(--card2);border-radius:16px;padding:16px;text-align:center}
 .pess .n{font-size:24px}.pess .fn{font-size:15px;color:var(--sub);margin-top:2px}.pess .grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .pess .din{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:15px;color:var(--sub)}.pess .din b{display:block;font-size:20px;color:var(--ink)}
 /* shows */
@@ -47,16 +47,16 @@ h2.tt{font-size:30px;font-weight:900;color:var(--pink);margin:30px 0 2px;letter-
 .dt{flex:none;width:64px;text-align:center;background:var(--pink);color:#fff;border-radius:14px;padding:8px 0;line-height:1}.dt b{display:block;font-size:28px;font-weight:900}.dt span{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
 .c.passou .dt{background:var(--muted)}
 .sh .n{font-size:20px}.sh .d{margin-top:2px}.seta{margin-left:auto;font-size:24px;color:var(--muted);flex:none;transition:transform .2s}.c.aberto .seta{transform:rotate(90deg)}
-.bd{margin-top:14px;padding-top:12px;border-top:2px solid var(--line)}.bd h4{font-size:16px;color:var(--pink);margin:12px 0 6px;letter-spacing:.04em;text-transform:uppercase}
-.bd .k{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bd .k div{background:var(--card);border-radius:12px;padding:10px;font-size:13px;color:var(--sub);text-align:center}.bd .k b{display:block;font-size:17px;color:var(--ink);margin-top:2px;white-space:nowrap}
+.bd{margin-top:14px;padding-top:12px;border-top:2px solid var(--line)}.bd h4{font-size:16px;color:var(--pinkl);margin:12px 0 6px;letter-spacing:.04em;text-transform:uppercase}
+.bd .k{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bd .k div{background:var(--card2);border-radius:12px;padding:10px;font-size:13px;color:var(--sub);text-align:center}.bd .k b{display:block;font-size:17px;color:var(--ink);margin-top:2px;white-space:nowrap}
 .bd .k .bom b{color:var(--pos)}.bd .k .mau b{color:var(--neg)}
 .it{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:16px}.it:last-child{border-bottom:0}.it span small{display:block;color:var(--muted);font-size:13px}.it b{white-space:nowrap}
-.mais{display:block;margin:14px auto 0;border:2px solid var(--line);background:#fff;color:var(--sub);border-radius:14px;padding:12px 18px;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.mais{display:block;margin:14px auto 0;border:2px solid var(--line);background:var(--card);color:var(--sub);border-radius:14px;padding:12px 18px;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
 /* ajudante (perguntas) no canto */
-.fab{position:fixed;right:16px;bottom:18px;z-index:40;border:0;background:var(--pink);color:#fff;border-radius:99px;padding:14px 20px 14px 16px;font:inherit;font-size:18px;font-weight:800;box-shadow:0 8px 24px rgba(224,17,95,.35);cursor:pointer;display:flex;align-items:center;gap:8px}
+.fab{position:fixed;right:16px;bottom:18px;z-index:40;border:0;background:var(--pink);color:#fff;border-radius:99px;padding:14px 20px 14px 16px;font:inherit;font-size:18px;font-weight:800;box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer;display:flex;align-items:center;gap:8px}
 .fab i{font-style:normal;font-size:26px;line-height:1}
-#chat{position:fixed;right:16px;bottom:84px;z-index:41;width:min(440px,calc(100vw - 32px));max-height:calc(100vh - 110px);overflow:auto;background:#fff;border:2px solid var(--line);border-radius:20px;box-shadow:0 14px 40px rgba(0,0,0,.18);padding:12px 12px 4px}
-#chat[hidden]{display:none}#chat .cbh{display:flex;justify-content:space-between;align-items:center;margin:2px 4px 8px}#chat .cbh b{font-size:18px;color:var(--pink)}#chat .cbh button{border:0;background:var(--card2);border-radius:99px;width:36px;height:36px;font-size:16px;cursor:pointer}
+#chat{position:fixed;right:16px;bottom:84px;z-index:41;width:min(440px,calc(100vw - 32px));max-height:calc(100vh - 110px);overflow:auto;background:var(--card);border:2px solid var(--line);border-radius:20px;box-shadow:0 14px 40px rgba(0,0,0,.5);padding:12px 12px 4px}
+#chat[hidden]{display:none}#chat .cbh{display:flex;justify-content:space-between;align-items:center;margin:2px 4px 8px}#chat .cbh b{font-size:18px;color:var(--pinkl)}#chat .cbh button{border:0;color:var(--ink);background:var(--card2);border-radius:99px;width:36px;height:36px;font-size:16px;cursor:pointer}
 #pg{display:none}
 </style>
 </head>
@@ -83,9 +83,9 @@ h2.tt{font-size:30px;font-weight:900;color:var(--pink);margin:30px 0 2px;letter-
 <button class="fab" id="ajuda" aria-label="Pergunte ao assistente"><i>💬</i>Ajuda</button>
 <div id="chat" hidden><div class="cbh"><b>Pergunte aqui 😊</b><button id="chx" aria-label="Fechar">✕</button></div><div id="lbq"></div></div>
 </div>
-<script src="../lb.js?v=mwiljpxd"></script>
-<script src="../lbmetas.js?v=mwiljpxd"></script>
-<script src="../lbchat.js?v=mwiljpxd"></script>
+<script src="../lb.js?v=mwilqn60"></script>
+<script src="../lbmetas.js?v=mwilqn60"></script>
+<script src="../lbchat.js?v=mwilqn60"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const brl=v=>'R$ '+Math.round(+v||0).toLocaleString('pt-BR');
@@ -201,7 +201,7 @@ async function carregar(){
   if(b.status==='fulfilled'){const r=b.value,px={};(r.pessoas||[]).forEach(q=>px[q.id]=q.pix);Object.entries(r.borderos||{}).forEach(([k,x])=>{if(x.tipo==='despesa'||!x.equipe)return;x.equipe.forEach(e=>{if(e.pessoa&&px[e.pessoa])e.pix=px[e.pessoa];delete e.doc});D.borderos[k]=x})}
   renderMetas();renderMinhas();renderEquipe();renderPags();urgentes()}
 
-LB.entrar({pagina:'artista',base:'../',titulo:'Artista',claro:true,ok:r=>{D=r.dados;D.borderos=D.borderos||{};
+LB.entrar({pagina:'artista',base:'../',titulo:'Artista',ok:r=>{D=r.dados;D.borderos=D.borderos||{};
   document.getElementById('pg').style.display='block';
   document.getElementById('links').innerHTML=LB.links(['artista'],'artista','../')+'<a class="sair" href="#" onclick="LB.sair();return false">Sair</a>';
   let s='metas';try{s=localStorage.getItem('lb_art_setor')||'metas'}catch(e){}setor(s);
