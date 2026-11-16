@@ -112,12 +112,45 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 #bvv .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}#bvv .chip{border:1px solid var(--line);background:transparent;border-radius:99px;padding:6px 12px;font:inherit;font-size:12.5px;color:var(--sub);cursor:pointer}#bvv .chip.on{background:var(--card2);color:var(--ink);border-color:var(--sub)}
 #bvv .hist{display:flex;flex-direction:column;gap:6px}#bvv .hist .r{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:12px;padding:10px 14px}#bvv .hist .r .t{flex:1;min-width:0}#bvv .hist .r .t b{display:block;font-size:14px;overflow-wrap:anywhere}#bvv .hist .r .t span{font-size:12px;color:var(--muted);overflow-wrap:anywhere}#bvv .hist .r .v{text-align:right;white-space:nowrap;font-weight:700}#bvv .hist .r .v small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
 #bvv .pv{background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:8px}#bvv .pv .hd{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}#bvv .pv .hd b{font-size:16px;display:block}#bvv .pv .hd span{font-size:12px;color:var(--muted)}#bvv .pv .cm{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:13px;color:var(--sub)}
+/* 16/11: aba Gestão — jornal, agenda do mês, financeiro do mês */
+.jmh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-top:3px double var(--line);border-bottom:1px solid var(--line);padding:8px 2px;margin:22px 0 12px}
+.jmh b{font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:700;letter-spacing:.02em}.jmh b em{font-style:italic;color:var(--pink)}.jmh span{font-size:11.5px;color:var(--muted);text-align:right}
+.jn{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 12px;scrollbar-width:none;margin:0 -16px;padding-left:16px;padding-right:16px}.jn::-webkit-scrollbar{display:none}
+.jc{flex:0 0 76%;max-width:290px;scroll-snap-align:start;background:var(--card);border-radius:16px;overflow:hidden;cursor:pointer;border:0;text-align:left;color:inherit;font:inherit;display:flex;flex-direction:column;padding:0}
+.jc .ill{height:118px;display:flex;align-items:center;justify-content:center;position:relative}.jc .ill svg{display:block}.jc .ill .em{font-size:52px;line-height:1;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}
+.jc .tx{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.jc .kk{font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+.jc h4{margin:0;font-family:Georgia,'Times New Roman',serif;font-size:18px;line-height:1.2;font-weight:700}
+.jc p{margin:0;font-size:12.5px;color:var(--sub);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.jc .mais2{margin-top:auto;padding-top:6px;font-size:11.5px;font-weight:700;color:var(--pinkl)}
+.jdots{display:flex;justify-content:center;gap:5px;margin-top:-4px}.jdots i{width:5px;height:5px;border-radius:99px;background:var(--line)}.jdots i.on{background:var(--pinkl)}
+.g-rs{background:linear-gradient(135deg,#2A1E30,#3A1A2A)}.g-cx{background:linear-gradient(135deg,#17302A,#1E2A26)}.g-sh{background:linear-gradient(135deg,#1B2440,#2A1E3E)}.g-al{background:linear-gradient(135deg,#3A2A14,#2E1F18)}
+.g-oc{background:linear-gradient(135deg,#2E2230,#22202A)}.g-mt{background:linear-gradient(135deg,#251E3E,#1E1C2E)}.g-eq{background:linear-gradient(135deg,#183028,#1C2420)}.g-gs{background:linear-gradient(135deg,#301A22,#241C22)}
+.kk.k-rs{color:var(--pinkl)}.kk.k-cx{color:var(--pos)}.kk.k-sh{color:#8EC5FF}.kk.k-al{color:var(--amber)}.kk.k-oc{color:#C9A0FF}.kk.k-mt{color:#B9A4FF}.kk.k-eq{color:var(--pos)}.kk.k-gs{color:var(--neg)}
+.jp{position:fixed;inset:0;z-index:60;display:none}.jp.on{display:block}.jp .bk{position:absolute;inset:0;background:rgba(0,0,0,.6)}
+.jp .bx{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--card);border-radius:18px 18px 0 0;max-width:620px;margin:0 auto;padding:0 0 22px}
+@media(min-width:700px){.jp .bx{bottom:auto;top:7vh;border-radius:18px}}
+.jp .bx .ill{height:150px;display:flex;align-items:center;justify-content:center;position:relative}.jp .bx .ill .em{font-size:64px}
+.jp .x{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.35);border:0;color:#fff;border-radius:99px;width:32px;height:32px;font-size:16px;cursor:pointer}
+.jp .ct{padding:14px 18px}.jp h4{font-family:Georgia,'Times New Roman',serif;font-size:23px;line-height:1.2;margin:4px 0 8px}.jp .ct>p{font-size:14px;color:var(--sub);margin:0 0 10px;white-space:pre-line}
+.jp .ln{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px}.jp .ln span{color:var(--sub);min-width:0}.jp .ln b{white-space:nowrap}
+.agc{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;background:var(--card);border-radius:14px;padding:10px}
+.agc .wd{font-size:10px;font-weight:700;letter-spacing:.1em;text-align:center;color:var(--muted);padding-bottom:4px}
+.agc .dy{min-height:58px;border-radius:8px;background:var(--card2);padding:4px;font-size:11px;display:flex;flex-direction:column;gap:2px;min-width:0}.agc .dy.fo{background:transparent}.agc .dy.hj{outline:2px solid var(--pink)}
+.agc .dy>b{font-size:11px;color:var(--sub)}.agc .sh{background:var(--pink);color:#fff;border-radius:5px;padding:1px 4px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10.5px}
+.agc .sh.ac{background:transparent;border:1px dashed var(--pinkl);color:var(--pinkl)}.agc .tk{font-size:10px;color:var(--pos);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.agc .tk.ok{color:var(--muted);text-decoration:line-through}
+@media(max-width:480px){.agc{gap:3px;padding:6px}.agc .dy{min-height:46px;padding:3px}.agc .sh{font-size:0;height:8px;padding:0}.agc .sh::before{content:'🎤';font-size:9px}.agc .tk{font-size:0}.agc .tk::before{content:'•';font-size:13px;line-height:.8}}
+.agl{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.agd{display:flex;gap:12px;background:var(--card);border-radius:12px;padding:10px 14px;align-items:flex-start}.agd.sh{background:linear-gradient(90deg,rgba(207,29,81,.22),var(--card) 60%);border-left:3px solid var(--pink)}
+.agd .d{flex:none;width:40px;text-align:center;line-height:1.1}.agd .d b{display:block;font-size:18px;font-weight:800}.agd .d span{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.agd .t{flex:1;min-width:0;font-size:13.5px}.agd .t b{display:block;font-size:14.5px}.agd .t div{color:var(--sub);font-size:12.5px}.agd .t div.ok{color:var(--muted);text-decoration:line-through}
+.fprev{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:12.5px;color:var(--sub);margin:8px 2px 0}.fprev b{color:var(--ink)}
 </style>
 </head>
 <body>
 <div id="app">
 <header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
-  <div class="ptabs" id="ptabs"><button class="on" data-p="fin">Financeiro</button><button data-p="ven">Vendas</button><button data-p="eq">Equipe</button></div></header>
+  <div class="ptabs" id="ptabs"><button class="on" data-p="fin">Gestão</button><button data-p="ven">Vendas</button><button data-p="eq">Equipe</button></div></header>
 <main class="wrap">
 <div id="lbq"></div>
   <p class="eyebrow">Sócio</p>
@@ -126,7 +159,16 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 
   <!-- ===================== FINANCEIRO ===================== -->
   <section class="aba" data-a="fin">
-  <div id="alertas"></div>
+  <div class="jmh"><b>Jornal <em>LB</em></b><span id="jsub"></span></div>
+  <div class="jn" id="jornal"></div><div class="jdots" id="jdots"></div>
+  <h3 id="agh"></h3>
+  <div id="agcal"></div><div class="agl" id="aglis"></div>
+  <h3 id="fmesh"></h3>
+  <div class="grid g3" id="fmesk"></div>
+  <div id="fmesg" style="margin-top:10px"></div>
+  <div class="g2d" style="margin-top:10px"><div id="entt"></div><div id="gastos"></div></div>
+  <div id="sinais" style="margin-top:10px"></div>
+  <div id="alertas" hidden></div>
   <h3>Visão geral <small id="fano"></small></h3>
   <div class="grid g4" id="fkpi"></div>
   <div class="hb" id="fano2"></div>
@@ -134,13 +176,8 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <div id="fch"></div>
   <h3>Entrou e saiu <small>meses fechados</small></h3>
   <div id="ffech"></div>
-  <h3 id="fmesh"></h3>
-  <div class="grid" id="fmesk" style="grid-template-columns:1fr 1fr"></div>
-  <div class="g2d" style="margin-top:10px"><div id="entt"></div><div id="gastos"></div></div>
-  <h3>Acontecimentos da empresa</h3>
-  <div class="list" id="ocall"></div>
-  <details class="det"><summary>Detalhes do mês</summary>
-    <div id="sinais"></div>
+  <details class="det"><summary>Todos os acontecimentos</summary><div class="list" id="ocall" style="margin-top:10px"></div></details>
+  <details class="det"><summary>Shows e movimentações do mês</summary>
     <h3>Shows do mês</h3><div class="list" id="smes"></div>
     <h3>Movimentações <small id="mvsub"></small></h3><div class="list" id="mvl"></div>
   </details>
@@ -187,9 +224,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <footer>Lucas Barros Ltda · números do extrato bancário, do caixa em dinheiro e das planilhas de cada show (borderôs)</footer>
 </main>
 </div>
-<script src="../lb.js?v=mwjrlzes"></script>
-<script src="../lbchat.js?v=mwjrlzes"></script>
-<script src="../lbvendas.js?v=mwjrlzes"></script>
+<div class="jp" id="jp"><div class="bk"></div><div class="bx" id="jpb"></div></div>
+<script src="../lb.js?v=mwjrsvwu"></script>
+<script src="../lbchat.js?v=mwjrsvwu"></script>
+<script src="../lbvendas.js?v=mwjrsvwu"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -225,7 +263,7 @@ document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.clo
 function render(){
   document.getElementById('app').style.display='block';
   document.getElementById('upd').textContent='Atualizado em '+D.atualizado.split('-').reverse().join('/')+' · extrato até '+(D.extrato_ate||(D.agora&&D.agora.ate)||'');
-  for(const f of [renderFin,renderVendas,renderEquipe])try{f()}catch(e){console.error(e)}
+  for(const f of [renderFin,renderJornal,renderAgendaMes,renderVendas,renderEquipe])try{f()}catch(e){console.error(e)}
 }
 
 /* ===================== FINANCEIRO ===================== */
@@ -248,10 +286,13 @@ function renderFin(){
   document.getElementById('ffech').innerHTML=fk.length?grafico(fk.map(k=>MES3[+k.slice(5,7)-1]),[{nome:'Entrou',cor:'#7FDDA9',vals:fk.map(k=>G.fechados[k].ent)},{nome:'Saiu',cor:'#CF1D51',vals:fk.map(k=>G.fechados[k].sai)}],{modo:'lado',ks:fk,tfmt:brl,nomes:fk.map(k=>nomeMes(k)+' · sobrou '+brl(G.fechados[k].res))}):nada('Nenhum mês fechado ainda.');
   // este mês
   document.getElementById('fmesh').innerHTML=`${MESES[+mk.slice(5,7)-1]} <small>mês atual · até ${esc(A.ate)}</small>`;
-  document.getElementById('fmesk').innerHTML=k4('Entrou',brl(A.entrou),'','pos')+k4('Saiu',brl(A.saiu),'');
-  const T=A.ent_tipos;document.getElementById('entt').innerHTML=T?dnt('De onde entrou',[['Cachês',T.cache,'var(--pos)'],['Sinal',T.sinal,'var(--amber)'],['Investidor',T.aporte,'var(--pinkl)'],['Outras',T.outros,'var(--sai)']]):'';
+  {const E=D.estimativa||{},tem=E.fim!=null;
+   document.getElementById('fmesk').innerHTML=k4('Entrou',brl(tem?E.ent_real:A.entrou),tem&&E.ent_prev?'+ '+brl(E.ent_prev)+' previsto':'','pos')+k4('Saiu',brl(tem?E.sai_real:A.saiu),tem&&E.sai_prev?'+ '+brl(E.sai_prev)+' previsto':'')+(tem?k4('Fim do mês',brl(E.fim),'saldo previsto',E.fim<0?'neg':''):k4('Sobrou',brl(A.entrou-A.saiu),'até agora',A.entrou-A.saiu<0?'neg':'pos'));
+   document.getElementById('fmesg').innerHTML=tem?grafico(['Entradas','Saídas'],[{nome:'Já aconteceu',cor:'#7FDDA9',vals:[E.ent_real||0,0]},{nome:'Já saiu',cor:'#CF1D51',vals:[0,E.sai_real||0]},{nome:'Previsto até o fim do mês',cor:'#6F697D',vals:[E.ent_prev||0,E.sai_prev||0]}],{fmt:kf,tfmt:brl,nomes:['Entradas: '+brl(E.ent_real)+' já entraram + '+brl(E.ent_prev)+' previstos','Saídas: '+brl(E.sai_real)+' já saíram + '+brl(E.sai_prev)+' previstas']})
+     +`<div class="fprev"><span>Começou o mês com <b>${brl(E.ini)}</b></span><span>Resultado previsto <b class="${E.res<0?'neg':'pos'}">${brl(E.res)}</b></span>${E.aporte?`<span>com investimento de <b>${brl(E.aporte)}</b></span>`:''}</div><p class="note">Previsão = o que ainda vai entrar (shows, sinais, investimento) e sair (equipe dos shows, fixos, contas) até o fim do mês.</p>`:''}
+  const T=A.ent_tipos;document.getElementById('entt').innerHTML=T?dnt('Entradas: sinal e não sinal',[['Cachês (show já feito)',T.cache,'var(--pos)'],['Sinal (show que vai acontecer)',T.sinal,'var(--amber)'],['Investidor',T.aporte,'var(--pinkl)'],['Outras',T.outros,'var(--sai)']]):'';
   {const l=A.gastos.slice().sort((x,y)=>y.valor-x.valor),top=l.slice(0,5),resto=l.slice(5).reduce((s,g)=>s+g.valor,0);
-   document.getElementById('gastos').innerHTML=dnt('Para onde foi',top.map((g,i)=>[g.grupo,g.valor,PAL[i]]).concat(resto?[['Outros',resto,'var(--sai)']]:[]))||'<span class="mut">Nenhuma saída no mês ainda.</span>'}
+   document.getElementById('gastos').innerHTML=dnt('Saídas por setor (no extrato)',top.map((g,i)=>[g.grupo,g.valor,PAL[i]]).concat(resto?[['Outros',resto,'var(--sai)']]:[]))||'<span class="mut">Nenhuma saída no mês ainda.</span>'}
   // acontecimentos (curto: título e uma linha)
   const oc=G.ocorrencias.slice().sort((x,y)=>y.data.localeCompare(x.data));
   document.getElementById('ocall').innerHTML=oc.length?vm(oc.map(o=>`<div class="oc">${dia(o.data)}<div class="t"><b>${esc(o.titulo)}</b><span class="um">${o.data>D.atualizado?'programado · ':''}${esc(o.detalhe||'')}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`),5):nada('Nada fora do normal.');
@@ -272,6 +313,61 @@ function renderFin(){
   document.getElementById('docs').onclick=async e=>{const b=e.target.closest('button');if(!b)return;const f=arqs[+b.dataset.i];b.textContent='Abrindo…';
     try{const buf=await LB.anexo(f.id,f.iv,'arquivos-socio');const u=URL.createObjectURL(new Blob([buf],{type:f.tipo}));const l=document.createElement('a');l.href=u;l.download=f.arq;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);b.textContent='Baixar'}catch(err){b.textContent='Erro, tente de novo'}};
 }
+
+
+/* ===================== GESTÃO: jornal, agenda do mês ===================== */
+const svgBar=(a,b,pa,pb)=>{const m=Math.max(a+pa,b+pb,1),h=v=>Math.round(v/m*76);return `<svg width="150" height="96" viewBox="0 0 150 96"><line x1="10" y1="88" x2="140" y2="88" stroke="#ffffff33"/>
+  <rect x="34" y="${88-h(a)}" width="30" height="${h(a)}" rx="4" fill="#7FDDA9"/><rect x="34" y="${88-h(a)-h(pa)}" width="30" height="${h(pa)}" rx="4" fill="none" stroke="#7FDDA9" stroke-dasharray="3 3"/>
+  <rect x="86" y="${88-h(b)}" width="30" height="${h(b)}" rx="4" fill="#CF1D51"/><rect x="86" y="${88-h(b)-h(pb)}" width="30" height="${h(pb)}" rx="4" fill="none" stroke="#F0507E" stroke-dasharray="3 3"/></svg>`};
+const svgLinha=v=>{v=v.filter(x=>x!=null);if(v.length<2)return '<span class="em">💰</span>';const mx=Math.max(...v),mn=Math.min(...v,0),W=180,H=80,x=i=>10+i*(W-20)/(v.length-1),y=t=>H-8-(t-mn)/((mx-mn)||1)*(H-20);
+  const pts=v.map((t,i)=>x(i)+','+y(t)).join(' ');return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><polyline points="${pts}" fill="none" stroke="#7FDDA9" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${x(v.length-1)}" cy="${y(v[v.length-1])}" r="5" fill="#7FDDA9"/></svg>`};
+const svgAnel=(p,c)=>{const R=30,C=2*Math.PI*R;return `<svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="${R}" fill="none" stroke="#ffffff1f" stroke-width="10"/><circle cx="48" cy="48" r="${R}" fill="none" stroke="${c||'#B9A4FF'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C*p} ${C}" transform="rotate(-90 48 48)"/><text x="48" y="54" text-anchor="middle" font-size="17" font-weight="800" fill="#fff">${Math.round(p*100)}%</text></svg>`};
+const em=e=>`<span class="em">${e}</span>`;
+let JN=[];
+function nota(k,ill,kick,tit,lede,det){JN.push({k,ill,kick,tit,lede,det})}
+function renderJornal(){JN=[];const A=D.agora,G=D.geral,E=D.estimativa||{},mk=D.mes,nm=MESES[+mk.slice(5,7)-1],cx=A.caixa.conta+A.caixa.maos;
+  const ln=(a,b,c)=>`<div class="ln"><span>${a}</span><b class="${c||''}">${b}</b></div>`;
+  // 1. resultado do mês com previsão
+  if(E.fim!=null){const r=E.res;nota('rs',svgBar(E.ent_real||0,E.sai_real||0,E.ent_prev||0,E.sai_prev||0),'Resultado do mês',r>=0?`${nm[0].toUpperCase()+nm.slice(1)} deve fechar com sobra de ${brl(r)}`:`${nm[0].toUpperCase()+nm.slice(1)} deve fechar no vermelho: ${brl(r)}`,
+    `Até agora entraram ${brl(E.ent_real)} e saíram ${brl(E.sai_real)}. Até o fim do mês ainda estão previstos ${brl(E.ent_prev)} de entrada e ${brl(E.sai_prev)} de saída.`,
+    ln('Começou o mês com',brl(E.ini))+ln('Já entrou',brl(E.ent_real),'pos')+ln('Já saiu',brl(E.sai_real))+ln('Ainda vai entrar (previsto)',brl(E.ent_prev),'pos')+ln('Ainda vai sair (previsto)',brl(E.sai_prev))+(E.aporte?ln('Investimento no mês',brl(E.aporte)):'')+ln('Resultado previsto',brl(r),r<0?'neg':'pos')+ln('Saldo previsto no fim do mês',brl(E.fim),E.fim<0?'neg':'')+'<p class="note">Previsão: shows confirmados, sinais, fixos, equipe dos shows e contas a pagar.</p>')}
+  // 2. caixa
+  {const ks=Object.keys(G.fechados).sort(),v=ks.map(k=>G.fechados[k].fim).concat([cx]);nota('cx',svgLinha(v),'Caixa',`Empresa tem ${brl(cx)} em caixa`,`Conta ${brl(A.caixa.conta)} e dinheiro em mãos ${brl(A.caixa.maos)}, conferidos em ${A.caixa.data.slice(0,5)}.`,
+    ln('Conta',brl(A.caixa.conta))+ln('Dinheiro em mãos',brl(A.caixa.maos))+ks.slice(-6).map(k=>ln('Fim de '+nomeMes(k),brl(G.fechados[k].fim))).join('')+(A.sinais_caixa&&A.sinais_caixa.total?ln('Do caixa, é sinal de show futuro',brl(A.sinais_caixa.total)):''))}
+  // 3. shows do mês
+  {const S=A.shows.filter(s=>s.sit!=='A confirmar'),fe=S.filter(s=>s.data<=D.atualizado),tt=S.reduce((a,s)=>a+s.valor,0);if(A.shows.length)nota('sh',em('🎤'),'Shows',`${S.length} show${S.length===1?'':'s'} em ${nm}, ${brl(tt)} em cachês`,`${fe.length} já aconteceu${fe.length===1?'':'ram'}${S.length-fe.length?' e '+(S.length-fe.length)+' ainda vem'+(S.length-fe.length===1?'':'m'):''}.${A.shows.length>S.length?' '+(A.shows.length-S.length)+' a confirmar.':''}`,
+    A.shows.map(s=>ln(ddmm(s.data)+' · '+esc(s.nome)+(s.sit==='A confirmar'?' (a confirmar)':s.data<=D.atualizado?'':' (vem aí)'),brl(s.valor)+(s.lucro!=null?' · lucro '+brl(s.lucro):''),s.lucro!=null&&s.lucro<0?'neg':'')).join(''))}
+  // 4. alertas
+  (D.alertas||[]).forEach(x=>nota('al',em(x.tipo==='despesa'?'🧾':'⚠️'),x.tipo==='despesa'?'Despesa prevista':'Alerta',esc(x.titulo),esc(x.texto||x.alvo||''),`<p>${esc(x.texto||'')}</p>`+(x.valor!=null?ln(x.situacao==='Confirmado'?'Valor':'Valor provável',brl(x.valor)):'')+(x.prazo?ln('Quando',esc(x.prazo)):'')+`<p class="note">${esc(x.rodape||'')}</p>`));
+  // 5. ocorrências do mês (fora do normal)
+  (A.ocorrencias||[]).slice().sort((a,b)=>b.data.localeCompare(a.data)).forEach(o=>nota('oc',em(o.data>D.atualizado?'🗓️':'📌'),(o.data>D.atualizado?'Programado · ':'Aconteceu · ')+dtx(o.data),esc(o.titulo),esc(o.detalhe||''),`<p>${esc(o.detalhe||'')}</p>`+(o.valor!=null?ln('Valor',brl(o.valor)):'')));
+  // 6. maior gasto
+  {const g=(A.gastos||[]).slice().sort((a,b)=>b.valor-a.valor);if(g.length){const tt=g.reduce((a,x)=>a+x.valor,0);nota('gs',em('💸'),'Para onde foi o dinheiro',`Maior saída do mês: ${esc(g[0].grupo)} (${brl(g[0].valor)})`,`${Math.round(g[0].valor/tt*100)}% de tudo que saiu em ${nm}.`,g.map(x=>ln(esc(x.grupo),brl(x.valor))).join(''))}}
+  // 7. itens que o Admin mandou para o jornal
+  (D.jornal||[]).forEach(x=>{const ic={meta:'🎯',tarefa:'✅',alerta:'⚠️',despesa:'🧾'}[x.tipo]||'📰';nota(x.tipo==='alerta'||x.tipo==='despesa'?'al':'mt',x.pct!=null?svgAnel(x.pct):em(ic),({meta:'Meta',tarefa:'Tarefa da empresa',alerta:'Alerta',despesa:'Despesa prevista'})[x.tipo]||'Notícia',esc(x.titulo),esc(x.texto||x.alvo||x.situacao||''),
+    (x.alvo?`<p>${esc(x.alvo)}</p>`:'')+(x.texto?`<p>${esc(x.texto)}</p>`:'')+(x.situacao?ln('Situação',esc(x.situacao)):'')+(x.pct!=null?ln('Andamento',Math.round(x.pct*100)+'%'):'')+(x.valor!=null?ln('Valor',brl(x.valor)):'')+(x.prazo?ln('Prazo',esc(x.prazo)):''))});
+  // 8. metas da empresa (as que o sócio vê)
+  (D.metas_empresa||[]).forEach(m=>{if((D.jornal||[]).some(j=>j.titulo===m.titulo))return;const p=m.pct!=null?m.pct:/atingid|conclu/i.test(m.situacao||'')?1:null;nota('mt',p!=null?svgAnel(p):em('🎯'),'Meta da empresa',esc(m.titulo),esc(m.ptxt||m.alvo||m.situacao||''),(m.alvo?`<p>${esc(m.alvo)}</p>`:'')+(m.progresso?`<p>${esc(m.progresso)}</p>`:'')+ln('Situação',esc(m.situacao||'—'))+(m.prazo?ln('Prazo',esc(m.prazo)):''))});
+  // 9. equipe
+  {const Q=D.equipe_resumo;if(Q&&Q.pessoas&&Q.pessoas.length){const c=Q.pessoas.reduce((a,p)=>a+p.concluidas,0),ab=Q.pessoas.reduce((a,p)=>a+p.abertas,0),at=Q.pessoas.reduce((a,p)=>a+p.atrasadas,0);
+    nota('eq',svgAnel(c+ab?c/(c+ab):0,'#7FDDA9'),'Equipe',`Equipe concluiu ${c} tarefa${c===1?'':'s'} em ${nm}`,`${ab} em aberto${at?', '+at+' atrasada'+(at===1?'':'s'):''}.`,Q.pessoas.map(p=>ln(esc(p.nome),p.concluidas+' feitas · '+p.abertas+' abertas'+(p.atrasadas?' · '+p.atrasadas+' atrasadas':''),p.atrasadas?'neg':'')).join(''))}}
+  document.getElementById('jsub').textContent='edição de '+dtx(D.atualizado)+' · '+JN.length+' notícias';
+  document.getElementById('jornal').innerHTML=JN.map((n,i)=>`<button class="jc" data-jn="${i}"><div class="ill g-${n.k}">${n.ill}</div><div class="tx"><span class="kk k-${n.k}">${n.kick}</span><h4>${n.tit}</h4><p>${n.lede}</p><span class="mais2">Ler mais ›</span></div></button>`).join('')||nada('Nenhuma notícia ainda.');
+  document.getElementById('jdots').innerHTML=JN.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('');
+  const jn=document.getElementById('jornal');jn.onscroll=()=>{const w=jn.firstElementChild?jn.firstElementChild.offsetWidth+12:1,i=Math.round(jn.scrollLeft/w);document.querySelectorAll('#jdots i').forEach((d,j)=>d.classList.toggle('on',j===i))}}
+document.addEventListener('click',e=>{const c=e.target.closest('[data-jn]');if(c){const n=JN[+c.dataset.jn];document.getElementById('jpb').innerHTML=`<div class="ill g-${n.k}">${n.ill}<button class="x" data-jx aria-label="Fechar">✕</button></div><div class="ct"><span class="kk k-${n.k}" style="font-size:10.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase">${n.kick}</span><h4>${n.tit}</h4>${n.det||`<p>${n.lede}</p>`}</div>`;
+  document.getElementById('jp').classList.add('on');document.body.style.overflow='hidden';return}
+  if(e.target.closest('[data-jx]')||e.target.classList.contains('bk')){document.getElementById('jp').classList.remove('on');document.body.style.overflow=''}});
+/* agenda do mês: shows em destaque + tarefas de todos */
+function renderAgendaMes(){const mk=D.mes,A=D.agora,y=+mk.slice(0,4),m=+mk.slice(5,7)-1,n=new Date(y,m+1,0).getDate(),off=(new Date(y,m,1).getDay()+6)%7,T=D.agenda||[];
+  document.getElementById('agh').innerHTML=`Agenda de ${MESES[m]} <small>shows em destaque · tarefas de toda a equipe</small>`;
+  const sh=A.shows,dd=d=>mk+'-'+String(d).padStart(2,'0');let h=['seg','ter','qua','qui','sex','sáb','dom'].map(x=>`<div class="wd">${x}</div>`).join('')+'<div class="dy fo"></div>'.repeat(off);
+  for(let d=1;d<=n;d++){const k=dd(d),S=sh.filter(s=>s.data===k),t=T.filter(x=>x.d===k);
+    h+=`<div class="dy${k===HJ?' hj':''}"><b>${d}</b>${S.map(s=>`<span class="sh${s.sit==='A confirmar'?' ac':''}" title="${esc(s.nome)}">${esc(s.nome)}</span>`).join('')}${t.slice(0,2).map(x=>`<span class="tk${x.ok?' ok':''}" title="${esc(x.t)}">${esc(x.t)}</span>`).join('')}${t.length>2?`<span class="tk">+${t.length-2}</span>`:''}</div>`}
+  document.getElementById('agcal').innerHTML=`<div class="agc">${h}</div>`;
+  const dias=[...new Set(sh.map(s=>s.data).concat(T.map(x=>x.d)))].sort();
+  const it=dias.map(k=>{const S=sh.filter(s=>s.data===k),t=T.filter(x=>x.d===k);return `<div class="agd${S.length?' sh':''}"><div class="d"><b>${k.slice(8,10)}</b><span>${MES3[+k.slice(5,7)-1]}</span></div><div class="t">${S.map(s=>`<b>🎤 ${esc(s.nome)}</b><div>${esc(s.local||'')}${s.sit==='A confirmar'?' · a confirmar':s.data<=D.atualizado?' · realizado':' · confirmado'}</div>`).join('')}${t.map(x=>`<div class="${x.ok?'ok':''}">📝 ${esc(x.t)} <span style="color:var(--muted)">· ${esc(x.quem)}</span></div>`).join('')}</div></div>`});
+  const fut=dias.findIndex(k=>k>=HJ);document.getElementById('aglis').innerHTML=it.length?vm(fut>0?it.slice(fut).concat(it.slice(0,fut)):it,6):nada('Nada na agenda deste mês.')}
 
 /* ===================== VENDAS ===================== */
 let VALIAS={},SV=[],VREF=MA,VDIA=null;
