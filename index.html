@@ -348,7 +348,7 @@ body.emb header .wrap,body.emb #ptabs,body.emb #lbq{display:none!important}body.
   <h1>Estima<em>tiva</em></h1>
   <div id="estcards" class="grid g3" style="margin-top:16px"></div>
   <h3>Saldo disponível dia a dia <small>conta + dinheiro em mãos</small></h3>
-  <div class="chips"><button class="chip on" data-ap="1">Com o aporte</button><button class="chip" data-ap="0">Sem o aporte</button></div>
+  <div class="chips"><button class="chip on" data-ap="1">Com o aporte</button><button class="chip" data-ap="0">Sem o aporte</button><span style="width:1px;align-self:stretch;background:var(--line);margin:0 4px"></span><button class="chip on" data-sc="0">Todos os shows</button><button class="chip" data-sc="1">Só shows confirmados</button></div>
   <div class="chart"><div id="chsaldo"></div><div class="tip" id="tipsaldo">Toque no gráfico para ver o saldo do dia.</div></div>
   <h3>Entradas e saídas por mês <small>2026 · nov em diante é estimativa</small></h3>
   <div id="chmes"></div>
@@ -392,10 +392,10 @@ body.emb header .wrap,body.emb #ptabs,body.emb #lbq{display:none!important}body.
 </main>
 </div>
 
-<script src="lb.js?v=mwjv6hww"></script>
-<script src="lbmetas.js?v=mwjv6hww"></script>
-<script src="lbchat.js?v=mwjv6hww"></script>
-<script src="lbvendas.js?v=mwjv6hww"></script>
+<script src="lb.js?v=mwjvhjag"></script>
+<script src="lbmetas.js?v=mwjvhjag"></script>
+<script src="lbchat.js?v=mwjvhjag"></script>
+<script src="lbvendas.js?v=mwjvhjag"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -1025,8 +1025,9 @@ function renderEst(){
     <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:13px"><span class="mut">Começa</span><span>${brl(m.ini)}</span></div>
     <div style="display:flex;justify-content:space-between;font-size:13px"><span class="mut">Entra${m.aporte?' (c/ aporte)':''}</span><span class="pos">+${brl(m.ent)}</span></div>
     <div style="display:flex;justify-content:space-between;font-size:13px"><span class="mut">Sai</span><span>−${brl(m.sai)}</span></div></div>`}).join('');
-  let ap=1;
-  document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=()=>{ap=+b.dataset.ap;document.querySelectorAll('[data-ap]').forEach(c=>c.classList.toggle('on',c===b));chartSaldo(ap)});
+  /* 16/11: com/sem aporte e todos os shows/só confirmados — valem para o saldo dia a dia e para Entradas e saídas por mês */
+  document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=()=>{AP=+b.dataset.ap;document.querySelectorAll('[data-ap]').forEach(c=>c.classList.toggle('on',c===b));chartSaldo(AP);chartMes()});
+  document.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{SC=+b.dataset.sc;document.querySelectorAll('[data-sc]').forEach(c=>c.classList.toggle('on',c===b));chartSaldo(AP);chartMes()});
   chartSaldo(1);chartMes();
   const fut=D.linha.filter(l=>l.data>=HOJE&&l.v).slice(0,14);
   document.getElementById('prox').innerHTML=fut.map(l=>`<div class="row"><div class="d"><b>${l.data.slice(8,10)}</b><span>${MES3[+l.data.slice(5,7)-1]}${l.data.slice(0,4)!==ANO_AT?' '+l.data.slice(2,4):''}</span></div><div class="t"><b>${esc(l.txt)}</b><span>saldo depois: <span class="${cls(l.saldo)}">${brl(l.saldo)}</span></span></div><div class="v ${l.v>0?'pos':''}">${l.v>0?'+':''}${brl(l.v)}</div></div>`).join('')
@@ -1036,10 +1037,10 @@ function renderEst(){
   renderRiscos();
 }
 let W=640;const setW=id=>{W=Math.max(330,Math.min(760,document.getElementById(id).clientWidth||640))};
-let AP=1;addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(()=>{if(typeof D==='undefined'||!D||!D.linha)return;chartSaldo(AP);chartMes()},200)});
+let AP=1,SC=0;const tiraL=l=>(!AP&&l.ap)||(SC&&l.ac);addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(()=>{if(typeof D==='undefined'||!D||!D.linha)return;chartSaldo(AP);chartMes()},200)});
 function chartSaldo(ap){AP=ap;setW('chsaldo');
   const t0=new Date(D.linha[0].data+'T12:00'),t1=new Date(D.linha[D.linha.length-1].data.slice(0,7)+'-'+String(new Date(+D.linha[D.linha.length-1].data.slice(0,4),+D.linha[D.linha.length-1].data.slice(5,7),0).getDate())+'T12:00');
-  let ac=0;const pts=D.linha.map(l=>{if(l.ap)ac+=l.v;const s=ap?l.saldo:l.saldo-ac;return {d:new Date(l.data+'T12:00'),s,l}});
+  let ac=0;const pts=D.linha.map(l=>{if(tiraL(l))ac+=l.v;const s=l.saldo-ac;return {d:new Date(l.data+'T12:00'),s,l}});
   // degraus: um ponto por dia (último saldo do dia)
   const byDay=[];pts.forEach(p=>{const last=byDay[byDay.length-1];if(last&&+last.d===+p.d)byDay[byDay.length-1]=p;else byDay.push(p)});
   byDay.push({d:t1,s:byDay[byDay.length-1].s,l:{data:t1.toISOString().slice(0,10)}});
@@ -1067,9 +1068,13 @@ function chartSaldo(ap){AP=ap;setW('chsaldo');
     cp.setAttribute('cx',cx);cp.setAttribute('cy',y(p.s));cp.setAttribute('opacity',1);
     const dd=d.toISOString().slice(0,10);tip.innerHTML=`<b style="color:var(--ink)">${ddmm(dd)}</b> · saldo disponível <b class="${cls(p.s)}">${brl2(p.s)}</b>${p.l.txt?` · último movimento: ${esc(p.l.txt)}`:''}`};
   sv.addEventListener('mousemove',mv);sv.addEventListener('touchstart',mv,{passive:true});sv.addEventListener('touchmove',mv,{passive:true});
-  tip.innerHTML=ap?'Toque no gráfico para ver o saldo do dia.':`<span class="neg">Sem os aportes previstos (${D.linha.filter(l=>l.ap).map(l=>brl(l.v)+' em '+ddmm(l.data)).join(', ')||'nenhum'}).</span> Toque no gráfico para ver o saldo do dia.`;
+  const nAC=new Set(D.linha.filter(l=>l.ac&&l.v>0).map(l=>l.txt)).size;
+  tip.innerHTML=(!ap?`<span class="neg">Sem os aportes previstos (${D.linha.filter(l=>l.ap).map(l=>brl(l.v)+' em '+ddmm(l.data)).join(', ')||'nenhum'}).</span> `:'')+(SC?`<span class="neg">Sem os ${nAC} show(s) a confirmar (cachê e equipe).</span> `:'')+'Toque no gráfico para ver o saldo do dia.';
 }
-function chartMes(){const ks=Object.keys(D.meses).sort(),M=D.meses,est=ks.findIndex(k=>M[k].tipo!=='fechado');
+function chartMes(){const ks=Object.keys(D.meses).sort(),M0=D.meses,est=ks.findIndex(k=>M0[k].tipo!=='fechado');
+  /* mesma escolha do saldo dia a dia (aporte / só confirmados): tira dos meses previstos o que sai da linha; o saldo final de cada mês acumula */
+  let acum=0;const M={};ks.forEach(k=>{const t=D.linha.filter(l=>l.data.slice(0,7)===k&&!l.real&&tiraL(l)),e=t.filter(l=>l.v>0).reduce((a,l)=>a+l.v,0),sa=-t.filter(l=>l.v<0).reduce((a,l)=>a+l.v,0);
+    acum+=e-sa;M[k]=Object.assign({},M0[k],{ent:M0[k].ent-e,sai:M0[k].sai-sa,fim:M0[k].fim-acum})});
   document.getElementById('chmes').innerHTML=LB.grafico(ks.map(k=>MES3[+k.slice(5,7)-1]),[{nome:'Entradas',cor:'#CF1D51',vals:ks.map(k=>M[k].ent)},{nome:'Saídas',cor:'#6F697D',vals:ks.map(k=>M[k].sai)},{nome:'Saldo no fim do mês',cor:'#7FDDA9',tipo:'linha',vals:ks.map(k=>M[k].fim)}],{modo:'lado',ks,est,hi:ks.indexOf(mkey(HOJE)),fmt:v=>kf(v).replace(' mil','k'),tfmt:brl,nomes:ks.map(mname),h:200,dica:'Toque num mês para ver os valores.'})}
 
 /* ===================== 16/11: AGENDA NOVA (como a do Artista): mês/semana/dia, filtros, tocar abre detalhes ===================== */
