@@ -63,6 +63,7 @@ h2.tt{font-size:11px;font-weight:700;letter-spacing:.26em;text-transform:upperca
 #chat{position:fixed;right:16px;bottom:74px;z-index:41;width:min(440px,calc(100vw - 32px));max-height:calc(100vh - 100px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.5);padding:12px 12px 4px}
 #chat[hidden]{display:none}#chat .cbh{display:flex;justify-content:space-between;align-items:center;margin:2px 4px 8px}#chat .cbh b{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--pinkl)}#chat .cbh button{border:0;color:var(--ink);background:var(--card2);border-radius:99px;width:32px;height:32px;font-size:14px;cursor:pointer}
 #pg{display:none}
+.ic{width:16px;height:16px;flex:none;vertical-align:-3px;margin-right:6px}.urg i .ic{width:20px;height:20px;margin:0;color:var(--neg)}.fab i .ic{width:18px;height:18px;margin:0;vertical-align:middle}
 </style>
 </head>
 <body>
@@ -86,13 +87,14 @@ h2.tt{font-size:11px;font-weight:700;letter-spacing:.26em;text-transform:upperca
   <button class="mais" id="antes">Ver shows que já passaram</button>
 </section>
 </div>
-<button class="fab" id="ajuda" aria-label="Pergunte ao assistente"><i>💬</i>Ajuda</button>
+<button class="fab" id="ajuda" aria-label="Pergunte ao assistente"><i><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></i>Ajuda</button>
 <div id="chat" hidden><div class="cbh"><b>Pergunte aqui</b><button id="chx" aria-label="Fechar">✕</button></div><div id="lbq"></div></div>
 </div>
-<script src="../lb.js?v=mwim1vg1"></script>
-<script src="../lbmetas.js?v=mwim1vg1"></script>
-<script src="../lbchat.js?v=mwim1vg1"></script>
+<script src="../lb.js?v=mwim83tm"></script>
+<script src="../lbmetas.js?v=mwim83tm"></script>
+<script src="../lbchat.js?v=mwim83tm"></script>
 <script>
+const IC={al:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',ok:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>'};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const brl=v=>'R$ '+Math.round(+v||0).toLocaleString('pt-BR');
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),MA=HOJE.slice(0,7);
@@ -111,7 +113,7 @@ function urgentes(){const U=[];
     else if(/^\d{4}-\d{2}-\d{2}$/.test(m.prazo||'')&&dias(m.prazo)<=2&&m.tipo!=='despesa')U.push({t:m.titulo,s:dias(m.prazo)<0?'ATRASADA desde '+ddmm(m.prazo):dias(m.prazo)===0?'é HOJE':'falta '+dias(m.prazo)+' dia'+(dias(m.prazo)>1?'s':''),ir:'metas'})});
   ((MIN&&MIN.tarefas)||[]).forEach(t=>{if(t.status==='Concluída'||!/^\d{4}-\d{2}-\d{2}$/.test(t.prazo||''))return;const n=dias(t.prazo);
     if(n<=1)U.push({t:'Sua tarefa: '+t.titulo,s:n<0?'ATRASADA desde '+ddmm(t.prazo):n===0?'é HOJE':'é amanhã',ir:'minhas'})});
-  document.getElementById('urg').innerHTML=U.slice(0,4).map(u=>`<button class="urg" data-ir="${u.ir}"><i>⚠️</i><span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join('')}
+  document.getElementById('urg').innerHTML=U.slice(0,4).map(u=>`<button class="urg" data-ir="${u.ir}"><i>${IC.al}</i><span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join('')}
 document.getElementById('urg').onclick=e=>{const b=e.target.closest('[data-ir]');if(!b)return;setor('metas');const x=document.getElementById(b.dataset.ir);if(x)x.scrollIntoView({behavior:'smooth',block:'start'})};
 
 /* ---------- 1. metas da empresa ---------- */
@@ -120,7 +122,7 @@ function renderMetas(){const el=document.getElementById('metas');
   if(!L.length){el.innerHTML='<div class="vazio">Nenhuma meta cadastrada.</div>';return}
   el.innerHTML=L.map(m=>{const ok=FEITO.test(m.situacao||''),iso=/^\d{4}-\d{2}-\d{2}$/.test(m.prazo||''),atr=!ok&&iso&&m.prazo<HOJE;
     const num=+m.meta_num>0?Math.min(1,(+m.atual||0)/(+m.meta_num)):null;
-    return `<div class="c ${ok?'ok':atr?'ruim':''}"><div class="n">${ok?'✅ ':atr?'⚠️ ':''}${esc(m.titulo)}</div>
+    return `<div class="c ${ok?'ok':atr?'ruim':''}"><div class="n">${ok?IC.ok:atr?IC.al:''}${esc(m.titulo)}</div>
       ${m.alvo?`<div class="d">${esc(m.alvo)}</div>`:''}
       <span class="tag ${ok?'ok':atr?'ruim':''}">${ok?'CUMPRIDA':atr?'ATRASADA':esc(m.situacao||'em aberto')}</span>${m.prazo?`<span class="tag">${iso?'até '+ddmm(m.prazo):esc(m.prazo)}</span>`:''}
       ${num!=null?`<div class="bar"><i style="width:${Math.round(num*100)}%"></i></div>`:''}</div>`}).join('')}
@@ -133,10 +135,10 @@ function renderMinhas(){const el=document.getElementById('minhas');
   let h=ab.map(t=>{const iso=/^\d{4}-\d{2}-\d{2}$/.test(t.prazo||''),n=iso?dias(t.prazo):null,atr=n!=null&&n<0;
     return `<div class="c ${atr?'ruim':''}"><div class="row"><div><div class="n">${esc(t.titulo)}</div>${t.prazo?`<span class="tag ${atr?'ruim':n!=null&&n<=1?'am':''}">${atr?'ATRASADA · era '+ddmm(t.prazo):n===0?'HOJE':n===1?'amanhã':iso?'até '+ddmm(t.prazo):esc(t.prazo)}</span>`:''}${t.status==='Em andamento'?'<span class="tag am">fazendo</span>':''}</div>
       <button class="btn fiz" data-fiz="${esc(t.id)}">✓ Fiz</button></div></div>`}).join('');
-  if(!ab.length)h='<div class="c ok"><div class="n">🎉 Nenhuma tarefa pendente!</div></div>';
+  if(!ab.length)h='<div class="c ok"><div class="n">'+IC.ok+'Nenhuma tarefa pendente</div></div>';
   if(rot.length&&window.LBROT)h+=rot.map(r=>{let p=null;try{p=LBROT.pct(r,MA)}catch(e){}const ok=p&&p.pct>=1;
-    return `<div class="c ${ok?'ok':''}"><div class="n">${ok?'✅ ':''}${esc(r.titulo)}</div>${p?`<div class="d">${p.feitos} de ${p.total} neste mês</div><div class="bar"><i style="width:${Math.round(Math.min(1,p.pct)*100)}%"></i></div>`:''}</div>`}).join('');
-  if(fe.length)h+=fe.slice(0,4).map(t=>`<div class="c ok"><div class="row"><div class="n">✅ ${esc(t.titulo)}</div><button class="btn leve" data-desfaz="${esc(t.id)}">desfazer</button></div><div class="d">feita ${dias(t.concluido_em)===0?'hoje':dias(t.concluido_em)===-1?'ontem':'em '+ddmm(t.concluido_em)}</div></div>`).join('');
+    return `<div class="c ${ok?'ok':''}"><div class="n">${ok?IC.ok:''}${esc(r.titulo)}</div>${p?`<div class="d">${p.feitos} de ${p.total} neste mês</div><div class="bar"><i style="width:${Math.round(Math.min(1,p.pct)*100)}%"></i></div>`:''}</div>`}).join('');
+  if(fe.length)h+=fe.slice(0,4).map(t=>`<div class="c ok"><div class="row"><div class="n">${IC.ok}${esc(t.titulo)}</div><button class="btn leve" data-desfaz="${esc(t.id)}">desfazer</button></div><div class="d">feita ${dias(t.concluido_em)===0?'hoje':dias(t.concluido_em)===-1?'ontem':'em '+ddmm(t.concluido_em)}</div></div>`).join('');
   el.innerHTML=h}
 document.getElementById('minhas').onclick=async e=>{const b=e.target.closest('[data-fiz],[data-desfaz]');if(!b)return;const fz=!!b.dataset.fiz;b.disabled=true;b.textContent='salvando…';
   try{const r=await api({acao:'marcar_tarefa',id:b.dataset.fiz||b.dataset.desfaz,status:fz?'Concluída':'A fazer'});MIN=Object.assign(MIN||{},r);renderMinhas();urgentes()}catch(er){b.disabled=false;b.textContent='tente de novo'}};
@@ -164,7 +166,7 @@ function renderPags(){const el=document.getElementById('pags');const L=[];
   Object.values(px).forEach(x=>L.push({nome:x.nome,desc:'show'+(x.shows.length>1?'s':'')+' '+x.shows.join(', '),valor:x.valor,data:x.data,pix:x.pix}));
   L.sort((a,b)=>(a.data||'').localeCompare(b.data||''));
   el.innerHTML=L.length?L.map(x=>{const venc=x.data&&x.data<HOJE;return `<div class="c ${venc?'ruim':''}"><div class="row"><div><div class="n">${esc(x.nome)}</div><div class="d">${esc(x.desc)}${x.data?` · <b style="color:${venc?'var(--neg)':'inherit'}">${venc?'venceu '+ddmm(x.data):'dia '+ddmm(x.data)}</b>`:''}</div></div><div class="v ${venc?'ruim':''}">${brl(x.valor)}</div></div>
-    ${x.pix?`<div class="pix">PIX <code>${esc(x.pix)}</code><button class="btn leve" data-pix="${esc(x.pix)}">copiar</button></div>`:''}</div>`}).join(''):'<div class="c ok"><div class="n">🎉 Nada para pagar agora</div></div>'}
+    ${x.pix?`<div class="pix">PIX <code>${esc(x.pix)}</code><button class="btn leve" data-pix="${esc(x.pix)}">copiar</button></div>`:''}</div>`}).join(''):'<div class="c ok"><div class="n">'+IC.ok+'Nada para pagar agora</div></div>'}
 document.getElementById('pags').onclick=e=>{const b=e.target.closest('[data-pix]');if(!b)return;try{navigator.clipboard.writeText(b.dataset.pix)}catch(x){}b.textContent='copiado ✓';setTimeout(()=>b.textContent='copiar',1800)};
 
 /* ---------- shows: agenda; tocar abre o borderô (quanto vai para cada um) ---------- */
