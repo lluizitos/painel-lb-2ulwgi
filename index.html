@@ -357,10 +357,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwjso3vn"></script>
-<script src="lbmetas.js?v=mwjso3vn"></script>
-<script src="lbchat.js?v=mwjso3vn"></script>
-<script src="lbvendas.js?v=mwjso3vn"></script>
+<script src="lb.js?v=mwjsvzud"></script>
+<script src="lbmetas.js?v=mwjsvzud"></script>
+<script src="lbchat.js?v=mwjsvzud"></script>
+<script src="lbvendas.js?v=mwjsvzud"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -767,7 +767,7 @@ function renderFalta(){const el=document.getElementById('fent');if(!el||!D)retur
     <div class="fqg">${vis.map(q).join('')}</div>${n>4?`<div class="center" style="margin-top:10px">${n>FE_LIM?`<button class="btn" id="femais">Mostrar mais (${n-FE_LIM})</button>`:`<button class="btn" id="femenos">Mostrar menos</button>`}</div>`:''}</div>`;
   const b=document.getElementById('femais');if(b)b.onclick=()=>{FE_LIM=999;renderFalta()};
   const m=document.getElementById('femenos');if(m)m.onclick=()=>{FE_LIM=4;renderFalta();el.scrollIntoView({block:'start',behavior:'smooth'})}}
-function etpHtml(et){const S=[['Cachês',et.cache,'var(--pos)'],['Sinal',et.sinal,'var(--amber)'],['Investidor',et.aporte,'var(--pinkl)'],['Outras',et.outros,'var(--muted)']].filter(x=>x[1]>0.5),tt=S.reduce((a,x)=>a+x[1],0);if(!tt)return '';
+function etpHtml(et){const S=[['Cachês',et.cache,'var(--pos)'],['Cachês atrasados',et.atrasado||0,'#2E8C5C'],['Sinal',et.sinal,'var(--amber)'],['Show não identificado',et.aident||0,'#9A93A8'],['Investidor',et.aporte,'var(--pinkl)'],['Outras',et.outros,'var(--muted)']].filter(x=>x[1]>0.5),tt=S.reduce((a,x)=>a+x[1],0);if(!tt)return '';
   let a0=0;const R=15.9155,arc=S.map(x=>{const p=x[1]/tt*100,c=`<circle r="${R}" cx="21" cy="21" fill="none" stroke="${x[2]}" stroke-width="6" stroke-dasharray="${Math.max(p-.6,.1)} ${100-Math.max(p-.6,.1)}" stroke-dashoffset="${25-a0}"/>`;a0+=p;return c}).join('');
   return `<div class="card k" style="margin-top:10px"><div class="l">De onde veio o que entrou</div><div class="dnt"><svg viewBox="0 0 42 42" width="110" height="110" aria-hidden="true"><circle r="${R}" cx="21" cy="21" fill="none" stroke="var(--card2)" stroke-width="6"/>${arc}<text x="21" y="22.5" text-anchor="middle" font-size="5.2" font-weight="700" fill="var(--ink)">${brl(tt).replace('R$ ','')}</text></svg><div class="etp">${S.map(x=>`<div><i style="background:${x[2]}"></i>${x[0]}<b>${brl(x[1])}</b><small>${Math.round(x[1]/tt*100)}%</small></div>`).join('')}</div></div></div>`}
 /* barra das entradas por tipo: cheio = já entrou, clarinho = ainda vai entrar */
@@ -798,7 +798,7 @@ function renderMes(){
       k4('Saídas',brl(m.sai),'equipe, fixos e contas')+
       k4(m.tipo==='fechado'?'Saldo no fim':'Saldo previsto no fim',brl(m.fim),`resultado do mês ${(m.res>=0?'+':'')+brl(m.res)}`,cls(m.fim))+`</div>`;
     if(m.tipo==='parcial'){
-      const et=m.ent_tipos||{sinal:0},sn=et.sinal||0,er=Math.max(m.ent_real,(et.cache||0)+(et.aporte||0)+(et.outros||0)+sn),bs=Math.max(m.ent,er),st=m.sai_tipos||{},sr=Math.max(m.sai_real,Object.values(st).reduce((a,v)=>a+v,0)); // sinal em outra cor na barra
+      const et=m.ent_tipos||{sinal:0},sn=et.sinal||0,er=Math.max(m.ent_real,(et.cache||0)+(et.atrasado||0)+(et.aident||0)+(et.aporte||0)+(et.outros||0)+sn),bs=Math.max(m.ent,er),st=m.sai_tipos||{},sr=Math.max(m.sai_real,Object.values(st).reduce((a,v)=>a+v,0)); // sinal em outra cor na barra
       h+=`<div class="grid g2" style="margin-top:10px"><div class="card k"><div class="l">Já entrou</div><div class="v" style="font-size:18px">${brl(er)}</div><div class="s">de ${brl(m.ent)} previstos</div>${entBar(et,er,m)}</div>
       <div class="card k"><div class="l">Já saiu</div><div class="v" style="font-size:18px">${brl(sr)}</div><div class="s">de ${brl(m.sai)} previstos</div>${saiBar(st,sr,m)}</div></div>`;
     }
@@ -855,7 +855,7 @@ function movList(ms){
     const te=l.filter(x=>x.valor>0).reduce((a,x)=>a+x.valor,0),ts=l.filter(x=>x.valor<0).reduce((a,x)=>a+x.valor,0);
     const n=l.length;l=l.slice(0,lim);let h='',dia='';
     l.forEach(x=>{if(x.data!==dia){dia=x.data;h+=`<div class="day">${ddmm(dia)}</div>`}
-      h+=`<div class="row"><div class="t"><b>${esc(x.quem||'—')}</b><span>${x.tipo==='sinal'?`<span class="pill pk">sinal · show ${dtx(x.show_data||'')}</span> `:x.tipo==='cache'?'<span class="pill ok">cachê</span> ':''}${esc(x.cat||'')}${(x.show_nome||x.show)?' · '+esc(x.show_nome||x.show):''}${x.meio==='dinheiro'?' · <span class="pill">dinheiro</span>':''}${x.app?' · <span class="pill am">lançado no app</span>':''}${x.obs?'<br>'+esc(x.obs):''}</span></div><div class="v ${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl2(x.valor)}</div></div>`});
+      h+=`<div class="row"><div class="t"><b>${esc(x.quem||'—')}</b><span>${x.tipo==='sinal'?`<span class="pill pk">sinal · show ${dtx(x.show_data||'')}</span> `:x.tipo==='atrasado'?'<span class="pill ok">cachê atrasado</span> ':x.tipo==='cache'?'<span class="pill ok">cachê</span> ':''}${esc(x.cat||'')}${(x.show_nome||x.show)?' · '+esc(x.show_nome||x.show):''}${x.meio==='dinheiro'?' · <span class="pill">dinheiro</span>':''}${x.app?' · <span class="pill am">lançado no app</span>':''}${x.obs?'<br>'+esc(x.obs):''}</span></div><div class="v ${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl2(x.valor)}</div></div>`});
     h=`<div class="list" data-max="0">${h||'<div class="empty">Nada encontrado.</div>'}</div>`;
     if(n>6)h+=`<div class="center" style="margin-top:10px;display:flex;gap:8px;justify-content:center">${n>lim?`<button class="btn" id="mais">Ver mais (${n-lim})</button>`:''}${lim>6?'<button class="btn" id="menos">Ver menos</button>':''}</div>`;
     const tg=l.length&&ms.filter(x=>x.tipo==='sinal').reduce((a,x)=>a+x.valor,0);
