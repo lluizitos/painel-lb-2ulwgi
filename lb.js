@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwjujzri';
+  const BUILD = 'mwjuqxbi';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -441,3 +441,45 @@
   caixa:'<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18M16 14.5h2"/>'};
   LB.ic=(n,c)=>P[n]?`<svg class="ico${c?' '+c:''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`:'';
   const st=document.createElement('style');st.textContent='.ico{width:1em;height:1em;display:inline-block;vertical-align:-.15em;flex:none}';document.head.appendChild(st)})();
+
+/* 16/11: Financeiro embutido (aba Financeiro do Artista e aba Gestão do sócio).
+   Lê as telas e o código da página do Financeiro publicada (../index.html) e roda dentro de box, isolado (shadow DOM),
+   com os dados r já abertos pela página. o.api(acao) responde às chamadas ao servidor (sem ela, vão ao servidor normalmente);
+   o.css = estilo extra. */
+(function () {
+  const carregaJs = src => new Promise((ok, no) => { const e = document.createElement('script'); e.src = src; e.onload = ok; e.onerror = no; document.head.appendChild(e); });
+  LB.financeiro = async function (box, r, o) {
+    o = o || {}; box.innerHTML = '<div style="padding:20px;color:#8B8697">Abrindo o financeiro…</div>';
+    const sv = (document.querySelector('script[src*="lb.js"]') || { getAttribute: () => '' }).getAttribute('src') || '', v = sv.split('?v=')[1] || '';
+    const html = await (await fetch('../index.html' + (v ? '?v=' + v : ''), { cache: 'no-store' })).text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const ajusta = t => t.replace(/href="(vendas|metas|tarefas|agenda|borderos|admin|artista|socio)\//g, 'href="../$1/')
+      .replace(/onclick="fecharBord\(\)"/g, 'onclick="window.__finFecha&&window.__finFecha()"')
+      .replace(/onclick="const s=document\.getElementById\('bds'\)/g, "onclick=\"const s=this.getRootNode().getElementById('bds')");
+    const css = [...doc.querySelectorAll('style')].map(x => x.textContent).join('\n').replace(/:root/g, ':host').replace(/(^|[^\w.#-])html\b/g, '$1:host').replace(/(^|[^\w.#-])body\b/g, '$1.fbody');
+    const code = ajusta([...doc.querySelectorAll('script:not([src])')].map(x => x.textContent).join('\n;\n')) + '\n;try{window.__finFecha=fecharBord}catch(e){}';
+    doc.querySelectorAll('script').forEach(x => x.remove());
+    if (!window.LBV) await carregaJs('../lbvendas.js' + (v ? '?v=' + v : ''));
+    if (!window.LBROT) await carregaJs('../lbmetas.js' + (v ? '?v=' + v : ''));
+    const host = document.createElement('div'); box.innerHTML = ''; box.appendChild(host);
+    const root = host.attachShadow({ mode: 'open' }), fb = document.createElement('div'); fb.className = 'fbody'; fb.innerHTML = ajusta(doc.body.innerHTML);
+    const st = document.createElement('style'); st.textContent = css + `
+.fbody{min-height:0!important;padding-top:0!important;background:transparent!important}
+.fbody header .wrap,.fbody #lbq{display:none!important}.fbody header{position:static!important;top:auto!important;background:transparent!important;border:0!important}
+.fbody main.wrap{padding-left:0!important;padding-right:0!important}` + (o.css || '');
+    root.append(st, fb);
+    const doDoc = new Set(['keydown', 'keyup', 'visibilitychange']);
+    const corpo = new Proxy(fb, { get: (t, k) => k === 'style' ? document.body.style : (typeof t[k] === 'function' ? t[k].bind(t) : t[k]) });
+    const fd = { getElementById: id => root.getElementById(id), querySelector: q => root.querySelector(q), querySelectorAll: q => root.querySelectorAll(q),
+      createElement: (...a) => document.createElement(...a), execCommand: (...a) => document.execCommand(...a), body: corpo, head: document.head, documentElement: document.documentElement,
+      addEventListener: (t, f, x) => (doDoc.has(t) ? document : root).addEventListener(t, f, x), removeEventListener: (t, f, x) => (doDoc.has(t) ? document : root).removeEventListener(t, f, x),
+      get activeElement() { return root.activeElement || document.activeElement; }, set title(x) { }, get title() { return document.title; }, get hidden() { return document.hidden; }, get visibilityState() { return document.visibilityState; } };
+    const fLB = Object.assign(Object.create(LB), { entrar: x => setTimeout(() => x.ok(r), 0), links: () => '', usuario: LB.usuario || r.nome || 'sócio' });
+    const fFetch = async (u, x) => {
+      if (o.api && x && x.method === 'POST') { let a = ''; try { a = JSON.parse(x.body).acao; } catch (e) { } return new Response(JSON.stringify(o.api(a) || { ok: false, erro: 'sem acesso' })); }
+      return fetch(typeof u === 'string' && !/^(https?:|\/|\.\.\/)/.test(u) ? '../' + u : u, x);
+    };
+    new Function('document', 'LB', 'fetch', code)(fd, fLB, fFetch);
+    return root;
+  };
+})();
