@@ -10,6 +10,10 @@
 <link rel="apple-touch-icon" href="icone.png">
 <style>
 #bds.sempix .pe .px{display:none}.pxb{margin:10px 0 0;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card2);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+.atv .fz{display:flex;justify-content:space-between;align-items:center;gap:10px;border:0;border-left:3px solid var(--line);border-radius:10px;padding:9px 12px;margin:6px 0;background:var(--card2);font-size:13.5px;color:var(--ink)}
+.atv .fz.f0{border-left-color:#7FDDA9;background:rgba(127,221,169,.13)}.atv .fz.f1{border-left-color:#6FA8FF;background:rgba(111,168,255,.09)}.atv .fz.f2{color:var(--sub)}
+.atv .fz b{flex:none;font-size:11.5px;font-weight:700;border-radius:99px;padding:3px 9px;background:rgba(255,255,255,.06);color:var(--sub);white-space:nowrap}.atv .fz.f0 b{background:#7FDDA9;color:#141218}.atv .fz.f1 b{background:rgba(111,168,255,.22);color:#BFD8FF}
+.atv .fz span small{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
 .atv{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}.atv .mt{display:flex;justify-content:space-between;gap:10px;font-size:13px}.atv .mt span{color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-size:11px}.atv h5{margin:10px 0 4px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.atv .it{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--line);color:var(--sub)}.atv .it b{white-space:nowrap;color:var(--ink)}
 .info{margin:14px 0 4px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:10px;background:var(--card);font-size:13.5px;color:var(--sub)}.info b{color:var(--ink)}.info ul{margin:6px 0 0;padding-left:18px}.info li{margin:2px 0}
 :root{
@@ -331,10 +335,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwihy0j4"></script>
-<script src="lbmetas.js?v=mwihy0j4"></script>
-<script src="lbchat.js?v=mwihy0j4"></script>
-<script src="lbvendas.js?v=mwihy0j4"></script>
+<script src="lb.js?v=mwii3s8n"></script>
+<script src="lbmetas.js?v=mwii3s8n"></script>
+<script src="lbchat.js?v=mwii3s8n"></script>
+<script src="lbvendas.js?v=mwii3s8n"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -583,10 +587,13 @@ function atv(r,MA){const A=D.atividades||{metas:{},feito:{}},mn=MESES[+MA.slice(
   const rts=pf?(TAR.rotinas||[]).filter(x=>x.pessoa===pf.id&&x.ativo!=='não'&&(!x.inicio||x.inicio.slice(0,7)<=MA)):[];
   rts.forEach(x=>{const p=LBROT.pct(x,MA);L.push(`<div class="it"><span>◎ ${esc(x.titulo)} ${barra(p.pct)}</span><b class="${p.pct>=1?'pos':''}" style="font-weight:600">${p.feitos} de ${p.total}</b></div>`)});
   const tl=pf?TAR.tarefas.filter(t=>t.pessoa===pf.id):[],fe2=tl.filter(t=>(t.concluido_em||'').startsWith(MA)),ab=tl.filter(t=>t.status!=='Concluída'),at=ab.filter(t=>t.prazo&&t.prazo<HOJE);
-  fe2.forEach(t=>L.push(`<div class="it"><span>✓ ${esc(t.titulo)}</span><b class="pos" style="font-weight:600">feito ${ddmm(t.concluido_em)}</b></div>`));
+  /* feitas: as mais recentes primeiro, em cartões coloridos (verde = hoje/ontem, azul = esta semana) */
+  const dAgo=d=>Math.round((new Date(HOJE+'T12:00')-new Date(String(d).slice(0,10)+'T12:00'))/864e5);
+  const FE=fe2.slice().sort((a,b)=>String(b.concluido_em).localeCompare(String(a.concluido_em))).map(t=>{const n=dAgo(t.concluido_em),c=n<=1?'f0':n<=6?'f1':'f2',q=n<=0?'hoje':n===1?'ontem':n<=6?'há '+n+' dias':'feito '+ddmm(t.concluido_em);
+    return `<div class="fz ${c}"><span>✓ ${esc(t.titulo)}${n>1&&n<=6?`<small>${ddmm(t.concluido_em)}</small>`:''}</span><b>${q}</b></div>`});
   if(meta&&typeof meta==='object'&&!rts.length){const f=(A.feito[MA]||{})[r.nome]||{};[['Postagens','postagens'],['Conteúdos produzidos','conteudos']].forEach(([n,k])=>{if(meta[k])L.push(`<div class="it"><span>${n}</span><b>${f[k]==null?'a informar':f[k]} / ${meta[k]}</b></div>`)})}
   const abH=ab.length?`<h5>Em aberto · ${ab.length}${at.length?` · <span class="pk">${at.length} atrasada${at.length>1?'s':''}</span>`:''}</h5><div class="list" data-max="4">${ab.sort((a,b)=>(a.prazo||'9').localeCompare(b.prazo||'9')).map(t=>`<div class="it"><span>${t.status==='Em andamento'?'◐':'○'} ${esc(t.titulo)}${t.justificativa?` <small style="color:#F5C451">· justificou: ${esc(t.justificativa)}</small>`:''}${window.LBROT&&LBROT.andL(t).length?` <small style="display:block;color:var(--sub)">${esc(LBROT.andTxt(t))}</small>`:''}</span><b class="${t.prazo&&t.prazo<HOJE?'pk':''}" style="font-weight:600">${t.prazo?'até '+ddmm(t.prazo):t.status.toLowerCase()}</b></div>`).join('')}</div>`:'';
-  return `<div class="atv"><div class="mt"><span>Meta</span><b>${mt}</b></div><h5>O que fez em ${mn}</h5>${L.length?`<div class="list" data-max="6">${L.join('')}</div>`:`<div class="vend">Nada concluído nem marcado ainda em ${mn}.</div>`}${abH}
+  return `<div class="atv"><div class="mt"><span>Meta</span><b>${mt}</b></div><h5>O que fez em ${mn}${FE.length?' · '+FE.length+' entrega'+(FE.length>1?'s':''):''}</h5>${FE.length?`<div class="list" data-max="5">${FE.join('')}</div>`:''}${L.length?`<div class="list" data-max="6">${L.join('')}</div>`:''}${!FE.length&&!L.length?`<div class="vend">Nada concluído nem marcado ainda em ${mn}.</div>`:''}${abH}
     <div class="vend" style="font-size:11.5px">Muda sozinho: tarefas concluídas e metas marcadas (Admin → Individuais)${/Bruninho|Bruno/.test(r.nome)?' e shows vendidos no mês (data da venda)':''}.</div></div>`}
 let TAR={perfis:[],tarefas:[]};
 function perfilDe(nome){const n=LB.norm(nome);return TAR.perfis.find(p=>{const q=LB.norm(p.nome);return q===n||n.startsWith(q+' ')||q.startsWith(n+' ')})}
