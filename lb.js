@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwjrsvwu';
+  const BUILD = 'mwjs6jc0';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -423,3 +423,21 @@
   const vmTudo = () => document.querySelectorAll('.list, .gp').forEach(l => { if (!l.closest('[data-semvm]')) colapsa(l); });
   new MutationObserver(() => { clearTimeout(vmT); vmT = setTimeout(vmTudo, 40); }).observe(document.documentElement, { childList: true, subtree: true });
 })();
+
+/* ícones monocromáticos (traço na cor do texto) — LB.ic('show') */
+(function(){const P={
+  show:'<rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/>',
+  pag:'<circle cx="12" cy="12" r="9"/><path d="M14.8 9.3c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2s1.2 1.6 2.8 1.9 2.8.8 2.8 2-1.2 2-2.8 2c-1.3 0-2.4-.5-2.9-1.4M12 6.2v1.7M12 16.1v1.7"/>',
+  tar:'<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9"/>',
+  emp:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/>',
+  sino:'<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/>',
+  alerta:'<path d="M12 3.5L2.8 19.5h18.4z"/><path d="M12 10v4.2M12 17.2v.1"/>',
+  recibo:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+  pino:'<path d="M9 3h6l-1 6 3 3H7l3-3z"/><path d="M12 12v9"/>',
+  agenda:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  saida:'<rect x="3" y="7" width="18" height="12" rx="2.5"/><path d="M12 3v9M8.5 6.5L12 3l3.5 3.5"/>',
+  jornal:'<path d="M4 5h13v14H6a2 2 0 0 1-2-2z"/><path d="M17 9h3v8a2 2 0 0 1-2 2M7.5 9h6M7.5 12.5h6M7.5 16h4"/>',
+  ok:'<circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7 5.3-5.6"/>',
+  caixa:'<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18M16 14.5h2"/>'};
+  LB.ic=(n,c)=>P[n]?`<svg class="ico${c?' '+c:''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`:'';
+  const st=document.createElement('style');st.textContent='.ico{width:1em;height:1em;display:inline-block;vertical-align:-.15em;flex:none}';document.head.appendChild(st)})();

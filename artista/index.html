@@ -184,7 +184,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .vq{background:var(--card);border-radius:14px;padding:14px 16px}.vr{padding:9px 0;border-top:1px solid var(--line)}.vr:first-of-type{border-top:0}.vr .top{display:flex;justify-content:space-between;gap:10px;font-size:13.5px}.vr .top b{font-weight:600}.vr .top span{font-weight:800}
 .vr .br{display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--card2);margin-top:6px}.vr .br i{display:block;height:100%}
 .v-fx{background:#6F697D}.v-sh{background:#CF1D51}.v-av{background:#F2B66B}
-.ce .ic2,.ev .ic2{font-style:normal;margin-right:3px}
+.ce .ic2,.ev .ic2{font-style:normal;margin-right:3px}.ce .ico{margin-right:2px;stroke-width:2.4}.chip .ico,.clg .ico{opacity:.85}
 </style>
 </head>
 <body>
@@ -224,9 +224,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwjrsvwu"></script>
-<script src="../lbmetas.js?v=mwjrsvwu"></script>
-<script src="../lbchat.js?v=mwjrsvwu"></script>
+<script src="../lb.js?v=mwjs6jc0"></script>
+<script src="../lbmetas.js?v=mwjs6jc0"></script>
+<script src="../lbchat.js?v=mwjs6jc0"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -266,11 +266,11 @@ function urgentes(){const U=[];
   ((MIN&&MIN.tarefas)||[]).forEach(t=>{if(t.status==='Concluída'||!ISO.test(t.prazo||''))return;const n=dias(t.prazo);
     if(n<=1)U.push({t:'Sua tarefa: '+t.titulo,s:n<0?'atrasada desde '+ddmm(t.prazo):n===0?'é hoje':'é amanhã',d:t.prazo})});
   const UF=U.filter(u=>u.fixo),UL=UF.concat(U.filter(u=>!u.fixo).slice(0,3)),min=ST.get('lb_urg_min')==='1';
-  document.getElementById('urg').innerHTML=!UL.length?'':`<div class="urgh"><span>🔔 <b>${UL.length} aviso${UL.length>1?'s':''}</b></span><button type="button" data-urgmin>${min?'ver ▾':'minimizar ▴'}</button></div>`+(min?'':UL.map(u=>`<button class="urg" data-urd="${esc(u.d)}">${IC.al}<span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join(''))}
+  document.getElementById('urg').innerHTML=!UL.length?'':`<div class="urgh"><span>${LB.ic('sino')} <b>${UL.length} aviso${UL.length>1?'s':''}</b></span><button type="button" data-urgmin>${min?'ver ▾':'minimizar ▴'}</button></div>`+(min?'':UL.map(u=>`<button class="urg" data-urd="${esc(u.d)}">${IC.al}<span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join(''))}
 document.getElementById('urg').onclick=e=>{if(e.target.closest('[data-urgmin]')){ST.set('lb_urg_min',ST.get('lb_urg_min')==='1'?'0':'1');urgentes();return}const b=e.target.closest('.urg');if(!b)return;setor('agenda');if(b.dataset.urd)diaPop(b.dataset.urd)};
 
 /* ======================= AGENDA ======================= */
-const CAT={show:{n:'Shows',c:'pt-s',i:'🎤'},pag:{n:'Pagamentos',c:'pt-c',i:'💰'},tar:{n:'Tarefas',c:'pt-t',i:'📝'},emp:{n:'Empresa',c:'pt-e',i:'🎯'}};
+const CAT={show:{n:'Shows',c:'pt-s',i:LB.ic('show')},pag:{n:'Pagamentos',c:'pt-c',i:LB.ic('pag')},tar:{n:'Tarefas',c:'pt-t',i:LB.ic('tar')},emp:{n:'Empresa',c:'pt-e',i:LB.ic('emp')}};
 const ICO=x=>`<i class="ic2">${(CAT[x.cat]||{}).i||''}</i>`;
 let OCULTO=new Set(jso(ST.get('lb_art_oculto')).l||[]),VIS=ST.get('lb_art_vis')||'mes',REF=HOJE;
 function bordDe(s){const B=D.borderos||{};if(s.cod&&B[s.cod])return B[s.cod];if(s.bordero_app&&B[s.bordero_app])return B[s.bordero_app];
@@ -311,7 +311,7 @@ function renderCal(){const el=document.getElementById('cal'),y=+REF.slice(0,4),m
     el.innerHTML=h+legenda();return}
   const dt=new Date(REF+'T12:00');document.getElementById('ctit').textContent=DSL[dt.getDay()]+', '+(+REF.slice(8))+' de '+MESES[mo];
   const l=eventos(REF,REF);el.innerHTML=(l.map(evHtml).join('')||'<div class="vazio">Nada neste dia.</div>')+legenda()}
-const legenda=()=>'<div class="clg"><span><em class="pt-s"></em>🎤 show</span><span><em class="pt-c"></em>💰 pagamento</span><span><em class="pt-t"></em>📝 tarefa</span><span><em class="pt-e"></em>🎯 empresa</span><span><em class="pt-a"></em>vencido / atrasado</span><span style="opacity:.5;text-decoration:line-through">pago / feito</span></div>';
+const legenda=()=>'<div class="clg"><span><em class="pt-s"></em>'+LB.ic('show')+' show</span><span><em class="pt-c"></em>'+LB.ic('pag')+' pagamento</span><span><em class="pt-t"></em>'+LB.ic('tar')+' tarefa</span><span><em class="pt-e"></em>'+LB.ic('emp')+' empresa</span><span><em class="pt-a"></em>vencido / atrasado</span><span style="opacity:.5;text-decoration:line-through">pago / feito</span></div>';
 document.getElementById('cvis').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;VIS=b.dataset.v;ST.set('lb_art_vis',VIS);renderCal()};
 document.getElementById('cprev').onclick=()=>nav(-1);document.getElementById('cnext').onclick=()=>nav(1);
 document.getElementById('choje').onclick=()=>{REF=HOJE;renderCal()};
