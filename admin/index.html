@@ -84,6 +84,8 @@ label textarea{min-height:60px;resize:vertical}
 .pcl{margin-top:8px;font-size:12.5px}.pcl>div{margin-top:4px}.pcl b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--sub)}.pcl span{display:block;padding:3px 0;border-bottom:1px solid var(--line)}
 .ppf .ppx{margin-top:8px}
 /* 16/11: formulários em pop-up, Metas e Tarefas, Notificações, Pagamentos separados, Extrato */
+.mtf{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-2px 0 12px}.mtf input{flex:1;min-width:180px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:inherit;font:inherit;font-size:14px;padding:9px 12px}
+.mseg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:99px;overflow:hidden}.mseg button{background:none;border:0;padding:8px 14px;font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);cursor:pointer}.mseg button.on{background:var(--card2);color:var(--ink)}
 .shc .card{background:none;padding:0}.shc h3{display:none}
 .nv2{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
 .mtq{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
@@ -110,6 +112,7 @@ label textarea{min-height:60px;resize:vertical}
   <div id="t_mt" style="display:none">
     <div class="nv2"><button class="btn pkb" id="mt_nt">＋ Nova tarefa</button><button class="btn pkb" id="mt_nm">＋ Nova meta</button></div>
     <div class="chips" id="mt_chips"></div>
+    <div class="mtf"><span class="mseg" id="mt_tipo"><button data-k="" class="on">Tudo</button><button data-k="meta">Metas</button><button data-k="tarefa">Tarefas</button></span><input id="mt_q" type="search" placeholder="Pesquisar metas e tarefas…" autocomplete="off"></div>
     <div id="mt_todos"></div><div id="mt_emp"></div><div id="mt_pes"></div>
   </div>
   <!-- NOTIFICAÇÕES (alertas e despesas previstas + página do sócio) -->
@@ -340,8 +343,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwjszopm"></script>
-<script src="../lbmetas.js?v=mwjszopm"></script>
+<script src="../lb.js?v=mwjt40p6"></script>
+<script src="../lbmetas.js?v=mwjt40p6"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -888,8 +891,18 @@ function mtChips(){const A=ativos();if(MTV!=='todos'&&MTV!=='emp'&&!A.some(p=>p.
   const nG=new Set(TF.filter(t=>t.grupo&&t.status!=='Concluída').map(t=>t.grupo)).size,nE=MT.filter(x=>['meta','tarefa'].includes(x.tipo||'meta')&&!fechado(x)).length;
   $('mt_chips').innerHTML=`<button class="chip${MTV==='emp'?' on':''}" data-v="emp">${LB.ic('emp')} Empresa${nE?`<small>${nE}</small>`:''}</button>`+A.map(p=>{const n=TF.filter(t=>t.pessoa===p.id&&t.status!=='Concluída').length;return `<button class="chip${p.id===MTV?' on':''}" data-v="${esc(p.id)}">${esc(p.nome)}${n?`<small>${n}</small>`:''}</button>`}).join('')+`<button class="chip${MTV==='todos'?' on':''}" data-v="todos">Toda a equipe${nG?`<small>${nG}</small>`:''}</button>`}
 function mtVer(){mtChips();$('mt_todos').style.display=MTV==='todos'?'':'none';$('mt_emp').style.display=MTV==='emp'?'':'none';$('mt_pes').style.display=MTV!=='todos'&&MTV!=='emp'?'':'none';
-  if(MTV==='emp'){$('mt_emp').appendChild($('e_lista'));EFIL='meta,tarefa';renderEmp()}
-  else if(MTV!=='todos'){SEL=MTV;renderInd();renderRot()}}
+  if(MTV==='emp'){$('mt_emp').appendChild($('e_lista'));EFIL=MTK||'meta,tarefa';renderEmp()}
+  else if(MTV!=='todos'){SEL=MTV;renderInd();renderRot()}mtFiltra()}
+/* 16/11: filtro Tudo / Metas / Tarefas e pesquisa (vale para Empresa, cada pessoa e Toda a equipe) */
+let MTK='',MTQ='';
+function mtFiltra(){const q=LB.norm(MTQ.trim()),vis=(el,v)=>{if(el)el.style.display=v?'':'none'};
+  if(MTV!=='todos'&&MTV!=='emp'){const m=MTK!=='tarefa',t=MTK!=='meta';vis($('r_h'),m);vis($('r_h').nextElementSibling,m);vis($('r_lista'),m);vis($('i_fil'),t);vis($('i_lista'),t)}
+  vis($('g_lista'),MTK!=='meta');
+  ['e_lista','g_lista','i_lista','r_lista'].forEach(id=>{const c=$(id);if(!c)return;c.querySelectorAll('.tf').forEach(x=>{const v=!q||LB.norm(x.textContent).includes(q);if((x.style.display==='none')===v)x.style.display=v?'':'none'});
+    c.querySelectorAll('details').forEach(d=>{const a=[...d.querySelectorAll('.tf')].some(x=>x.style.display!=='none'),v=a?'':'none';if(d.style.display!==v)d.style.display=v;if(q&&a&&!d.open)d.open=true})})}
+$('mt_tipo').onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;MTK=b.dataset.k;$('mt_tipo').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));mtVer()};
+$('mt_q').oninput=e=>{MTQ=e.target.value;mtFiltra()};
+{let tm=0;new MutationObserver(()=>{clearTimeout(tm);tm=setTimeout(mtFiltra,30)}).observe($('t_mt'),{childList:true,subtree:true})}
 $('mt_chips').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;MTV=b.dataset.v;mtVer()};
 {const r0=render;render=function(){r0();if($('t_mt').style.display!=='none')mtVer();else mtChips()}}
 /* ---------- EXTRATO: PDF → texto (sem dados pessoais) → IA → compara com o que foi lançado no app ---------- */
@@ -924,7 +937,7 @@ function xtRender(){const el=$('xt_res');if(!XT.length){el.innerHTML='';return}c
     if(d){e.preventDefault();if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent='toque de novo para apagar';return}try{XT=(await api({acao:'excluir_extrato',id:d.dataset.xdel})).extratos||[];xtRender()}catch(er){d.textContent='erro'}}}}
 {const a0=lnAbre;lnAbre=async function(){await a0();xtCarrega()};const r0=lnRender;lnRender=function(){r0();if(XTOK)xtRender()}}
 </script>
-<script src="../lbchat.js?v=mwjszopm"></script>
+<script src="../lbchat.js?v=mwjt40p6"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>
