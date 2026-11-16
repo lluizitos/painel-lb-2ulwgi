@@ -187,9 +187,9 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <footer>Lucas Barros Ltda · números do extrato bancário, do caixa em dinheiro e das planilhas de cada show (borderôs)</footer>
 </main>
 </div>
-<script src="../lb.js?v=mwjl6mjq"></script>
-<script src="../lbchat.js?v=mwjl6mjq"></script>
-<script src="../lbvendas.js?v=mwjl6mjq"></script>
+<script src="../lb.js?v=mwjlpiyb"></script>
+<script src="../lbchat.js?v=mwjlpiyb"></script>
+<script src="../lbvendas.js?v=mwjlpiyb"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -212,31 +212,7 @@ const vm=(itens,n)=>itens.length<=n?itens.join(''):itens.map((x,i)=>i<n?x:`<div 
 const leg=(S,o={})=>`<div class="leg">${S.map(s=>`<span><i style="${s.tipo==='linha'?`background:${s.cor};border-radius:99px;height:3px;vertical-align:3px;width:14px`:s.tipo==='contorno'?`background:transparent;border:1.5px solid ${s.cor}`:`background:${s.cor}`}"></i>${esc(s.nome)}${s.hoje?` <b style="color:var(--ink)">${esc(s.hoje)}</b>`:''}</span>`).join('')}${o.media?`<span><i style="background:#F2B66B;border-radius:99px;height:3px;vertical-align:3px;width:14px"></i>Média de 3 meses</span>`:''}</div>`;
 /* gráfico de barras no formato do Vendas · series=[{nome,cor,vals,tipo}] tipo: 'barra' (cheia, padrão) · 'contorno' (só a borda, ex.: marcados) · 'linha' (linha por cima, ex.: saldo)
    o: modo 'lado' (lado a lado) ou empilhado · ks (chaves AAAA-MM: põe o ano embaixo) · hi (coluna destacada) · media (linha da média de 3 meses) · fmt (número em cima) · tfmt (valores no toque) · nomes (título no toque) */
-function grafico(labels,series,o={}){const n=labels.length,W=360,H=o.h||(o.ks?178:160),pl=8,pr=8,pt=18,pb=o.ks?30:20,cw=(W-pl-pr)/n,fmt=o.fmt||(v=>v),tf=o.tfmt||fmt,lado=o.modo==='lado';
-  const B=series.filter(s=>s.tipo!=='linha'),L=series.filter(s=>s.tipo==='linha'),V=(s,i)=>Math.max(0,+s.vals[i]||0);
-  const tot=labels.map((_,i)=>B.reduce((a,s)=>a+V(s,i),0)),cheio=labels.map((_,i)=>B.filter(s=>s.tipo!=='contorno').reduce((a,s)=>a+V(s,i),0));
-  const lv=L.flatMap(s=>s.vals.filter(v=>v!=null&&isFinite(v)).map(Number));
-  const mx=Math.max(1,...(lado?labels.flatMap((_,i)=>B.map(s=>V(s,i))):tot),...lv),mn=Math.min(0,...lv),ph=H-pt-pb,y=v=>pt+ph*(mx-v)/(mx-mn),y0=y(0);
-  let g='',tx='';const pass=n>14;
-  labels.forEach((l,i)=>{const x0=pl+i*cw;
-    if(i===o.hi)g+=`<rect x="${x0}" y="${pt-12}" width="${cw}" height="${ph+12}" fill="#F3F1F6" opacity=".06"/>`;
-    if(lado){const k=B.length,gw=cw*.8,bw=gw/k;B.forEach((s,j)=>{const v=V(s,i);if(v)g+=`<rect x="${x0+cw*.1+j*bw+.8}" y="${y(v)}" width="${Math.max(1,bw-1.6)}" height="${y0-y(v)}" rx="2.5" fill="${s.cor}"/>`})}
-    else{const bw=Math.max(4,cw*.62),bx=x0+(cw-bw)/2;
-      const ct=B.find(s=>s.tipo==='contorno');if(ct&&tot[i])g+=`<rect x="${bx}" y="${y(tot[i])}" width="${bw}" height="${y0-y(tot[i])}" rx="3" fill="none" stroke="${ct.cor}" stroke-width="1.3"/>`;
-      let a=0;B.filter(s=>s.tipo!=='contorno').forEach(s=>{const v=V(s,i);if(!v)return;g+=`<rect x="${bx}" y="${y(a+v)}" width="${bw}" height="${y(a)-y(a+v)}" rx="3" fill="${s.cor}"/>`;a+=v});
-      if(o.rot!==false&&tot[i])tx+=`<text x="${bx+bw/2}" y="${y(tot[i])-4}" text-anchor="middle" font-size="10.5" fill="#B8B3C3" stroke="#1E1C24" stroke-width="3" paint-order="stroke">${fmt(tot[i])}</text>`}
-    if(!pass||i%2===0||i===o.hi)g+=`<text x="${x0+cw/2}" y="${H-pb+15}" text-anchor="middle" font-size="10.5" font-weight="${i===o.hi?700:400}" fill="${i===o.hi?'#F0507E':'#8B8697'}">${esc(l)}</text>`;
-    if(o.ks&&(i===0||o.ks[i].slice(5)==='01'))g+=`<text x="${x0+cw/2}" y="${H-3}" text-anchor="middle" font-size="9" fill="#8B8697">${o.ks[i].slice(0,4)}</text>`});
-  g+=`<line x1="${pl}" x2="${W-pr}" y1="${y0}" y2="${y0}" stroke="#3A3644"/>`;
-  if(o.media){const pts=[];labels.forEach((_,i)=>{if(o.hi!=null&&o.hi>=0&&i>o.hi)return;const j=[i,i-1,i-2].filter(q=>q>=0);pts.push(`${pl+i*cw+cw/2},${y(j.reduce((a,q)=>a+tot[q],0)/j.length)}`)});
-    if(pts.length>1)g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="#F2B66B" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`}
-  L.forEach(s=>{const P=labels.map((_,i)=>s.vals[i]==null||!isFinite(s.vals[i])?null:[pl+i*cw+cw/2,y(+s.vals[i])]).filter(Boolean);
-    const pp=P.map(p=>p.join(',')).join(' ');if(P.length>1)g+=`<polyline points="${pp}" fill="none" stroke="#1E1C24" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${pp}" fill="none" stroke="${s.cor}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`;
-    P.forEach(p=>g+=`<circle cx="${p[0]}" cy="${p[1]}" r="3.2" fill="${s.cor}" stroke="#1E1C24" stroke-width="1.5"/>`)});
-  g+=tx;
-  labels.forEach((l,i)=>{const ss=series.filter(s=>s.vals[i]!=null&&(s.tipo==='linha'||+s.vals[i]));const t=(o.nomes?o.nomes[i]:l)+': '+(ss.length?ss.map(s=>s.nome+' '+tf(+s.vals[i])).join(' · '):'nada');
-    g+=`<rect x="${pl+i*cw}" y="0" width="${cw}" height="${H}" fill="#F3F1F6" opacity="0" data-t="${esc(t)}" style="cursor:pointer"/>`});
-  return `<div class="chart">${o.semLeg?'':leg(series,o)}<svg viewBox="0 0 ${W} ${H}" role="img">${g}</svg><div class="tip">${esc(o.dica||'Toque numa barra para ver os valores.')}</div></div>`}
+function grafico(labels,series,o={}){return LB.grafico(labels,series,o)} // o mesmo gráfico de todas as páginas (lb.js)
 /* rosca: S = [[nome, valor, cor]] · centro = total */
 const PAL=['var(--pink)','var(--amber)','#8EC5FF','var(--pos)','#C9A0FF','var(--sai)','#5FD3C6'];
 function dnt(titulo,S){S=S.filter(x=>x[1]>0.5);const tt=S.reduce((a,x)=>a+x[1],0);if(!tt)return '';let a0=0;const R=15.9155;
@@ -368,7 +344,7 @@ function renderEquipe(){const M=D.metas_empresa||[],E=D.equipe_resumo,EV=D.equip
       return `<div class="eqc"><div class="n"><b>${esc(p.nome)}</b></div>${p.funcao?`<div class="f">${esc(p.funcao)}</div>`:''}
         <div class="grid g3">${k4('Em aberto',p.abertas,'')}${k4('Atrasadas',p.atrasadas,'',p.atrasadas?'neg':'')}${k4('Feitas no mês',p.concluidas,'','pos')}</div>
         <h5>Em aberto <span>${ab.length}</span></h5><div>${ab.length?vm(abL,3):'<div><div class="tl"><span style="color:var(--muted)">nada em aberto</span></div></div>'}</div>
-        <h5>Cumpridas <span>${fe.length} no total · por semana</span></h5>${sm.some(Boolean)?grafico(SEM,[{nome:'Cumpridas',cor:'#7FDDA9',vals:sm}],{semLeg:true,h:110,nomes:SEM.map(s=>'semana de '+s)}):'<div><div class="tl"><span style="color:var(--muted)">nenhuma nas últimas 8 semanas</span></div></div>'}
+        <h5>Cumpridas <span>${fe.length} no total · por semana</span></h5>${sm.some(Boolean)?grafico(SEM,[{nome:'Cumpridas',cor:'#7FDDA9',vals:sm}],{semLeg:true,plano:true,nomes:SEM.map(s=>'semana de '+s)}):'<div><div class="tl"><span style="color:var(--muted)">nenhuma nas últimas 8 semanas</span></div></div>'}
         ${fe.length?`<div style="margin-top:6px">${vm(feL,3)}</div>`:''}
         ${rot.length?`<h5>Metas do mês</h5>${rot.map(r=>`<div class="rt"><div class="top"><span>${esc(r.titulo)}</span><b>${r.comeca?'começa '+ddmm(r.comeca):Math.round(r.pct*100)+'%'}</b></div><div class="tr"><i style="width:${Math.min(100,r.pct*100)}%;background:${r.pct>=1?'var(--pos)':r.pct>=.5?'var(--amber)':'var(--pink)'}"></i></div></div>`).join('')}`:''}
       </div>`}).join('')}

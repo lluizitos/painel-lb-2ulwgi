@@ -305,8 +305,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwjl6mjq"></script>
-<script src="../lbmetas.js?v=mwjl6mjq"></script>
+<script src="../lb.js?v=mwjlpiyb"></script>
+<script src="../lbmetas.js?v=mwjlpiyb"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -629,9 +629,10 @@ const CJ_ACOES={
   'rc|a_mais':c=>[['din','Foi em dinheiro'],['vai','Ainda vai cair na conta'],['apaga','Lançado por engano (apagar)'],['outro','Outro motivo']],
   'pg|valor':c=>[['ext','O extrato está certo (diferença em dinheiro/outra conta)'],['juros','Juros, multa ou taxa'],['outro','Outro motivo']],
   'pg|a_mais':c=>[['din','Pago em dinheiro / outra conta'],['vai','Ainda vai sair'],['desm','Não foi pago (desmarcar)'],['outro','Outro motivo']],
+  'rc|outro_show':c=>[['este','É deste show (o extrato estava ligado errado)'],['aquele','É do outro show (lançado errado em Vendas)'],['outro','Outro motivo']],
   'ext|a_menos':c=>[['vendas','Lançar em Vendas'],['nao','Não é cachê de show'],['ja','Já lançado em outro show'],['outro','Outro motivo']]};
 const cjDe=c=>CJ.find(j=>j.chave===c.k);
-function lnConf(){const T={a_mais:['a mais','lançado e não está no extrato'],a_menos:['a menos','no extrato e não lançado'],valor:['valor diferente','']};
+function lnConf(){const T={a_mais:['a mais','lançado e não está no extrato'],a_menos:['a menos','no extrato e não lançado'],valor:['valor diferente',''],outro_show:['outro show','no extrato está ligado a outro show']};
   const A=(AD.conf||[]).filter(c=>!cjDe(c)),J=(AD.conf||[]).filter(c=>cjDe(c)),ix=c=>(AD.conf||[]).indexOf(c);
   const it=(c,j)=>`<div class="cfi"><span class="pill ${j?'ok':c.tipo==='a_menos'?'am':'neg'}">${T[c.tipo][0]}</span><div style="flex:1;min-width:0"><b>${ddmm(c.data)} · ${esc(c.quem||'—')} · ${brl2(c.valor)}</b><small>${esc(c.msg)}${c.show?' · '+esc(c.show):''}${c.por?' · lançado por '+esc(c.por):''}</small>
     ${j?`<small style="color:var(--pos)">✓ ${esc(j.acao)}${j.obs?' — '+esc(j.obs):''} <span style="color:var(--muted)">(${esc(j.por||'')} ${esc(String(j.atualizado_em||'').slice(8,10)+'/'+String(j.atualizado_em||'').slice(5,7))})</span> · <a href="#" data-cu="${ix(c)}" style="color:var(--muted)">desfazer</a></small>`
@@ -780,7 +781,7 @@ $('duv_f').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;DUVF=b.
 $('duv_l').addEventListener('click',async e=>{const b=e.target.closest('[data-ds]');if(!b)return;const r=document.querySelector(`[data-dr="${b.dataset.ds}"]`).value.trim();if(!r){b.textContent='escreva a resposta';return}
   b.disabled=true;b.textContent='enviando…';try{DUV=(await api({acao:'responder_duvida',id:b.dataset.ds,resposta:r})).duvidas||DUV;duvRender()}catch(err){b.disabled=false;b.textContent='não enviou: '+err.message}});
 </script>
-<script src="../lbchat.js?v=mwjl6mjq"></script>
+<script src="../lbchat.js?v=mwjlpiyb"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

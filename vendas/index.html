@@ -170,8 +170,8 @@ label textarea{min-height:64px;resize:vertical}
 </form></div>
 <div id="vw"><div class="vwc"><div id="vwb"></div><button type="button" class="btn" id="vwx">Fechar</button></div></div>
 
-<script src="../lb.js?v=mwjl6mjq"></script>
-<script src="../lbvendas.js?v=mwjl6mjq"></script>
+<script src="../lb.js?v=mwjlpiyb"></script>
+<script src="../lbvendas.js?v=mwjlpiyb"></script>
 <script>
 const TIPOS=['Show','Prefeitura','Casamento','Aniversário','Formatura','Evento corporativo','Evento de fim de ano','Réveillon','Rodeio','Exposição','Show próprio (Sem Roteiro)','Show próprio (Colab)'];
 const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
@@ -253,7 +253,7 @@ function renderMeu(){const el=document.getElementById('tmeu'),S=SHOWS.filter(s=>
   h+=`<h3>Comparativo</h3><div class="mk3">${cc('Este mês',MA)}${cc('Mês passado',mesAnt)}${cc('Mesmo mês '+A1,A1+MA.slice(4))}</div><div style="margin-top:10px">`+
     grafV(mm.map(MS),[{nome:A1+' ('+mA1.length+')',cor:'#6F697D',vals:mm.map(k=>doM(mA1,A1+k.slice(4)).length)},{nome:ANO+' ('+mAno.length+')',cor:'#F0507E',vals:mm.map(k=>doM(mAno,k).length)}],{modo:'lado',ks:mm,hi:+MA.slice(5,7)-1,tfmt:v=>v+' show'+(v===1?'':'s')})+'</div>';
   h+=`<div class="g2"><div><h3>Cidades <small>${Object.keys(cid).length}</small></h3>${hbV(Object.entries(cid).sort((a,b)=>b[1]-a[1]).slice(0,6))}</div><div><h3>Por tipo de show</h3>${hbV(Object.entries(tip).sort((a,b)=>b[1]-a[1]).map(([n,v])=>[n,v,'#7AB8FF']),brl)}</div></div>`;
-  h+=`<h3>Falta receber dos meus shows <small>${rec.length?brl(frec):''}</small></h3><div class="hb">${rec.sort((a,b)=>a.data.localeCompare(b.data)).slice(0,8).map(s=>`<div class="rl"><span>${s.data.slice(8,10)}/${s.data.slice(5,7)} · ${esc(s.evento||s.tipo||'Show')} · ${esc(s.cidade||'')}</span><b>${brl((+s.valor||0)-(+s.recebido||0))}</b></div>`).join('')||'<p class="note" style="margin:0">Nada a receber. 👏</p>'}</div>`;
+  h+=`<h3>Falta receber dos meus shows <small>${rec.length?brl(frec):''}</small></h3><div class="hb">${rec.sort((a,b)=>a.data.localeCompare(b.data)).slice(0,8).map(s=>`<div class="rl"><span>${s.data.slice(8,10)}/${s.data.slice(5,7)} · ${esc(s.evento||s.tipo||'Show')} · ${esc(s.cidade||'')}</span><b>${brl((+s.valor||0)-(+s.recebido||0))}</b></div>`).join('')||'<p class="note" style="margin:0">Nada a receber.</p>'}</div>`;
   el.innerHTML=h}
 document.getElementById('tmeu').addEventListener('click',e=>{const w=e.target.closest('[data-meu]');if(w){MEU=w.dataset.meu;renderMeu();return}
   const t=e.target.closest('[data-t]');if(t){const x=t.closest('.chart').querySelector('.tip');if(x)x.textContent=t.dataset.t}});
@@ -364,10 +364,15 @@ async function salvarRc(){const m=document.getElementById('r_msg'),v=num(documen
   if(!v||v<=0){m.innerHTML='<span class="neg">Informe o valor.</span>';return}if(!d){m.innerHTML='<span class="neg">Informe a data.</span>';return}
   const r={data:d,valor:v,meio:document.getElementById('r_m').value,quem:document.getElementById('r_q').value.trim(),obs:document.getElementById('r_o').value.trim(),por:RCED.por||NOME,lancado_em:RCED.lancado_em||HOJE};
   if(RCED.anexo)r.anexo=RCED.anexo;if(RCED.extrato)r.extrato=RCED.extrato;
-  const f=document.getElementById('r_f').files[0];
-  if(f){m.textContent='Enviando comprovante…';try{const a=await prepArq(f),x=await api({acao:'anexo',dados:a.dados,tipo:a.tipo,show:(ef.data.value||'')+' '+(ef.cidade.value||'')});if(!x.ok)throw new Error(x.erro||'erro');r.anexo={id:x.id,nome:x.nome,tipo:x.tipo}}
+  const aviso=[];const f=document.getElementById('r_f').files[0];
+  if(f){m.textContent='Enviando comprovante…';try{const a=await prepArq(f),x=await api({acao:'anexo',dados:a.dados,tipo:a.tipo,show:(ef.data.value||'')+' '+(ef.cidade.value||'')});if(!x.ok)throw new Error(x.erro||'erro');r.anexo={id:x.id,nome:x.nome,tipo:x.tipo}
+    /* a IA do site lê o comprovante: vale a data dele (se for antes do extrato, o saldo segue o extrato e o Admin liga/alerta) */
+    try{m.textContent='Lendo o comprovante…';const c=await api({acao:'ler_comprovante',id:x.id});
+      if(c.ok&&c.lido){const dd=v=>v.split('-').reverse().join('/');
+        if(c.data!==r.data){aviso.push('Data ajustada pelo comprovante: '+dd(c.data)+' (estava '+dd(r.data)+').');r.obs=[r.obs,'data pelo comprovante (lançado '+dd(r.data)+')'].filter(Boolean).join(' · ');r.data=c.data}
+        if(c.valor&&Math.abs(c.valor-v)>0.5)aviso.push('Atenção: o comprovante mostra '+brl(c.valor)+', foi lançado '+brl(v)+'. Confira o valor.')}}catch(e){}}
     catch(e){m.innerHTML='<span class="neg">Comprovante não foi ('+esc(e.message)+'). Tente de novo ou lance sem ele.</span>';return}}
-  if(RCED._i!=null)RC[RCED._i]=r;else RC.push(r);RC.sort((a,b)=>a.data.localeCompare(b.data));RCED=null;renderPg();prev();await gravarPg()}
+  if(RCED._i!=null)RC[RCED._i]=r;else RC.push(r);RC.sort((a,b)=>a.data.localeCompare(b.data));RCED=null;renderPg();prev();await gravarPg();if(aviso.length){const g=document.getElementById('msg');if(g)g.innerHTML+='<div class="rcav" style="margin-top:6px;color:var(--amber);font-size:13px">'+aviso.map(esc).join('<br>')+'</div>'}}
 /* show já salvo: o pagamento vai direto para a planilha (não precisa tocar em Salvar) */
 async function gravarPg(){const m=document.getElementById('msg');
   if(!editId){m.innerHTML='<span style="color:var(--amber)">Pagamento anotado. Toque em Salvar para criar o show.</span>';return}
@@ -435,7 +440,7 @@ ef.addEventListener('submit',async e=>{e.preventDefault();const m=document.getEl
   catch(err){m.innerHTML='<span class="neg">Não salvou ('+esc(err.message)+'). Tente de novo.</span>'}
   bt.disabled=false});
 </script>
-<script src="../lbchat.js?v=mwjl6mjq"></script>
+<script src="../lbchat.js?v=mwjlpiyb"></script>
 <script>LBCHAT.auto(document.querySelector('main.wrap').firstElementChild,{base:'../',pagina:'Vendas',exemplo:'quantos shows vendi este mês?'})</script>
 </body>
 </html>
