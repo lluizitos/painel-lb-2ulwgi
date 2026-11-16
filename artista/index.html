@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#ffffff">
+<title>Artista · Lucas Barros</title>
+<link rel="icon" href="../icone.png"><link rel="apple-touch-icon" href="../icone.png">
+<!-- Página do Lucas: o mínimo de informação, tudo grande, fundo branco. Metas (empresa, minhas tarefas, equipe, pagamentos) e Shows (agenda + borderô de cada show). -->
+<style>
+:root{--bg:#fff;--card:#F6F4F8;--card2:#EEEAF2;--line:#E2DDE8;--ink:#1B1820;--sub:#4A4553;--muted:#8A8494;--pink:#E0115F;--pinkl:#E0115F;--hot:#FF5A1F;--neg:#D7263D;--pos:#14945A;--amber:#E08A00;--blue:#2F6FE0}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 120px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0 6px}
+header.top img{height:30px}header.top .links{display:flex;align-items:center;gap:8px}header.top .sair{color:var(--muted);font-size:14px;text-decoration:none;padding:8px 4px}
+.ola{font-size:30px;font-weight:900;margin:10px 0 4px;letter-spacing:-.01em}.ola em{font-style:normal;color:var(--pink)}
+/* avisos urgentes (piscando) */
+#urg{display:grid;gap:10px;margin:12px 0 4px}#urg:empty{display:none}
+.urg{display:flex;gap:12px;align-items:center;background:var(--neg);color:#fff;border-radius:18px;padding:14px 16px;font-size:18px;font-weight:800;line-height:1.25;animation:pisca 1.2s ease-in-out infinite;cursor:pointer;border:0;text-align:left;width:100%;font-family:inherit}
+.urg small{display:block;font-size:14px;font-weight:600;opacity:.92;margin-top:3px}.urg i{font-style:normal;font-size:28px}
+@keyframes pisca{0%,100%{box-shadow:0 0 0 0 rgba(215,38,61,.55);transform:scale(1)}50%{box-shadow:0 0 0 8px rgba(215,38,61,0);transform:scale(1.015)}}
+@media (prefers-reduced-motion:reduce){.urg{animation:none}}
+/* duas abas grandes */
+.setores{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 8px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
+.setores button{border:3px solid var(--line);background:#fff;color:var(--ink);border-radius:20px;padding:18px 10px;font:inherit;font-size:24px;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.setores button span{font-size:34px;line-height:1}.setores button.on{border-color:var(--pink);background:var(--pink);color:#fff}
+h2.tt{font-size:30px;font-weight:900;color:var(--pink);margin:30px 0 2px;letter-spacing:-.01em;line-height:1.1}h2.tt+.sub{margin-top:0}
+.sub{font-size:16px;color:var(--sub);margin:4px 0 12px}
+.lista{display:grid;gap:10px}
+.c{background:#fff;border:2px solid var(--line);border-radius:18px;padding:14px 16px}
+.c .n{font-size:21px;font-weight:800;line-height:1.25}.c .d{font-size:15px;color:var(--sub);margin-top:4px;line-height:1.4}
+.c.ok{border-color:var(--pos);background:#F0FAF4}.c.ok .n{color:var(--pos)}.c.ruim{border-color:var(--neg);background:#FFF2F3}.c.ruim .n{color:var(--neg)}
+.tag{display:inline-block;font-size:13px;font-weight:800;border-radius:99px;padding:4px 10px;margin:8px 6px 0 0;background:var(--card2);color:var(--sub);letter-spacing:.02em}
+.tag.ok{background:var(--pos);color:#fff}.tag.ruim{background:var(--neg);color:#fff}.tag.am{background:#FFF1D6;color:#8A5300}
+.bar{height:12px;background:var(--card2);border-radius:99px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;background:var(--pink);border-radius:99px}.c.ok .bar i{background:var(--pos)}
+.row{display:flex;gap:12px;align-items:center;justify-content:space-between}
+.btn{border:0;border-radius:14px;padding:12px 16px;font:inherit;font-size:17px;font-weight:800;cursor:pointer;white-space:nowrap}
+.btn.fiz{background:var(--pos);color:#fff}.btn.leve{background:var(--card2);color:var(--ink)}.btn:disabled{opacity:.5}
+.v{font-size:22px;font-weight:900;white-space:nowrap}.v.ruim{color:var(--neg)}
+.pix{display:flex;gap:8px;align-items:center;margin-top:10px;background:var(--card);border-radius:12px;padding:8px 10px;font-size:15px}.pix code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:16px;font-weight:700;color:var(--ink)}
+.vazio{font-size:17px;color:var(--muted);background:var(--card);border-radius:16px;padding:16px;text-align:center}
+.pess .n{font-size:24px}.pess .fn{font-size:15px;color:var(--sub);margin-top:2px}.pess .grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pess .din{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:15px;color:var(--sub)}.pess .din b{display:block;font-size:20px;color:var(--ink)}
+/* shows */
+.sh{display:flex;gap:14px;align-items:center;cursor:pointer;width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;padding:0}
+.dt{flex:none;width:64px;text-align:center;background:var(--pink);color:#fff;border-radius:14px;padding:8px 0;line-height:1}.dt b{display:block;font-size:28px;font-weight:900}.dt span{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.c.passou .dt{background:var(--muted)}
+.sh .n{font-size:20px}.sh .d{margin-top:2px}.seta{margin-left:auto;font-size:24px;color:var(--muted);flex:none;transition:transform .2s}.c.aberto .seta{transform:rotate(90deg)}
+.bd{margin-top:14px;padding-top:12px;border-top:2px solid var(--line)}.bd h4{font-size:16px;color:var(--pink);margin:12px 0 6px;letter-spacing:.04em;text-transform:uppercase}
+.bd .k{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bd .k div{background:var(--card);border-radius:12px;padding:10px;font-size:13px;color:var(--sub);text-align:center}.bd .k b{display:block;font-size:17px;color:var(--ink);margin-top:2px;white-space:nowrap}
+.bd .k .bom b{color:var(--pos)}.bd .k .mau b{color:var(--neg)}
+.it{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:16px}.it:last-child{border-bottom:0}.it span small{display:block;color:var(--muted);font-size:13px}.it b{white-space:nowrap}
+.mais{display:block;margin:14px auto 0;border:2px solid var(--line);background:#fff;color:var(--sub);border-radius:14px;padding:12px 18px;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+/* ajudante (perguntas) no canto */
+.fab{position:fixed;right:16px;bottom:18px;z-index:40;border:0;background:var(--pink);color:#fff;border-radius:99px;padding:14px 20px 14px 16px;font:inherit;font-size:18px;font-weight:800;box-shadow:0 8px 24px rgba(224,17,95,.35);cursor:pointer;display:flex;align-items:center;gap:8px}
+.fab i{font-style:normal;font-size:26px;line-height:1}
+#chat{position:fixed;right:16px;bottom:84px;z-index:41;width:min(440px,calc(100vw - 32px));max-height:calc(100vh - 110px);overflow:auto;background:#fff;border:2px solid var(--line);border-radius:20px;box-shadow:0 14px 40px rgba(0,0,0,.18);padding:12px 12px 4px}
+#chat[hidden]{display:none}#chat .cbh{display:flex;justify-content:space-between;align-items:center;margin:2px 4px 8px}#chat .cbh b{font-size:18px;color:var(--pink)}#chat .cbh button{border:0;background:var(--card2);border-radius:99px;width:36px;height:36px;font-size:16px;cursor:pointer}
+#pg{display:none}
+</style>
+</head>
+<body>
+<div id="pg"><div class="wrap">
+<header class="top"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></header>
+<div class="ola">Oi, <em>Lucas</em> 👋</div>
+<div id="urg"></div>
+<nav class="setores" id="setores"><button class="on" data-s="metas"><span>🎯</span>Metas</button><button data-s="shows"><span>🎤</span>Shows</button></nav>
+
+<section id="s_metas">
+  <h2 class="tt">Metas</h2><p class="sub">O que a empresa quer alcançar</p><div class="lista" id="metas"><div class="vazio">Carregando…</div></div>
+  <h2 class="tt">Minhas tarefas</h2><p class="sub">O que você precisa fazer</p><div class="lista" id="minhas"><div class="vazio">Carregando…</div></div>
+  <h2 class="tt">Equipe</h2><p class="sub">Funcionários e produtividade</p><div class="lista" id="equipe"><div class="vazio">Carregando…</div></div>
+  <h2 class="tt">Pagamentos</h2><p class="sub">Quem falta pagar</p><div class="lista" id="pags"><div class="vazio">Carregando…</div></div>
+</section>
+
+<section id="s_shows" hidden>
+  <h2 class="tt">Shows</h2><p class="sub">Toque no show para ver quanto vai para cada um</p>
+  <div class="lista" id="shows"></div>
+  <button class="mais" id="antes">Ver shows que já passaram</button>
+</section>
+</div>
+<button class="fab" id="ajuda" aria-label="Pergunte ao assistente"><i>💬</i>Ajuda</button>
+<div id="chat" hidden><div class="cbh"><b>Pergunte aqui 😊</b><button id="chx" aria-label="Fechar">✕</button></div><div id="lbq"></div></div>
+</div>
+<script src="../lb.js?v=mwiljpxd"></script>
+<script src="../lbmetas.js?v=mwiljpxd"></script>
+<script src="../lbchat.js?v=mwiljpxd"></script>
+<script>
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const brl=v=>'R$ '+Math.round(+v||0).toLocaleString('pt-BR');
+const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),MA=HOJE.slice(0,7);
+const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const ddmm=d=>/^\d{4}-\d{2}-\d{2}/.test(d||'')?d.slice(8,10)+'/'+d.slice(5,7):(d||'');
+const dias=d=>Math.round((new Date(String(d).slice(0,10)+'T12:00')-new Date(HOJE+'T12:00'))/864e5);
+const FEITO=/conclu|feit|batid|pago|resolvid|cumprid/i;
+const fimMes=(()=>{const d=new Date(+MA.slice(0,4),+MA.slice(5,7),0);return MA+'-'+String(d.getDate()).padStart(2,'0')})();
+let D=null,API='',TAR=null,MIN=null,PAGS=null,ANTES=false;
+async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({usuario:LB.login,senha:LB.senha,nome:LB.usuario},c))})).json();if(!r.ok)throw new Error(r.erro||'erro');return r}
+
+/* ---------- avisos urgentes no topo ---------- */
+function urgentes(){const U=[];
+  ((TAR&&TAR.metas)||[]).forEach(m=>{if(FEITO.test(m.situacao||''))return;
+    if(m.tipo==='alerta')U.push({t:m.titulo,s:[m.alvo,m.prazo?'prazo '+ddmm(m.prazo):''].filter(Boolean).join(' · '),ir:'metas'});
+    else if(/^\d{4}-\d{2}-\d{2}$/.test(m.prazo||'')&&dias(m.prazo)<=2&&m.tipo!=='despesa')U.push({t:m.titulo,s:dias(m.prazo)<0?'ATRASADA desde '+ddmm(m.prazo):dias(m.prazo)===0?'é HOJE':'falta '+dias(m.prazo)+' dia'+(dias(m.prazo)>1?'s':''),ir:'metas'})});
+  ((MIN&&MIN.tarefas)||[]).forEach(t=>{if(t.status==='Concluída'||!/^\d{4}-\d{2}-\d{2}$/.test(t.prazo||''))return;const n=dias(t.prazo);
+    if(n<=1)U.push({t:'Sua tarefa: '+t.titulo,s:n<0?'ATRASADA desde '+ddmm(t.prazo):n===0?'é HOJE':'é amanhã',ir:'minhas'})});
+  document.getElementById('urg').innerHTML=U.slice(0,4).map(u=>`<button class="urg" data-ir="${u.ir}"><i>🚨</i><span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join('')}
+document.getElementById('urg').onclick=e=>{const b=e.target.closest('[data-ir]');if(!b)return;setor('metas');const x=document.getElementById(b.dataset.ir);if(x)x.scrollIntoView({behavior:'smooth',block:'start'})};
+
+/* ---------- 1. metas da empresa ---------- */
+function renderMetas(){const el=document.getElementById('metas');
+  const L=((TAR&&TAR.metas)||[]).filter(m=>['meta','tarefa',''].includes(m.tipo||''));
+  if(!L.length){el.innerHTML='<div class="vazio">Nenhuma meta cadastrada.</div>';return}
+  el.innerHTML=L.map(m=>{const ok=FEITO.test(m.situacao||''),iso=/^\d{4}-\d{2}-\d{2}$/.test(m.prazo||''),atr=!ok&&iso&&m.prazo<HOJE;
+    const num=+m.meta_num>0?Math.min(1,(+m.atual||0)/(+m.meta_num)):null;
+    return `<div class="c ${ok?'ok':atr?'ruim':''}"><div class="n">${ok?'✅ ':atr?'⚠️ ':''}${esc(m.titulo)}</div>
+      ${m.alvo?`<div class="d">${esc(m.alvo)}</div>`:''}
+      <span class="tag ${ok?'ok':atr?'ruim':''}">${ok?'CUMPRIDA':atr?'ATRASADA':esc(m.situacao||'em aberto')}</span>${m.prazo?`<span class="tag">${iso?'até '+ddmm(m.prazo):esc(m.prazo)}</span>`:''}
+      ${num!=null?`<div class="bar"><i style="width:${Math.round(num*100)}%"></i></div>`:''}</div>`}).join('')}
+
+/* ---------- 2. minhas tarefas ---------- */
+function renderMinhas(){const el=document.getElementById('minhas');
+  if(!MIN){el.innerHTML='<div class="vazio">Não consegui carregar agora.</div>';return}
+  const T=MIN.tarefas||[],ab=T.filter(t=>t.status!=='Concluída').sort((a,b)=>(a.prazo||'9').localeCompare(b.prazo||'9')),fe=T.filter(t=>t.status==='Concluída'&&t.concluido_em&&dias(t.concluido_em)>=-7).sort((a,b)=>String(b.concluido_em).localeCompare(String(a.concluido_em)));
+  const rot=(MIN.rotinas||[]).filter(r=>r.ativo!=='não');
+  let h=ab.map(t=>{const iso=/^\d{4}-\d{2}-\d{2}$/.test(t.prazo||''),n=iso?dias(t.prazo):null,atr=n!=null&&n<0;
+    return `<div class="c ${atr?'ruim':''}"><div class="row"><div><div class="n">${esc(t.titulo)}</div>${t.prazo?`<span class="tag ${atr?'ruim':n!=null&&n<=1?'am':''}">${atr?'ATRASADA · era '+ddmm(t.prazo):n===0?'HOJE':n===1?'amanhã':iso?'até '+ddmm(t.prazo):esc(t.prazo)}</span>`:''}${t.status==='Em andamento'?'<span class="tag am">fazendo</span>':''}</div>
+      <button class="btn fiz" data-fiz="${esc(t.id)}">✓ Fiz</button></div></div>`}).join('');
+  if(!ab.length)h='<div class="c ok"><div class="n">🎉 Nenhuma tarefa pendente!</div></div>';
+  if(rot.length&&window.LBROT)h+=rot.map(r=>{let p=null;try{p=LBROT.pct(r,MA)}catch(e){}const ok=p&&p.pct>=1;
+    return `<div class="c ${ok?'ok':''}"><div class="n">${ok?'✅ ':''}${esc(r.titulo)}</div>${p?`<div class="d">${p.feitos} de ${p.total} neste mês</div><div class="bar"><i style="width:${Math.round(Math.min(1,p.pct)*100)}%"></i></div>`:''}</div>`}).join('');
+  if(fe.length)h+=fe.slice(0,4).map(t=>`<div class="c ok"><div class="row"><div class="n">✅ ${esc(t.titulo)}</div><button class="btn leve" data-desfaz="${esc(t.id)}">desfazer</button></div><div class="d">feita ${dias(t.concluido_em)===0?'hoje':dias(t.concluido_em)===-1?'ontem':'em '+ddmm(t.concluido_em)}</div></div>`).join('');
+  el.innerHTML=h}
+document.getElementById('minhas').onclick=async e=>{const b=e.target.closest('[data-fiz],[data-desfaz]');if(!b)return;const fz=!!b.dataset.fiz;b.disabled=true;b.textContent='salvando…';
+  try{const r=await api({acao:'marcar_tarefa',id:b.dataset.fiz||b.dataset.desfaz,status:fz?'Concluída':'A fazer'});MIN=Object.assign(MIN||{},r);renderMinhas();urgentes()}catch(er){b.disabled=false;b.textContent='tente de novo'}};
+
+/* ---------- 3. equipe: funções e metas batidas primeiro, depois valores ---------- */
+function rendDe(nome){const n=LB.norm(nome);return (D.rendimento||[]).find(r=>{const q=LB.norm(r.nome);return q===n||q.startsWith(n+' ')||n.startsWith(q+' ')})}
+function renderEquipe(){const el=document.getElementById('equipe');if(!TAR){el.innerHTML='<div class="vazio">Não consegui carregar agora.</div>';return}
+  const P=(TAR.perfis||[]).filter(p=>p.ativo!=='não'&&p.id!=='lucas'&&!/^teste/i.test(p.nome||''));
+  el.innerHTML=P.map(p=>{const T=(TAR.tarefas||[]).filter(t=>t.pessoa===p.id),fe=T.filter(t=>(t.concluido_em||'').startsWith(MA)).length,ab=T.filter(t=>t.status!=='Concluída'),at=ab.filter(t=>/^\d{4}-/.test(t.prazo||'')&&t.prazo<HOJE).length;
+    const R=(TAR.rotinas||[]).filter(r=>r.pessoa===p.id&&r.ativo!=='não').map(r=>{let x=null;try{x=LBROT.pct(r,MA)}catch(e){}return [r,x]}).filter(x=>x[1]);
+    const rd=rendDe(p.nome),m=rd&&rd.meses[MA]||null,bom=at===0;
+    return `<div class="c pess ${at?'ruim':''}"><div class="n">${esc(p.nome)}</div>${p.funcao?`<div class="fn">${esc(p.funcao)}</div>`:''}
+      <div class="grid"><span class="tag ok">✓ ${fe} feita${fe!==1?'s':''} no mês</span>${at?`<span class="tag ruim">${at} atrasada${at>1?'s':''}</span>`:''}<span class="tag">${ab.length} em aberto</span>
+      ${R.map(([r,x])=>`<span class="tag ${x.pct>=1?'ok':''}">${esc(r.titulo)}: ${x.feitos}/${x.total}</span>`).join('')}</div>
+      ${p.meta?`<div class="d" style="margin-top:8px"><b>Meta:</b> ${esc(p.meta)}</div>`:''}
+      ${rd?`<div class="din"><div>Fixo por mês<b>${rd.fixo?brl(rd.fixo):'—'}</b></div><div>Recebeu em ${MES3[+MA.slice(5,7)-1]}<b>${brl(m?m.total:0)}</b></div></div>`:''}</div>`}).join('')||'<div class="vazio">Ninguém na equipe ainda.</div>'}
+
+/* ---------- 4. pagamentos (por último): o que falta pagar até o fim do mês, com o PIX ---------- */
+function renderPags(){const el=document.getElementById('pags');const L=[];
+  (PAGS||[]).forEach(g=>{if(g.ativo==='não'||g.direcao==='entrada')return;let oc=[];try{oc=LB.pgx.ocorr(g,fimMes).filter(o=>!o.pago&&o.falta>0)}catch(e){}
+    oc.forEach(o=>L.push({nome:g.nome,desc:g.descricao||(g.tipo==='fixo'?'fixo do mês':''),valor:o.falta,data:o.data,pix:g.pix||''}))});
+  /* equipe de shows que já aconteceram e ainda não foi paga (borderô) */
+  const px={};(D.shows||[]).filter(s=>s.data<HOJE&&s.data>=MA.slice(0,4)+'-01-01').forEach(s=>{const b=D.borderos[s.cod]||D.borderos[s.bordero_app];if(!b||!b.equipe)return;
+    b.equipe.filter(e=>e.status&&!/pago/i.test(e.status)&&+e.total>0).forEach(e=>{const k=e.pessoa||e.nome;(px[k]=px[k]||{nome:e.nome,valor:0,shows:[],pix:e.pix||'',data:s.data}).valor+=+e.total;px[k].shows.push(ddmm(s.data))})});
+  Object.values(px).forEach(x=>L.push({nome:x.nome,desc:'show'+(x.shows.length>1?'s':'')+' '+x.shows.join(', '),valor:x.valor,data:x.data,pix:x.pix}));
+  L.sort((a,b)=>(a.data||'').localeCompare(b.data||''));
+  el.innerHTML=L.length?L.map(x=>{const venc=x.data&&x.data<HOJE;return `<div class="c ${venc?'ruim':''}"><div class="row"><div><div class="n">${esc(x.nome)}</div><div class="d">${esc(x.desc)}${x.data?` · <b style="color:${venc?'var(--neg)':'inherit'}">${venc?'venceu '+ddmm(x.data):'dia '+ddmm(x.data)}</b>`:''}</div></div><div class="v ${venc?'ruim':''}">${brl(x.valor)}</div></div>
+    ${x.pix?`<div class="pix">PIX <code>${esc(x.pix)}</code><button class="btn leve" data-pix="${esc(x.pix)}">copiar</button></div>`:''}</div>`}).join(''):'<div class="c ok"><div class="n">🎉 Nada para pagar agora</div></div>'}
+document.getElementById('pags').onclick=e=>{const b=e.target.closest('[data-pix]');if(!b)return;try{navigator.clipboard.writeText(b.dataset.pix)}catch(x){}b.textContent='copiado ✓';setTimeout(()=>b.textContent='copiar',1800)};
+
+/* ---------- shows: agenda; tocar abre o borderô (quanto vai para cada um) ---------- */
+function bordDe(s){return D.borderos[s.cod]||D.borderos[s.bordero_app]||null}
+function bdHtml(s){const b=bordDe(s),t=(b&&b.totais)||{},gasto=t.gasto!=null?t.gasto:s.gasto,valor=s.valor||(b&&b.valor)||0,sobra=valor&&gasto!=null?valor-gasto:null;
+  let h=`<div class="bd"><div class="k"><div>Cachê<b>${valor?brl(valor):'a definir'}</b></div><div class="mau">Custo<b>${gasto!=null?brl(gasto):'—'}</b></div><div class="${sobra==null?'':sobra>=0?'bom':'mau'}">Sobra<b>${sobra!=null?brl(sobra):'—'}</b></div></div>`;
+  if(!b){return h+'<div class="vazio" style="margin-top:12px">O borderô deste show ainda não foi montado.</div></div>'}
+  const G={};(b.equipe||[]).forEach(e=>{(G[e.grupo||'Equipe']=G[e.grupo||'Equipe']||[]).push(e)});
+  Object.entries(G).forEach(([g,l])=>{h+=`<h4>${esc(g)}</h4>`+l.map(e=>`<div class="it"><span>${esc(e.nome)}<small>${esc(e.funcao||'')}${e.status?' · '+esc(e.status):''}</small></span><b>${brl(e.total||e.valor)}</b></div>`).join('')});
+  const it=(b.itens||[]).filter(x=>+x.valor);if(it.length)h+=`<h4>Itens</h4>`+it.map(x=>`<div class="it"><span>${esc(x.desc||x.item||'item')}</span><b>${brl((+x.valor||0)*(+x.qtd||1))}</b></div>`).join('');
+  if(t.diesel)h+=`<h4>Viagem</h4><div class="it"><span>Diesel</span><b>${brl(t.diesel)}</b></div>`;
+  return h+'</div>'}
+function renderShows(){const S=(D.shows||[]).filter(s=>!/cancel/i.test(s.sit||'')&&(ANTES?s.data<HOJE:s.data>=HOJE)).sort((a,b)=>ANTES?b.data.localeCompare(a.data):a.data.localeCompare(b.data)).slice(0,ANTES?30:60);
+  document.getElementById('shows').innerHTML=S.map(s=>{const conf=/confirmado|realizado/i.test(s.sit||''),k=s.cod||s.bordero_app||s.data;
+    return `<div class="c ${ANTES?'passou':''}" data-k="${esc(k)}"><button class="sh" data-sh="${esc(k)}"><div class="dt"><b>${s.data.slice(8,10)}</b><span>${MES3[+s.data.slice(5,7)-1]}</span></div>
+      <div><div class="n">${esc(s.nome)}</div><div class="d">${esc(s.local||'')}${!conf?' · <b style="color:var(--amber)">a confirmar</b>':''}</div></div><span class="seta">›</span></button><div class="cx"></div></div>`}).join('')||'<div class="vazio">Nenhum show aqui.</div>';
+  document.getElementById('antes').textContent=ANTES?'Ver próximos shows':'Ver shows que já passaram'}
+document.getElementById('shows').onclick=e=>{const b=e.target.closest('[data-sh]');if(!b)return;const c=b.closest('.c'),cx=c.querySelector('.cx');
+  if(c.classList.toggle('aberto')){const s=(D.shows||[]).find(x=>(x.cod||x.bordero_app||x.data)===b.dataset.sh);cx.innerHTML=s?bdHtml(s):''}else cx.innerHTML=''};
+document.getElementById('antes').onclick=()=>{ANTES=!ANTES;renderShows();scrollTo({top:document.getElementById('s_shows').offsetTop-90,behavior:'smooth'})};
+
+/* ---------- abas grandes ---------- */
+function setor(s){document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));document.getElementById('s_metas').hidden=s!=='metas';document.getElementById('s_shows').hidden=s!=='shows';try{localStorage.setItem('lb_art_setor',s)}catch(e){}}
+document.getElementById('setores').onclick=e=>{const b=e.target.closest('[data-s]');if(b){setor(b.dataset.s);scrollTo({top:0,behavior:'smooth'})}};
+
+/* ---------- ajudante no canto ---------- */
+let CHAT=false;const chat=document.getElementById('chat');
+document.getElementById('ajuda').onclick=()=>{chat.hidden=!chat.hidden;if(!chat.hidden&&!CHAT){CHAT=true;
+  LBCHAT.montar(document.getElementById('lbq'),{base:'../',pagina:'artista',atalhos:[],exemplo:'quanto falta receber dos shows?',base_dados:()=>D.ctx_ia||'',
+    contexto:()=>'PÁGINA ARTISTA (Lucas): '+LBCHAT.texto(document.querySelector('.wrap'))})}
+  if(!chat.hidden)setTimeout(()=>{const i=chat.querySelector('input');if(i)i.focus()},50)};
+document.getElementById('chx').onclick=()=>{chat.hidden=true};
+
+/* ---------- dados ao vivo ---------- */
+async function carregar(){
+  try{API=(await (await fetch('../config.json',{cache:'no-store'})).json()).api_url}catch(e){}
+  if(!API)return;
+  const [t,m,p,b]=await Promise.allSettled([api({acao:'tarefas'}),api({acao:'minhas_tarefas'}),api({acao:'pagamentos'}),api({acao:'borderos'})]);
+  if(t.status==='fulfilled')TAR=t.value;if(m.status==='fulfilled')MIN=m.value;if(p.status==='fulfilled')PAGS=p.value.pagamentos||[];
+  if(b.status==='fulfilled'){const r=b.value,px={};(r.pessoas||[]).forEach(q=>px[q.id]=q.pix);Object.entries(r.borderos||{}).forEach(([k,x])=>{if(x.tipo==='despesa'||!x.equipe)return;x.equipe.forEach(e=>{if(e.pessoa&&px[e.pessoa])e.pix=px[e.pessoa];delete e.doc});D.borderos[k]=x})}
+  renderMetas();renderMinhas();renderEquipe();renderPags();urgentes()}
+
+LB.entrar({pagina:'artista',base:'../',titulo:'Artista',claro:true,ok:r=>{D=r.dados;D.borderos=D.borderos||{};
+  document.getElementById('pg').style.display='block';
+  document.getElementById('links').innerHTML=LB.links(['artista'],'artista','../')+'<a class="sair" href="#" onclick="LB.sair();return false">Sair</a>';
+  let s='metas';try{s=localStorage.getItem('lb_art_setor')||'metas'}catch(e){}setor(s);
+  renderShows();carregar()}});
+</script>
+</body>
+</html>

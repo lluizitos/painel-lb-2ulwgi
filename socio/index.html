@@ -171,9 +171,9 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
   <footer>Lucas Barros Ltda · números do extrato bancário, do caixa em dinheiro e das planilhas de cada show (borderôs)</footer>
 </main>
 </div>
-<script src="../lb.js?v=mwij3xu9"></script>
-<script src="../lbchat.js?v=mwij3xu9"></script>
-<script src="../lbvendas.js?v=mwij3xu9"></script>
+<script src="../lb.js?v=mwiljpxd"></script>
+<script src="../lbchat.js?v=mwiljpxd"></script>
+<script src="../lbvendas.js?v=mwiljpxd"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -202,7 +202,7 @@ const ATALHOS=[
 {id:'metas',rot:'Metas',chaves:'meta metas objetivo objetivos',ir:ATS('met','metas')},
 {id:'equipe',rot:'Equipe',chaves:'equipe tarefa tarefas rendimento pessoa funcionario',ir:ATS('met','equipe')},
 ];
-LB.entrar({pagina:'socio',base:'../',titulo:'Prestação de contas',ok:r=>{D=r.dados;document.getElementById('links').innerHTML=LB.links(r.paginas,'socio','../');render();abasSoc();try{LBCHAT.montar(document.getElementById('lbq'),{base:'../',pagina:'socio',atalhos:ATALHOS.filter(x=>{const e=document.getElementById({agora:'b1',gastos:'gastos',movs:'mvl',showsmes:'smes',proximos:'prox',fixos:'fixos',temporada:'kpis',fechados:'fech',aportes:'aportes',ocorrencias:'ocall',ultimos:'ult',docs:'docs',vendas:'bvv',metas:'b25',equipe:'equipe'}[x.id]);return e&&e.style.display!=='none'}),exemplo:'qual foi o lucro dos shows em outubro?',base_dados:()=>D.ctx_ia||'',contexto:()=>{const x=Object.assign({},D);delete x.links;delete x.vendas_venda;return JSON.stringify(x).slice(0,12000)}})}catch(e){}}});
+LB.entrar({pagina:'socio',base:'../',titulo:'Sócio',ok:r=>{D=r.dados;document.getElementById('links').innerHTML=LB.links(['socio'],'socio','../');/* sócio: página única, só com as abas (sem menu de páginas) */render();abasSoc();try{LBCHAT.montar(document.getElementById('lbq'),{base:'../',pagina:'socio',atalhos:[],exemplo:'qual foi o lucro dos shows em outubro?',base_dados:()=>D.ctx_ia||'',contexto:()=>{const x=Object.assign({},D);delete x.links;delete x.vendas_venda;return JSON.stringify(x).slice(0,12000)}})}catch(e){}}});
 const k4=(l,v,s,c)=>`<div class="card bar k"><div class="l">${l}</div><div class="v ${c||''}">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`;
 const dia=d=>`<div class="d"><b>${d.slice(8,10)}</b><span>${MES3[+d.slice(5,7)-1]} ${d.slice(2,4)}</span></div>`;
 const ocRow=o=>`<div class="oc">${dia(o.data)}<div class="t"><b>${esc(o.titulo)}</b><span>${esc(o.detalhe||'')}${o.doc?` · <a href="#docs" style="color:var(--pinkl)">ver documento</a>`:''}${o.data>D.atualizado?' · <span class="pill">programado</span>':''}</span></div><div class="v">${o.valor!=null?brl(o.valor):''}</div></div>`;

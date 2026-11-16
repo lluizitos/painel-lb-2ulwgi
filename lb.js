@@ -3,9 +3,13 @@
    para cada usuário liberado (cifrada com PBKDF2-SHA256(usuário|senha) → AES-GCM). O endereço do "cofre" de cada usuário
    é um hash do nome, então o arquivo público não mostra quem tem acesso. */
 (function () {
-  const NOMES = { painel: 'Painel', vendas: 'Vendas', agenda: 'Agenda', socio: 'Sócio', contador: 'Prestação de contas', bordero: 'Borderôs', admin: 'Admin', metas: 'Metas' };
-  const ROTAS = { painel: '', vendas: 'vendas/', agenda: 'agenda/', socio: 'socio/', contador: 'contador/', bordero: 'borderos/', admin: 'admin/', metas: 'metas/' };
-  const ORDEM = ['painel', 'admin', 'bordero', 'vendas', 'metas', 'socio', 'contador'];
+  const NOMES = { artista: 'Artista', painel: 'Financeiro', vendas: 'Vendas', agenda: 'Agenda', socio: 'Sócio', contador: 'Prestação de contas', bordero: 'Borderôs', admin: 'Admin', metas: 'Metas' };
+  const ROTAS = { artista: 'artista/', painel: '', vendas: 'vendas/', agenda: 'agenda/', socio: 'socio/', contador: 'contador/', bordero: 'borderos/', admin: 'admin/', metas: 'metas/' };
+  const ORDEM = ['painel', 'artista', 'admin', 'bordero', 'vendas', 'metas', 'socio', 'contador'];
+  /* Lucas e sócio: página única e simples, sem menu de páginas (o Financeiro do Lucas é um link separado) */
+  const semMenu = ps => !ps.includes('admin') && (ps.includes('artista') || ps.includes('socio'));
+  /* a raiz do site é o Financeiro; o Lucas entrando pela raiz vai para a página Artista (o link do Financeiro dele leva #financeiro) */
+  const vaiArtista = (pagina, ps) => pagina === 'painel' && ps.includes('artista') && !ps.includes('admin') && !/financeiro/i.test(location.hash + location.search);
   const norm = u => String(u || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
   const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
   const hex = buf => [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
@@ -17,7 +21,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwij3xu9';
+  const BUILD = 'mwiljpxd';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -63,7 +67,7 @@
   function links(paginas, atual, base) {
     // menu só com as páginas do login; quem tem uma página só (ex.: artista) não vê menu, só o Sair
     MENU = { paginas: paginas.slice(), atual, base };
-    const ps = ORDEM.filter(p => paginas.includes(p));
+    const ps = semMenu(paginas) ? [] : ORDEM.filter(p => paginas.includes(p));
     return (ps.length > 1 ? ps.concat('agenda') : []).map(p =>
       `<a href="${base}${ROTAS[p]}" class="${p === atual ? 'on' : ''}">${NOMES[p]}</a>`).join('') +
       `<a href="#" class="lbav" onclick="LB.perfil();return false" title="Meu perfil" aria-label="Meu perfil"></a>` + (setTimeout(carregar, 0), '');
@@ -93,7 +97,9 @@
 #lock input{display:block;width:100%;box-sizing:border-box;background:#1E1C24;border:1px solid #2E2B36;border-radius:12px;padding:14px 16px;color:#F3F1F6;font:inherit;font-size:16px;text-align:center;margin-top:8px}
 #lock button{width:100%;margin-top:12px;padding:14px;border:0;border-radius:12px;background:#CF1D51;color:#fff;font:inherit;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px;cursor:pointer}
 #lock .pw{position:relative}#lock .pw input{padding-right:50px;padding-left:50px}#lock .olho{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:auto;margin:4px 0 0;padding:8px 10px;background:transparent;border:0;color:#B8B3C3;font-size:19px;letter-spacing:0;line-height:1}
-#lock .err{color:#FF8FA8;font-size:13px;min-height:20px;margin-top:10px}`;
+#lock .err{color:#FF8FA8;font-size:13px;min-height:20px;margin-top:10px}
+#lock.auto form>*:not(img):not(.spl){display:none}#lock .spl{display:none}#lock.auto .spl{display:block;width:26px;height:26px;margin:14px auto 0;border:3px solid #2E2B36;border-top-color:#CF1D51;border-radius:99px;animation:lbsp .8s linear infinite}@keyframes lbsp{to{transform:rotate(360deg)}}
+#lock.claro{background:#fff}#lock.claro .spl{border-color:#eee;border-top-color:#E0115F}`;
       document.head.appendChild(st);
     }
     const lock = document.createElement('div');
@@ -101,7 +107,7 @@
     lock.innerHTML = `<form autocomplete="on"><img src="${base}logo.png" alt="Lucas Barros"><p>${titulo}</p>
       <input name="u" placeholder="Usuário" autocomplete="username" autocapitalize="words" aria-label="Usuário">
       <div class="pw"><input name="p" type="password" placeholder="Senha" autocomplete="current-password" aria-label="Senha"><button type="button" class="olho" aria-label="Mostrar senha" title="Mostrar senha">👁</button></div>
-      <button type="submit">Entrar</button><div class="err"></div></form>`;
+      <button type="submit">Entrar</button><div class="err"></div><div class="spl" aria-label="Abrindo"></div></form>`;
     document.body.appendChild(lock);
     const f = lock.querySelector('form'), err = lock.querySelector('.err'), olho = lock.querySelector('.olho');
     olho.onclick = () => { const v = f.p.type === 'password'; f.p.type = v ? 'text' : 'password'; olho.textContent = v ? '🙈' : '👁'; olho.setAttribute('aria-label', v ? 'Esconder senha' : 'Mostrar senha'); f.p.focus(); };
@@ -110,7 +116,8 @@
       if (!auto) err.textContent = 'Abrindo…';
       try {
         const r = await abrir2(base, pagina, u, p);
-        store.set('lb_cred', JSON.stringify({ u, p }));
+        store.set('lb_cred', JSON.stringify({ u, p })); store.set('lb_pgs', JSON.stringify({ u: norm(u), p: r.paginas || [] }));
+        if (vaiArtista(pagina, r.paginas || [])) { location.replace(base + ROTAS.artista); return; }
         LB.usuario = r.nome; LB.senha = p; LB.login = u;
         lock.remove();
         ok(r);
@@ -120,16 +127,20 @@
             try { await abrir2(base, pg, u, p); store.set('lb_cred', JSON.stringify({ u, p })); location.replace(base + ROTAS[pg]); return; } catch (e2) { if (e2.message === 'senha') break; }
           }
         }
-        if (auto) { err.textContent = e.message === 'acesso' ? 'Seu usuário não tem acesso a esta página.' : ''; return; }
+        if (auto) { lock.classList.remove('auto', 'claro'); err.textContent = e.message === 'acesso' ? 'Seu usuário não tem acesso a esta página.' : ''; return; }
         err.textContent = e.message === 'acesso' ? 'Usuário sem acesso a esta página (ou nome digitado diferente).' :
           e.message === 'senha' ? 'Senha incorreta.' : 'Não consegui abrir agora. Tente de novo.';
       }
     };
     f.addEventListener('submit', e => { e.preventDefault(); tentar(f.u.value, f.p.value.trim()); });
     let c = null; try { c = JSON.parse(store.get('lb_cred') || 'null'); } catch (e) { }
-    if (c && c.u && (!lu || norm(c.u) === norm(lu))) { f.u.value = c.u; tentar(c.u, c.p, true); }
+    if (c && c.u && (!lu || norm(c.u) === norm(lu))) {
+      /* já entrou neste aparelho: nada de tela de login, só o logo girando enquanto abre (e a raiz manda o Lucas direto para Artista) */
+      let pg = null; try { pg = JSON.parse(store.get('lb_pgs') || 'null'); } catch (e) { }
+      if (pg && pg.u === norm(c.u) && vaiArtista(pagina, pg.p || [])) { location.replace(base + ROTAS.artista); return; }
+      lock.classList.add('auto'); if (opc.claro) lock.classList.add('claro'); f.u.value = c.u; tentar(c.u, c.p, true); }
   }
-  function sair() { store.del('lb_cred'); store.del('lb_pf'); try { Object.keys(localStorage).filter(x => x.startsWith('lbk_')).forEach(x => localStorage.removeItem(x)); } catch (e) { } location.reload(); }
+  function sair() { store.del('lb_cred'); store.del('lb_pf'); store.del('lb_pgs'); try { Object.keys(localStorage).filter(x => x.startsWith('lbk_')).forEach(x => localStorage.removeItem(x)); } catch (e) { } location.reload(); }
   /* ---------- Meu perfil: foto, WhatsApp, e-mail e troca de senha ---------- */
   let CFG = null;
   const cfg = async () => CFG || (CFG = await (await fetch((LB.base || '') + 'config.json', { cache: 'no-store' })).json());

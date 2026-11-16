@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#141218">
-<title>Painel LB</title>
+<title>Financeiro LB</title>
 <link rel="icon" href="icone.png">
 <link rel="apple-touch-icon" href="icone.png">
 <style>
@@ -335,10 +335,10 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 
-<script src="lb.js?v=mwij3xu9"></script>
-<script src="lbmetas.js?v=mwij3xu9"></script>
-<script src="lbchat.js?v=mwij3xu9"></script>
-<script src="lbvendas.js?v=mwij3xu9"></script>
+<script src="lb.js?v=mwiljpxd"></script>
+<script src="lbmetas.js?v=mwiljpxd"></script>
+<script src="lbchat.js?v=mwiljpxd"></script>
+<script src="lbvendas.js?v=mwiljpxd"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -371,7 +371,7 @@ const ATALHOS=[
 {id:'vendas',rot:'Vendas',chaves:'venda vendas vendedor vendedores vendido negociacao contrato fechado',ir:ATP('ven','pven')},
 {id:'rendimento',rot:'Rendimento da equipe',chaves:'rendimento equipe desempenho atraso prazo pessoa funcionario produtividade',ir:ATP('ren','rpess')},
 ];
-LB.entrar({pagina:'painel',base:'./',titulo:'Painel',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}try{renderSaldo()}catch(e){}try{renderFalta();loadVSL()}catch(e){}try{LBCHAT.montar(document.getElementById('lbq'),{base:'',exemplo:'quanto falta receber em dezembro?',contexto:()=>ctxPainel()+'\n\nTELA ABERTA:\n'+LBCHAT.texto(document.querySelector('main')),base_dados:()=>D.ctx_ia||'',pagina:'painel',anexo:true,atalhos:ATALHOS})}catch(e){}}});
+LB.entrar({pagina:'painel',base:'./',titulo:'Financeiro',ok:r=>{D=r.dados;PAG=r.paginas;iniciar();try{renderInfo()}catch(e){}try{renderSaldo()}catch(e){}try{renderFalta();loadVSL()}catch(e){}try{LBCHAT.montar(document.getElementById('lbq'),{base:'',exemplo:'quanto falta receber em dezembro?',contexto:()=>ctxPainel()+'\n\nTELA ABERTA:\n'+LBCHAT.texto(document.querySelector('main')),base_dados:()=>D.ctx_ia||'',pagina:'painel',anexo:true,atalhos:ATALHOS})}catch(e){}}});
 let PAG=[];
 
 /* ---------- início ---------- */
@@ -783,7 +783,9 @@ function renderMes(){
       const venc=c.venc<HOJE;const dias=Math.round((new Date(c.venc)-new Date(HOJE))/864e5);
       const st=venc?`<span class="pill pk">venceu ${ddmm(c.venc)}</span>`:dias===0?`<span class="pill am">vence hoje</span>`:`<span class="pill">vence ${ddmm(c.venc)}${dias<=7?` · ${dias} dia${dias>1?'s':''}`:''}</span>`;
       return `<div class="row cclk${min?' cmin':''}" data-cx="${esc(c.pg||'')}" role="button" tabindex="0"><div class="t"><b>${esc(c.desc)}</b>${min?'':`<span>${c.para?esc(c.para)+' · ':''}${st}${c.conf?' <span class="pill am">valor a confirmar</span>':''}${c.fora?' <span class="pill">fora da estimativa</span>':''}</span>`}</div><div class="v">${cParc(c)?`${brl2(c.valor-cParc(c))}<small style="display:block;font-size:11px;color:var(--muted);font-weight:500">pago ${brl2(cParc(c))} de ${brl2(c.valor)}</small>`:brl2(c.valor)}</div><button class="cmb" data-cm="${esc(ck(c))}" title="${min?'voltar para o assistente de pagamento':'adiar: minimiza e tira do assistente de pagamento'}" aria-label="${min?'desadiar':'adiar'}"${min?' style="width:auto;padding:0 8px;font-size:12px"':''}>${min?'desadiar':'–'}</button></div>`};
-    h+=`<h3>Contas a pagar <small>${cs.length} contas · ${brl2(tot)}</small></h3><div class="list" id="clist">`+ab.map(c=>linhaC(c,0)).join('')+`</div>`+(mn.length?`<details class="cat cmins"><summary>Adiadas (fora do assistente de pagamento) <small>${mn.length} · ${brl2(mn.reduce((a,c)=>a+c.valor,0))}</small></summary><div class="list">${mn.map(c=>linhaC(c,1)).join('')}</div></details>`:'');
+    /* fixos do mês ficam menores: recolhidos numa linha só (toque para ver); as outras contas aparecem normais */
+    const abV=ab.filter(c=>!c.fixo),abF=ab.filter(c=>c.fixo);
+    h+=`<h3>Contas a pagar <small>${cs.length} contas · ${brl2(tot)}</small></h3><div class="list" id="clist">`+abV.map(c=>linhaC(c,0)).join('')+`</div>`+(abF.length?`<details class="cat cmins cfix"><summary>Fixos do mês <small>${abF.length} · ${brl2(abF.reduce((a,c)=>a+(c.fora?0:c.valor),0))}${abF.some(c=>c.venc<HOJE)?' · <span class="pk">'+abF.filter(c=>c.venc<HOJE).length+' vencido'+(abF.filter(c=>c.venc<HOJE).length>1?'s':'')+'</span>':''}</small></summary><div class="list">${abF.map(c=>linhaC(c,0)).join('')}</div></details>`:'')+(mn.length?`<details class="cat cmins"><summary>Adiadas (fora do assistente de pagamento) <small>${mn.length} · ${brl2(mn.reduce((a,c)=>a+c.valor,0))}</small></summary><div class="list">${mn.map(c=>linhaC(c,1)).join('')}</div></details>`:'');
     if(cs.some(c=>c.venc<HOJE))h+=`<p class="note">“Venceu” = vencimento já passou e o pagamento ainda não apareceu no extrato conferido (até ${ddmm(D.saldo_inicial.data)}).</p>`;
   }
   // shows do mês
