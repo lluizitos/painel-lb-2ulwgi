@@ -181,9 +181,9 @@ label textarea{min-height:60px;resize:vertical}
       <label>Mostrar no jornal (página do sócio)<select id="e_jo"><option value="não">Não</option><option value="sim">Sim</option></select></label>
       <label class="w">Título<input id="e_tit" placeholder="ex.: Cachê de prefeitura em R$ 35 mil"></label>
       <label class="w">Alvo / o que é<input id="e_alvo" placeholder="ex.: R$ 35 mil por show de prefeitura"></label>
-      <label>Prazo / repetição<select id="e_fq"><option value="uma">Uma vez (até a data de término)</option><option value="dia">Diariamente</option><option value="util">Dias úteis (seg a sex)</option><option value="semana">Semanalmente</option><option value="mes">Mensalmente</option><option value="ano">Anualmente</option><option value="outro">Outro (escrever)</option></select></label>
+      <label id="e_fqw">Prazo / repetição<select id="e_fq"><option value="uma">Uma vez (até a data de término)</option><option value="dia">Diariamente</option><option value="util">Dias úteis (seg a sex)</option><option value="semana">Semanalmente</option><option value="mes">Mensalmente</option><option value="ano">Anualmente</option><option value="outro">Outro (escrever)</option></select></label>
       <label id="e_pzw" style="display:none">Quando (texto)<input id="e_pz" placeholder="ex.: carnaval 2027"></label>
-      <label>Data de início<input type="date" id="e_ini"></label>
+      <label id="e_iniw">Data de início<input type="date" id="e_ini"></label>
       <label>Data de término<input type="date" id="e_tm"></label>
       <p class="note w" id="e_pzn" style="margin:-2px 2px 4px">Passou do término sem cumprir, ou uma meta individual ligada falhou num dia/semana que já passou → aparece como <b style="color:var(--neg)">atrasada</b>.</p>
       <label>Valor (R$, opcional)<input id="e_val" inputmode="decimal" placeholder="ex.: 1300"></label>
@@ -196,8 +196,8 @@ label textarea{min-height:60px;resize:vertical}
         <div id="e_rl" class="rlig"></div>
         <div style="font-size:12px;color:var(--sub);margin:12px 0 4px">e/ou ligar a tarefas das pessoas <small style="color:var(--muted)">(trabalho em equipe: cada tarefa concluída avança a barra)</small></div>
         <input id="e_tf" placeholder="🔎 buscar tarefa ou pessoa" style="margin-bottom:6px;width:100%;box-sizing:border-box;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:9px 12px;font:inherit;font-size:14px"><div id="e_tl" class="rlig"></div>
-        <div style="font-size:12px;color:var(--sub);margin:14px 0 4px">👥 Designar para <small style="color:var(--muted)">(cria a mesma tarefa, com o mesmo nome, para cada pessoa marcada; completa sozinha quando todos concluírem ou justificarem)</small></div>
-        <div id="e_dg" class="rlig"></div><label style="display:block;margin-top:8px;font-size:12px;color:var(--sub)">Entregar até<input type="date" id="e_dpz" style="display:block;margin-top:4px"></label></div>
+        <div style="font-size:12px;color:var(--sub);margin:14px 0 4px">👥 Designar para <small style="color:var(--muted)">(é a MESMA tarefa, ligada a cada pessoa marcada: mudar nome, descrição ou entrega aqui ou na tarefa de qualquer um muda para todos; cada um marca a sua; completa sozinha quando todos concluírem ou justificarem)</small></div>
+        <div id="e_dg" class="rlig"></div><label id="e_dpzw" style="display:block;margin-top:8px;font-size:12px;color:var(--sub)">Entregar até<input type="date" id="e_dpz" style="display:block;margin-top:4px"></label></div>
     </div><div class="acts"><button class="btn pkb" id="e_ok">Salvar</button><button class="btn" id="e_can" style="display:none">Cancelar edição</button><span class="msg" id="e_msg"></span></div></div>
   </div>
 
@@ -343,8 +343,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwkzhivd"></script>
-<script src="../lbmetas.js?v=mwkzhivd"></script>
+<script src="../lb.js?v=mwl05oiv"></script>
+<script src="../lbmetas.js?v=mwl05oiv"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -404,7 +404,7 @@ function renderInd(){const A=ativos();if(SEL&&!PF.some(p=>p.id===SEL))SEL=null;i
     <div class="lk"><code>${esc(linkDe(p))}</code><button class="btn sm" data-cp="${esc(linkDe(p))}">copiar link</button></div></div>`;
   $('i_h').textContent=EDT?'Editar tarefa':'Nova tarefa para '+p.nome;
   const l=mt.filter(t=>FIL==='tudo'||(FIL==='concl'?t.status==='Concluída':t.status!=='Concluída')).sort(ordem);
-  $('i_lista').innerHTML=l.length?agrupa(l,t=>t.categoria,t=>`<div class="tf ${cls(t)}"><div class="hd"><div><b>${esc(t.titulo)}</b>${t.descricao?`<div class="ds">${esc(t.descricao)}</div>`:''}</div>
+  $('i_lista').innerHTML=l.length?agrupa(l,t=>t.categoria,t=>`<div class="tf ${cls(t)}"><div class="hd"><div><b>${esc(t.titulo)}</b>${t.descricao?`<div class="ds">${esc(t.descricao)}</div>`:''}${t.grupo?(o=>o.length?`<div class="ds" style="color:var(--pinkl)">🔗 Ligada: mesma tarefa de ${esc(o.join(', '))}${/^emp:/.test(t.grupo)?' (Empresa)':''} · editar muda para todos</div>`:'')(TF.filter(y=>y.grupo===t.grupo&&y.id!==t.id).map(y=>nomeP(y.pessoa))):''}</div>
       <select data-st="${esc(t.id)}">${['A fazer','Em andamento','Concluída'].map(s=>`<option${s===t.status?' selected':''}>${s}</option>`).join('')}</select></div>
     ${window.LBROT&&LBROT.andL(t).length&&t.status!=='Concluída'?`<div class="mt" style="color:var(--sub)">${esc(LBROT.andTxt(t))} <small style="color:var(--muted)">· ${esc(String(LBROT.andL(t).slice(-1)[0].d).slice(8,10)+'/'+String(LBROT.andL(t).slice(-1)[0].d).slice(5,7))}</small></div>`:''}${t.justificativa?`<div class="mt" style="color:#F5C451">Justificativa${t.justificado_em?' '+ddmm(t.justificado_em):''}: ${esc(t.justificativa)}</div>`:''}<div class="mt">${stPill(t)} ${t.prazo?'· entregar até '+ddmm(t.prazo):''}${t.status==='Concluída'&&t.prazo&&t.concluido_em>t.prazo?' · <span class="neg">entregue depois do prazo</span>':''}${t.recorrencia?' · 🔁 '+(t.recorrencia==='mensal'?'todo mês':'toda semana'):''}${t.grupo?' · mandada para todos':''} · <a href="#" data-ed="${esc(t.id)}" style="color:var(--pinkl)">editar</a> · <a href="#" data-del="${esc(t.id)}" style="color:var(--muted)">excluir</a></div></div>`)
     :`<div class="empty">${FIL==='concl'?'Nada concluído ainda.':'Nenhuma tarefa em aberto.'}</div>`}
@@ -635,17 +635,20 @@ function renderEmp(){const l=MT.filter(x=>!EFIL||EFIL.split(',').includes(x.tipo
 function limpaE(){EDE=null;dgRender(null);['e_tit','e_alvo','e_pz','e_ini','e_tm','e_val','e_ord','e_pro','e_at','e_mn','e_tf','e_dpz'].forEach(i=>$(i).value='');rlRender('');tlRender('');setTimeout(pgVis);$('e_tp').value='meta';$('e_fq').value='uma';fqVis();$('e_so').value='não';$('e_pn').value='não';$('e_jo').value='não';sitOpts('meta');$('e_can').style.display='none';$('e_h').textContent='Novo item';$('e_msg').textContent=''}
 const salvaMeta=x=>api({acao:'salvar_meta',meta:x});
 /* 16/11: prazo = repetição (menu) + início e término (calendário); "Outro" mantém o texto livre */
-function fqVis(){const o=$('e_fq').value==='outro';$('e_pzw').style.display=o?'':'none';$('e_tm').closest('label').firstChild.textContent=$('e_fq').value==='uma'?'Prazo (data)':'Data de término'}
+function fqVis(){const tf=$('e_tp').value==='tarefa';if(tf)$('e_fq').value='uma';const o=$('e_fq').value==='outro';$('e_pzw').style.display=o&&!tf?'':'none';
+  $('e_fqw').style.display=tf?'none':'';$('e_iniw').style.display=tf?'none':'';$('e_dpzw').style.display=tf?'none':'';if(tf)$('e_ini').value='';
+  $('e_tm').closest('label').firstChild.textContent=tf?'Entregar até':$('e_fq').value==='uma'?'Prazo (data)':'Data de término';
+  $('e_pzn').innerHTML=tf?'Passou da data de entrega sem concluir → aparece como <b style="color:var(--neg)">atrasada</b>. A data também aparece nas agendas.':'Passou do término sem cumprir, ou uma meta individual ligada falhou num dia/semana que já passou → aparece como <b style="color:var(--neg)">atrasada</b>.'}
 $('e_fq').onchange=fqVis;
 function pzMonta(){const f=$('e_fq').value;if(f==='outro')return $('e_pz').value;if(f==='uma')return $('e_tm').value||'';return LBROT.prazoTxt({freq:f,inicio:$('e_ini').value,termino:$('e_tm').value}).slice(0,40)}
 function pzCarrega(x){const iso=/^\d{4}-\d{2}-\d{2}$/.test(x.prazo||'');$('e_fq').value=x.freq||(iso||!x.prazo?'uma':'outro');$('e_pz').value=x.freq||iso?'':(x.prazo||'');$('e_ini').value=x.inicio||'';$('e_tm').value=x.termino||(iso?x.prazo:'');fqVis()}
-const pgVis=()=>{$('e_pg').style.display=['meta','tarefa'].includes($('e_tp').value)?'':'none'};
+const pgVis=()=>{$('e_pg').style.display=['meta','tarefa'].includes($('e_tp').value)?'':'none';try{fqVis()}catch(e){}};
 $('e_tp').onchange=()=>{sitOpts($('e_tp').value,$('e_sit').value);pgVis()};
 $('e_can').onclick=limpaE;
 $('e_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;EFIL=b.dataset.f;document.querySelectorAll('#e_fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderEmp()};
 $('e_ok').onclick=async()=>{const m=$('e_msg'),t=$('e_tit').value.trim();if(!t){m.innerHTML='<span class="neg">Escreva o título.</span>';return}
   const v=$('e_val').value.trim().replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');
-  m.textContent='Salvando…';try{await salvaMeta({id:EDE||undefined,tipo:$('e_tp').value,socio:$('e_so').value,painel:$('e_pn').value,jornal:$('e_jo').value,titulo:t,alvo:$('e_alvo').value,freq:$('e_fq').value,inicio:$('e_ini').value,termino:$('e_tm').value,prazo:pzMonta(),valor:v,situacao:$('e_sit').value,ordem:$('e_ord').value,progresso:$('e_pro').value,atual:$('e_at').value.trim().replace(',','.'),meta_num:$('e_mn').value.trim().replace(',','.'),rotinas:[...$('e_rl').querySelectorAll('input:checked')].map(i=>i.value),tarefas:tlSel(),designar:dgSel(),designar_prazo:$('e_dpz').value,designar_desc:$('e_alvo').value});limpaE();m.innerHTML='<span class="pos">Salvo ✓</span>';render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
+  m.textContent='Salvando…';try{await salvaMeta({id:EDE||undefined,tipo:$('e_tp').value,socio:$('e_so').value,painel:$('e_pn').value,jornal:$('e_jo').value,titulo:t,alvo:$('e_alvo').value,freq:$('e_fq').value,inicio:$('e_ini').value,termino:$('e_tm').value,prazo:pzMonta(),valor:v,situacao:$('e_sit').value,ordem:$('e_ord').value,progresso:$('e_pro').value,atual:$('e_at').value.trim().replace(',','.'),meta_num:$('e_mn').value.trim().replace(',','.'),rotinas:[...$('e_rl').querySelectorAll('input:checked')].map(i=>i.value),tarefas:tlSel(),designar:dgSel(),designar_prazo:$('e_tp').value==='tarefa'?$('e_tm').value:$('e_dpz').value,designar_desc:$('e_alvo').value});limpaE();m.innerHTML='<span class="pos">Salvo ✓</span>';render()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
 $('e_lista').addEventListener('click',async e=>{const ed=e.target.closest('[data-me]'),so=e.target.closest('[data-mso]'),pn=e.target.closest('[data-mpn]'),del=e.target.closest('[data-mdel]'),jo=e.target.closest('[data-mjo]');if(!ed&&!so&&!pn&&!del&&!jo)return;e.preventDefault();
   if(jo){const x=MT.find(y=>y.id===jo.dataset.mjo);jo.textContent='salvando…';try{await salvaMeta(Object.assign({},x,{jornal:x.jornal==='sim'?'não':'sim'}));render()}catch(err){jo.textContent='erro'}return}
   if(pn){const x=MT.find(y=>y.id===pn.dataset.mpn);pn.textContent='salvando…';try{await salvaMeta(Object.assign({},x,{painel:x.painel==='sim'?'não':'sim'}));render()}catch(err){pn.textContent='erro'}return}
@@ -940,7 +943,7 @@ function xtRender(){const el=$('xt_res');if(!XT.length){el.innerHTML='';return}c
     if(d){e.preventDefault();if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent='toque de novo para apagar';return}try{XT=(await api({acao:'excluir_extrato',id:d.dataset.xdel})).extratos||[];xtRender()}catch(er){d.textContent='erro'}}}}
 {const a0=lnAbre;lnAbre=async function(){await a0();xtCarrega()};const r0=lnRender;lnRender=function(){r0();if(XTOK)xtRender()}}
 </script>
-<script src="../lbchat.js?v=mwkzhivd"></script>
+<script src="../lbchat.js?v=mwl05oiv"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

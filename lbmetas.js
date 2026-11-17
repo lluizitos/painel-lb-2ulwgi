@@ -427,7 +427,7 @@
     function form() {
       if (NV === 'tarefa') return `<div class="nvf"><label>Tarefa</label><input id="nv_t" maxlength="200" placeholder="ex.: mandar o orçamento do figurino" value="${esc(NVPRE.t)}">
         <label>Detalhes (opcional)</label><textarea id="nv_d" maxlength="2000"></textarea>
-        <label>Prazo (opcional)</label><input id="nv_p" type="date" value="${esc(NVPRE.p)}">
+        <label>Entregar até (opcional)</label><input id="nv_p" type="date" value="${esc(NVPRE.p)}">
         <label>Repetir</label><select id="nv_r"><option value="">Não repete</option><option value="semanal">Toda semana</option><option value="mensal">Todo mês</option></select>
         <label>Categoria (opcional)</label><input id="nv_c" maxlength="40" placeholder="Pessoal">
         <div class="msg" id="nv_m"></div><div class="rkb"><button class="ok" data-nvs="tarefa">Criar tarefa</button><button data-nv="">Cancelar</button></div></div>`;
