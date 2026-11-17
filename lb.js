@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwkz7tso';
+  const BUILD = 'mwkzhivd';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -32,6 +32,24 @@
       location.replace(location.pathname + '?v=' + j.v + location.hash);
     }).catch(() => { });
   }
+  /* 17/11: site deixado aberto no celular. Ao VOLTAR para ele (trocou de app, bloqueou a tela, voltou pelo "voltar"):
+     - fora 3 min ou mais: confere se saiu versão nova do site (arquivo pequeno do GitHub, não gasta a API) e recarrega se saiu;
+     - fora 30 min ou mais: recarrega a página para trazer os dados novos (umas poucas chamadas à API, só nessa hora).
+     Não recarrega se a pessoa estiver digitando ou com uma janela de edição aberta. */
+  let saiuEm = 0, BASE0 = null; // BASE0: página com login (guardado ao entrar)
+  const ocupado = () => { const a = document.activeElement; if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.value) return true;
+    return !!document.querySelector('.sheet.on,.sh.on,[aria-hidden="false"].on,#lbpf,dialog[open]'); };
+  function aoVoltar(min) {
+    if (BASE0 === null) return;
+    if (min >= 30 && !ocupado()) { location.reload(); return; }
+    if (min >= 3) versao(BASE0);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { saiuEm = Date.now(); return; }
+    if (saiuEm) { const m = (Date.now() - saiuEm) / 6e4; saiuEm = 0; aoVoltar(m); }
+  });
+  addEventListener('pageshow', e => { if (e.persisted) aoVoltar(saiuEm ? (Date.now() - saiuEm) / 6e4 : 3); });
+  addEventListener('pagehide', () => { saiuEm = saiuEm || Date.now(); });
   /* chave da senha (PBKDF2, 600 mil rodadas = lento no celular): calcula 1 vez e guarda neste aparelho (o login já fica guardado nele) */
   async function kekDe(u, p, salt, iter) {
     const id = 'lbk_' + hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(norm(u) + '|' + p + '|' + salt + '|' + iter))).slice(0, 24);
@@ -94,7 +112,7 @@
   /* Monta a tela de login e chama ok({dados, paginas, nome}) quando abrir. */
   function entrar(opc) {
     const { pagina, base, titulo, ok } = opc;
-    versao(base);
+    versao(base); BASE0 = base;
     if (!document.getElementById('lbcss')) {
       const st = document.createElement('style'); st.id = 'lbcss';
       st.textContent = `#lock{position:fixed;inset:0;z-index:50;background:#141218;display:flex;align-items:center;justify-content:center;padding:24px;font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
