@@ -392,10 +392,10 @@ body.emb header .wrap,body.emb #ptabs,body.emb #lbq{display:none!important}body.
 </main>
 </div>
 
-<script src="lb.js?v=mwjw1py0"></script>
-<script src="lbmetas.js?v=mwjw1py0"></script>
-<script src="lbchat.js?v=mwjw1py0"></script>
-<script src="lbvendas.js?v=mwjw1py0"></script>
+<script src="lb.js?v=mwkz7tso"></script>
+<script src="lbmetas.js?v=mwkz7tso"></script>
+<script src="lbchat.js?v=mwkz7tso"></script>
+<script src="lbvendas.js?v=mwkz7tso"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -614,7 +614,7 @@ async function pagAoVivo(){ // pagamentos avulsos e fixos da página Admin
     const r=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'pagamentos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json();
     if(r.ok){PAGS=r.pagamentos||[];PAGS_OK=true;renderPagar();renderMes();try{renderFalta()}catch(e){}try{renderSaldo()}catch(e){}migraMin()}
     const l=await (await fetch(c.api_url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'lancamentos',usuario:LB.login,senha:LB.senha,nome:LB.usuario})})).json(); // ajustes e lançamentos novos do Admin
-    if(l.ok){LANCS=l.lancamentos||[];LANCS_OK=true;renderMes()}}catch(e){}}
+    if(l.ok){LANCS=l.lancamentos||[];LANCS_OK=true;renderMes();try{renderSaldo()}catch(e){}}}catch(e){}}
 let LANCS=[],LANCS_OK=false;
 /* aplica ao vivo o que foi editado/criado no Admin (o build também aplica; aqui é para ver na hora) */
 function comLancs(movs,app){if(!LANCS_OK)return movs.concat(app);const aj={};LANCS.forEach(l=>{if(l.ref)aj[l.ref]=l});

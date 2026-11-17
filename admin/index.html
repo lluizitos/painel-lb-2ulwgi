@@ -343,8 +343,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwjw1py0"></script>
-<script src="../lbmetas.js?v=mwjw1py0"></script>
+<script src="../lb.js?v=mwkz7tso"></script>
+<script src="../lbmetas.js?v=mwkz7tso"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -806,8 +806,8 @@ function envRender(){const pd=ENV.filter(x=>x.status==='pendente');$('env_n').te
   const l=ENVT?ENV.slice(0,30):pd;const st={pendente:'aguardando',lançado:'✅ lançado',conferido:'✓ já estava no extrato',descartado:'descartado'};
   $('env_box').innerHTML=(ENV.length?`<div class="envh"><b>📎 ANEXOS ENVIADOS PELOS CHATS${pd.length?' · '+pd.length+' para conferir':''}</b><a href="#" id="env_t">${ENVT?'só os pendentes':'ver todos'}</a></div>`:'')+
   l.map(x=>{const a=x.ia&&x.ia.e_comprovante!==false?x.ia:null;return `<div class="envc ${x.status==='pendente'?'':'ok'}"><div class="mt">${esc(x.nome||x.usuario)}${x.pagina?' · '+esc(x.pagina):''} · ${esc(ddmm(x.criado_em)+' '+String(x.criado_em).slice(11,16))} · ${st[x.status]||x.status}</div>
-  <div class="rs">${a?esc(a.resumo||''):x.ia?'⚠️ '+esc(x.ia.resumo||'não parece comprovante'):'Comprovante (ainda sem leitura automática)'}</div>${a?`<div class="nt">${[a.tipo==='entrada'?'Entrada':a.tipo==='saida'?'Saída':'',a.valor?brl2(a.valor):'',a.quem,a.data?ddmm(a.data):''].filter(Boolean).map(esc).join(' · ')}</div>`:''}${x.nota?`<div class="nt">“${esc(x.nota)}”</div>`:''}
-  <div class="ac"><button class="btn sm" data-ev="ver" data-id="${esc(x.id)}">📄 Ver arquivo</button>${x.status==='pendente'?`<button class="btn sm pkb" data-ev="lan" data-id="${esc(x.id)}">Lançar</button><button class="btn sm" data-ev="conferido" data-id="${esc(x.id)}">Já está no extrato</button><button class="btn sm" data-ev="descartado" data-id="${esc(x.id)}">Descartar</button>`:`<button class="btn sm" data-ev="pendente" data-id="${esc(x.id)}">Voltar para conferir</button>`}<button class="btn sm" data-ev="del" data-id="${esc(x.id)}">Excluir</button></div></div>`}).join('')}
+  ${x.ia&&x.ia.aviso?`<div class="nt" style="color:#F5C451;font-weight:700">⚠️ ${esc(x.ia.aviso)}</div>`:''}${x.conferido_por==='automático'&&x.status==='lançado'?'<div class="nt" style="color:var(--pos)">Entrou sozinho no saldo (lançado automático). Para revisar, abra em Lançamentos; se estiver errado, desfaça.</div>':''}<div class="rs">${a?esc(a.resumo||''):x.ia&&x.ia.resumo?'⚠️ '+esc(x.ia.resumo):'Comprovante (ainda sem leitura automática)'}</div>${a?`<div class="nt">${[a.tipo==='entrada'?'Entrada':a.tipo==='saida'?'Saída':'',a.valor?brl2(a.valor):'',a.quem,a.data?ddmm(a.data):''].filter(Boolean).map(esc).join(' · ')}</div>`:''}${x.nota?`<div class="nt">“${esc(x.nota)}”</div>`:''}
+  <div class="ac"><button class="btn sm" data-ev="ver" data-id="${esc(x.id)}">📄 Ver arquivo</button>${x.status==='pendente'?`<button class="btn sm pkb" data-ev="lan" data-id="${esc(x.id)}">Lançar</button><button class="btn sm" data-ev="conferido" data-id="${esc(x.id)}">Já está no extrato</button><button class="btn sm" data-ev="descartado" data-id="${esc(x.id)}">Descartar</button>`:(x.status==='lançado'&&x.lanc_id?`<button class="btn sm" data-ev="rev" data-id="${esc(x.id)}">Revisar lançamento</button><button class="btn sm" data-ev="desf" data-id="${esc(x.id)}">Desfazer lançamento</button>`:'')+`<button class="btn sm" data-ev="pendente" data-id="${esc(x.id)}">Voltar para conferir</button>`}<button class="btn sm" data-ev="del" data-id="${esc(x.id)}">Excluir</button></div></div>`}).join('')}
 $('env_box').onclick=async e=>{if(e.target.id==='env_t'){e.preventDefault();ENVT=!ENVT;envRender();return}
   const b=e.target.closest('[data-ev]');if(!b)return;const x=ENV.find(y=>y.id===b.dataset.id);if(!x)return;const k=b.dataset.ev;
   if(k==='ver'){const w=window.open('','_blank');b.textContent='abrindo…';try{const r=await api({acao:'ver_anexo',id:x.arquivo_id});if(!r.ok)throw new Error(r.erro);const bl=new Blob([Uint8Array.from(atob(r.dados),c=>c.charCodeAt(0))],{type:r.tipo});if(w)w.location=URL.createObjectURL(bl);else location=URL.createObjectURL(bl)}catch(er){if(w)w.close();alert('Não abriu: '+er.message)}b.textContent='📄 Ver arquivo';return}
@@ -816,6 +816,9 @@ $('env_box').onclick=async e=>{if(e.target.id==='env_t'){e.preventDefault();ENVT
     $('ln_qm').value=a.quem||'';$('ln_ob').value=['📎 comprovante enviado por '+(x.nome||x.usuario)+' em '+ddmm(x.criado_em),x.nota,a.descricao].filter(Boolean).join(' · ').slice(0,300);
     if(a.data&&a.data<=AD.ext_ate)$('ln_msg').innerHTML=`<span class="neg">Data até ${ddmm(AD.ext_ate)}: já deve estar no extrato. Se estiver, use "Já está no extrato".</span>`;return}
   if(k==='del'){if(b.dataset.ok!=='1'){b.dataset.ok='1';b.textContent='toque de novo (apaga o arquivo)';return}}
+  if(k==='rev'){try{if(!LNOK)await lnAbre()}catch(er){}const l=lnTodos().find(y=>y.id==='ln-'+x.lanc_id);if(l)lnSheet(l);else alert('Não achei o lançamento (pode ter sido excluído).');return}
+  if(k==='desf'){if(b.dataset.ok!=='1'){b.dataset.ok='1';b.textContent='toque de novo (tira do saldo)';return}b.disabled=true;
+    try{LN=(await api({acao:'excluir_lancamento',id:x.lanc_id})).lancamentos||LN;ENV=(await api({acao:'envio_status',id:x.id,status:'pendente'})).envios||ENV;envRender();try{lnRender()}catch(er){}}catch(er){b.disabled=false;b.textContent='erro'}return}
   b.disabled=true;try{ENV=(await api(k==='del'?{acao:'excluir_envio',id:x.id}:{acao:'envio_status',id:x.id,status:k})).envios||ENV;envRender()}catch(er){b.disabled=false;b.textContent='erro'}};
 /* ---------- DÚVIDAS ---------- */
 let DUV=[],DUVF='aberta';
@@ -937,7 +940,7 @@ function xtRender(){const el=$('xt_res');if(!XT.length){el.innerHTML='';return}c
     if(d){e.preventDefault();if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent='toque de novo para apagar';return}try{XT=(await api({acao:'excluir_extrato',id:d.dataset.xdel})).extratos||[];xtRender()}catch(er){d.textContent='erro'}}}}
 {const a0=lnAbre;lnAbre=async function(){await a0();xtCarrega()};const r0=lnRender;lnRender=function(){r0();if(XTOK)xtRender()}}
 </script>
-<script src="../lbchat.js?v=mwjw1py0"></script>
+<script src="../lbchat.js?v=mwkz7tso"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>
