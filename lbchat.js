@@ -160,8 +160,14 @@
       throw new Error('use foto ou PDF'); };
     const tiraArq = () => { ARQ = null; if (qf) { qf.hidden = true; qf.innerHTML = ''; } phSet(); bt.textContent = 'Perguntar'; };
     const STV = { pendente: ['⏳ o Luiz vai conferir', ''], 'lançado': ['✅ lançado', 'ok'], conferido: ['✓ conferido', 'ok'], descartado: ['descartado', 'x'] };
-    const evRender = l => { if (!ev) return; const v = (l || []).filter(x => x.status === 'pendente' || Date.now() - new Date(String(x.atualizado_em).replace(' ', 'T')).getTime() < 3 * 864e5).slice(0, 5);
-      ev.hidden = !v.length; ev.innerHTML = v.length ? '<b>📎 SEUS ENVIOS</b>' + v.map(x => { const s = STV[x.status] || STV.pendente; return `<div><small>${esc(String(x.criado_em).slice(8, 10) + '/' + String(x.criado_em).slice(5, 7))}</small><span>${esc((x.ia && x.ia.e_comprovante !== false && x.ia.resumo) || x.nota || 'Comprovante')}</span><em class="${s[1]}">${s[0]}</em></div>`; }).join('') : ''; };
+    /* 18/11: cada envio aparece UMA vez por situação (enviado → lançado/conferido): na próxima visita some. Guardado neste aparelho. */
+    const EVK = 'lbev_vistos', evS = () => { try { return JSON.parse(localStorage.getItem(EVK) || '[]'); } catch (e) { return []; } }, EVSESS = new Set(); let evFechou = false;
+    const evRender = l => { if (!ev) return; const vis = new Set(evS());
+      const v = evFechou ? [] : (l || []).filter(x => x.status === 'pendente' || Date.now() - new Date(String(x.atualizado_em).replace(' ', 'T')).getTime() < 3 * 864e5)
+        .filter(x => { const k = x.id + '|' + x.status; return EVSESS.has(k) || !vis.has(k); }).slice(0, 5);
+      v.forEach(x => { const k = x.id + '|' + x.status; EVSESS.add(k); vis.add(k); }); try { localStorage.setItem(EVK, JSON.stringify([...vis].slice(-300))); } catch (e) { }
+      ev.hidden = !v.length; ev.innerHTML = v.length ? '<b>📎 SEUS ENVIOS</b><button type="button" class="evx" aria-label="Fechar" style="float:right;background:none;border:0;color:inherit;font-size:18px;line-height:1;cursor:pointer;padding:0 2px">×</button>' + v.map(x => { const s = STV[x.status] || STV.pendente; return `<div><small>${esc(String(x.criado_em).slice(8, 10) + '/' + String(x.criado_em).slice(5, 7))}</small><span>${esc((x.ia && x.ia.e_comprovante !== false && x.ia.resumo) || x.nota || 'Comprovante')}</span><em class="${s[1]}">${s[0]}</em></div>`; }).join('') : ''; };
+    if (ev) ev.addEventListener('click', e => { if (e.target.closest('.evx')) { evFechou = true; ev.hidden = true; ev.innerHTML = ''; } });
     const evCarrega = async () => { if (!ev || (!op.auth && (!window.LB || !LB.senha))) return;
       try { const r = await (await fetch(await URL_(), { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'meus_envios' }, cred())) })).json(); if (r.ok) evRender(r.envios); } catch (e) { } };
     if (op.anexo) {
@@ -186,7 +192,7 @@
         const L = r.leitura, ok = L && L.e_comprovante !== false;
         const det = ok ? [L.tipo === 'entrada' ? 'Entrada' : L.tipo === 'saida' ? 'Saída' : '', L.valor ? brl(L.valor) : '', L.quem, L.data ? L.data.slice(8, 10) + '/' + L.data.slice(5, 7) : ''].filter(Boolean).join(' · ') : '';
         oa.innerHTML = `<div class="qr"><div class="qp">📎 ${esc(a.name || 'comprovante')}${nota ? ' · ' + esc(nota) : ''}</div><div class="qt">${r.lancado ? '✅ Comprovante lançado: já entrou no saldo.' : r.motivo === 'repetido' ? '⚠️ Esse comprovante parece repetido, então não lancei de novo. O Luiz vai conferir.' : '✅ Enviado para o Luiz conferir.'}${ok && L.resumo ? '\n\nLi aqui: ' + esc(L.resumo) : ''}</div>${det ? `<div class="qc">${esc(det)}</div>` : ''}${L && L.e_comprovante === false ? `<div class="qv">Não parece um comprovante: ${esc(L.resumo || '')}. Se estiver certo, tudo bem: o Luiz vê do mesmo jeito.</div>` : ''}<div class="qn"><span>Fica guardado numa pasta privada do Drive.</span><span><a href="#" class="qx">fechar</a></span></div></div>`;
-        inp.value = ''; tiraArq(); evCarrega();
+        inp.value = ''; tiraArq(); evFechou = false; evCarrega();
       } catch (er) { oa.innerHTML = `<div class="qr"><div class="qt qe">${esc(er && er.message && /PDF|foto/.test(er.message) ? er.message : 'Sem conexão. Tente de novo.')}</div></div>`; }
       finally { setTimeout(() => { bt.disabled = false; }, 1500); }
     }
