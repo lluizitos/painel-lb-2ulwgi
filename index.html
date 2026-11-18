@@ -392,10 +392,10 @@ body.emb header .wrap,body.emb #ptabs,body.emb #lbq{display:none!important}body.
 </main>
 </div>
 
-<script src="lb.js?v=mwms4qh7"></script>
-<script src="lbmetas.js?v=mwms4qh7"></script>
-<script src="lbchat.js?v=mwms4qh7"></script>
-<script src="lbvendas.js?v=mwms4qh7"></script>
+<script src="lb.js?v=mwms7ivt"></script>
+<script src="lbmetas.js?v=mwms7ivt"></script>
+<script src="lbchat.js?v=mwms7ivt"></script>
+<script src="lbvendas.js?v=mwms7ivt"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -532,7 +532,7 @@ function renderPagar(){const tp=document.getElementById('tpag');if(tp&&D.avisos)
     const k=t.pessoa||LB.norm(t.para);const x=P[k]=P[k]||{k,nome:t.para,pix:t.pix,tot:0,it:[]};x.tot+=+t.valor;if(!x.pix)x.pix=t.pix;
     x.it.push({b,e:{funcao:'item: '+(t.desc||'')},item:j,f:+t.valor,ps:[{k:'item',n:t.desc||'item',v:+t.valor}]})}));
   // pagamentos avulsos e fixos (página Admin): entram na data, até marcar pago
-  PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada').forEach(g=>LB.pgx.ocorr(g,FM).filter(o=>!o.pago&&o.falta>0.004&&(!pAdiado(g,o.ref)||(NAD++,false))).forEach(o=>{const k=g.pessoa||LB.norm(g.nome);const x=P[k]=P[k]||{k,nome:g.nome,pix:g.pix,tot:0,it:[]};x.tot+=o.falta;if(!x.pix)x.pix=g.pix;
+  PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada'&&g.ocultar!=='sim').forEach(g=>LB.pgx.ocorr(g,FM).filter(o=>!o.pago&&o.falta>0.004&&(!pAdiado(g,o.ref)||(NAD++,false))).forEach(o=>{const k=g.pessoa||LB.norm(g.nome);const x=P[k]=P[k]||{k,nome:g.nome,pix:g.pix,tot:0,it:[]};x.tot+=o.falta;if(!x.pix)x.pix=g.pix;
     x.it.push({b:{id:'pg-'+g.id,data:o.data,show:g.descricao||(g.tipo==='fixo'?'fixo mensal':'pagamento avulso')},e:{funcao:g.tipo==='fixo'?'fixo de '+MES3P[+o.ref.slice(5,7)-1]:'avulso'},g,o,fut:o.data>HJ,f:o.falta,ps:[{k:'pg',n:(g.meio==='Pix'?'pagamento':g.meio.toLowerCase())+(o.pg?' · falta (já pago '+brl(o.pg)+')':''),v:o.falta}]})}));
   const l=Object.values(P).sort((a,b)=>b.tot-a.tot),tot=l.reduce((a,x)=>a+x.tot,0),nsh=new Set(l.flatMap(x=>x.it.filter(i=>!i.g).map(i=>i.b.id))).size;
   const vtot=l.reduce((a,x)=>a+x.it.filter(i=>!i.fut).reduce((b,i)=>b+i.f,0),0);
