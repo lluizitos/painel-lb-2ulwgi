@@ -102,9 +102,10 @@
     return `<div class="qg"><b>${esc(g.titulo)}</b><div class="qb">${it.map(x => `<span title="${esc(x.rotulo)}">${esc(x.rotulo)}</span><i style="width:${Math.abs(x.valor) / mx * 100}%;background:${x.valor < 0 ? 'var(--neg)' : 'var(--pink)'}"></i><em>${fmt(x.valor, it)}</em>`).join('')}</div></div>`;
   }
   /* el = elemento; op.contexto() = texto curto com os dados; op.base = caminho até config.json; op.exemplos = sugestões no placeholder */
+  function css() { if (!document.getElementById('lbqcss')) { const s = document.createElement('style'); s.id = 'lbqcss'; s.textContent = CSS; document.head.appendChild(s); } }
   function montar(el, op) {
     if (!el) return; if (op.anexo === undefined) op = Object.assign({}, op, { anexo: true }); // 📎 em todos os chats
-    if (!document.getElementById('lbqcss')) { const s = document.createElement('style'); s.id = 'lbqcss'; s.textContent = CSS; document.head.appendChild(s); }
+    css();
     el.className = 'lbq';
     el.innerHTML = `<div class="du"></div>${op.anexo ? '<div class="ev" hidden></div><div class="qf" hidden></div>' : ''}<form>${op.anexo ? '<button type="button" class="qan" title="Mandar comprovante ou documento (foto ou PDF)" aria-label="Anexar arquivo">📎</button>' : ''}<input maxlength="300" placeholder="💬 Pergunte sua dúvida${op.exemplo ? ' · ex.: ' + esc(op.exemplo) : ''}" aria-label="Pergunte sua dúvida" enterkeyhint="send"><button>Perguntar</button></form>${op.anexo ? '<div class="qm"><button type="button" data-qm="cam">📷 Tirar foto</button><button type="button" data-qm="arq">🖼️ Foto ou PDF do celular</button></div><input type="file" accept="image/*" capture="environment" hidden data-qin="cam"><input type="file" accept="image/*,application/pdf" hidden data-qin="arq">' : ''}<div class="qs"></div><div class="qtb"></div><div class="qoa"></div><div class="qo"></div>`;
     const f = el.querySelector('form'), inp = f.querySelector('input'), bt = f.querySelector('button:not(.qan)'), out = el.querySelector('.qo'), du = el.querySelector('.du'), tb = el.querySelector('.qtb'), oa = el.querySelector('.qoa');
@@ -319,5 +320,5 @@ table{width:100%;border-collapse:collapse;margin-top:6px}th,td{text-align:left;p
 <button class="bt" onclick="print()">Imprimir / salvar PDF</button></body></html>`;
     const w = window.open('', '_blank'); if (!w) { alert('Libere as janelas (pop-up) para abrir o documento.'); return; } w.document.open(); w.document.write(html); w.document.close();
   }
-  window.LBCHAT = { montar, grafico, formata, destaques, texto, auto, limpa, documento, nrm };
+  window.LBCHAT = { css, montar, grafico, formata, destaques, texto, auto, limpa, documento, nrm };
 })();
