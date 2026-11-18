@@ -164,6 +164,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 <header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
   <div class="ptabs" id="ptabs"><button class="on" data-p="fin">Gestão</button><button data-p="ven">Vendas</button><button data-p="eq">Equipe</button></div></header>
 <main class="wrap">
+  <div id="orcbox"></div>
 <div id="lbq"></div>
   <p class="eyebrow">Sócio</p>
   <h1>Lucas <em>Barros</em></h1>
@@ -240,9 +241,9 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 <div class="jp" id="jp"><div class="bk"></div><div class="bx" id="jpb"></div></div>
-<script src="../lb.js?v=mwl05oiv"></script>
-<script src="../lbchat.js?v=mwl05oiv"></script>
-<script src="../lbvendas.js?v=mwl05oiv"></script>
+<script src="../lb.js?v=mwmmezj7"></script>
+<script src="../lbchat.js?v=mwmmezj7"></script>
+<script src="../lbvendas.js?v=mwmmezj7"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -278,13 +279,14 @@ document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.clo
 function render(){
   document.getElementById('app').style.display='block';
   document.getElementById('upd').textContent='Atualizado em '+D.atualizado.split('-').reverse().join('/')+' · extrato até '+(D.extrato_ate||(D.agora&&D.agora.ate)||'');
+  try{LB.orc.mostra(document.getElementById('orcbox'),(D.alertas||[]).filter(a=>a.tipo==='despesa'&&a.painel==='sim'))}catch(e){console.error(e)}
   for(const f of [renderFin,renderJornal,renderAgendaMes,renderVendas,renderEquipe,renderFinSoc])try{f()}catch(e){console.error(e)}
 }
 
 /* ===================== FINANCEIRO ===================== */
 function renderFin(){
   const A=D.agora,P=D.proximos,G=D.geral,a=G.ano,mk=D.mes;
-  document.getElementById('alertas').innerHTML=(D.alertas||[]).map(x=>`<div class="alerta"><b class="t">${x.tipo==='despesa'?'Despesa prevista: ':''}${esc(x.titulo)}</b><p>${esc(x.texto)}</p>
+  document.getElementById('alertas').innerHTML=(D.alertas||[]).filter(a=>!(a.tipo==='despesa'&&a.painel==='sim')).map(x=>`<div class="alerta"><b class="t">${x.tipo==='despesa'?'Despesa prevista: ':''}${esc(x.titulo)}</b><p>${esc(x.texto)}</p>
     <div class="vv">${x.valor!=null?`<div>${x.situacao==='Confirmado'?'Valor':'Valor provável'}<b>${brl(x.valor)}</b></div>`:''}${x.minimo!=null&&x.maximo!=null?`<div>Pode variar de<b>${brl(x.minimo)} a ${brl(x.maximo)}</b></div>`:''}${x.prazo?`<div>Quando<b>${esc(x.prazo)}</b></div>`:''}</div></div>`).join('');
   // visão geral do ano
   const ap=G.aportes.reduce((s,x)=>s+x.valor,0),cx=A.caixa.conta+A.caixa.maos;
@@ -360,7 +362,7 @@ function renderJornal(){JN=[];const A=D.agora,G=D.geral,E=D.estimativa||{},mk=D.
     if(tt)nota({c:'ok',dt:'Entradas · '+nm+' · '+ate,t:'De onde entrou',body:nm4(['Total',brl(tt),'pos'],['Sinal',brl(T.sinal||0)])+`<div class="gf">${hbar(R)}</div>`,det:R.map(x=>lnD(x[0],brl(x[1]))).join('')+'<p class="note">Sinal = show que ainda vai acontecer. Cachê = show do mesmo mês, já feito. Cachê atrasado = show de um mês anterior. Show não identificado = entrada de show que ainda não está ligada a um show.</p>'})}}
   {const g=(A.gastos||[]).slice().sort((a,b)=>b.valor-a.valor);if(g.length){const tt=g.reduce((a,x)=>a+x.valor,0);
     nota({c:'ng',dt:'Saídas · '+nm+' · '+ate,t:'Saídas por setor',body:nm4(['Total',brl(tt)],['Maior setor',Math.round(g[0].valor/tt*100)+'%'])+`<div class="gf">${hbar(g.slice(0,7).map(x=>[esc(x.grupo),x.valor,'#CF1D51']))}</div>`,det:g.map(x=>lnD(esc(x.grupo),brl(x.valor))).join('')+'<p class="note">Só o que já está no extrato.</p>'})}}
-  (D.alertas||[]).forEach(x=>nota({c:'am',dt:x.tipo==='despesa'?'Despesa prevista':'Alerta',t:esc(x.titulo),pill:x.situacao?esc(x.situacao):'',body:nm4(x.valor!=null?[x.situacao==='Confirmado'?'Valor':'Valor provável',brl(x.valor)]:null,x.prazo?['Quando',esc(x.prazo)]:null)+`<div class="tx">${esc(x.texto||x.alvo||'')}</div>`,det:`<p>${esc(x.texto||'')}</p>`+(x.valor!=null?lnD('Valor',brl(x.valor)):'')+(x.prazo?lnD('Quando',esc(x.prazo)):'')+`<p class="note">${esc(x.rodape||'')}</p>`}));
+  (D.alertas||[]).filter(a=>!(a.tipo==='despesa'&&a.painel==='sim')).forEach(x=>nota({c:'am',dt:x.tipo==='despesa'?'Despesa prevista':'Alerta',t:esc(x.titulo),pill:x.situacao?esc(x.situacao):'',body:nm4(x.valor!=null?[x.situacao==='Confirmado'?'Valor':'Valor provável',brl(x.valor)]:null,x.prazo?['Quando',esc(x.prazo)]:null)+`<div class="tx">${esc(x.texto||x.alvo||'')}</div>`,det:`<p>${esc(x.texto||'')}</p>`+(x.valor!=null?lnD('Valor',brl(x.valor)):'')+(x.prazo?lnD('Quando',esc(x.prazo)):'')+`<p class="note">${esc(x.rodape||'')}</p>`}));
   (A.ocorrencias||[]).slice().sort((a,b)=>b.data.localeCompare(a.data)).forEach(o=>nota({c:'li',dt:(o.data>D.atualizado?'Programado · ':'Ocorrência · ')+dtx(o.data),t:esc(o.titulo),body:nm4(o.valor!=null?['Valor',brl(o.valor)]:null,['Data',ddmm(o.data)])+`<div class="tx">${esc(o.detalhe||'')}</div>`,det:`<p>${esc(o.detalhe||'')}</p>`+(o.valor!=null?lnD('Valor',brl(o.valor)):'')}));
   const metaCard=(m,kick)=>{const p=m.pct!=null?m.pct:/atingid|conclu/i.test(m.situacao||'')?1:null;nota({c:m.atr?'ng':'li',dt:kick,t:esc(m.titulo),pill:m.atr?'atrasada':esc(m.situacao||''),body:(p!=null?`<div class="nums"><div>Andamento<b>${Math.round(p*100)}%</b></div>${m.prazo?`<div>Prazo<b>${esc(m.prazo)}</b></div>`:''}</div><div class="prog"><i style="width:${p*100}%"></i></div>`:nm4(m.prazo?['Prazo',esc(m.prazo)]:null))+`<div class="tx">${esc([m.alvo,m.ptxt||m.texto||m.progresso].filter(Boolean).join('\n'))}</div>`,
     det:(m.alvo?`<p>${esc(m.alvo)}</p>`:'')+((m.progresso||m.texto)?`<p>${esc(m.progresso||m.texto)}</p>`:'')+lnD('Situação',esc(m.situacao||'—'))+(p!=null?lnD('Andamento',Math.round(p*100)+'%'):'')+(m.valor!=null?lnD('Valor',brl(m.valor)):'')+(m.prazo?lnD('Prazo',esc(m.prazo)):'')})};

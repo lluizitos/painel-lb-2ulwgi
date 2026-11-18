@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwl05oiv';
+  const BUILD = 'mwmmezj7';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -505,4 +505,57 @@
     new Function('document', 'LB', 'fetch', code)(fd, fLB, fFetch);
     return root;
   };
+})();
+
+/* 18/11: AVISO PRINCIPAL (Admin → Empresa, "Despesa prevista" com "avisar no painel"): cartão no topo do Artista e do Sócio,
+   tela com o orçamento inteiro (detalhes no formato "## seção" / "- item: R$ valor") e link direto: <página>/#orc */
+(function () {
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const brl = v => 'R$ ' + (+v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const css = () => { if (document.getElementById('lborc')) return; const st = document.createElement('style'); st.id = 'lborc'; st.textContent = `
+.orcc{display:block;width:100%;text-align:left;font:inherit;color:#F3F1F6;cursor:pointer;margin:14px 0 16px;padding:16px 16px 14px;border-radius:16px;border:1px solid rgba(240,80,126,.45);
+  background:linear-gradient(135deg,rgba(207,29,81,.22),rgba(207,29,81,.05) 60%),#1E1C24;box-shadow:0 8px 28px rgba(207,29,81,.18)}
+.orcc .ol{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#F0507E}
+.orcc .ol i{font-style:normal;background:#CF1D51;color:#fff;border-radius:99px;padding:3px 9px;letter-spacing:.08em}
+.orcc h3{margin:8px 0 2px!important;font-size:19px!important;font-weight:800;line-height:1.25;color:#F3F1F6!important;letter-spacing:0!important;text-transform:none!important}
+.orcc .os{font-size:13px;color:#B8B3C3}.orcc .ov{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:12px;flex-wrap:wrap}
+.orcc .ov b{font-size:26px;font-weight:800;color:#F3F1F6;letter-spacing:-.01em}.orcc .ov small{font-size:12.5px;color:#B8B3C3}
+.orcc .ob{margin-top:12px;display:inline-flex;align-items:center;gap:6px;background:#CF1D51;color:#fff;border-radius:10px;padding:9px 14px;font-weight:700;font-size:13.5px}
+#orcv{position:fixed;inset:0;z-index:70;background:rgba(10,9,12,.78);display:flex;align-items:flex-start;justify-content:center;padding:18px 12px;overflow:auto;font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
+#orcv .op{width:100%;max-width:560px;background:#1E1C24;border:1px solid #2E2B36;border-radius:18px;padding:20px 18px;color:#F3F1F6;position:relative}
+#orcv .ox{position:absolute;top:10px;right:12px;background:none;border:0;color:#B8B3C3;font-size:28px;cursor:pointer;line-height:1}
+#orcv .ol{font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#F0507E}
+#orcv h2{margin:6px 30px 4px 0;font-size:21px;font-weight:800;line-height:1.25}#orcv .os{font-size:13px;color:#B8B3C3;margin-bottom:14px}
+#orcv .ok{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}#orcv .ok div{background:#26232D;border-radius:12px;padding:10px 12px;border-top:3px solid #CF1D51}
+#orcv .ok small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8B8697;margin-bottom:3px}#orcv .ok b{font-size:18px;font-weight:800}
+#orcv .ok .g{border-top-color:#7FDDA9}#orcv .ok .g b{color:#7FDDA9}
+#orcv .lbq{margin:0}#orcv .qt{background:none!important;padding:0!important;border-radius:0!important;border:0!important;display:block!important}#orcv .orf{font-size:12px;color:#8B8697;margin-top:14px;border-top:1px solid #2E2B36;padding-top:10px}
+#orcv .ocp{margin-top:12px;border:1px solid #2E2B36;background:#26232D;color:#F3F1F6;border-radius:10px;padding:9px 14px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}`;
+    document.head.appendChild(st); };
+  /* m = {id, titulo, alvo, valor, prazo, situacao, texto|progresso} */
+  function card(m) { css(); if (!m) return '';
+    return `<button type="button" class="orcc" data-orc="${esc(m.id || '')}"><div class="ol"><span>Aviso principal · orçamento</span><i>${esc(m.situacao || 'Previsto')}</i></div>
+      <h3>${esc(m.titulo)}</h3>${m.alvo ? `<div class="os">${esc(m.alvo)}</div>` : ''}
+      <div class="ov">${m.valor ? `<b>${brl(m.valor)}</b>` : ''}${m.prazo ? `<small>${esc(m.prazo)}</small>` : ''}</div><span class="ob">Ver orçamento completo →</span></button>`; }
+  function fecha() { const v = document.getElementById('orcv'); if (v) v.remove(); document.body.style.overflow = ''; if (/^#orc/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); }
+  function abre(m, base) { css(); fecha(); if (!m) return;
+    const det = String(m.texto || m.progresso || ''), fm = window.LBCHAT && LBCHAT.formata;
+    const tot = (det.match(/Orçamento[^:\n]*:\s*R\$\s?([\d.,]+)/i) || [])[1], fe = (det.match(/Fechado[^:\n]*:\s*R\$\s?([\d.,]+)/i) || [])[1];
+    const v = document.createElement('div'); v.id = 'orcv';
+    const link = location.origin + location.pathname.replace(/[^/]*$/, '') + '#orc';
+    v.innerHTML = `<div class="op"><button class="ox" aria-label="Fechar">×</button><div class="ol">Orçamento</div><h2>${esc(m.titulo)}</h2>${m.alvo ? `<div class="os">${esc(m.alvo)}</div>` : ''}
+      ${tot || fe ? `<div class="ok">${tot ? `<div><small>Orçamento</small><b>R$ ${esc(tot)}</b></div>` : ''}${fe ? `<div class="g"><small>Valor fechado</small><b>R$ ${esc(fe)}</b></div>` : ''}</div>` : (m.valor ? `<div class="ok"><div><small>Valor</small><b>${brl(m.valor)}</b></div></div>` : '')}
+      <div class="lbq"><div class="qt fm">${fm ? fm(det) : `<p style="white-space:pre-line">${esc(det)}</p>`}</div></div>
+      <div class="orf">${esc(m.situacao || 'Previsto')}${m.prazo ? ' · ' + esc(m.prazo) : ''}</div>
+      <button class="ocp" type="button">Copiar link deste orçamento</button></div>`;
+    document.body.appendChild(v); document.body.style.overflow = 'hidden';
+    v.onclick = e => { if (e.target === v || e.target.closest('.ox')) fecha();
+      const c = e.target.closest('.ocp'); if (c) { try { navigator.clipboard.writeText(link); c.textContent = 'Link copiado ✓'; } catch (er) { c.textContent = link; } } };
+    if (!/^#orc/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search + '#orc'); }
+  /* el = onde mostrar o cartão; lista = itens; abre sozinho se o link tiver #orc */
+  function mostra(el, lista) { if (!el) return; const m = (lista || [])[0]; el.innerHTML = m ? card(m) : '';
+    el.onclick = e => { if (e.target.closest('[data-orc]')) abre(m); };
+    if (m && /^#orc/.test(location.hash) && !document.getElementById('orcv')) abre(m); }
+  addEventListener('keydown', e => { if (e.key === 'Escape') fecha(); });
+  LB.orc = { card, abre, mostra, fecha };
 })();

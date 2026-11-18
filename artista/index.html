@@ -192,6 +192,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 <header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
 <nav class="ptabs" id="setores"><button class="on" data-s="agenda">Agenda</button><button data-s="pags">Pagamentos</button><button data-s="equipe">Equipe</button><button data-s="fin">Financeiro</button><button data-s="ven">Vendas</button></nav></header>
 <div class="wrap" id="main">
+<div id="orcbox"></div>
 <p class="eyebrow">Artista</p><h1>Lucas <em>Barros</em></h1>
 <div id="lbq"></div>
 <div id="urg"></div>
@@ -226,9 +227,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwl05oiv"></script>
-<script src="../lbmetas.js?v=mwl05oiv"></script>
-<script src="../lbchat.js?v=mwl05oiv"></script>
+<script src="../lb.js?v=mwmmezj7"></script>
+<script src="../lbmetas.js?v=mwmmezj7"></script>
+<script src="../lbchat.js?v=mwmmezj7"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -260,8 +261,9 @@ function vm(id,itens,n){if(itens.length<=n||ABERTO.has(id))return itens.join('')
 document.addEventListener('click',e=>{const b=e.target.closest('[data-vm]');if(!b)return;const k=b.dataset.vm;ABERTO.has(k)?ABERTO.delete(k):ABERTO.add(k);renderTudo()});
 
 /* ---------- avisos urgentes no topo ---------- */
-function urgentes(){const U=[];
-  ((TAR&&TAR.metas)||[]).forEach(m=>{if(FEITO.test(m.situacao||''))return;
+const orcPrin=()=>((TAR&&TAR.metas)||[]).filter(m=>m.tipo==='despesa'&&m.painel==='sim'&&!/Pago|Resolvido/.test(m.situacao||'')); // 18/11: aviso principal (orçamento)
+function urgentes(){const U=[];try{LB.orc.mostra(document.getElementById('orcbox'),orcPrin())}catch(e){console.error(e)}
+  ((TAR&&TAR.metas)||[]).forEach(m=>{if(FEITO.test(m.situacao||''))return;if(m.tipo==='despesa'&&m.painel==='sim')return;
     if(m.painel==='sim')U.push({t:m.titulo,s:[m.alvo,m.prazo?'prazo '+(ISO.test(m.prazo)?ddmm(m.prazo):m.prazo):''].filter(Boolean).join(' · '),d:ISO.test(m.prazo||'')?m.prazo:'',fixo:1}); // marcado no Admin "Aviso no topo": sempre aparece
     else if(m.tipo==='alerta')U.push({t:m.titulo,s:[m.alvo,m.prazo?'prazo '+ddmm(m.prazo):''].filter(Boolean).join(' · '),d:ISO.test(m.prazo||'')?m.prazo:''});
     else if(ISO.test(m.prazo||'')&&dias(m.prazo)<=2&&m.tipo!=='despesa')U.push({t:m.titulo,s:dias(m.prazo)<0?'atrasada desde '+ddmm(m.prazo):dias(m.prazo)===0?'é hoje':'falta '+dias(m.prazo)+' dia'+(dias(m.prazo)>1?'s':''),d:m.prazo})});
