@@ -261,6 +261,7 @@ label textarea{min-height:60px;resize:vertical}
       <label class="w">Quem<input id="ln_qm" list="pes_dl" autocomplete="off"></label>
       <label>Categoria<input id="ln_ct" list="ln_cdl" autocomplete="off"></label>
       <label>Show<input id="ln_shw" list="ln_sdl" autocomplete="off" placeholder="dd/mm nome do show"></label>
+      <label>Orçamento (Empresa)<select id="ln_orc"></select></label>
       <label class="w">Justificativa / observação<textarea id="ln_ob" placeholder="ex.: não é do show; foi adiantamento do Diogo"></textarea></label>
     </div>
     <div class="acts"><button class="btn pkb" id="ln_ok">Salvar</button><button class="btn" id="ln_del" style="display:none"></button><span class="msg" id="ln_msg"></span></div>
@@ -339,13 +340,14 @@ label textarea{min-height:60px;resize:vertical}
       <label class="av">Situação<select id="pg_sit"><option value="">A pagar (entra no assistente)</option><option value="pago">Já pago (ex.: lanche, compra feita)</option></select></label>
       <label>Saldo previsto<select id="pg_est"><option value="sim">Entra na estimativa</option><option value="não">Fora da estimativa (só pendente)</option></select></label>
       <label>Aba Pagamentos<select id="pg_oc"><option value="">Mostrar no assistente de pagamento</option><option value="sim">Esconder por enquanto (continua no previsto)</option></select></label>
+      <label>Orçamento (Empresa)<select id="pg_orc"></select></label>
       <label>Ativo<select id="pg_at"><option value="sim">Sim</option><option value="não">Não (pausado)</option></select></label>
     </div><div class="acts"><button class="btn pkb" id="pg_ok">Salvar pagamento</button><button class="btn" id="pg_can" style="display:none">Cancelar edição</button><span class="msg" id="pg_msg"></span></div></div>
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwnb8sj7"></script>
-<script src="../lbmetas.js?v=mwnb8sj7"></script>
+<script src="../lb.js?v=mwo1e7u4"></script>
+<script src="../lbmetas.js?v=mwo1e7u4"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -570,11 +572,12 @@ function acharPes(t){const v=String(t||'');if(PESK[v])return PESK[v];const k=LB.
   let m=PES.filter(p=>LB.norm(p.nome||'')===k||LB.norm(p.apelido||'')===k);if(m.length===1)return m[0];
   m=PES.filter(p=>LB.norm(p.nome||'').split(' ')[0]===k);return m.length===1?m[0]:null}
 let PIXAUTO='';
+const orcOpts=v=>'<option value="">— nenhum —</option>'+MT.filter(m=>m.tipo==='despesa'||m.id===v).map(m=>`<option value="${esc(m.id)}"${m.id===v?' selected':''}>${esc(m.titulo)}</option>`).join(''); // 19/11: pagamento/lançamento de um orçamento (pago/total na página do Lucas)
 function pixPg(){const x=acharPes($('pg_pes').value),h=$('pg_pixh');PGID=x?x.id:(EDG?PGID:'');
   if(x&&x.pix){if(!$('pg_pix').value||$('pg_pix').value===PIXAUTO){$('pg_pix').value=x.pix;PIXAUTO=x.pix}h.textContent='PIX do cadastro de '+x.nome+(x.pix!==$('pg_pix').value?' (você mudou a chave)':'')}
   else{if($('pg_pix').value===PIXAUTO){$('pg_pix').value='';PIXAUTO=''}h.textContent=x?x.nome+' está no cadastro, mas sem PIX':$('pg_pes').value.trim()?'nome fora da lista do borderô: preencha a chave':''}}
 $('pg_pes').addEventListener('input',pixPg);$('pg_pes').addEventListener('change',pixPg);
-function limpaG(){EDG=null;PGID='';PIXAUTO='';$('pg_pixh').textContent='';['pg_pes','pg_pix','pg_dados','pg_desc','pg_val','pg_data','pg_dia','pg_fim'].forEach(i=>$(i).value='');$('pg_ini').value=HOJE.slice(0,7);$('pg_tp').value='avulso';$('pg_sit').value='';$('pg_meio').value='Pix';$('pg_at').value='sim';$('pg_dir').value='saida';$('pg_est').value='sim';$('pg_oc').value='';$('pg_var').value='';tipoPg();meioPg();dirPg();$('pg_can').style.display='none';$('pg_h').textContent='Novo pagamento'}
+function limpaG(){EDG=null;PGID='';PIXAUTO='';$('pg_pixh').textContent='';['pg_pes','pg_pix','pg_dados','pg_desc','pg_val','pg_data','pg_dia','pg_fim'].forEach(i=>$(i).value='');$('pg_ini').value=HOJE.slice(0,7);$('pg_tp').value='avulso';$('pg_sit').value='';$('pg_meio').value='Pix';$('pg_at').value='sim';$('pg_dir').value='saida';$('pg_est').value='sim';$('pg_oc').value='';$('pg_orc').innerHTML=orcOpts('');$('pg_var').value='';tipoPg();meioPg();dirPg();$('pg_can').style.display='none';$('pg_h').textContent='Novo pagamento'}
 $('pg_can').onclick=()=>{limpaG();$('pg_msg').textContent=''};
 $('g2_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;G2F=b.dataset.f;document.querySelectorAll('#g2_fil .chip').forEach(c=>c.classList.toggle('on',c===b));renderPag()};
 $('pg_ok').onclick=async()=>{const m=$('pg_msg'),nome=$('pg_pes').value.trim(),x=acharPes(nome);const er=t=>m.innerHTML='<span class="neg">'+t+'</span>';
@@ -583,14 +586,14 @@ $('pg_ok').onclick=async()=>{const m=$('pg_msg'),nome=$('pg_pes').value.trim(),x
   if(tp==='fixo'&&!(+$('pg_dia').value>=1&&+$('pg_dia').value<=31&&$('pg_ini').value))return er('Dia do mês e mês de início.');
   m.textContent='Salvando…';
   try{const r=await api({acao:'salvar_pagamento',pagamento:{id:EDG||undefined,tipo:tp,pessoa:x?x.id:PGID,nome:x?x.nome:nome,pix:$('pg_pix').value,meio:$('pg_meio').value,dados:$('pg_dados').value,
-      descricao:$('pg_desc').value,valor:v,data:$('pg_data').value,dia:$('pg_dia').value,inicio:$('pg_ini').value,fim:$('pg_fim').value,ativo:$('pg_at').value,direcao:$('pg_dir').value,estimativa:$('pg_est').value,ocultar:$('pg_oc').value,varia:$('pg_var').value}});
+      descricao:$('pg_desc').value,valor:v,data:$('pg_data').value,dia:$('pg_dia').value,inicio:$('pg_ini').value,fim:$('pg_fim').value,ativo:$('pg_at').value,direcao:$('pg_dir').value,estimativa:$('pg_est').value,ocultar:$('pg_oc').value,orc:$('pg_orc').value,varia:$('pg_var').value}});
     let nv=r.pagamentos;if(!EDG&&tp==='avulso'&&$('pg_sit').value==='pago'){const g=nv.find(x=>!PAGS.some(o=>o.id===x.id));if(g)nv=(await api({acao:'pagar_pagamento',id:g.id,ref:'unico',data:$('pg_data').value})).pagamentos}
     PAGS=nv;limpaG();m.innerHTML='<span class="pos">Salvo ✓</span>';render()}catch(e){er('Não salvou ('+esc(e.message)+')')}};
 $('pg_lista').addEventListener('click',async e=>{const fm=e.target.closest('[data-gfim]');if(fm){e.preventDefault();const[id,fim]=fm.dataset.gfim.split('|'),g=PAGS.find(y=>y.id===id);fm.textContent='salvando…';
     try{const r=await api({acao:'salvar_pagamento',pagamento:Object.assign({},g,{fim})});PAGS=r.pagamentos;render()}catch(err){fm.textContent='erro: '+err.message}return}
   const ed=e.target.closest('[data-eg]'),pg=e.target.closest('[data-gp]'),un=e.target.closest('[data-gu]'),dx=e.target.closest('[data-gx]');if(!ed&&!pg&&!un&&!dx)return;e.preventDefault();
   if(ed){const g=PAGS.find(y=>y.id===ed.dataset.eg);EDG=g.id;PGID=g.pessoa;$('pg_tp').value=g.tipo;$('pg_pes').value=rotPes(pesDe(g.pessoa))||g.nome;$('pg_pix').value=g.pix;$('pg_meio').value=g.meio;$('pg_dados').value=g.dados;
-    $('pg_desc').value=g.descricao;$('pg_val').value=String(g.valor).replace('.',',');$('pg_data').value=g.data;$('pg_dia').value=g.dia;$('pg_ini').value=g.inicio||HOJE.slice(0,7);$('pg_fim').value=g.fim;$('pg_at').value=g.ativo==='não'?'não':'sim';$('pg_dir').value=g.direcao==='entrada'?'entrada':'saida';$('pg_est').value=g.estimativa==='não'?'não':'sim';$('pg_oc').value=g.ocultar==='sim'?'sim':'';$('pg_var').value=g.varia==='sim'?'sim':'';
+    $('pg_desc').value=g.descricao;$('pg_val').value=String(g.valor).replace('.',',');$('pg_data').value=g.data;$('pg_dia').value=g.dia;$('pg_ini').value=g.inicio||HOJE.slice(0,7);$('pg_fim').value=g.fim;$('pg_at').value=g.ativo==='não'?'não':'sim';$('pg_dir').value=g.direcao==='entrada'?'entrada':'saida';$('pg_est').value=g.estimativa==='não'?'não':'sim';$('pg_orc').innerHTML=orcOpts(g.orc||'');$('pg_oc').value=g.ocultar==='sim'?'sim':'';$('pg_var').value=g.varia==='sim'?'sim':'';
     tipoPg();meioPg();dirPg();$('pg_can').style.display='';$('pg_h').textContent='Editar pagamento';$('pg_msg').textContent='';$('pg_pes').scrollIntoView({block:'center'});return}
   const b=pg||un||dx;if(b.dataset.ok!=='1'){b.dataset.ok='1';b.textContent=dx?'toque de novo para excluir':'toque de novo para confirmar';return}
   b.textContent='salvando…';
@@ -743,7 +746,7 @@ function lnSheet(x){ENVID=null;LED=x||null;const ext=x&&!x.novo&&!x.src,nv=!x||x
   $('ln_info').innerHTML=ext?`<span>${ddmm(x.data)}/${x.data.slice(2,4)}</span><b class="${x.valor>0?'pos':''}">${x.valor>0?'+':''}${brl2(x.valor)}</b><span>${x.meio==='dinheiro'?'caixa em dinheiro':'extrato da conta'}</span>`:'';
   $('ln_info').style.display=ext?'':'none';
   $('ln_dt').value=x&&x.novo?x.data:HOJE>AD.ext_ate?HOJE:'';$('ln_vl').value=x&&x.novo?String(Math.abs(x.valor)).replace('.',','):'';$('ln_sg').value=x&&x.valor>0?'1':'-1';$('ln_me').value=x&&x.meio==='dinheiro'?'dinheiro':'conta';
-  $('ln_qm').value=x?x.quem||'':'';$('ln_ct').value=x?x.cat||'':'';$('ln_shw').value=x?x.show||'':'';$('ln_ob').value=x&&(x.aj||x.novo)?x.obs||'':'';
+  $('ln_qm').value=x?x.quem||'':'';$('ln_ct').value=x?x.cat||'':'';$('ln_shw').value=x?x.show||'':'';$('ln_ob').value=x&&(x.aj||x.novo)?x.obs||'':'';$('ln_orc').innerHTML=orcOpts(x&&(x.novo||x.aj)?(x.novo||x.aj).orc||'':'');
   const d=$('ln_del');d.dataset.ok='';d.style.display=x&&(x.aj||x.novo)?'':'none';d.textContent=x&&x.novo?'Excluir':'Desfazer ajuste';
   $('ln_sh').classList.add('on');$('ln_sh').setAttribute('aria-hidden','false');setTimeout(()=>(nv&&!x?$('ln_vl'):$('ln_ct')).focus(),50)}
 /* aba Contexto da IA */
@@ -790,13 +793,13 @@ $('ln_mes').onclick=e=>{const b=e.target.closest('[data-m]');if(b){LMES=b.datase
 $('ln_fil').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;LFIL=b.dataset.f;document.querySelectorAll('#ln_fil .chip').forEach(c=>c.classList.toggle('on',c===b));lnRender()};
 $('ln_lista').onclick=e=>{const b=e.target.closest('[data-id]');if(b)lnSheet(lnTodos().find(x=>x.id===b.dataset.id))};
 $('ln_ok').onclick=async()=>{const m=$('ln_msg'),x=LED,ext=x&&!x.novo;let o;
-  if(ext)o={id:x.aj&&x.aj.id,ref:x.id,quem:$('ln_qm').value,cat:$('ln_ct').value,show:$('ln_shw').value,obs:$('ln_ob').value};
+  if(ext)o={id:x.aj&&x.aj.id,ref:x.id,quem:$('ln_qm').value,cat:$('ln_ct').value,show:$('ln_shw').value,obs:$('ln_ob').value,orc:$('ln_orc').value};
   else{const v=+$('ln_vl').value.replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'),dt=$('ln_dt').value;
     if(!dt){m.innerHTML='<span class="neg">Escolha a data.</span>';return}
     if(dt<=AD.ext_ate){m.innerHTML=`<span class="neg">Até ${ddmm(AD.ext_ate)} vale o extrato: edite o lançamento de lá.</span>`;return}
     if(!(v>0)){m.innerHTML='<span class="neg">Escreva o valor.</span>';return}
     if(!$('ln_qm').value.trim()){m.innerHTML='<span class="neg">Quem pagou ou recebeu?</span>';return}
-    o={id:x&&x.novo.id,data:dt,valor:v*+$('ln_sg').value,meio:$('ln_me').value,quem:$('ln_qm').value,cat:$('ln_ct').value,show:$('ln_shw').value,obs:$('ln_ob').value}}
+    o={id:x&&x.novo.id,data:dt,valor:v*+$('ln_sg').value,meio:$('ln_me').value,quem:$('ln_qm').value,cat:$('ln_ct').value,show:$('ln_shw').value,obs:$('ln_ob').value,orc:$('ln_orc').value}}
   m.textContent='Salvando…';try{LN=(await api({acao:'salvar_lancamento',lanc:o})).lancamentos||[];if(ENVID&&!ext){const eid=ENVID;ENVID=null;try{ENV=(await api({acao:'envio_status',id:eid,status:'lançado'})).envios||ENV}catch(e){}envRender()}if(!ext)LMES=o.data.slice(0,7);lnRender();lnFecha()}catch(e){m.innerHTML='<span class="neg">Não salvou ('+esc(e.message)+')</span>'}};
 $('ln_del').onclick=async()=>{const d=$('ln_del'),x=LED,id=x&&(x.novo?x.novo.id:x.aj&&x.aj.id);if(!id)return;
   if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent=x.novo?'Toque de novo para excluir':'Toque de novo: volta como veio do extrato';return}
@@ -944,7 +947,7 @@ function xtRender(){const el=$('xt_res');if(!XT.length){el.innerHTML='';return}c
     if(d){e.preventDefault();if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent='toque de novo para apagar';return}try{XT=(await api({acao:'excluir_extrato',id:d.dataset.xdel})).extratos||[];xtRender()}catch(er){d.textContent='erro'}}}}
 {const a0=lnAbre;lnAbre=async function(){await a0();xtCarrega()};const r0=lnRender;lnRender=function(){r0();if(XTOK)xtRender()}}
 </script>
-<script src="../lbchat.js?v=mwnb8sj7"></script>
+<script src="../lbchat.js?v=mwo1e7u4"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

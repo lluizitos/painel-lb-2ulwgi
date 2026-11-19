@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwnb8sj7';
+  const BUILD = 'mwo1e7u4';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -540,7 +540,7 @@
   function fecha() { const v = document.getElementById('orcv'); if (v) v.remove(); document.body.style.overflow = ''; if (/^#orc/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); }
   function abre(m, base) { css(); fecha(); if (!m) return;
     const det = String(m.texto || m.progresso || ''), fm = window.LBCHAT && LBCHAT.formata;
-    const tot = (det.match(/Orçamento[^:\n]*:\s*R\$\s?([\d.,]+)/i) || [])[1], fe = (det.match(/Fechado[^:\n]*:\s*R\$\s?([\d.,]+)/i) || [])[1];
+    const tot = (det.match(/^-\s*Orçamento[^:\n]*:\s*R\$\s?([\d.,]+)/im) || [])[1], fe = (det.match(/^-\s*Fechado[^:\n]*:\s*R\$\s?([\d.,]+)/im) || [])[1];
     const v = document.createElement('div'); v.id = 'orcv';
     const link = location.origin + location.pathname.replace(/[^/]*$/, '') + '#orc';
     v.innerHTML = `<div class="op"><button class="ox" aria-label="Fechar">×</button><div class="ol">Orçamento</div><h2>${esc(m.titulo)}</h2>${m.alvo ? `<div class="os">${esc(m.alvo)}</div>` : ''}

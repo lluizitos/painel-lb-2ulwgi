@@ -102,7 +102,8 @@
     return `<div class="qg"><b>${esc(g.titulo)}</b><div class="qb">${it.map(x => `<span title="${esc(x.rotulo)}">${esc(x.rotulo)}</span><i style="width:${Math.abs(x.valor) / mx * 100}%;background:${x.valor < 0 ? 'var(--neg)' : 'var(--pink)'}"></i><em>${fmt(x.valor, it)}</em>`).join('')}</div></div>`;
   }
   /* el = elemento; op.contexto() = texto curto com os dados; op.base = caminho até config.json; op.exemplos = sugestões no placeholder */
-  function css() { if (!document.getElementById('lbqcss')) { const s = document.createElement('style'); s.id = 'lbqcss'; s.textContent = CSS; document.head.appendChild(s); } }
+  const CSS_FZ = `.qfz{margin-top:10px;background:rgba(127,221,169,.08);border:1px solid rgba(127,221,169,.35);border-radius:12px;padding:10px 12px;font-size:13px}.qfz b{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#7FDDA9;margin-bottom:4px}.qfz .ok{color:#F3F1F6;padding:2px 0}.qfz .er{color:#FF8FA8;padding:2px 0}.qdz{margin-top:8px;border:1px solid #2E2B36;background:#26232D;color:#F3F1F6;border-radius:9px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}`;
+  function css() { if (!document.getElementById('lbqcss')) { const s = document.createElement('style'); s.id = 'lbqcss'; s.textContent = CSS + CSS_FZ; document.head.appendChild(s); } }
   function montar(el, op) {
     if (!el) return; if (op.anexo === undefined) op = Object.assign({}, op, { anexo: true }); // 📎 em todos os chats
     css();
@@ -209,8 +210,11 @@
       const r = m.r || {}, eu = `<div class="qme"><span>${esc(m.q)}</span></div>`;
       if (m.pend) return eu + `<div class="qr"><div class="qt"><span class="ql"></span>Pensando…</div>${m.sg && m.sg.length ? linkH(m.sg) : ''}</div>`;
       if (m.erro) return eu + `<div class="qr"><div class="qt qe">${esc(m.erro)}</div></div>`;
-      return eu + `<div class="qr">${destaques(r.destaques)}<div class="qt fm">${formata(r.resposta)}</div>${linkH(r.links)}${r.grafico ? grafico(r.grafico) : ''}${r.doc ? `<div class="qd"><button class="qdb" data-di="${i}">📄 Abrir documento: ${esc(r.doc.titulo || 'relatório')}</button></div>` : ''}${r.duvida ? '<div class="qv">📨 Já avisei a equipe. Quando a resposta chegar, ela aparece aqui em cima.</div>' : ''}${m.cache ? `<div class="qc">Você já perguntou isso em ${ddh(m.cache)}. Os atalhos levam aos números de agora. <a href="#" class="qnv" data-ni="${i}">Perguntar de novo</a></div>` : ''}</div>`;
+      return eu + `<div class="qr">${destaques(r.destaques)}<div class="qt fm">${formata(r.resposta)}</div>${linkH(r.links)}${r.grafico ? grafico(r.grafico) : ''}${r.doc ? `<div class="qd"><button class="qdb" data-di="${i}">📄 Abrir documento: ${esc(r.doc.titulo || 'relatório')}</button></div>` : ''}${r.duvida ? '<div class="qv">📨 Já avisei a equipe. Quando a resposta chegar, ela aparece aqui em cima.</div>' : ''}${feitasH(r, i)}${m.cache ? `<div class="qc">Você já perguntou isso em ${ddh(m.cache)}. Os atalhos levam aos números de agora. <a href="#" class="qnv" data-ni="${i}">Perguntar de novo</a></div>` : ''}</div>`;
     }
+    /* 19/11: o que o APPLB fez no site (só o Luiz) + Desfazer */
+    function feitasH(r, i) { const F = r.feitas; if (!F || !F.length) return r.fazendo ? '<div class="qfz"><span class="ql"></span>Fazendo no site…</div>' : '';
+      return `<div class="qfz"><b>${r.desfeito ? '↩ Desfeito' : 'Feito no site'}</b>${F.map(x => `<div class="${x.ok ? 'ok' : 'er'}">${x.ok ? '✓' : '✕'} ${esc(x.resumo || '')}${x.ok ? '' : ' — não deu (' + esc(x.erro || 'erro') + ')'}</div>`).join('')}${r.desf && !r.desfeito ? `<button type="button" class="qdz" data-dz="${i}">↩ Desfazer</button>` : ''}</div>`; }
     function phSet() { if (!ARQ) inp.placeholder = CV.some(c => c.id === ATV) ? '💬 Continue a conversa… (ou toque em + Nova)' : PH; }
     function render(rolar) {
       tb.innerHTML = CV.length ? CV.map(c => `<button type="button" class="qtab${c.id === ATV ? ' on' : ''}" data-cv="${esc(c.id)}" title="${esc(c.titulo)}"><span>${esc(curto(c.titulo))}</span>${c.msgs.some(m => m.pend) ? '<span class="ql"></span>' : ''}<i data-cx="${esc(c.id)}" role="button" aria-label="Fechar conversa">✕</i></button>`).join('') + `<button type="button" class="qtab qnew${ATV ? '' : ' on'}" data-cv="">+ Nova</button>` : '';
@@ -241,8 +245,11 @@
         m.pend = false; delete m.sg;
         if (!r.ok) { m.erro = r.erro === 'espera' ? `Espere ${r.s} s para a próxima pergunta.` : ERR[r.erro] || 'Não consegui responder agora. Tente de novo.'; if (!inp.value) inp.value = q; }
         else { const LK = (r.links && r.links.length ? r.links : SG).slice(0, 4);
-          m.r = { resposta: r.resposta, links: LK, destaques: r.destaques || null, grafico: r.grafico || null, doc: r.doc || null, duvida: !!r.duvida }; if (r.uso != null) c.uso = r.uso;
-          if (!r.duvida && !hist.length) { H.unshift({ tk: tq, t: Date.now(), resposta: r.resposta, links: LK, doc: r.doc || null, grafico: r.grafico || null, destaques: r.destaques || null }); gravar('_hist', H.slice(0, 30)); }
+          m.r = { resposta: r.resposta, links: LK, destaques: r.destaques || null, grafico: r.grafico || null, doc: r.doc || null, duvida: !!r.duvida, fazendo: !!(r.acoes && r.acoes.length) }; if (r.uso != null) c.uso = r.uso;
+          if (r.acoes && r.acoes.length) { salva(); render(c.id === ATV); try { const x = await (await fetch(api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'executar_ia', acoes: r.acoes, pergunta: q }, op.auth ? op.auth() : { usuario: LB.login, senha: LB.senha, nome: LB.usuario })) })).json();
+            m.r.feitas = x.ok ? x.feitas : r.acoes.map(a => ({ resumo: a.resumo, ok: false, erro: x.erro || 'erro' })); m.r.desf = x.desfazer || ''; } catch (er) { m.r.feitas = r.acoes.map(a => ({ resumo: a.resumo, ok: false, erro: 'sem conexão' })); }
+            m.r.fazendo = false; try { dispatchEvent(new Event('lb:mudou')); } catch (er) { } }
+          if (!r.duvida && !hist.length && !(r.acoes && r.acoes.length)) { H.unshift({ tk: tq, t: Date.now(), resposta: r.resposta, links: LK, doc: r.doc || null, grafico: r.grafico || null, destaques: r.destaques || null }); gravar('_hist', H.slice(0, 30)); }
           if (r.duvida) dCarrega(); }
       } catch (er) { m.pend = false; delete m.sg; m.erro = 'Sem conexão. Tente de novo.'; if (!inp.value) inp.value = q; }
       finally { c.t = Date.now(); salva(); if (CV.includes(c)) render(c.id === ATV); else render(); setTimeout(() => { bt.disabled = false; }, 3000); }
@@ -257,6 +264,9 @@
       const c = CV.find(y => y.id === ATV); if (!c) return;
       const nv = e.target.closest('.qnv'); if (nv) { e.preventDefault(); const m = c.msgs[+nv.dataset.ni]; if (!m) return; c.msgs.splice(+nv.dataset.ni, 1); if (!c.msgs.length) { CV = CV.filter(y => y !== c); ATV = null; } salva(); render();
         inp.value = m.q; const ev = new Event('submit', { cancelable: true }); ev.lbqNova = true; f.dispatchEvent(ev); return; }
+      const dz = e.target.closest('.qdz'); if (dz) { e.preventDefault(); const m = c.msgs[+dz.dataset.dz]; if (!m || !m.r || !m.r.desf) return; dz.disabled = true; dz.textContent = 'desfazendo…';
+        (async () => { try { await URL_(); const x = await (await fetch(api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ acao: 'desfazer_ia', id: m.r.desf }, op.auth ? op.auth() : { usuario: LB.login, senha: LB.senha, nome: LB.usuario })) })).json();
+          if (x.ok || x.erro === 'já foi desfeito') { m.r.desfeito = true; salva(); render(); try { dispatchEvent(new Event('lb:mudou')); } catch (er) { } } else { dz.disabled = false; dz.textContent = 'não deu (' + (x.erro || 'erro') + ') — tentar de novo'; } } catch (er) { dz.disabled = false; dz.textContent = 'sem conexão — tentar de novo'; } })(); return; }
       const db = e.target.closest('.qdb'); if (db) { e.preventDefault(); const m = c.msgs[+db.dataset.di]; if (!m || !m.r || !m.r.doc) return; let b = ''; try { b = op.base_dados ? op.base_dados() : ''; } catch (er) { } documento(m.r.doc, b); } });
   }
   /* dados pessoais nunca vão para o assistente: some PIX, CPF/CNPJ, telefone, e-mail e dados de conta */

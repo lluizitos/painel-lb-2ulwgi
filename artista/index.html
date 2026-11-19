@@ -185,11 +185,25 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .vr .br{display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--card2);margin-top:6px}.vr .br i{display:block;height:100%}
 .v-fx{background:#6F697D}.v-sh{background:#CF1D51}.v-av{background:#F2B66B}
 .ce .ic2,.ev .ic2{font-style:normal;margin-right:3px}.ce .ico{margin-right:2px;stroke-width:2.4}.chip .ico,.clg .ico{opacity:.85}
+/* 19/11: faixa "Últimos lançamentos" (no topo, em todas as abas) */
+.ult{max-width:900px;margin:0 auto;padding:0 16px 8px}.ult:empty{display:none}
+.ult .uh{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 5px}
+.ult .ar{display:flex;gap:5px}.ult .ar button{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:8px;width:34px;height:24px;cursor:pointer;font-size:11px;line-height:1}
+.ult .ul{max-height:152px;overflow-y:auto;scrollbar-width:none;transition:max-height .2s}.ult .ul::-webkit-scrollbar{display:none}
+.ult .ur{height:36px;margin:0 0 2px;display:flex;align-items:center;gap:8px;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:0 10px;cursor:pointer}
+.ult .ur.gr{border-color:rgba(240,80,126,.35)}
+.ult .ud{font-size:11px;color:var(--muted);flex:none;width:34px}
+.ult .un{flex:1;min-width:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ult .un small{color:var(--muted);font-size:11px;margin-left:6px}
+.ult .uv{flex:none;font-size:13px;font-weight:800}.ult .uv.neg{color:var(--neg)}.ult .uv.pos{color:var(--pos)}
+.ult .up{flex:none;text-align:right;font-size:12.5px;font-weight:800;line-height:1.1}.ult .up s{text-decoration:none;color:var(--muted);font-weight:600}.ult .up small{display:block;font-weight:600;color:var(--muted);font-size:10px}
+header.mini .ult .ul{max-height:38px}
+.cxlist{margin-top:10px}.cxlist .cxl b{font-weight:600}
 </style>
 </head>
 <body>
 <div id="pg">
 <header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
+<div class="ult" id="ult"></div>
 <nav class="ptabs" id="setores"><button class="on" data-s="agenda">Agenda</button><button data-s="pags">Pagamentos</button><button data-s="equipe">Equipe</button><button data-s="fin">Financeiro</button><button data-s="ven">Vendas</button></nav></header>
 <div class="wrap" id="main">
 <div id="orcbox"></div>
@@ -227,9 +241,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwnb8sj7"></script>
-<script src="../lbmetas.js?v=mwnb8sj7"></script>
-<script src="../lbchat.js?v=mwnb8sj7"></script>
+<script src="../lb.js?v=mwo1e7u4"></script>
+<script src="../lbmetas.js?v=mwo1e7u4"></script>
+<script src="../lbchat.js?v=mwo1e7u4"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -547,13 +561,51 @@ function renderTL(){const el=document.getElementById('tl');if(!el||!D||!D.shows)
   requestAnimationFrame(()=>go(false));if(!el._ro&&window.ResizeObserver){let w0=0;el._ro=new ResizeObserver(()=>{const w=el.clientWidth;if(w&&!w0)go(false);w0=w});el._ro.observe(el)}
   document.getElementById('tlp').onclick=()=>el.scrollBy({left:-274,behavior:'smooth'});document.getElementById('tln').onclick=()=>el.scrollBy({left:274,behavior:'smooth'});document.getElementById('tlh').onclick=()=>go(true);
   el.onclick=e=>{const c=e.target.closest('[data-tls]');if(c)detalhe('s|'+c.dataset.tls)}}
-function renderTudo(){renderFiltros();renderCal();renderTL();renderMetas();renderPagar();renderEquipe();urgentes()}
+function renderTudo(){renderFiltros();renderCal();renderTL();renderMetas();renderPagar();renderEquipe();urgentes();try{renderUlt()}catch(e){console.error(e)}}
+
+/* ---------- 19/11: últimos lançamentos (extrato + app) no topo; o que é de um orçamento, borderô ou show aparece junto: pago / total ---------- */
+let LNV=null,ULT=[];
+const ultKey=m=>m.orc?'o:'+m.orc:m.bord?'b:'+m.bord:m.desp?'d:'+m.desp:(+m.valor>0&&m.show_data)?'s:'+m.show_data+'|'+(m.show_nome||''):'';
+function ultMovs(){const ext=D.ext_ate||'',L=[];
+  (D.movs||[]).forEach(m=>L.push(Object.assign({fonte:'extrato'},m)));
+  (D.movs_app||[]).forEach(m=>{if(PAGS_OK&&/^pg-/.test(m.id||''))return;if(LNV&&/^ln-/.test(m.id||''))return;L.push(Object.assign({fonte:'app'},m))});
+  if(PAGS_OK)PAGS.forEach(g=>LB.pgx.movs(g).forEach(o=>{if(!o.data||o.data<=ext)return;const e=g.direcao==='entrada';
+    L.push({id:o.id,data:o.data,quem:g.nome,valor:(e?1:-1)*o.valor,cat:g.descricao||'Pagamento',meio:o.meio||'conta',orc:g.orc||'',obs:o.parte?'parte'+(o.obs?' · '+o.obs:''):'',fonte:'app'})}));
+  if(LNV)LNV.forEach(l=>{if(l.ref||!l.data||l.data<=ext)return;L.push({id:'ln-'+l.id,data:l.data,quem:l.quem||'',valor:+l.valor||0,cat:l.cat||'Outros (a classificar)',meio:l.meio||'conta',obs:l.obs||'',orc:l.orc||'',show:l.show||'',fonte:'app'})});
+  return L.filter(m=>m.data).sort((a,b)=>a.data<b.data?1:a.data>b.data?-1:0)}
+function ultGrupo(k,L){const t=k[0],id=k.slice(2),its=L.filter(m=>ultKey(m)===k),soma=Math.round(its.reduce((a,m)=>a+Math.abs(+m.valor||0),0)*100)/100;
+  if(t==='o'){const mt=((TAR&&TAR.metas)||[]).find(x=>String(x.id)===id);return{tipo:'Orçamento',tit:mt?mt.titulo:'Orçamento',pago:soma,total:mt?+mt.valor||0:0,its,mt}}
+  if(t==='b'){const b=(D.borderos||{})[id],tt=b&&b.totais;const tot=b?(tt&&tt.gasto!=null?+tt.gasto:(b.equipe||[]).reduce((a,e)=>a+(+e.total||+e.valor||0),0)+(b.itens||[]).reduce((a,x)=>a+(+x.valor||0),0)):0;
+    return{tipo:'Borderô do show',tit:b?(b.show||'Show')+' · '+ddmm(b.data):'Borderô',pago:soma,total:tot,its,b,s:b?(D.shows||[]).find(x=>x.data===b.data):null}}
+  if(t==='d'){const x=(D.desp_res||{})[id];return{tipo:'Borderô de despesa',tit:x?x.titulo:'Despesa',pago:soma,total:x?x.total:0,its}}
+  const[dt,nm]=id.split('|'),s=(D.shows||[]).find(x=>x.data===dt);
+  return{tipo:'Cachê do show',tit:nm||(s?ddmm(s.data)+' '+s.nome:'Show'),pago:s&&s.rec!=null?Math.max(+s.rec||0,soma):soma,total:s?+s.valor||0:0,its,s,ent:true}}
+function renderUlt(){const el=document.getElementById('ult');if(!el||!D)return;const L=ultMovs(),R=[],vis=new Set();
+  for(const m of L){if(R.length>=15)break;const k=ultKey(m);if(k){if(vis.has(k))continue;vis.add(k);R.push({k,m,g:ultGrupo(k,L)})}else R.push({k:'',m})}
+  ULT=R;if(!R.length){el.innerHTML='';return}
+  const top=(document.getElementById('ul')||{}).scrollTop||0;
+  el.innerHTML=`<div class="uh"><span>Últimos lançamentos</span><span class="ar"><button type="button" data-ua="-1" aria-label="Lançamentos mais novos">▲</button><button type="button" data-ua="1" aria-label="Lançamentos mais antigos">▼</button></span></div><div class="ul" id="ul">${R.map((r,i)=>{const m=r.m,v=+m.valor||0;
+    if(r.g){const g=r.g,pc=g.total>0?Math.min(999,Math.round(g.pago/g.total*100)):null;
+      return `<button type="button" class="ur gr" data-ui="${i}"><span class="ud">${ddmm(m.data)}</span><span class="un">${esc(g.tit)}<small>${esc(g.tipo)}</small></span><span class="up">${brl(g.pago)}${g.total?`<s> / ${brl(g.total)}</s>`:''}${pc!=null?`<small>${pc}% ${g.ent?'recebido':'pago'}</small>`:''}</span></button>`}
+    return `<button type="button" class="ur" data-ui="${i}"><span class="ud">${ddmm(m.data)}</span><span class="un">${esc(m.quem||m.cat||'')}<small>${esc(m.cat||'')}</small></span><span class="uv ${v<0?'neg':'pos'}">${v>0?'+':'−'}${brl(Math.abs(v))}</span></button>`}).join('')}</div>`;
+  document.getElementById('ul').scrollTop=top}
+function ultAbre(r){if(!r)return;const m=r.m,g=r.g;
+  if(g&&g.mt&&LB.orc){const mt=g.mt,tx='## Já pago deste orçamento\n'+g.its.map(x=>'- '+ddmm(x.data)+' '+String(x.quem||x.cat||'').replace(/:/g,' ')+': R$ '+Math.abs(+x.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})).join('\n')+'\n- Total pago: R$ '+g.pago.toLocaleString('pt-BR',{minimumFractionDigits:2})+'\n> Pago R$ '+g.pago.toLocaleString('pt-BR',{minimumFractionDigits:2})+' de R$ '+g.total.toLocaleString('pt-BR',{minimumFractionDigits:2})+' do orçamento.\n\n';
+    LB.orc.abre({id:mt.id,titulo:mt.titulo,alvo:mt.alvo,valor:mt.valor,prazo:mt.prazo,situacao:mt.situacao,texto:tx+(mt.progresso||'')});return}
+  if(g){const res=`<div class="cxb"><div class="cxl"><span>${g.ent?'Recebido':'Pago'} até agora</span><b>${brl2(g.pago)}${g.total?' de '+brl2(g.total):''}</b></div>${g.total?`<div class="cxl"><span>${g.ent?'Falta receber':'Falta pagar'}</span><b>${brl2(Math.max(0,g.total-g.pago))}</b></div>`:''}</div><div class="cxl" style="justify-content:flex-start;color:var(--muted);font-size:12px">${g.its.length} ${g.its.length>1?'lançamentos':'lançamento'} somados · o último em ${ddmm(g.its[0].data)}</div>`;
+    if(g.s){abre(topo(g.tipo,g.tit,'')+res+'<div style="margin-top:14px"></div>'+bordHtml(g.s).replace(/^[\s\S]*?<\/button><\/div>/,''));return}
+    abre(topo(g.tipo,g.tit,'')+res);return}
+  abre(topo('Lançamento · '+(m.fonte==='extrato'?'extrato':'app'),m.quem||m.cat||'',ddmm(m.data)+'/'+String(m.data).slice(0,4))+`<div class="cxb"><div class="cxl"><span>Valor</span><b class="${+m.valor<0?'neg':'pos'}">${(+m.valor>0?'+':'−')+brl2(Math.abs(+m.valor||0))}</b></div><div class="cxl"><span>Categoria</span><b>${esc(m.cat||'—')}</b></div>${m.show_nome||m.show?`<div class="cxl"><span>Show</span><b>${esc(m.show_nome||m.show)}</b></div>`:''}<div class="cxl"><span>Meio</span><b>${m.meio==='dinheiro'?'Dinheiro':'Conta'}</b></div>${m.obs?`<div class="cxl"><span>Observação</span><b style="font-weight:400">${esc(m.obs)}</b></div>`:''}</div>`)}
+document.getElementById('ult').addEventListener('click',e=>{const a=e.target.closest('[data-ua]');if(a){const u=document.getElementById('ul');if(u)u.scrollBy({top:+a.dataset.ua*38,behavior:'smooth'});return}
+  const b=e.target.closest('[data-ui]');if(b)ultAbre(ULT[+b.dataset.ui])});
+addEventListener('scroll',()=>{const h=document.querySelector('header');if(h)h.classList.toggle('mini',scrollY>140)},{passive:true});
+addEventListener('lb:mudou',()=>{try{carregar()}catch(e){}});
 
 /* ---------- dados ao vivo ---------- */
 async function carregar(){
   try{API=(await (await fetch('../config.json',{cache:'no-store'})).json()).api_url}catch(e){}
   if(!API){renderTudo();return}
-  const [t,m,p,b]=await Promise.allSettled([api({acao:'tarefas'}),api({acao:'minhas_tarefas'}),api({acao:'pagamentos'}),api({acao:'borderos'})]);
+  const [t,m,p,b,ln]=await Promise.allSettled([api({acao:'tarefas'}),api({acao:'minhas_tarefas'}),api({acao:'pagamentos'}),api({acao:'borderos'}),api({acao:'lancamentos'})]);if(ln.status==='fulfilled')LNV=ln.value.lancamentos||[];
   if(t.status==='fulfilled')TAR=t.value;if(m.status==='fulfilled')MIN=m.value;if(p.status==='fulfilled'){PAGS=p.value.pagamentos||[];PAGS_OK=true}
   if(b.status==='fulfilled'){const r=b.value;PESS=r.pessoas||[];const px={};PESS.forEach(q=>px[q.id]=q.pix);Object.entries(r.borderos||{}).forEach(([k,x])=>{if(x.tipo==='despesa'||!x.equipe)return;x.equipe.forEach(e=>{if(e.pessoa&&px[e.pessoa])e.pix=px[e.pessoa];delete e.doc});D.borderos[k]=x})}
   renderTudo()}
