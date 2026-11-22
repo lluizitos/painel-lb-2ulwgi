@@ -203,6 +203,10 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .ult .uv{flex:none;font-size:13px;font-weight:800}.ult .uv.neg{color:var(--neg)}.ult .uv.pos{color:var(--pos)}
 .ult .up{flex:none;text-align:right;font-size:12.5px;font-weight:800;line-height:1.1}.ult .up s{text-decoration:none;color:var(--muted);font-weight:600}.ult .up small{display:block;font-weight:600;color:var(--muted);font-size:10px}
 .cxlist{margin-top:10px}.cxlist .cxl b{font-weight:600}
+.nfn{margin-top:14px}.nfn .nfa{width:100%;background:none;border:1px dashed var(--line);color:var(--sub);border-radius:12px;padding:11px;font:inherit;font-weight:700;cursor:pointer}
+.nfn .nff{display:none;gap:8px;flex-wrap:wrap;background:var(--card);border-radius:12px;padding:12px;margin-top:8px}.nfn.on .nff{display:flex}.nfn.on .nfa{display:none}
+.nff input,.nff select{flex:1 1 140px;min-width:0;background:var(--card2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px;font:inherit;font-size:14px}
+.nff .nfok{flex:1 1 100%;background:var(--pink);color:#fff;border:0;border-radius:10px;padding:11px;font:inherit;font-weight:800;cursor:pointer}.nff .nfm{flex:1 1 100%;font-size:12.5px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -246,9 +250,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mws68q9f"></script>
-<script src="../lbmetas.js?v=mws68q9f"></script>
-<script src="../lbchat.js?v=mws68q9f"></script>
+<script src="../lb.js?v=mws6e6kg"></script>
+<script src="../lbmetas.js?v=mws6e6kg"></script>
+<script src="../lbchat.js?v=mws6e6kg"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -362,6 +366,11 @@ function fecha(){bd.classList.remove('open');document.body.style.overflow='';PGP
 bd.addEventListener('click',e=>{if(e.target===bd||e.target.closest('[data-fecha]'))return fecha();
   const v=e.target.closest('[data-volta]');if(v)return diaPop(v.dataset.volta);
   const ev=e.target.closest('[data-ev]');if(ev)return detalhe(ev.dataset.ev,ev.dataset.evd);
+  const nfa=e.target.closest('[data-nfa]');if(nfa){const w=nfa.closest('.nfn');w.classList.add('on');w.querySelector('[data-nf=funcao]').focus();return}
+  const nok=e.target.closest('[data-nfok]');if(nok){const w=nok.closest('.nfn'),m=w.querySelector('.nfm'),g=k=>w.querySelector(`[data-nf=${k}]`).value.trim();
+    if(!g('funcao')){m.textContent='Escreva a função.';return}nok.disabled=true;m.textContent='Salvando…';
+    api({acao:'add_funcao_bordero',id:w.dataset.nfb,funcao:g('funcao'),grupo:g('grupo'),valor:g('valor')}).then(r=>{D.borderos[w.dataset.nfb]=r.bordero;const sc=bds.scrollTop;
+      const s=(D.shows||[]).find(x=>bordDe(x)===r.bordero);if(s){abre(bordHtml(s));bds.scrollTop=sc+80}}).catch(er=>{nok.disabled=false;m.textContent='Não salvou ('+er.message+')'});return}
   const pe=e.target.closest('.pe[data-px]');if(pe&&!e.target.closest('button'))pe.classList.toggle('vpx')});
 addEventListener('keydown',e=>{if(e.key==='Escape')fecha()});
 const topo=(eb,t,sub)=>`<div class="top"><div><p class="eyebrow" style="margin:0">${eb}</p><h3>${esc(t)}</h3>${sub?`<span style="font-size:13px;color:var(--muted)">${esc(sub)}</span>`:''}</div><button class="x" data-fecha aria-label="Fechar">×</button></div>`;
@@ -382,9 +391,12 @@ function bordHtml(s){const b=bordDe(s),dt=new Date(s.data+'T12:00'),t=(b&&b.tota
   if(!b||!b.equipe)return h+'<div class="vazio" style="margin-top:12px">O borderô deste show ainda não foi montado.</div>';
   const G={};b.equipe.forEach(e=>{(G[e.grupo||'Equipe']=G[e.grupo||'Equipe']||[]).push(e)});
   Object.entries(G).forEach(([g,l])=>{h+=`<h4>${esc(g)} <span>${brl(l.reduce((a,e)=>a+(e.fora?0:+e.total||0),0))}</span></h4>`+l.map(e=>{const f=LB.pg.falta(e);
+    if(!e.pessoa&&(e.a_definir||e.nome==='A definir'))return `<div class="pe"><div class="t"><b style="color:var(--amber)">A definir</b><span>${esc(e.funcao||'')} · quem vai fazer ainda não foi escolhido</span></div><div class="v">${brl(e.total||e.valor||0)}</div></div>`;
     return `<div class="pe" data-px="1"><div class="t"><b>${esc(e.nome)}</b><span>${esc(e.funcao||'')} · toque para ver o PIX</span><div class="px">${e.pix?`PIX <b>${esc(limpaPix(e.pix))}</b> <button class="cp" data-cp="${esc(limpaPix(e.pix))}">copiar</button>`:'sem PIX no cadastro'}</div></div><div class="v">${brl(e.fora?e.valor:e.total)}<small><span class="pill ${e.status==='Pago'||f<=0.004?'ok':s.data<=HOJE?'ruim':'am'}">${esc((e.status||'pendente').toLowerCase())}</span></small></div></div>`}).join('')});
   const it=(b.itens||[]).filter(x=>+x.valor);if(it.length)h+=`<h4>Itens <span>${brl(t.itens)}</span></h4>`+it.map(x=>`<div class="pe"><div class="t"><b>${esc(x.desc||'item')}</b>${+x.qtd>1?`<span>${x.qtd} ×</span>`:''}</div><div class="v">${brl((+x.valor||0)*(+x.qtd||1))}</div></div>`).join('');
   if(t.diesel)h+=`<h4>Viagem</h4><div class="pe"><div class="t"><b>Diesel</b></div><div class="v">${brl(t.diesel)}</div></div>`;
+  /* 22/11: nova função sem nome (quem vai fazer é escolhido depois) */
+  h+=`<div class="nfn" data-nfb="${esc(Object.keys(D.borderos||{}).find(k=>D.borderos[k]===b)||b.id||'')}"><button type="button" class="btn nfa" data-nfa>＋ Adicionar função (sem nome)</button><div class="nff"><input data-nf="funcao" placeholder="Função (ex.: Roadie, Iluminação)" maxlength="60"><select data-nf="grupo">${['Técnica','Produção','Músicos','Outros','Artista'].map(g=>`<option>${g}</option>`).join('')}</select><input data-nf="valor" inputmode="decimal" placeholder="Cachê R$ (opcional)"><button type="button" class="btn nfok" data-nfok>Adicionar</button><span class="nfm"></span></div></div>`;
   return h}
 
 /* ---------- minhas tarefas (abaixo da agenda) ---------- */
