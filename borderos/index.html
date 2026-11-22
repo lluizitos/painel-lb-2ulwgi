@@ -248,7 +248,7 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
   <div class="acts" style="justify-content:space-between"><button type="button" class="btn dg" id="pm_del">Excluir</button><span style="display:flex;gap:8px"><button type="button" class="btn" id="pm_x">Cancelar</button><button type="submit" class="btn pkb">Salvar</button></span></div>
 </form></div>
 
-<script src="../lb.js?v=mwsa3kvc"></script>
+<script src="../lb.js?v=mwsbbr0y"></script>
 <script>
 const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
 const brl2=v=>v==null||isNaN(v)?'—':'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -386,7 +386,7 @@ $('cp_ok').onclick=()=>{const o=BORD[$('cp_de').value];if(!o)return;const q=k=>!
   if(q('equipe')){const ja=new Set(ED.equipe.map(e=>e.pessoa||LB.norm(e.nome)));o.equipe.filter(e=>!e.fora&&e.grupo!=='Comissão').forEach(e=>{const k=e.pessoa||LB.norm(e.nome);if(ja.has(k))return;ja.add(k);
     const p=PES.find(x=>x.id===e.pessoa)||{};const c={pessoa:e.pessoa,nome:e.nome,pix:p.pix||e.pix||'',doc:p.doc||e.doc||'',grupo:e.grupo,funcao:e.funcao,status:'Pendente'};
     ['valor','diaria','gasolina','ajuda','estacionamento'].forEach(x=>{if(e[x])c[x]=e[x]});ED.equipe.push(c);n++})}
-  if(q('itens')){ED.itens=ED.itens||[];(o.itens||[]).forEach(t=>{ED.itens.push({desc:t.desc,valor:t.valor,status:'Pendente',pessoa:t.pessoa,para:t.para,pix:t.pix});m++})}
+  if(q('itens')){ED.itens=ED.itens||[];(o.itens||[]).forEach(t=>{ED.itens.push({desc:t.desc,valor:t.valor,status:'Pendente',pessoa:t.pessoa,para:t.para,pix:t.pix,pag_em:''});m++})}
   if(q('diesel')&&o.diesel){['km_ida','km_volta','km_adic'].forEach(k=>{if(o.diesel[k]!=null)ED.diesel[k]=o.diesel[k]});$('d_ida').value=nf(ED.diesel.km_ida);$('d_volta').value=nf(ED.diesel.km_volta);$('d_ad').value=ED.diesel.km_adic===''?'':nf(ED.diesel.km_adic)}
   ED._sujo=true;renderEq();renderIt();calcTot();$('cp_res').textContent=`Copiado: ${n} pessoa${n!==1?'s':''}${m?`, ${m} ite${m>1?'ns':'m'}`:''}. Salve o borderô.`};
 function renderMassa(){renderCopia();const sel=new Set([...document.querySelectorAll('#m_partes [data-mk].ok')].map(b=>b.dataset.mk));
@@ -482,9 +482,11 @@ $('d_maps').onclick=async()=>{const m=$('d_mres'),de=destino();if(!$('e_local').
 /* itens */
 function renderIt(){$('e_it').innerHTML=(ED.itens||[]).map((t,i)=>`<div class="pp" data-ii="${i}"><div class="f4" style="grid-template-columns:2fr 1fr 1fr auto;align-items:end"><label>Item<input data-k="desc" value="${esc(t.desc)}"></label><label>Valor (R$)<input data-k="valor" inputmode="decimal" value="${nf(t.valor)}"></label><label>Situação<select data-k="status"><option${t.status!=='Pago'?' selected':''}>Pendente</option><option${t.status==='Pago'?' selected':''}>Pago</option></select></label><button type="button" class="x" data-rmi>×</button></div>
   ${t.para?`<div class="ipara"><span>Pagar para <b>${esc(t.para)}</b>${t.pix?' · PIX '+esc(t.pix):' · <span class="pk">sem PIX</span>'}</span><button type="button" class="x" data-ipx title="Trocar">×</button></div>`
-   :`<div class="res" style="margin-top:8px"><input class="search" data-ib placeholder="Pagar para quem? (busque no banco de pessoas)" autocomplete="off"><div class="dd" data-idd></div></div>`}</div>`).join('')}
+   :`<div class="res" style="margin-top:8px"><input class="search" data-ib placeholder="Pagar para quem? (busque no banco de pessoas)" autocomplete="off"><div class="dd" data-idd></div></div>`}
+  <div class="pa">Pagar item em <input type="date" data-k="pag_em" value="${esc(t.pag_em||'')}">${t.pag_em?`<span class="tg">${t.pag_em<(ED.data||'')?'antecipado':t.pag_em>(ED.data||'')?'depois do show':'no dia do show'}</span>`:'<span>(vazio = dia do show)</span>'}</div></div>`).join('')}
 $('e_addit').onclick=()=>{ED.itens=ED.itens||[];ED.itens.push({desc:'',valor:'',status:'Pendente'});renderIt();ED._sujo=true};
 $('e_it').addEventListener('input',e=>{const c=e.target.closest('[data-ii]');if(!c||!e.target.dataset.k)return;const t=ED.itens[+c.dataset.ii];t[e.target.dataset.k]=e.target.dataset.k==='valor'?num(e.target.value):e.target.value;ED._sujo=true;calcTot()});
+$('e_it').addEventListener('change',e=>{if(e.target.dataset.k==='pag_em')renderIt()});
 $('e_it').addEventListener('click',e=>{const c=e.target.closest('[data-ii]');if(!c)return;const t=ED.itens[+c.dataset.ii];
   if(e.target.closest('[data-rmi]')){ED.itens.splice(+c.dataset.ii,1);renderIt();calcTot();ED._sujo=true;return}
   if(e.target.closest('[data-ipx]')){delete t.pessoa;delete t.para;delete t.pix;ED._sujo=true;renderIt();const n=$('e_it').querySelector(`[data-ii="${c.dataset.ii}"] [data-ib]`);if(n)n.focus();return}
@@ -620,7 +622,7 @@ $('cj_salvar').onclick=()=>{CFG.base=$('cj_base').value.trim()||'Divinópolis, M
   store.set('lb_bord_cfg',JSON.stringify({base:CFG.base,onibus_kml:CFG.onibus_kml,diesel_preco:CFG.diesel_preco,adicional_pct:CFG.adicional_pct,gasolina_preco:CFG.gasolina_preco,veiculos:CFG.veiculos}));
   $('cj_msg').textContent='Salvo neste aparelho.';setTimeout(()=>$('cj_msg').textContent='',2500)};
 </script>
-<script src="../lbchat.js?v=mwsa3kvc"></script>
+<script src="../lbchat.js?v=mwsbbr0y"></script>
 <script>LBCHAT.auto(document.querySelector('main.wrap').firstElementChild,{base:'../',pagina:'Borderôs',exemplo:'quanto gastei de diesel em outubro?'})</script>
 </body>
 </html>

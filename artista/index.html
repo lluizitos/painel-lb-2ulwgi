@@ -267,9 +267,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwsa3kvc"></script>
-<script src="../lbmetas.js?v=mwsa3kvc"></script>
-<script src="../lbchat.js?v=mwsa3kvc"></script>
+<script src="../lb.js?v=mwsbbr0y"></script>
+<script src="../lbmetas.js?v=mwsbbr0y"></script>
+<script src="../lbchat.js?v=mwsbbr0y"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -430,7 +430,7 @@ function bordHtml(s){const b=bordDe(s),dt=new Date(s.data+'T12:00'),t=(b&&b.tota
   Object.entries(G).forEach(([g,l])=>{h+=`<h4>${esc(g)} <span>${brl(l.reduce((a,e)=>a+(e.fora?0:+e.total||0),0))}</span></h4>`+l.map(e=>{const f=LB.pg.falta(e);
     if(!e.pessoa&&(e.a_definir||e.nome==='A definir'))return `<div class="pe"><div class="t"><b style="color:var(--amber)">A definir</b><span>${esc(e.funcao||'')} · quem vai fazer ainda não foi escolhido</span></div><div class="v">${brl(e.total||e.valor||0)}</div></div>`;
     return `<div class="pe" data-px="1"><div class="t"><b>${esc(e.nome)}</b><span>${esc(e.funcao||'')} · toque para ver o PIX</span><div class="px">${e.pix?`PIX <b>${esc(limpaPix(e.pix))}</b> <button class="cp" data-cp="${esc(limpaPix(e.pix))}">copiar</button>`:'sem PIX no cadastro'}</div></div><div class="v">${brl(e.fora?e.valor:e.total)}<small><span class="pill ${e.status==='Pago'||f<=0.004?'ok':s.data<=HOJE?'ruim':'am'}">${esc((e.status||'pendente').toLowerCase())}</span></small></div></div>`}).join('')});
-  const it=(b.itens||[]).filter(x=>+x.valor);if(it.length)h+=`<h4>Itens <span>${brl(t.itens)}</span></h4>`+it.map(x=>`<div class="pe"><div class="t"><b>${esc(x.desc||'item')}</b>${+x.qtd>1?`<span>${x.qtd} ×</span>`:''}</div><div class="v">${brl((+x.valor||0)*(+x.qtd||1))}</div></div>`).join('');
+  const it=(b.itens||[]).filter(x=>+x.valor);if(it.length)h+=`<h4>Itens <span>${brl(t.itens)}</span></h4>`+it.map(x=>`<div class="pe"><div class="t"><b>${esc(x.desc||'item')}</b>${+x.qtd>1||x.pag_em||x.status==='Pago'?`<span>${[+x.qtd>1?x.qtd+' ×':'',x.status==='Pago'?'pago':x.pag_em?'pagar em '+ddmm(x.pag_em):''].filter(Boolean).join(' · ')}</span>`:''}</div><div class="v">${brl((+x.valor||0)*(+x.qtd||1))}</div></div>`).join('');
   if(t.diesel)h+=`<h4>Viagem</h4><div class="pe"><div class="t"><b>Diesel</b></div><div class="v">${brl(t.diesel)}</div></div>`;
   return h}
 
@@ -485,8 +485,8 @@ function renderPagar(){const pode=!!API,B={},C=[];let NAD=0;
   const grp=b=>B[b.id]=B[b.id]||{id:b.id,show:b.show||'Show',data:b.data,it:[],tot:0};
   Object.values(D.borderos||{}).filter(b=>b.equipe).forEach(b=>b.equipe.forEach((e,i)=>{if(e.fora||e.grupo==='Comissão')return;
     LB.pg.pend(b,e,HOJE).forEach(q=>{const x=grp(b);x.tot+=q.f;x.it.push({b,e,i,nome:e.nome,pix:pixDe(e.pessoa,e.nome,e.pix),f:q.f,ps:q.ps,d:q.d,fut:q.d>HOJE,ant:q.d<b.data})})}));
-  Object.values(D.borderos||{}).filter(b=>b.equipe&&b.data<=HOJE).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!t.para||!(+t.valor>0))return;
-    const x=grp(b);x.tot+=+t.valor;x.it.push({b,e:{funcao:'item: '+(t.desc||''),pessoa:t.pessoa},item:j,nome:t.para,pix:pixDe(t.pessoa,t.para,t.pix),f:+t.valor,ps:[{k:'item',n:t.desc||'item',v:+t.valor}],d:b.data,fut:false})}));
+  Object.values(D.borderos||{}).filter(b=>b.equipe).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!t.para||!(+t.valor>0))return;const dI=t.pag_em||b.data;if(!t.pag_em&&b.data>HOJE)return; // 22/11: item tem prazo próprio (vazio = dia do show)
+    const x=grp(b);x.tot+=+t.valor;x.it.push({b,e:{funcao:'item: '+(t.desc||''),pessoa:t.pessoa},item:j,nome:t.para,pix:pixDe(t.pessoa,t.para,t.pix),f:+t.valor,ps:[{k:'item',n:t.desc||'item',v:+t.valor}],d:dI,fut:dI>HOJE})}));
   PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada'&&g.ocultar!=='sim').forEach(g=>LB.pgx.ocorr(g,fimMes).filter(o=>!o.pago&&o.falta>0.004&&(!pAdiado(g,o.ref)||(NAD++,false))).forEach(o=>C.push({g,o,d:o.data,f:o.falta,fut:o.data>HOJE,pix:pixDe(g.pessoa,g.nome,g.pix)})));
   Object.values(B).forEach(x=>{const ds=x.it.map(i=>i.d).sort();x.np=new Set(x.it.map(i=>i.e.pessoa||LB.norm(i.nome))).size;x.d=ds[ds.length-1];x.dmin=ds[0]});
   PGB=B;
