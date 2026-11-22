@@ -200,7 +200,14 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .v-fx{background:#6F697D}.v-sh{background:#CF1D51}.v-av{background:#F2B66B}
 .ce .ic2,.ev .ic2{font-style:normal;margin-right:3px}.ce .ico{margin-right:2px;stroke-width:2.4}.chip .ico,.clg .ico{opacity:.85}
 /* 19/11: faixa "Últimos lançamentos" (no topo, em todas as abas) */
-.ult{max-width:900px;margin:0 auto;padding:0 16px 8px}.ult:empty{display:none}
+.ult{margin:0 0 18px}
+/* 22/11: cada aba só com o seu conteúdo — avisos na Agenda e no Financeiro; últimos lançamentos e pagamentos próximos só no Financeiro */
+body:not([data-s=agenda]):not([data-s=fin]) #orcbox,body:not([data-s=agenda]):not([data-s=fin]) #urg{display:none}
+body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
+#fprox{opacity:.62;margin-top:26px}#fprox:empty{display:none}
+#fprox h3{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.fpx{display:flex;gap:10px;align-items:center;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 6px;cursor:pointer}
+.fpx>b{flex:none;width:40px;font-size:12.5px;color:var(--sub)}.fpx span{flex:1;min-width:0;font-size:13.5px;font-weight:700}.fpx small{display:block;font-weight:500;color:var(--muted);font-size:11.5px}.fpx em{flex:none;font-style:normal;font-weight:800;font-size:13.5px}.ult:empty{display:none}
 .ult .uh{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 5px}
 .ult .ar{display:flex;gap:5px}.ult .ar button{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:8px;width:34px;height:24px;cursor:pointer;font-size:11px;line-height:1}
 .ult .ul{max-height:152px;overflow-y:auto;scrollbar-width:none;transition:max-height .2s}.ult .ul::-webkit-scrollbar{display:none}
@@ -220,13 +227,13 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 <body>
 <div id="pg">
 <header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
-<div class="ult" id="ult"></div>
 <nav class="ptabs" id="setores"><button class="on" data-s="agenda">Agenda</button><button data-s="pags">Pagamentos</button><button data-s="equipe">Equipe</button><button data-s="fin">Financeiro</button><button data-s="ven">Vendas</button></nav></header>
 <div class="wrap" id="main">
 <div id="urg"></div>
 <div id="orcbox"></div>
 <p class="eyebrow">Artista</p><h1>Lucas <em>Barros</em></h1>
 <div id="lbq"></div>
+<div class="ult" id="ult"></div>
 
 <section id="s_agenda">
   <div class="qsh" id="qsh"></div>
@@ -249,6 +256,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </section>
 
 <section id="s_fin" hidden></section>
+<div id="fprox"></div>
 <section id="s_ven" hidden></section>
 <section id="s_equipe" hidden>
   <h2 class="tt">Metas da empresa</h2><div id="metas"><div class="vazio">Carregando…</div></div>
@@ -259,9 +267,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwsa04as"></script>
-<script src="../lbmetas.js?v=mwsa04as"></script>
-<script src="../lbchat.js?v=mwsa04as"></script>
+<script src="../lb.js?v=mwsa3kvc"></script>
+<script src="../lbmetas.js?v=mwsa3kvc"></script>
+<script src="../lbchat.js?v=mwsa3kvc"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -318,6 +326,14 @@ function urgentes(){const U=[];try{LB.orc.mostra(document.getElementById('orcbox
   el.innerHTML=!UL.length?'':`<div class="urgh"><span>${LB.ic('sino')} <b>${UL.length} aviso${UL.length>1?'s':''}</b>${UL.length>1&&!min?' <small style="color:var(--muted);font-size:12.5px">· arraste para o lado</small>':''}</span><button type="button" data-urgmin>${min?'ver ▾':'minimizar ▴'}</button></div>`+(min?'':`<div class="urgc" id="urgc">${UL.map(u=>`<button class="urg${u.c?' '+u.c:''}" data-urd="${esc(u.d||'')}"${u.k?` data-urk="${esc(u.k)}"`:''}>${u.ic||IC.al}<span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join('')}</div>${UL.length>1?`<div class="urgd" id="urgd">${UL.map((u,i)=>`<i${i?'':' class="on"'}></i>`).join('')}</div>`:''}`);
   const c=document.getElementById('urgc'),dt=document.getElementById('urgd');
   if(c&&dt)c.onscroll=()=>{const w=(c.firstElementChild||{}).offsetWidth||1,i=Math.round(c.scrollLeft/(w+8));[...dt.children].forEach((x,j)=>x.classList.toggle('on',j===Math.min(i,dt.children.length-1)))}}
+/* 22/11: Financeiro → "Pagamentos próximos" (30 dias): contas/fixos e equipe dos próximos shows; tocar detalha */
+function renderProx(){const el=document.getElementById('fprox');if(!el||!D)return;const ate=new Date(Date.now()+30*864e5).toISOString().slice(0,10),L=[];
+  if(PAGS_OK)PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada'&&g.ocultar!=='sim').forEach(g=>LB.pgx.ocorr(g,ate).filter(o=>!o.pago&&o.falta>0.004&&o.data>=HOJE&&!pAdiado(g,o.ref)).forEach(o=>L.push({d:o.data,t:g.descricao||g.nome,s:g.nome&&g.nome!==g.descricao?g.nome:(g.tipo==='fixo'?'fixo':'conta'),v:o.falta,k:'g|'+g.id+'|'+o.ref})));
+  (D.shows||[]).forEach((s,i)=>{if(/cancel/i.test(s.sit||'')||s.data<HOJE||s.data>ate)return;const b=bordDe(s);if(!b||!b.equipe)return;let f=0;try{LB.pg.porData(b).forEach(q=>{f+=q.falta||0})}catch(e){}
+    if(f>=1)L.push({d:s.data,t:'Equipe do show · '+s.nome,s:'borderô',v:f,k:'s|'+i})});
+  L.sort((a,b)=>a.d<b.d?-1:1);
+  el.innerHTML=L.length?`<h3>Pagamentos próximos · 30 dias</h3>${L.map(x=>`<button type="button" class="fpx" data-urk="${esc(x.k)}"><b>${ddmm(x.d)}</b><span>${esc(x.t)}<small>${esc(x.s)}</small></span><em>${brl(x.v)}</em></button>`).join('')}`:''}
+document.getElementById('fprox').onclick=e=>{const b=e.target.closest('[data-urk]');if(b)detalhe(b.dataset.urk)};
 /* 22/11: quadros "Shows da semana" e "Shows pendentes" (em cima da Agenda); tocar abre o borderô */
 function quadros(SW,SPn,SPa){const el=document.getElementById('qsh');if(!el)return;
   const prox=(D.shows||[]).filter(s=>!/cancel/i.test(s.sit||'')&&dias(s.data)>7).sort((a,b)=>a.data<b.data?-1:1)[0];
@@ -584,7 +600,7 @@ async function abreVen(){if(VENOK)return;VENOK=true;const box=document.getElemen
 async function abreFin(){if(FINOK)return;FINOK=true;const box=document.getElementById('s_fin');
   try{if(!window.__ART_R)throw new Error('dados ainda não carregados');await LB.financeiro(box,window.__ART_R)}
   catch(e){FINOK=false;box.innerHTML='<div class="vazio">Não consegui abrir o financeiro agora ('+esc(String(e.message||e))+'). Tente de novo.</div>';console.error(e)}}
-function setor(s){if(!['agenda','pags','equipe','fin','ven'].includes(s))s='agenda';document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));['agenda','pags','equipe','fin','ven'].forEach(x=>document.getElementById('s_'+x).hidden=x!==s);ST.set('lb_art_setor',s);
+function setor(s){if(!['agenda','pags','equipe','fin','ven'].includes(s))s='agenda';document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));['agenda','pags','equipe','fin','ven'].forEach(x=>document.getElementById('s_'+x).hidden=x!==s);ST.set('lb_art_setor',s);document.body.dataset.s=s;try{fixaAbas()}catch(e){}if(s==='fin')try{renderProx()}catch(e){console.error(e)}
   if(s==='fin')abreFin();if(s==='ven')abreVen()}
 document.getElementById('setores').onclick=e=>{const b=e.target.closest('[data-s]');if(b){setor(b.dataset.s);scrollTo({top:0,behavior:'smooth'})}};
 
@@ -611,7 +627,7 @@ function renderTL(){const el=document.getElementById('tl');if(!el||!D||!D.shows)
   requestAnimationFrame(()=>go(false));if(!el._ro&&window.ResizeObserver){let w0=0;el._ro=new ResizeObserver(()=>{const w=el.clientWidth;if(w&&!w0)go(false);w0=w});el._ro.observe(el)}
   document.getElementById('tlp').onclick=()=>el.scrollBy({left:-274,behavior:'smooth'});document.getElementById('tln').onclick=()=>el.scrollBy({left:274,behavior:'smooth'});document.getElementById('tlh').onclick=()=>go(true);
   el.onclick=e=>{const c=e.target.closest('[data-tls]');if(c)detalhe('s|'+c.dataset.tls)}}
-function renderTudo(){renderFiltros();renderCal();renderTL();renderMetas();renderPagar();renderEquipe();urgentes();try{renderUlt()}catch(e){console.error(e)}}
+function renderTudo(){renderFiltros();renderCal();renderTL();renderMetas();renderPagar();renderEquipe();urgentes();try{renderUlt()}catch(e){console.error(e)}try{renderProx()}catch(e){console.error(e)}}
 
 /* ---------- 19/11: últimos lançamentos (extrato + app) no topo; o que é de um orçamento, borderô ou show aparece junto: pago / total ---------- */
 let LNV=null,ULT=[];
