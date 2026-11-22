@@ -250,9 +250,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mws6e6kg"></script>
-<script src="../lbmetas.js?v=mws6e6kg"></script>
-<script src="../lbchat.js?v=mws6e6kg"></script>
+<script src="../lb.js?v=mws76g2p"></script>
+<script src="../lbmetas.js?v=mws76g2p"></script>
+<script src="../lbchat.js?v=mws76g2p"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -395,8 +395,6 @@ function bordHtml(s){const b=bordDe(s),dt=new Date(s.data+'T12:00'),t=(b&&b.tota
     return `<div class="pe" data-px="1"><div class="t"><b>${esc(e.nome)}</b><span>${esc(e.funcao||'')} · toque para ver o PIX</span><div class="px">${e.pix?`PIX <b>${esc(limpaPix(e.pix))}</b> <button class="cp" data-cp="${esc(limpaPix(e.pix))}">copiar</button>`:'sem PIX no cadastro'}</div></div><div class="v">${brl(e.fora?e.valor:e.total)}<small><span class="pill ${e.status==='Pago'||f<=0.004?'ok':s.data<=HOJE?'ruim':'am'}">${esc((e.status||'pendente').toLowerCase())}</span></small></div></div>`}).join('')});
   const it=(b.itens||[]).filter(x=>+x.valor);if(it.length)h+=`<h4>Itens <span>${brl(t.itens)}</span></h4>`+it.map(x=>`<div class="pe"><div class="t"><b>${esc(x.desc||'item')}</b>${+x.qtd>1?`<span>${x.qtd} ×</span>`:''}</div><div class="v">${brl((+x.valor||0)*(+x.qtd||1))}</div></div>`).join('');
   if(t.diesel)h+=`<h4>Viagem</h4><div class="pe"><div class="t"><b>Diesel</b></div><div class="v">${brl(t.diesel)}</div></div>`;
-  /* 22/11: nova função sem nome (quem vai fazer é escolhido depois) */
-  h+=`<div class="nfn" data-nfb="${esc(Object.keys(D.borderos||{}).find(k=>D.borderos[k]===b)||b.id||'')}"><button type="button" class="btn nfa" data-nfa>＋ Adicionar função (sem nome)</button><div class="nff"><input data-nf="funcao" placeholder="Função (ex.: Roadie, Iluminação)" maxlength="60"><select data-nf="grupo">${['Técnica','Produção','Músicos','Outros','Artista'].map(g=>`<option>${g}</option>`).join('')}</select><input data-nf="valor" inputmode="decimal" placeholder="Cachê R$ (opcional)"><button type="button" class="btn nfok" data-nfok>Adicionar</button><span class="nfm"></span></div></div>`;
   return h}
 
 /* ---------- minhas tarefas (abaixo da agenda) ---------- */
