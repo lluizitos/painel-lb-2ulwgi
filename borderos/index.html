@@ -68,7 +68,7 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
 .st.pago{background:rgba(127,221,169,.14);color:var(--pos)}
 .res{position:relative}
 .nfx{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.nfx .search{flex:1 1 100%;min-width:0}.nfx select{flex:1 1 auto!important;height:42px}.nfx #e_nfv{height:42px}.nfx .btn{height:42px}
-input[data-quem]{background:var(--card2,#26232D);border:1px solid var(--pink,#E8336E);border-radius:10px;padding:8px 10px;color:inherit;font:inherit;font-size:14px}.nfx select,.nfx #e_nfv{flex:none;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 8px;color:inherit;font:inherit;font-size:14px}.nfx #e_nfv{width:70px}.nfx .btn{flex:none;font-size:18px;padding:0 14px}.nfh{font-size:12px;color:var(--muted);margin:4px 2px 0}
+.pp .qm{margin:8px 0 2px}.nfx select,.nfx #e_nfv{flex:none;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 8px;color:inherit;font:inherit;font-size:14px}.nfx #e_nfv{width:70px}.nfx .btn{flex:none;font-size:18px;padding:0 14px}.nfh{font-size:12px;color:var(--muted);margin:4px 2px 0}
 .dd{position:absolute;left:0;right:0;top:100%;z-index:8;background:var(--card2);border:1px solid var(--line);border-radius:12px;margin-top:4px;max-height:300px;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.5);display:none}
 .dd.open{display:block}
 .dd button{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:9px 12px}
@@ -248,7 +248,7 @@ input[data-quem]{background:var(--card2,#26232D);border:1px solid var(--pink,#E8
   <div class="acts" style="justify-content:space-between"><button type="button" class="btn dg" id="pm_del">Excluir</button><span style="display:flex;gap:8px"><button type="button" class="btn" id="pm_x">Cancelar</button><button type="submit" class="btn pkb">Salvar</button></span></div>
 </form></div>
 
-<script src="../lb.js?v=mws9tzqf"></script>
+<script src="../lb.js?v=mwsa04as"></script>
 <script>
 const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
 const brl2=v=>v==null||isNaN(v)?'—':'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -424,8 +424,9 @@ $('e_qp').addEventListener('change',e=>{const t=e.target.closest('[data-qd]');if
 function renderEq(){try{$('dl_pes').innerHTML=PES.map(q=>`<option value="${esc(q.nome)}">${esc(q.apelido||'')}</option>`).join('')}catch(e){}const r=resumo(ED);$('e_fm').textContent=fmTxt(r);renderMassa();renderQP();
   $('e_eq').innerHTML=ED.equipe.length?GR.map(g=>{const l=ED.equipe.map((e,i)=>({e,i})).filter(x=>x.e.grupo===g);if(!l.length)return '';
     return `<div class="note" style="margin:10px 2px 6px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;font-size:10.5px;color:var(--pinkl)">${g} · ${l.length}</div>`+l.map(({e,i})=>`<div class="pp" data-i="${i}">
-    <div class="top"><div>${!e.pessoa&&(e.a_definir||e.nome==='A definir')?`<b class="pk">A definir</b><span><input data-quem list="dl_pes" placeholder="Escolher quem vai fazer (nome)" autocomplete="off" style="margin-top:4px;width:100%"></span>`:`<b>${esc(e.nome)}</b><span>${e.doc?'CPF/doc '+esc(doc11(e.doc))+' · ':''}${e.pix?'PIX '+esc(e.pix):'<span class="pk">sem PIX</span>'}</span>`}</div>
+    <div class="top"><div>${!e.pessoa&&(e.a_definir||e.nome==='A definir')?`<b class="pk">A definir</b><span>${esc(e.funcao||'')}</span>`:`<b>${esc(e.nome)}</b><span>${e.doc?'CPF/doc '+esc(doc11(e.doc))+' · ':''}${e.pix?'PIX '+esc(e.pix):'<span class="pk">sem PIX</span>'}</span>`}</div>
     <div style="display:flex;gap:4px;align-items:center"><button type="button" class="st${e.status==='Pago'?' pago':e.status==='Parcial'?' parc':''}" data-st>${e.status==='Pago'?'pago':e.status==='Parcial'?'parcial':'a pagar'}</button><button type="button" class="x" data-rm title="Tirar">×</button></div></div>
+    <div class="f2 qm"><label>Quem vai fazer<input data-quem list="dl_pes" value="${!e.pessoa&&(e.a_definir||e.nome==='A definir')?'':esc(e.nome)}" placeholder="A definir" autocomplete="off"></label><label>Chave PIX<input data-k="pix" value="${esc(e.pix||'')}" placeholder="pode ficar em branco" autocomplete="off"></label></div>
     <div class="f4 ex"><label>Grupo<select data-k="grupo">${GR.map(x=>`<option${x===e.grupo?' selected':''}>${x}</option>`).join('')}</select></label>
     <label>Função<input data-k="funcao" list="dl_fun" value="${esc(e.funcao)}"></label><label>Cachê (R$)<input data-k="valor" inputmode="decimal" value="${nf(e.valor)}"></label>
     <label>Gasolina (R$) <a href="#" data-gas style="color:var(--pinkl);text-transform:none;letter-spacing:0">calcular</a><input data-k="gasolina" inputmode="decimal" value="${nf(e.gasolina)}"></label>
@@ -438,8 +439,11 @@ $('e_eq').addEventListener('input',e=>{const t=e.target,c=t.closest('[data-i]');
   if(t.dataset.k==='funcao'){const f=D.funcoes.find(x=>LB.norm(x.funcao)===LB.norm(t.value));if(f&&!p.valor){p.valor=f.valor;c.querySelector('[data-k=valor]').value=nf(f.valor)}}
   ED._sujo=true;c.querySelector('.ex>div:last-child').textContent=brl2(totP(p));calcTot()});
 $('e_eq').addEventListener('change',e=>{const t=e.target;
-  if(t.dataset.quem!=null){const c=t.closest('[data-i]'),x=ED.equipe[+c.dataset.i],v=LB.norm(t.value);const pp=PES.find(q=>LB.norm(q.nome)===v)||PES.find(q=>LB.norm(q.apelido||'')===v);
-    if(pp){Object.assign(x,{pessoa:pp.id,nome:pp.nome,pix:pp.pix||'',doc:pp.doc||''});delete x.a_definir;ED._sujo=true;renderEq();calcTot()}return}if(t.dataset.k==='grupo'||t.dataset.k==='pag_em'){renderEq();calcTot();return}
+  if(t.dataset.quem!=null){const c=t.closest('[data-i]'),x=ED.equipe[+c.dataset.i],nm=t.value.trim(),v=LB.norm(nm);const pp=nm?(PES.find(q=>LB.norm(q.nome)===v)||PES.find(q=>LB.norm(q.apelido||'')===v)):null;
+    if(pp)Object.assign(x,{pessoa:pp.id,nome:pp.nome,pix:pp.pix||'',doc:pp.doc||''}),delete x.a_definir; // pessoa do cadastro: troca nome, PIX e doc
+    else if(nm){if(x.pessoa)x.pix='';Object.assign(x,{pessoa:'',nome:nm,doc:''});delete x.a_definir} // nome novo (fora do cadastro): PIX fica para preencher
+    else{Object.assign(x,{pessoa:'',nome:'A definir',pix:'',doc:'',a_definir:'sim'})} // apagou o nome: volta a "A definir"
+    ED._sujo=true;renderEq();calcTot();return}if(t.dataset.k==='grupo'||t.dataset.k==='pag_em'){renderEq();calcTot();return}
   if(t.dataset.k==='funcao'){const c=t.closest('[data-i]'),i=+c.dataset.i,p=ED.equipe[i];const f=D.funcoes.find(x=>LB.norm(x.funcao)===LB.norm(t.value));
     if(f&&f.grupo&&f.grupo!==p.grupo&&GR.includes(f.grupo)){p.grupo=f.grupo;ED._sujo=true;renderEq();calcTot();
       const n=document.querySelector(`#e_eq [data-i="${i}"]`);if(n){n.scrollIntoView({block:'center'});n.classList.add('flash');setTimeout(()=>n.classList.remove('flash'),1600)}}}});
@@ -616,7 +620,7 @@ $('cj_salvar').onclick=()=>{CFG.base=$('cj_base').value.trim()||'Divinópolis, M
   store.set('lb_bord_cfg',JSON.stringify({base:CFG.base,onibus_kml:CFG.onibus_kml,diesel_preco:CFG.diesel_preco,adicional_pct:CFG.adicional_pct,gasolina_preco:CFG.gasolina_preco,veiculos:CFG.veiculos}));
   $('cj_msg').textContent='Salvo neste aparelho.';setTimeout(()=>$('cj_msg').textContent='',2500)};
 </script>
-<script src="../lbchat.js?v=mws9tzqf"></script>
+<script src="../lbchat.js?v=mwsa04as"></script>
 <script>LBCHAT.auto(document.querySelector('main.wrap').firstElementChild,{base:'../',pagina:'Borderôs',exemplo:'quanto gastei de diesel em outubro?'})</script>
 </body>
 </html>

@@ -41,6 +41,14 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .urgc .urg{flex:0 0 86%;max-width:420px;scroll-snap-align:start;align-self:stretch}.urgc .urg:only-child{flex-basis:100%;max-width:none}
 .urg.ush{background:rgba(122,184,255,.1);border-color:rgba(122,184,255,.5);animation:none}.urg.ush small{color:var(--blue)}.urg.ush .ic{color:var(--blue)}
 .urg.upd{background:rgba(242,182,107,.1);border-color:rgba(242,182,107,.55);animation:none}.urg.upd small{color:var(--amber)}.urg.upd .ic{color:var(--amber)}
+.qsh{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 18px}@media(max-width:380px){.qsh{gap:7px}}
+.qb{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 10px 8px;min-width:0}.qb.qsem{border-color:rgba(122,184,255,.45)}.qb.qpen{border-color:rgba(242,182,107,.5)}
+.qh{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin:0 2px 8px}.qh .ic{width:14px;height:14px;flex:none}.qsem .qh .ic{color:var(--blue)}.qpen .qh .ic{color:var(--amber)}
+.qh i{font-style:normal;margin-left:auto;background:var(--card2);border-radius:99px;padding:1px 7px;color:var(--ink);letter-spacing:0}
+.ql{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--card2);border:0;border-radius:10px;padding:8px;margin:0 0 6px;cursor:pointer}
+.ql>b{flex:none;font-size:12px;font-weight:800;padding-top:1px}.qsem .ql>b{color:var(--blue)}.qpen .ql>b{color:var(--amber)}
+.ql span{flex:1;min-width:0;font-size:12.5px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}.ql small{display:block;font-weight:500;color:var(--muted);font-size:11px;margin-top:2px}
+.qv{font-size:12.5px;color:var(--muted);padding:4px 2px 8px;line-height:1.4}.qv b{color:var(--ink)}
 .urgd{display:flex;justify-content:center;gap:5px;margin-top:2px}.urgd i{width:6px;height:6px;border-radius:9px;background:var(--line)}.urgd i.on{background:var(--pinkl);width:16px}
 /* comuns */
 .list{display:flex;flex-direction:column;gap:8px}
@@ -221,6 +229,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 <div id="lbq"></div>
 
 <section id="s_agenda">
+  <div class="qsh" id="qsh"></div>
   <h2 class="tt">Agenda</h2>
   <div class="cbar"><button class="nv" id="cprev" aria-label="Anterior">‹</button><div class="tit" id="ctit"></div><button class="nv" id="cnext" aria-label="Próximo">›</button><button class="chip" id="choje">Hoje</button></div>
   <div class="chips"><span class="seg" id="cvis"><button data-v="mes" class="on">Mês</button><button data-v="sem">Semana</button><button data-v="dia">Dia</button></span></div>
@@ -250,9 +259,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mws9tzqf"></script>
-<script src="../lbmetas.js?v=mws9tzqf"></script>
-<script src="../lbchat.js?v=mws9tzqf"></script>
+<script src="../lb.js?v=mwsa04as"></script>
+<script src="../lbmetas.js?v=mwsa04as"></script>
+<script src="../lbchat.js?v=mwsa04as"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -303,11 +312,23 @@ function urgentes(){const U=[];try{LB.orc.mostra(document.getElementById('orcbox
   /* pendentes de mais de 60 dias: um cartão só (tocar mostra a lista) */
   const SPn=SP.filter(x=>dias(x.d)>=-60),SPa=SP.filter(x=>dias(x.d)<-60);URGANT=SPa;
   if(SPa.length)SPn.push({t:SPa.length+' shows mais antigos pendentes',s:'somam '+brl(SPa.reduce((a,x)=>a+x.v,0))+' · toque para ver',d:'',k:'antigos',c:'upd',ic:IC.al});
-  const UF=U.filter(u=>u.fixo),UL=UF.concat(U.filter(u=>!u.fixo),SW,SPn),min=ST.get('lb_urg_min2')==='1';
+  try{quadros(SW,SPn,SPa)}catch(e){console.error(e)}
+  const UF=U.filter(u=>u.fixo),UL=UF.concat(U.filter(u=>!u.fixo)),min=ST.get('lb_urg_min2')==='1';
   const el=document.getElementById('urg');
   el.innerHTML=!UL.length?'':`<div class="urgh"><span>${LB.ic('sino')} <b>${UL.length} aviso${UL.length>1?'s':''}</b>${UL.length>1&&!min?' <small style="color:var(--muted);font-size:12.5px">· arraste para o lado</small>':''}</span><button type="button" data-urgmin>${min?'ver ▾':'minimizar ▴'}</button></div>`+(min?'':`<div class="urgc" id="urgc">${UL.map(u=>`<button class="urg${u.c?' '+u.c:''}" data-urd="${esc(u.d||'')}"${u.k?` data-urk="${esc(u.k)}"`:''}>${u.ic||IC.al}<span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join('')}</div>${UL.length>1?`<div class="urgd" id="urgd">${UL.map((u,i)=>`<i${i?'':' class="on"'}></i>`).join('')}</div>`:''}`);
   const c=document.getElementById('urgc'),dt=document.getElementById('urgd');
   if(c&&dt)c.onscroll=()=>{const w=(c.firstElementChild||{}).offsetWidth||1,i=Math.round(c.scrollLeft/(w+8));[...dt.children].forEach((x,j)=>x.classList.toggle('on',j===Math.min(i,dt.children.length-1)))}}
+/* 22/11: quadros "Shows da semana" e "Shows pendentes" (em cima da Agenda); tocar abre o borderô */
+function quadros(SW,SPn,SPa){const el=document.getElementById('qsh');if(!el)return;
+  const prox=(D.shows||[]).filter(s=>!/cancel/i.test(s.sit||'')&&dias(s.data)>7).sort((a,b)=>a.data<b.data?-1:1)[0];
+  const lin=(u,c)=>`<button type="button" class="ql ${c}" data-urk="${esc(u.k)}"><b>${ddmm(u.d)}</b><span>${esc(u.t.replace(/^Show (feito pendente · )?(\S+ )?\d\d\/\d\d( · | )/,''))}<small>${esc(u.s)}</small></span></button>`;
+  const rec=SPn.filter(u=>u.k!=='antigos');
+  el.innerHTML=`<div class="qb qsem"><div class="qh">${LB.ic('show')} Shows da semana <i>${SW.length}</i></div>${SW.length?SW.map(u=>lin(u,'')).join(''):`<div class="qv">Nenhum show nos próximos 7 dias${prox?`<br>Próximo: <b>${ddmm(prox.data)} ${esc(prox.nome)}</b>`:''}</div>`}</div>
+  <div class="qb qpen"><div class="qh">${IC.al} Shows pendentes <i>${rec.length+SPa.length}</i></div>${rec.length?rec.map(u=>lin(u,'')).join(''):(SPa.length?'':'<div class="qv">Nada pendente 🎉</div>')}${SPa.length?`<button type="button" class="ql qant" data-urk="antigos"><b>+${SPa.length}</b><span>mais antigos<small>somam ${brl(SPa.reduce((a,x)=>a+x.v,0))}</small></span></button>`:''}</div>`}
+document.getElementById('qsh').onclick=e=>{const b=e.target.closest('[data-urk]');if(!b)return;
+  if(b.dataset.urk==='antigos'){abre(topo('Shows feitos pendentes','Mais de 60 dias atrás','')+`<div class="cxb">${URGANT.map(x=>`<button type="button" class="cxl" data-ant="${esc(x.k)}" style="width:100%;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer"><span>${esc(x.t.replace(/^Show feito pendente · /,''))}</span><b>${esc(x.s)}</b></button>`).join('')}</div>`);return}
+  detalhe(b.dataset.urk)};
+document.addEventListener('click',e=>{const a=e.target.closest('[data-ant]');if(a)detalhe(a.dataset.ant)});
 document.getElementById('urg').onclick=e=>{if(e.target.closest('[data-urgmin]')){ST.set('lb_urg_min2',ST.get('lb_urg_min2')==='1'?'0':'1');urgentes();return}const b=e.target.closest('.urg');if(!b)return;if(b.dataset.urk==='antigos'){abre(topo('Shows feitos pendentes','Mais de 60 dias atrás','')+`<div class="cxb">${URGANT.map(x=>`<div class="cxl"><span>${esc(x.t.replace(/^Show feito pendente · /,''))}</span><b>${esc(x.s)}</b></div>`).join('')}</div>`);return}if(b.dataset.urk){detalhe(b.dataset.urk);return}setor('agenda');if(b.dataset.urd)diaPop(b.dataset.urd)};
 
 /* ======================= AGENDA ======================= */

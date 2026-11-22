@@ -49,8 +49,8 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px;margin:20px 2px 8
 <div id="mpgs"></div>
 </div>
 </div>
-<script src="../lb.js?v=mws9tzqf"></script>
-<script src="../lbmetas.js?v=mws9tzqf"></script>
+<script src="../lb.js?v=mwsa04as"></script>
+<script src="../lbmetas.js?v=mwsa04as"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10),MES=HOJE.slice(0,7);
@@ -65,7 +65,7 @@ LB.entrar({pagina:'metas',base:'../',titulo:'Metas',ok:async r=>{document.getEle
   try{API=(await (await fetch('../config.json',{cache:'no-store'})).json()).api_url;await LBROT.pagina(app,api,'metas LB')}
   catch(e){app.innerHTML=`<p class="err">${e.message==='sem_perfil'?'Seu login ainda não está ligado a uma pessoa da equipe. Peça ao Luiz.':'Não consegui abrir agora. Tente de novo em instantes.'}</p>`}}});
 </script>
-<script src="../lbchat.js?v=mws9tzqf"></script>
+<script src="../lbchat.js?v=mwsa04as"></script>
 <script>LBCHAT.auto(document.getElementById('app'),{base:'../',pagina:'Metas',exemplo:'o que falta eu fazer esta semana?'})</script>
 </body>
 </html>
