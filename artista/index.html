@@ -215,10 +215,10 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 <div class="ult" id="ult"></div>
 <nav class="ptabs" id="setores"><button class="on" data-s="agenda">Agenda</button><button data-s="pags">Pagamentos</button><button data-s="equipe">Equipe</button><button data-s="fin">Financeiro</button><button data-s="ven">Vendas</button></nav></header>
 <div class="wrap" id="main">
+<div id="urg"></div>
 <div id="orcbox"></div>
 <p class="eyebrow">Artista</p><h1>Lucas <em>Barros</em></h1>
 <div id="lbq"></div>
-<div id="urg"></div>
 
 <section id="s_agenda">
   <h2 class="tt">Agenda</h2>
@@ -250,9 +250,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mws7a0ru"></script>
-<script src="../lbmetas.js?v=mws7a0ru"></script>
-<script src="../lbchat.js?v=mws7a0ru"></script>
+<script src="../lb.js?v=mws9tzqf"></script>
+<script src="../lbmetas.js?v=mws9tzqf"></script>
+<script src="../lbchat.js?v=mws9tzqf"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -303,12 +303,12 @@ function urgentes(){const U=[];try{LB.orc.mostra(document.getElementById('orcbox
   /* pendentes de mais de 60 dias: um cartão só (tocar mostra a lista) */
   const SPn=SP.filter(x=>dias(x.d)>=-60),SPa=SP.filter(x=>dias(x.d)<-60);URGANT=SPa;
   if(SPa.length)SPn.push({t:SPa.length+' shows mais antigos pendentes',s:'somam '+brl(SPa.reduce((a,x)=>a+x.v,0))+' · toque para ver',d:'',k:'antigos',c:'upd',ic:IC.al});
-  const UF=U.filter(u=>u.fixo),UL=UF.concat(U.filter(u=>!u.fixo),SW,SPn),min=ST.get('lb_urg_min')==='1';
+  const UF=U.filter(u=>u.fixo),UL=UF.concat(U.filter(u=>!u.fixo),SW,SPn),min=ST.get('lb_urg_min2')==='1';
   const el=document.getElementById('urg');
   el.innerHTML=!UL.length?'':`<div class="urgh"><span>${LB.ic('sino')} <b>${UL.length} aviso${UL.length>1?'s':''}</b>${UL.length>1&&!min?' <small style="color:var(--muted);font-size:12.5px">· arraste para o lado</small>':''}</span><button type="button" data-urgmin>${min?'ver ▾':'minimizar ▴'}</button></div>`+(min?'':`<div class="urgc" id="urgc">${UL.map(u=>`<button class="urg${u.c?' '+u.c:''}" data-urd="${esc(u.d||'')}"${u.k?` data-urk="${esc(u.k)}"`:''}>${u.ic||IC.al}<span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join('')}</div>${UL.length>1?`<div class="urgd" id="urgd">${UL.map((u,i)=>`<i${i?'':' class="on"'}></i>`).join('')}</div>`:''}`);
   const c=document.getElementById('urgc'),dt=document.getElementById('urgd');
   if(c&&dt)c.onscroll=()=>{const w=(c.firstElementChild||{}).offsetWidth||1,i=Math.round(c.scrollLeft/(w+8));[...dt.children].forEach((x,j)=>x.classList.toggle('on',j===Math.min(i,dt.children.length-1)))}}
-document.getElementById('urg').onclick=e=>{if(e.target.closest('[data-urgmin]')){ST.set('lb_urg_min',ST.get('lb_urg_min')==='1'?'0':'1');urgentes();return}const b=e.target.closest('.urg');if(!b)return;if(b.dataset.urk==='antigos'){abre(topo('Shows feitos pendentes','Mais de 60 dias atrás','')+`<div class="cxb">${URGANT.map(x=>`<div class="cxl"><span>${esc(x.t.replace(/^Show feito pendente · /,''))}</span><b>${esc(x.s)}</b></div>`).join('')}</div>`);return}if(b.dataset.urk){detalhe(b.dataset.urk);return}setor('agenda');if(b.dataset.urd)diaPop(b.dataset.urd)};
+document.getElementById('urg').onclick=e=>{if(e.target.closest('[data-urgmin]')){ST.set('lb_urg_min2',ST.get('lb_urg_min2')==='1'?'0':'1');urgentes();return}const b=e.target.closest('.urg');if(!b)return;if(b.dataset.urk==='antigos'){abre(topo('Shows feitos pendentes','Mais de 60 dias atrás','')+`<div class="cxb">${URGANT.map(x=>`<div class="cxl"><span>${esc(x.t.replace(/^Show feito pendente · /,''))}</span><b>${esc(x.s)}</b></div>`).join('')}</div>`);return}if(b.dataset.urk){detalhe(b.dataset.urk);return}setor('agenda');if(b.dataset.urd)diaPop(b.dataset.urd)};
 
 /* ======================= AGENDA ======================= */
 const CAT={show:{n:'Shows',c:'pt-s',i:LB.ic('show')},pag:{n:'Pagamentos',c:'pt-c',i:LB.ic('pag')},tar:{n:'Tarefas',c:'pt-t',i:LB.ic('tar')},emp:{n:'Empresa',c:'pt-e',i:LB.ic('emp')}};
