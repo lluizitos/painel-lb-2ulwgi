@@ -36,6 +36,12 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .urg span{font-size:14.5px;font-weight:600}.urg small{display:block;font-size:12.5px;font-weight:400;color:var(--neg);margin-top:2px}.urg .ic{width:20px;height:20px;margin:0;color:var(--neg)}
 @keyframes pisca{0%,100%{border-color:rgba(255,143,168,.5)}50%{border-color:var(--neg);background:rgba(255,143,168,.2)}}
 @media (prefers-reduced-motion:reduce){.urg{animation:none}}
+/* 22/11: avisos em carrossel (arrasta para o lado) + shows da semana e shows feitos sem pagamento */
+.urgc{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:0 -16px;padding:2px 16px 4px;scroll-padding:0 16px}.urgc::-webkit-scrollbar{display:none}
+.urgc .urg{flex:0 0 86%;max-width:420px;scroll-snap-align:start;align-self:stretch}.urgc .urg:only-child{flex-basis:100%;max-width:none}
+.urg.ush{background:rgba(122,184,255,.1);border-color:rgba(122,184,255,.5);animation:none}.urg.ush small{color:var(--blue)}.urg.ush .ic{color:var(--blue)}
+.urg.upd{background:rgba(242,182,107,.1);border-color:rgba(242,182,107,.55);animation:none}.urg.upd small{color:var(--amber)}.urg.upd .ic{color:var(--amber)}
+.urgd{display:flex;justify-content:center;gap:5px;margin-top:2px}.urgd i{width:6px;height:6px;border-radius:9px;background:var(--line)}.urgd i.on{background:var(--pinkl);width:16px}
 /* comuns */
 .list{display:flex;flex-direction:column;gap:8px}
 .c{background:var(--card);border-radius:12px;padding:12px 14px;border-left:4px solid var(--line)}
@@ -240,9 +246,9 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mws62nwl"></script>
-<script src="../lbmetas.js?v=mws62nwl"></script>
-<script src="../lbchat.js?v=mws62nwl"></script>
+<script src="../lb.js?v=mws68q9f"></script>
+<script src="../lbmetas.js?v=mws68q9f"></script>
+<script src="../lbchat.js?v=mws68q9f"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -275,6 +281,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-vm]');if(!
 
 /* ---------- avisos urgentes no topo ---------- */
 const orcPrin=()=>((TAR&&TAR.metas)||[]).filter(m=>m.tipo==='despesa'&&m.painel==='sim'&&!/Pago|Resolvido/.test(m.situacao||'')); // 18/11: aviso principal (orçamento)
+let URGANT=[];
 function urgentes(){const U=[];try{LB.orc.mostra(document.getElementById('orcbox'),orcPrin())}catch(e){console.error(e)}
   ((TAR&&TAR.metas)||[]).forEach(m=>{if(FEITO.test(m.situacao||''))return;if(m.tipo==='despesa'&&m.painel==='sim')return;
     if(m.painel==='sim')U.push({t:m.titulo,s:[m.alvo,m.prazo?'prazo '+(ISO.test(m.prazo)?ddmm(m.prazo):m.prazo):''].filter(Boolean).join(' · '),d:ISO.test(m.prazo||'')?m.prazo:'',fixo:1}); // marcado no Admin "Aviso no topo": sempre aparece
@@ -282,9 +289,22 @@ function urgentes(){const U=[];try{LB.orc.mostra(document.getElementById('orcbox
     else if(ISO.test(m.prazo||'')&&dias(m.prazo)<=2&&m.tipo!=='despesa')U.push({t:m.titulo,s:dias(m.prazo)<0?'atrasada desde '+ddmm(m.prazo):dias(m.prazo)===0?'é hoje':'falta '+dias(m.prazo)+' dia'+(dias(m.prazo)>1?'s':''),d:m.prazo})});
   ((MIN&&MIN.tarefas)||[]).forEach(t=>{if(t.status==='Concluída'||!ISO.test(t.prazo||''))return;const n=dias(t.prazo);
     if(n<=1)U.push({t:'Sua tarefa: '+t.titulo,s:n<0?'atrasada desde '+ddmm(t.prazo):n===0?'é hoje':'é amanhã',d:t.prazo})});
-  const UF=U.filter(u=>u.fixo),UL=UF.concat(U.filter(u=>!u.fixo).slice(0,3)),min=ST.get('lb_urg_min')==='1';
-  document.getElementById('urg').innerHTML=!UL.length?'':`<div class="urgh"><span>${LB.ic('sino')} <b>${UL.length} aviso${UL.length>1?'s':''}</b></span><button type="button" data-urgmin>${min?'ver ▾':'minimizar ▴'}</button></div>`+(min?'':UL.map(u=>`<button class="urg" data-urd="${esc(u.d)}">${IC.al}<span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join(''))}
-document.getElementById('urg').onclick=e=>{if(e.target.closest('[data-urgmin]')){ST.set('lb_urg_min',ST.get('lb_urg_min')==='1'?'0':'1');urgentes();return}const b=e.target.closest('.urg');if(!b)return;setor('agenda');if(b.dataset.urd)diaPop(b.dataset.urd)};
+  /* shows dos próximos 7 dias e shows já feitos que ainda têm valor a receber ou equipe a pagar */
+  const SW=[],SP=[],dsem=['dom','seg','ter','qua','qui','sex','sáb'];
+  (D.shows||[]).forEach((s,i)=>{if(/cancel/i.test(s.sit||''))return;const n=dias(s.data);
+    if(n>=0&&n<=7){const conf=/confirmado|realizado/i.test(s.sit||'');SW.push({t:'Show '+dsem[new Date(s.data+'T12:00').getDay()]+' '+ddmm(s.data)+' · '+s.nome,s:[s.local,n===0?'é hoje':n===1?'é amanhã':'faltam '+n+' dias',conf?'':'a confirmar'].filter(Boolean).join(' · '),d:s.data,k:'s|'+i,c:'ush',ic:LB.ic('show')})}
+    else if(n<0&&s.data>='2026-01-01'&&!/projeto/i.test(s.sit||'')){const fr=+s.falta||0,b=bordDe(s);let fe=0;if(b&&b.equipe)try{LB.pg.porData(b).forEach(q=>{fe+=q.falta||0})}catch(e){}
+      if(fr>=1||fe>=1)SP.push({t:'Show feito pendente · '+ddmm(s.data)+' '+s.nome,s:[fr>=1?'falta receber '+brl(fr):'',fe>=1?'equipe a pagar '+brl(fe):''].filter(Boolean).join(' · '),d:s.data,k:'s|'+i,c:'upd',ic:IC.al,v:fr+fe})}});
+  SW.sort((a,b)=>a.d<b.d?-1:1);SP.sort((a,b)=>a.d<b.d?1:-1);
+  /* pendentes de mais de 60 dias: um cartão só (tocar mostra a lista) */
+  const SPn=SP.filter(x=>dias(x.d)>=-60),SPa=SP.filter(x=>dias(x.d)<-60);URGANT=SPa;
+  if(SPa.length)SPn.push({t:SPa.length+' shows mais antigos pendentes',s:'somam '+brl(SPa.reduce((a,x)=>a+x.v,0))+' · toque para ver',d:'',k:'antigos',c:'upd',ic:IC.al});
+  const UF=U.filter(u=>u.fixo),UL=UF.concat(U.filter(u=>!u.fixo),SW,SPn),min=ST.get('lb_urg_min')==='1';
+  const el=document.getElementById('urg');
+  el.innerHTML=!UL.length?'':`<div class="urgh"><span>${LB.ic('sino')} <b>${UL.length} aviso${UL.length>1?'s':''}</b>${UL.length>1&&!min?' <small style="color:var(--muted);font-size:12.5px">· arraste para o lado</small>':''}</span><button type="button" data-urgmin>${min?'ver ▾':'minimizar ▴'}</button></div>`+(min?'':`<div class="urgc" id="urgc">${UL.map(u=>`<button class="urg${u.c?' '+u.c:''}" data-urd="${esc(u.d||'')}"${u.k?` data-urk="${esc(u.k)}"`:''}>${u.ic||IC.al}<span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join('')}</div>${UL.length>1?`<div class="urgd" id="urgd">${UL.map((u,i)=>`<i${i?'':' class="on"'}></i>`).join('')}</div>`:''}`);
+  const c=document.getElementById('urgc'),dt=document.getElementById('urgd');
+  if(c&&dt)c.onscroll=()=>{const w=(c.firstElementChild||{}).offsetWidth||1,i=Math.round(c.scrollLeft/(w+8));[...dt.children].forEach((x,j)=>x.classList.toggle('on',j===Math.min(i,dt.children.length-1)))}}
+document.getElementById('urg').onclick=e=>{if(e.target.closest('[data-urgmin]')){ST.set('lb_urg_min',ST.get('lb_urg_min')==='1'?'0':'1');urgentes();return}const b=e.target.closest('.urg');if(!b)return;if(b.dataset.urk==='antigos'){abre(topo('Shows feitos pendentes','Mais de 60 dias atrás','')+`<div class="cxb">${URGANT.map(x=>`<div class="cxl"><span>${esc(x.t.replace(/^Show feito pendente · /,''))}</span><b>${esc(x.s)}</b></div>`).join('')}</div>`);return}if(b.dataset.urk){detalhe(b.dataset.urk);return}setor('agenda');if(b.dataset.urd)diaPop(b.dataset.urd)};
 
 /* ======================= AGENDA ======================= */
 const CAT={show:{n:'Shows',c:'pt-s',i:LB.ic('show')},pag:{n:'Pagamentos',c:'pt-c',i:LB.ic('pag')},tar:{n:'Tarefas',c:'pt-t',i:LB.ic('tar')},emp:{n:'Empresa',c:'pt-e',i:LB.ic('emp')}};
