@@ -77,6 +77,8 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .rcmf{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid #2E2B36}.rcmf input{flex:1;min-width:0;background:#26232D;border:1px solid #2E2B36;border-radius:99px;padding:10px 14px;color:#F3F1F6;font:inherit;font-size:14px}.rcmf button{background:none;border:0;color:#F0507E;font:inherit;font-weight:800;cursor:pointer}
 .rlh{position:absolute;left:50%;bottom:calc(110px + env(safe-area-inset-bottom));transform:translateX(-50%);color:#fff;font-size:12.5px;font-weight:700;background:rgba(0,0,0,.45);border-radius:99px;padding:6px 12px;pointer-events:none;animation:rlh 1.6s ease-in-out infinite}@keyframes rlh{50%{transform:translate(-50%,-6px)}}
 .urgd{display:flex;justify-content:center;gap:5px;margin-top:2px}.urgd i{width:6px;height:6px;border-radius:9px;background:var(--line)}.urgd i.on{background:var(--pinkl);width:16px}
+.urgd{align-items:center}.urgd i{cursor:pointer;padding:0;transition:width .2s}.urgd .avs-a{display:none;background:none;border:1px solid var(--line);color:var(--ink);width:28px;height:28px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer;margin:0 8px}
+@media (hover:hover) and (pointer:fine){.urgd .avs-a{display:inline-flex;align-items:center;justify-content:center}.urgd i{width:8px;height:8px}.urgd i.on{width:18px}.avx{cursor:grab}}
 /* comuns */
 .list{display:flex;flex-direction:column;gap:8px}
 .c{background:var(--card);border-radius:12px;padding:12px 14px;border-left:4px solid var(--line)}
@@ -302,9 +304,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwtcwcj4"></script>
-<script src="../lbmetas.js?v=mwtcwcj4"></script>
-<script src="../lbchat.js?v=mwtcwcj4"></script>
+<script src="../lb.js?v=mwtipjgf"></script>
+<script src="../lbmetas.js?v=mwtipjgf"></script>
+<script src="../lbchat.js?v=mwtipjgf"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -364,7 +366,17 @@ function urgentes(){const U=[];try{LB.orc.mostra(document.getElementById('orcbox
   el.innerHTML=UL.map(u=>`<button type="button" class="urg avs${u.c?' '+u.c:''}" data-urd="${esc(u.d||'')}"${u.k?` data-urk="${esc(u.k)}"`:''}><span class="al">${u.ic||IC.al} Aviso${u.d?' · '+DS[new Date(u.d+'T12:00').getDay()]+' '+ddmm(u.d):''}</span><b>${esc(u.t)}</b>${u.s?`<small>${esc(u.s)}</small>`:''}</button>`).join('');
   const ax=document.getElementById('avx'),dt=document.getElementById('avd'),sl=[...ax.children].flatMap(x=>x.id==='urg'?[...x.children]:x.children.length?[x]:[]).sort((a,b)=>(a.classList.contains('vidav')?-1:0)-(b.classList.contains('vidav')?-1:0));
   ax.classList.toggle('um',sl.length<=1);dt.innerHTML=sl.length>1?sl.map((u,i)=>`<i${i?'':' class="on"'}></i>`).join(''):'';
-  ax.onscroll=()=>{const w=(sl[0]||{}).offsetWidth||1,i=Math.round(ax.scrollLeft/(w+10));[...dt.children].forEach((x,j)=>x.classList.toggle('on',j===Math.min(i,dt.children.length-1)))}}
+  ax.onscroll=()=>{const w=(sl[0]||{}).offsetWidth||1,i=Math.round(ax.scrollLeft/(w+10));const D=dt.querySelectorAll('i'),fim=ax.scrollLeft>=ax.scrollWidth-ax.clientWidth-4;D.forEach((x,j)=>x.classList.toggle('on',j===(fim?D.length-1:Math.min(i,D.length-1))))}
+  /* 23/11: no computador: bolinhas e setas ‹ › clicáveis, e arrastar com o mouse */
+  const W=()=>((sl[0]||{}).offsetWidth||300)+10,anda=x=>{x=Math.max(0,Math.min(x,ax.scrollWidth-ax.clientWidth));const a=ax.scrollLeft,t0=performance.now();ax.style.scrollSnapType='none';const f=()=>{const k=Math.min(1,(performance.now()-t0)/320),e=1-Math.pow(1-k,3);ax.scrollLeft=a+(x-a)*e;if(k<1)setTimeout(f,16);else ax.style.scrollSnapType=''};f()},vai=d=>anda((Math.round(ax.scrollLeft/W())+d)*W());
+  dt.querySelectorAll('i').forEach((x,j)=>x.onclick=()=>anda(j*W()));
+  dt.querySelectorAll('.avs-a').forEach(x=>x.remove());
+  if(sl.length>1){const p=document.createElement('button'),n=document.createElement('button');p.type=n.type='button';p.className=n.className='avs-a';p.textContent='‹';n.textContent='›';p.setAttribute('aria-label','Aviso anterior');n.setAttribute('aria-label','Próximo aviso');p.onclick=()=>vai(-1);n.onclick=()=>vai(1);dt.prepend(p);dt.append(n)}
+  if(!ax.dataset.arr){ax.dataset.arr=1;let x0=null,s0=0,mv=false;
+    ax.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||e.button)return;x0=e.clientX;s0=ax.scrollLeft;mv=false});
+    addEventListener('pointermove',e=>{if(x0===null)return;const d=e.clientX-x0;if(Math.abs(d)>5){mv=true;ax.style.scrollSnapType='none';ax.style.cursor='grabbing'}if(mv)ax.scrollLeft=s0-d});
+    addEventListener('pointerup',()=>{if(x0===null)return;x0=null;ax.style.cursor='';if(mv)anda(Math.round(ax.scrollLeft/W())*W())});
+    ax.addEventListener('click',e=>{if(mv){e.stopPropagation();e.preventDefault();mv=false}},true)}}
 /* 22/11: Financeiro → "Pagamentos próximos" (30 dias): contas/fixos e equipe dos próximos shows; tocar detalha */
 function renderProx(){const el=document.getElementById('fprox');if(!el||!D)return;const ate=new Date(Date.now()+30*864e5).toISOString().slice(0,10),L=[];
   if(PAGS_OK)PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada'&&g.ocultar!=='sim').forEach(g=>LB.pgx.ocorr(g,ate).filter(o=>!o.pago&&o.falta>0.004&&o.data>=HOJE&&!pAdiado(g,o.ref)).forEach(o=>L.push({d:o.data,t:g.descricao||g.nome,s:g.nome&&g.nome!==g.descricao?g.nome:(g.tipo==='fixo'?'fixo':'conta'),v:o.falta,k:'g|'+g.id+'|'+o.ref})));
