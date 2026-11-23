@@ -299,9 +299,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwtc4oo1"></script>
-<script src="../lbmetas.js?v=mwtc4oo1"></script>
-<script src="../lbchat.js?v=mwtc4oo1"></script>
+<script src="../lb.js?v=mwtc718f"></script>
+<script src="../lbmetas.js?v=mwtc718f"></script>
+<script src="../lbchat.js?v=mwtc718f"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -372,6 +372,8 @@ function renderProx(){const el=document.getElementById('fprox');if(!el||!D)retur
 document.getElementById('fprox').onclick=e=>{const b=e.target.closest('[data-urk]');if(b)detalhe(b.dataset.urk)};
 /* 23/11: área de vídeos — card por vídeo com o nome e o play ali mesmo (prévia H.264 ou Drive) + baixar original */
 let VIDS=[];
+/* baixar original: link do Drive vira download direto do arquivo (usercontent + confirm, passa do aviso de arquivo grande); outro link fica como está */
+const vidBaixar=u=>{const id=vidDrive(u)||(String(u||'').match(/drive\.google\.com\/file\/d\/([\w-]{20,})/)||[])[1];return id?'https://drive.usercontent.google.com/download?id='+id+'&export=download&confirm=t':u};
 const vidDrive=u=>{const m=String(u||'').match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([\w-]{20,})/);return m?m[1]:''};
 function abreVid(show){const L=(VIDS||[]).filter(v=>v.visivel!=='não'&&(!show||(v.show||'Vídeos')===show));
   abre(topo('Vídeos',show||'Vídeos','')+`<div class="vds">${L.map((v,i)=>`<button type="button" class="vdc" data-vi="${i}"${v.previa?'':' disabled'}><span class="vdp">${v.previa&&!vidDrive(v.previa)?`<video src="${esc(v.previa)}#t=0.5" muted playsinline preload="metadata"></video>`:''}${v.previa?'<i class="vpl">▶</i>':`<span class="vsb">${esc(v.status==='em mixagem'?'Em mixagem':'Em breve')}</span>`}</span>
@@ -383,7 +385,7 @@ const RIC={cor:'<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C1 8.6 
   env:'<svg viewBox="0 0 24 24"><path d="M21.5 3.5 10.6 13.4M21.5 3.5l-6.9 17-4-7.1-7.1-4z"/></svg>',
   bx:'<svg viewBox="0 0 24 24"><path d="M12 3.5v12m0 0-5-5m5 5 5-5M4.5 20.5h15"/></svg>'};
 function reels(P,ini){if(!P.length)return;const o=document.createElement('div');o.className='rls';const show=P[0].show||'Vídeos';
-  const acts=v=>`<div class="rla"><button type="button" data-ra="cur" class="${v.curti?'on':''}" aria-label="Curtir">${RIC.cor}<span>${+v.curtidas||''}</span></button><button type="button" data-ra="com" aria-label="Comentários">${RIC.com}<span>${(v.comentarios||[]).length||''}</span></button><button type="button" data-ra="env" aria-label="Compartilhar">${RIC.env}</button>${v.original?`<a href="${esc(v.original)}" target="_blank" rel="noopener" aria-label="Baixar original">${RIC.bx}</a>`:''}</div>`;
+  const acts=v=>`<div class="rla"><button type="button" data-ra="cur" class="${v.curti?'on':''}" aria-label="Curtir">${RIC.cor}<span>${+v.curtidas||''}</span></button><button type="button" data-ra="com" aria-label="Comentários">${RIC.com}<span>${(v.comentarios||[]).length||''}</span></button><button type="button" data-ra="env" aria-label="Compartilhar">${RIC.env}</button>${v.original?`<a href="${esc(vidBaixar(v.original))}" download target="_blank" rel="noopener" aria-label="Baixar original (.mov)">${RIC.bx}<span>.mov</span></a>`:''}</div>`;
   o.innerHTML=`<div class="rlx">${P.map((v,i)=>{const id=vidDrive(v.previa);return `<section class="rl" data-i="${i}">${id?`<iframe src="https://drive.google.com/file/d/${id}/preview" allow="autoplay; fullscreen" allowfullscreen></iframe>`:`<video src="${esc(v.previa)}" playsinline loop preload="${i===ini?'auto':'metadata'}"></video>`}
     <div class="rlb"><div class="rlu"><i>LB</i><b>lucasbarros</b></div><p>${esc(v.titulo)}</p>${v.status?`<small>${esc(v.status)}</small>`:''}</div>${acts(v)}<span class="rlp">▶</span><span class="rlk">${RIC.cor}</span></section>`}).join('')}</div>
     <div class="rlt"><b>Vídeos</b><span>${esc(show)}</span></div><button type="button" class="rlc" aria-label="Fechar">✕</button>${P.length>1?'<div class="rlh">role para cima ↑</div>':''}

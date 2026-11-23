@@ -278,7 +278,7 @@ label textarea{min-height:60px;resize:vertical}
       <label>Show<input id="vd_sh" maxlength="80" placeholder="ex.: Show LB 19/11"></label>
       <label>Data<input id="vd_dt" type="date"></label>
       <label class="w">Link da prévia (toca no site)<input id="vd_pv" placeholder="https://drive.google.com/file/d/… ou https://….mp4"></label>
-      <label class="w">Link do original (baixar)<input id="vd_or" placeholder="https://…"></label>
+      <label class="w">Link do original para o filmmaker (.mov da câmera, qualidade cheia — link do Google Drive vira download direto)<input id="vd_or" placeholder="https://drive.google.com/file/d/…/view"></label>
       <label>Situação<select id="vd_st"><option>em breve</option><option>em mixagem</option><option>aguardando aprovação</option><option>aprovado</option></select></label>
       <label>Ordem<input id="vd_od" inputmode="numeric" placeholder="1"></label>
       <label>Visível no site<select id="vd_vi"><option value="sim">Sim</option><option value="não">Não</option></select></label>
@@ -363,8 +363,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwtc4oo1"></script>
-<script src="../lbmetas.js?v=mwtc4oo1"></script>
+<script src="../lb.js?v=mwtc718f"></script>
+<script src="../lbmetas.js?v=mwtc718f"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -978,7 +978,7 @@ function xtRender(){const el=$('xt_res');if(!XT.length){el.innerHTML='';return}c
     if(d){e.preventDefault();if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent='toque de novo para apagar';return}try{XT=(await api({acao:'excluir_extrato',id:d.dataset.xdel})).extratos||[];xtRender()}catch(er){d.textContent='erro'}}}}
 {const a0=lnAbre;lnAbre=async function(){await a0();xtCarrega()};const r0=lnRender;lnRender=function(){r0();if(XTOK)xtRender()}}
 </script>
-<script src="../lbchat.js?v=mwtc4oo1"></script>
+<script src="../lbchat.js?v=mwtc718f"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>
