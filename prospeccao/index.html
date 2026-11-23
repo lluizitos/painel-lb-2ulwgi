@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#141218">
+<title>Prospecção · LB</title>
+<link rel="icon" href="../icone.png"><link rel="apple-touch-icon" href="../icone.png">
+<style>
+:root{--bg:#141218;--card:#1E1C24;--card2:#26232D;--line:#2E2B36;--ink:#F3F1F6;--sub:#B8B3C3;--muted:#8B8697;--pink:#CF1D51;--pinkl:#F0507E;--neg:#FF8FA8;--pos:#7FDDA9;--blue:#8EC5FF;--amb:#F2C46D}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%;padding-bottom:60px}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
+a{color:var(--blue)}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:20;background:rgba(20,18,24,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .hw{max-width:1000px;margin:0 auto;padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:58px;gap:10px}header img{height:24px;display:block}
+.links{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;min-width:0}.links::-webkit-scrollbar{display:none}.links a{flex:none;text-decoration:none;color:var(--sub);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:7px 11px;border:1px solid var(--line);border-radius:99px}.links a.on{background:var(--pink);border-color:var(--pink);color:#fff}
+@media(max-width:480px){header img{height:18px}.links{gap:4px}.links a{font-size:10px;letter-spacing:.08em;padding:6px 8px}}
+#pg{display:none}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--pinkl);margin:18px 0 4px;text-align:center}
+h1{font-size:32px;font-weight:900;text-transform:uppercase;margin:0;text-align:center;line-height:1.05}
+.fn{text-align:center;color:var(--sub);font-size:13.5px;margin-top:6px}
+.tabs{display:flex;gap:4px;margin:18px 0 6px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1;min-width:max-content;background:none;border:0;border-bottom:2px solid transparent;padding:10px 12px;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--pink)}
+.tabs button i{font-style:normal;background:var(--pink);color:#fff;border-radius:99px;padding:1px 6px;font-size:10px;margin-left:5px;letter-spacing:0}
+h3{font-size:11px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--pinkl);margin:26px 2px 10px}
+h3 small{letter-spacing:.04em;text-transform:none;color:var(--muted);font-weight:600;font-size:12px;margin-left:6px}
+.aviso{margin-top:14px;background:rgba(242,196,109,.1);border:1px solid rgba(242,196,109,.45);border-radius:14px;padding:12px 14px;font-size:14px;display:flex;gap:10px;align-items:center}
+.aviso b{color:var(--amb)}.aviso button{margin-left:auto;flex:none}
+.err{color:var(--neg);font-size:13.5px}
+.grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+/* card de cidade */
+.cc{background:var(--card);border-radius:16px;padding:14px 14px 12px;border-left:4px solid var(--line);display:flex;flex-direction:column;gap:8px;min-width:0}
+.cc.ch-alta{border-left-color:var(--pos)}.cc.ch-média{border-left-color:var(--amb)}.cc.ch-baixa{border-left-color:var(--muted)}
+.cc .t{display:flex;align-items:flex-start;gap:8px}.cc .t b{font-size:17px;line-height:1.2}.cc .t span{font-size:12.5px;color:var(--muted);display:block;margin-top:2px}
+.chip{flex:none;margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.06em;border-radius:99px;padding:3px 9px;border:1px solid var(--line);color:var(--sub);white-space:nowrap}
+.chip.alta{color:var(--pos);border-color:rgba(127,221,169,.5)}.chip.média{color:var(--amb);border-color:rgba(242,196,109,.5)}.chip.baixa{color:var(--muted)}
+.vals{display:flex;flex-wrap:wrap;gap:6px}.vals span{background:var(--card2);border-radius:8px;padding:4px 8px;font-size:12.5px;color:var(--sub)}.vals span b{color:var(--ink)}.vals .rev{background:rgba(142,197,255,.12);color:var(--blue)}
+.ct{font-size:13.5px;color:var(--sub)}.ct b{color:var(--ink)}.ct .fal{color:var(--neg)}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.bt{border:1px solid var(--line);background:var(--card2);border-radius:99px;padding:8px 13px;font-size:13px;font-weight:700;text-decoration:none;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+.bt.p{background:var(--pink);border-color:var(--pink);color:#fff}.bt.wa{background:#1f7a4d;border-color:#1f7a4d;color:#fff}.bt.s{padding:6px 11px;font-size:12px}
+.bt[disabled]{opacity:.5}
+.st{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
+.st select{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:6px 8px;font-size:13px;max-width:100%}
+.pp{font-size:13px;color:var(--sub);background:var(--card2);border-radius:10px;padding:8px 10px}.pp b{color:var(--ink)}.pp .venc{color:var(--neg);font-weight:800}
+.obs{font-size:12.5px;color:var(--muted);white-space:pre-wrap}
+.mais{background:none;border:0;color:var(--blue);font-size:13px;font-weight:700;padding:2px 0;text-align:left}
+.det{display:none;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px;font-size:13px;color:var(--sub)}.cc.ab .det{display:flex}
+.det table{width:100%;border-collapse:collapse;font-size:12.5px}.det td{padding:5px 4px;border-bottom:1px solid var(--line);vertical-align:top}.det td.v{white-space:nowrap;text-align:right;color:var(--ink);font-weight:700}
+.det .dt{white-space:nowrap;color:var(--muted)}
+.hist{display:flex;flex-direction:column;gap:6px}.hist div{background:var(--card2);border-radius:10px;padding:7px 9px}.hist small{display:block;color:var(--muted);font-size:11.5px}
+/* status cores */
+.s-nc{color:var(--muted)}.s-and{color:var(--blue)}.s-ok{color:var(--pos)}.s-x{color:var(--neg)}
+/* plano */
+.pl{background:var(--card);border-radius:16px;padding:14px 16px}
+.metas{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.metas div{background:var(--card);border-radius:14px;padding:12px;border-top:3px solid var(--line)}.metas div.ag{border-top-color:var(--pink)}
+.metas span{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.metas b{display:block;font-size:20px;margin-top:2px}
+.cal{display:flex;flex-direction:column;gap:8px}.cal div{background:var(--card);border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:center}
+.cal .d{flex:none;text-align:center;min-width:64px}.cal .d b{display:block;font-size:22px;color:var(--pinkl)}.cal .d span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.cal p{margin:0;font-size:13.5px;color:var(--sub)}.cal p b{color:var(--ink);display:block;font-size:15px}
+.regras{margin:0;padding-left:18px;color:var(--sub);font-size:14px}.regras li{margin:5px 0}
+.kit{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.kit button{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:left}
+.kit button i{font-style:normal;flex:none;width:34px;height:34px;border-radius:10px;background:rgba(207,29,81,.15);color:var(--pinkl);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px}
+.kit button span{font-size:13.5px;font-weight:700}.kit button small{display:block;color:var(--muted);font-weight:500;font-size:11.5px}
+.ordem{display:flex;flex-direction:column;gap:6px}
+.lin{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:10px 12px;cursor:pointer;border:0;width:100%;text-align:left}
+.lin b{font-size:14.5px}.lin small{color:var(--muted);font-size:12px;display:block}.lin .r{margin-left:auto;text-align:right;font-size:12px;flex:none}
+.lin .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--sub)}
+/* todas */
+.flt{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.flt input,.flt select{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:13.5px;min-width:0}
+.flt input{flex:1 1 100%}.flt select{flex:1 1 140px}
+.flt label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.cnt{font-size:12.5px;color:var(--muted);margin:10px 2px}
+/* funil */
+.fun{display:flex;flex-direction:column;gap:6px}.fun div{display:flex;align-items:center;gap:10px;font-size:13.5px}
+.fun span{flex:none;width:150px;color:var(--sub)}.fun i{display:block;height:22px;border-radius:6px;background:var(--pink);min-width:3px}.fun b{flex:none;min-width:28px}
+.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.kp div{background:var(--card);border-radius:14px;padding:12px;text-align:center}.kp b{display:block;font-size:26px}.kp span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+/* janela */
+.mod{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:700px){.mod{align-items:center}}
+.mod>div{background:var(--card);width:100%;max-width:560px;max-height:92dvh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+@media(min-width:700px){.mod>div{border-radius:18px}}
+.mod h2{margin:0 0 12px;font-size:18px;display:flex;align-items:center}.mod h2 button{margin-left:auto;background:none;border:0;font-size:20px;color:var(--sub)}
+.mod label{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px}
+.mod input,.mod select,.mod textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:15px}
+.mod textarea{min-height:80px;resize:vertical}
+.mod .row{display:flex;gap:8px}.mod .row>*{flex:1;min-width:0}
+.mod .bts{display:flex;gap:8px;margin-top:16px}.mod .bts .bt{flex:1;justify-content:center;padding:11px}
+.mod .msg{font-size:13px;margin-top:8px;color:var(--neg)}
+.vazio{color:var(--muted);text-align:center;padding:24px;font-size:14px}
+.fonte{font-size:11.5px;color:var(--muted);text-align:center;margin-top:30px}
+</style>
+</head>
+<body>
+<header><div class="hw"><img src="../logo.png" alt="Lucas Barros"><nav class="links" id="links"></nav></div></header>
+<div id="pg"><div class="wrap">
+  <div class="eyebrow">Abertura de cidades · prefeituras</div>
+  <h1>Prospecção</h1>
+  <div class="fn" id="fn"></div>
+  <div id="avisos"></div>
+  <div class="tabs" id="tabs"><button data-t="plano">Plano</button><button data-t="ligar">Ligar agora</button><button data-t="todas">Todas</button><button data-t="funil">Funil</button></div>
+  <div id="app"></div>
+  <div class="fonte" id="fonte"></div>
+</div></div>
+<script src="../lb.js?v=mwtk6mib"></script>
+<script>
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
+const ddmm=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
+const mil=v=>v==null||v===''?'—':'R$ '+(v>=1000?(Math.round(v/100)/10).toLocaleString('pt-BR')+' mil':Math.round(v).toLocaleString('pt-BR'));
+const num=v=>(+v||0).toLocaleString('pt-BR');
+const st=k=>{try{return localStorage.getItem(k)}catch(e){return null}},sst=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let API='',D=null,ED={},SIT=['Não contatado','Contato feito','Aguardando retorno','Reunião / visita','Proposta enviada','Negociando','Fechado','Show realizado','Perdido','Sem interesse'],C=[],TAB=st('lb_pr_tab')||'ligar',ONL=null;
+const FIM=['Fechado','Show realizado','Perdido','Sem interesse'];
+const stCls=s=>!s||s==='Não contatado'?'s-nc':['Fechado','Show realizado'].includes(s)?'s-ok':['Perdido','Sem interesse'].includes(s)?'s-x':'s-and';
+async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({usuario:LB.login,senha:LB.senha,nome:LB.usuario},c))})).json();if(!r.ok)throw new Error(r.erro||'erro');if(r.edicoes){ED=Object.fromEntries(r.edicoes.map(e=>[e.id,e]));if(r.situacoes)SIT=r.situacoes}return r}
+/* base da planilha + o que a equipe mudou no site (o que foi editado vence) */
+function junta(){const base=D.cidades.map(c=>{const e=ED[c.id],x=Object.assign({},c,{historico:[]});if(e){for(const k of ['grupo','chance','status','contato_nome','contato_cargo','telefone','email','festa','proximo','data_prox','obs'])if(e[k])x[k]=e[k]==='-'?'':e[k];x.historico=e.historico||[];x.por=e.por;x.atualizado_em=e.atualizado_em}return x});
+  const ids=new Set(base.map(c=>c.id));
+  Object.values(ED).filter(e=>e.novo==='sim'&&!ids.has(e.id)).forEach(e=>base.push(Object.assign({prior:'',polo:'',shows:0,contratos:[],regiao:e.regiao||'Nossa região',uf:e.uf||'MG',status:'Não contatado'},e,{chance:e.chance==='-'?'':e.chance,novo:'sim'})));
+  C=base}
+const vencido=c=>c.data_prox&&c.data_prox<=HOJE&&!FIM.includes(c.status);
+const temRev=c=>/31\/12|r[ée]veillon/i.test((c.festa||'')+' '+(c.proximo||''))||(c.st_rev&&c.st_rev>0);
+function fones(t){return String(t||'').split(/·|\/|,|;| ou /).map(s=>{const d=s.replace(/\D/g,'');const ddd=(s.match(/\((\d{2})\)/)||[])[1];let n=d;if(n.length===8||n.length===9)n=(ddd||'')+n;return{txt:s.trim(),n,wa:/whats/i.test(s)||/^\d{2}9\d{8}$/.test(n)}}).filter(x=>x.n.length>=10)}
+function msgWa(c){const quem=(LB.usuario||'').split(' ')[0]||'Bruno';const ev=temRev(c)&&HOJE<'2026-12-31'?'o Réveillon e o Carnaval 2027':'o Carnaval 2027';
+  return `Olá! Aqui é o ${quem}, da produção do cantor Lucas Barros. Gostaria de falar com o responsável pela Cultura/Eventos de ${c.municipio} sobre ${ev}. Posso enviar a nossa apresentação e a proposta?`}
+function card(c){const f=fones(c.telefone),wa=f.find(x=>x.wa),tel=f[0];
+  const vals=[c.st_carn?`<span>Carnaval <b>${mil(c.st_carn)}</b></span>`:'',c.st_rev?`<span class="rev">Réveillon <b>${mil(c.st_rev)}</b></span>`:'',c.cache_med?`<span>Cachê mediano <b>${mil(c.cache_med)}</b></span>`:'',c.shows?`<span><b>${c.shows}</b> shows no PNCP</span>`:'',c.festa?`<span>Festa <b>${esc(c.festa)}</b></span>`:''].join('');
+  const sub=[c.regiao,c.polo&&c.polo!==c.municipio?c.polo:'',c.pop?num(c.pop)+' hab.':'',c.grupo?c.grupo:''].filter(Boolean).map(esc).join(' · ');
+  const cont=c.contato_nome||c.contato_cargo?`👤 <b>${esc(c.contato_nome||'')}</b>${c.contato_nome&&c.contato_cargo?' · ':''}${esc(c.contato_cargo||'')}`:'';
+  const tl=c.telefone?`📞 ${esc(c.telefone)}`:'<span class="fal">Falta o telefone</span>';
+  const hs=(c.historico||[]).slice().reverse();
+  return `<div class="cc ch-${esc(c.chance||'x')}" data-id="${esc(c.id)}">
+  <div class="t"><div><b>${esc(c.municipio)} · ${esc(c.uf)}</b><span>${sub}</span></div>${c.chance?`<span class="chip ${esc(c.chance)}">${c.chance==='alta'?'🟢':c.chance==='média'?'🟡':'⚪'} chance ${esc(c.chance)}</span>`:''}</div>
+  ${vals?`<div class="vals">${vals}</div>`:''}
+  <div class="ct">${cont?cont+'<br>':''}${tl}${c.email?`<br>✉ ${esc(c.email)}`:''}</div>
+  <div class="acts">${tel?`<a class="bt p" href="tel:+55${tel.n}">📞 Ligar</a>`:''}${wa?`<a class="bt wa" target="_blank" rel="noopener" href="https://wa.me/55${wa.n}?text=${encodeURIComponent(msgWa(c))}">💬 WhatsApp</a>`:''}${c.email?`<a class="bt" href="mailto:${esc(c.email)}?subject=${encodeURIComponent('Show Lucas Barros · '+c.municipio)}">✉ E-mail</a>`:''}<button class="bt" data-a="reg">＋ Registrar contato</button><button class="bt" data-a="ed">✎ Editar</button></div>
+  <div class="st">Status: <select data-a="st">${SIT.map(s=>`<option${s===(c.status||'Não contatado')?' selected':''}>${esc(s)}</option>`).join('')}</select>${hs.length?`<span class="${stCls(c.status)}">· último contato ${ddmm(hs[0].em)} (${esc(hs[0].quem.split(' ')[0])})</span>`:''}</div>
+  ${c.proximo||c.data_prox?`<div class="pp">Próximo passo: <b>${esc(c.proximo||'—')}</b>${c.data_prox?` · <span class="${vencido(c)?'venc':''}">${vencido(c)?'venceu ':'até '}${ddmm(c.data_prox)}</span>`:''}</div>`:''}
+  ${c.obs?`<div class="obs">${esc(c.obs)}</div>`:''}${c.nota_chance?`<div class="obs">⚠ ${esc(c.nota_chance)}</div>`:''}
+  <button class="mais" data-a="mais">▸ histórico e o que a cidade já contratou</button>
+  <div class="det">
+    <b style="color:var(--ink)">Histórico de contatos</b>
+    <div class="hist">${hs.length?hs.map(h=>`<div>${esc(h.texto)}<small>${ddmm(h.em)} · ${esc(h.quem)}${h.status?' · '+esc(h.status):''}${h.quem===LB.usuario||LB.admin?` · <a href="#" data-hd="${esc(h.id)}">apagar</a>`:''}</small></div>`).join(''):'<div>Nenhum contato registrado ainda.</div>'}</div>
+    ${c.contratos&&c.contratos.length?`<b style="color:var(--ink)">Últimos shows contratados (PNCP)</b><table>${c.contratos.map(k=>`<tr><td class="dt">${ddmm(k.data)}/${(k.data||'').slice(2,4)}</td><td>${esc(k.objeto)}${k.quem?`<br><small>${esc(k.quem)}</small>`:''}${k.link?` <a href="${esc(k.link)}" target="_blank" rel="noopener">ver ↗</a>`:''}</td><td class="v">${mil(k.valor)}</td></tr>`).join('')}</table>`:'<div>Sem contratos no PNCP (a planilha não cobre esta região).</div>'}
+    ${c.meses?`<div><b style="color:var(--ink)">Meses em que contrata:</b> ${esc(c.meses)} <small>(o show costuma ser até 60 dias depois)</small></div>`:''}
+    ${c.tipos?`<div><b style="color:var(--ink)">Festas:</b> ${esc(c.tipos)}</div>`:''}
+    ${c.fornecedores?`<div><b style="color:var(--ink)">Produtoras/fornecedores:</b> ${esc(c.fornecedores)}</div>`:''}
+    ${c.st_n?`<div>${c.st_n32} de ${c.st_n} contratos foram de R$ 32 mil ou mais · ${c.st_faixa}% na faixa de R$ 25–80 mil · maior ${mil(c.maior)}</div>`:''}
+    ${c.atualizado_em?`<small>Editado por ${esc(c.por||'')} em ${ddmm(c.atualizado_em)}</small>`:''}${c.novo==='sim'?` <a href="#" data-a="del">apagar esta cidade</a>`:''}
+  </div></div>`}
+function lin(c,n){return `<button class="lin" data-abre="${esc(c.id)}">${n?`<span class="n">${n}</span>`:''}<div><b>${esc(c.municipio)} · ${esc(c.uf)}</b><small>${esc([c.regiao,c.cache_med?'mediana '+mil(c.cache_med):'',c.telefone?'tem contato':'sem contato'].filter(Boolean).join(' · '))}</small></div><div class="r"><span class="${stCls(c.status)}">${esc(c.status||'Não contatado')}</span>${c.chance?`<br><span class="chip ${esc(c.chance)}" style="margin:2px 0 0">${esc(c.chance)}</span>`:''}</div></button>`}
+/* ---------- abas ---------- */
+function plano(){const P=D.plano,cas=C.filter(c=>c.grupo).sort((a,b)=>(a.ordem||99)-(b.ordem||99));
+  const cal=P.calendario.map(([t,d,s])=>{const dias=d?Math.ceil((new Date(d)-new Date(HOJE))/864e5):null;return `<div><div class="d">${d?`<b>${dias>0?dias:0}</b><span>dias</span>`:'<b>📅</b>'}</div><p><b>${esc(t)}</b>${d?'ligar até '+ddmm(d)+' · ':''}${esc(s)}</p></div>`}).join('');
+  const blocos=[['já contrataram','1 · As 3 prefeituras que já contrataram','oferecer 2027 · R$ 32–35 mil'],['Lucas já tocou','2 · Cidades onde o Lucas já tocou',''],['vizinhas','3 · Vizinhas','']];
+  return `<h3>Cachê-meta de prefeitura</h3><div class="metas">${P.metas.map((m,i)=>`<div class="${i===1?'ag':''}"><span>${esc(m[0])}</span><b>${esc(m[1])}</b>${m[2]?`<small style="color:var(--muted);font-size:12px">${esc(m[2])}</small>`:''}</div>`).join('')}</div>
+  <div class="pl" style="margin-top:8px;font-size:14px;color:var(--sub)"><b style="color:var(--ink)">${esc(P.preco_novo)}</b><br>${esc(P.lei)}</div>
+  <h3>Quando ligar</h3><div class="cal">${cal}</div>
+  <h3>Ordem das vendas <small>nossa região primeiro</small></h3>
+  ${blocos.map(([g,t,s])=>`<div style="margin:12px 2px 6px;font-weight:800;font-size:14px">${esc(t)}${s?` <small style="color:var(--muted);font-weight:500">${esc(s)}</small>`:''}</div><div class="ordem">${cas.filter(c=>c.grupo===g).map(c=>lin(c,c.ordem)).join('')}</div>`).join('')}
+  <div class="acts" style="margin-top:10px"><button class="bt" data-a="nova">＋ Nova cidade</button></div>
+  <h3>Kit Prefeitura <small>toque para enviar ou baixar</small></h3><div class="kit">${(D.arquivos||[]).map((a,i)=>`<button data-kit="${i}"><i>PDF</i><span>${esc(a.nome)}<small>${/interno/i.test(a.nome)?'uso interno · não enviar':'para mandar à prefeitura'}</small></span></button>`).join('')||'<div class="vazio">Kit não encontrado.</div>'}</div>
+  <h3>Regras de preço</h3><div class="pl"><ul class="regras">${P.regras.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div>`}
+function ligar(){const ok=c=>!FIM.includes(c.status);
+  const anda=C.filter(c=>c.status&&c.status!=='Não contatado'&&ok(c)).sort((a,b)=>(a.data_prox||'9').localeCompare(b.data_prox||'9'));
+  const ids=new Set(anda.map(c=>c.id));
+  const ordRev=(a,b)=>(temRev(b)-temRev(a))||((b.st_carn||0)>=30000)-((a.st_carn||0)>=30000)||(a.municipio.localeCompare(b.municipio));
+  const casa=C.filter(c=>c.grupo&&!ids.has(c.id)&&ok(c)).sort((a,b)=>(a.ordem||99)-(b.ordem||99));casa.forEach(c=>ids.add(c.id));
+  const alta=C.filter(c=>c.chance==='alta'&&!ids.has(c.id)&&ok(c)).sort(ordRev),media=C.filter(c=>c.chance==='média'&&!ids.has(c.id)&&ok(c)).sort(ordRev);
+  const sec=(t,s,L)=>L.length?`<h3>${t}${s?` <small>${s}</small>`:''}</h3><div class="grid">${L.map(card).join('')}</div>`:'';
+  return sec('Em andamento','com contato feito',anda)+sec('🟢 Chance alta','pagam o nosso valor · réveillon primeiro (decidem em dezembro)',alta)+sec('Nossa região','ordem das vendas do plano · falta achar os contatos',casa)+sec('🟡 Chance média','pagam acima do nosso valor ou ficam mais longe',media)}
+let FT=JSON.parse(st('lb_pr_ft')||'{}'),LIM=60;
+function todas(){const regs=[...new Set(C.map(c=>c.regiao))].sort();
+  const sel=(k,t,ops)=>`<select data-f="${k}"><option value="">${t}</option>${ops.map(o=>`<option${FT[k]===o?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
+  return `<div class="flt"><input data-f="q" placeholder="Buscar cidade…" value="${esc(FT.q||'')}">${sel('regiao','Todas as regiões',regs)}${sel('prior','Prioridade',['A','B','C'])}${sel('chance','Chance',['alta','média','baixa'])}${sel('status','Status',SIT)}
+  <label><input type="checkbox" data-f="cont"${FT.cont?' checked':''}> com contato</label><label><input type="checkbox" data-f="paga"${FT.paga?' checked':''}> paga ≥ R$ 32 mil</label></div><div id="lista"></div>
+  <div class="acts" style="margin-top:12px"><button class="bt" data-a="nova">＋ Nova cidade</button></div>`}
+function listaTodas(){const q=(FT.q||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  const L=C.filter(c=>(!q||c.municipio.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().includes(q))&&(!FT.regiao||c.regiao===FT.regiao)&&(!FT.prior||c.prior===FT.prior)&&(!FT.chance||c.chance===FT.chance)&&(!FT.status||(c.status||'Não contatado')===FT.status)&&(!FT.cont||c.telefone||c.email)&&(!FT.paga||(c.st_n32>0||(c.cache_med||0)>=32000)))
+    .sort((a,b)=>(a.prior||'Z').localeCompare(b.prior||'Z')||(b.shows||0)-(a.shows||0));
+  document.getElementById('lista').innerHTML=`<div class="cnt">${L.length} cidade${L.length===1?'':'s'}</div><div class="ordem">${L.slice(0,LIM).map(c=>lin(c)).join('')||'<div class="vazio">Nenhuma cidade com esses filtros.</div>'}</div>${L.length>LIM?`<div class="acts" style="margin-top:10px;justify-content:center"><button class="bt" data-a="maisl">Mostrar mais (${L.length-LIM})</button></div>`:''}`}
+function funil(){const cnt=s=>C.filter(c=>(c.status||'Não contatado')===s).length,mx=Math.max(1,...SIT.slice(1).map(cnt));
+  const hist=C.flatMap(c=>(c.historico||[]).map(h=>Object.assign({cid:c},h))).sort((a,b)=>(b.reg||b.em).localeCompare(a.reg||a.em));
+  const sem=new Date(Date.now()-3*3600e3-7*864e5).toISOString().slice(0,10),porP={};hist.filter(h=>h.em>=sem).forEach(h=>porP[h.quem]=(porP[h.quem]||0)+1);
+  const contat=C.filter(c=>c.status&&c.status!=='Não contatado').length;
+  return `<h3>Resumo</h3><div class="kp"><div><b>${C.filter(c=>c.telefone||c.email).length}</b><span>com contato</span></div><div><b>${contat}</b><span>contatadas</span></div><div><b>${cnt('Proposta enviada')+cnt('Negociando')}</b><span>em proposta</span></div><div><b style="color:var(--pos)">${cnt('Fechado')+cnt('Show realizado')}</b><span>fechadas</span></div></div>
+  <h3>Funil</h3><div class="pl"><div class="fun">${SIT.slice(1).map(s=>`<div><span>${esc(s)}</span><i style="width:${Math.round(cnt(s)/mx*60)}%;${['Perdido','Sem interesse'].includes(s)?'background:var(--muted)':''}"></i><b>${cnt(s)}</b></div>`).join('')}</div></div>
+  <h3>Contatos nos últimos 7 dias</h3><div class="kp">${Object.entries(porP).map(([q,n])=>`<div><b>${n}</b><span>${esc(q)}</span></div>`).join('')||'<div class="vazio" style="grid-column:1/-1">Nenhum contato registrado nesta semana.</div>'}</div>
+  <h3>Últimos registros</h3><div class="ordem">${hist.slice(0,25).map(h=>`<button class="lin" data-abre="${esc(h.cid.id)}"><div><b>${esc(h.cid.municipio)}</b><small>${esc(h.texto)}</small></div><div class="r">${ddmm(h.em)}<br><span style="color:var(--muted)">${esc(h.quem.split(' ')[0])}</span></div></button>`).join('')||'<div class="vazio">Ainda não há registros.</div>'}</div>`}
+function avisos(){const v=C.filter(vencido).filter(c=>c.status!=='Não contatado'||c.chance==='alta'||c.grupo);
+  document.getElementById('avisos').innerHTML=(ONL!==false?'':'<div class="aviso">⚠ Sem conexão com o servidor: mostrando a planilha. O que você mudar não vai ser salvo agora.</div>')+(v.length?`<div class="aviso">⏰ <span><b>${v.length} próximo${v.length>1?'s passos venceram':' passo venceu'}</b> · ${v.slice(0,4).map(c=>esc(c.municipio)).join(', ')}${v.length>4?'…':''}</span><button class="bt s" data-a="irligar">Ver</button></div>`:'')}
+function render(){junta();avisos();const T={plano,ligar,todas,funil};
+  document.querySelectorAll('#tabs button').forEach(b=>{b.classList.toggle('on',b.dataset.t===TAB)});
+  const a=document.querySelector('#tabs [data-t=ligar]');const nv=C.filter(c=>vencido(c)&&(c.chance==='alta'||c.grupo||c.status!=='Não contatado')).length;a.innerHTML='Ligar agora'+(nv?`<i>${nv}</i>`:'');
+  const ab=[...document.querySelectorAll('.cc.ab')].map(x=>x.dataset.id);
+  document.getElementById('app').innerHTML=T[TAB]();if(TAB==='todas')listaTodas();
+  ab.forEach(id=>{const x=document.querySelector(`#app .cc[data-id="${CSS.escape(id)}"]`);if(x)x.classList.add('ab')})}
+/* ---------- janelas ---------- */
+function mod(h,on){const m=document.createElement('div');m.className='mod';m.innerHTML=`<div>${h}</div>`;document.body.appendChild(m);document.documentElement.style.overflow='hidden';
+  const fecha=()=>{m.remove();if(!document.querySelector('.mod'))document.documentElement.style.overflow=''};m.addEventListener('click',e=>{if(e.target===m||e.target.closest('[data-x]'))fecha()});if(on)on(m,fecha);return m}
+const cid=id=>C.find(c=>c.id===id);
+function abreCidade(id){const c=cid(id);if(!c)return;mod(`<h2>${esc(c.municipio)}<button data-x aria-label="Fechar">✕</button></h2><div id="mc">${card(c)}</div>`,m=>{const x=m.querySelector('.cc');x.classList.add('ab');x.style.borderRadius='14px'})}
+function editar(id){const c=id?cid(id):{id:'',municipio:'',uf:'MG',regiao:'Nossa região',novo:'sim'};const nova=!id;
+  const f=(k,t,tipo)=>`<label>${t}</label><input data-k="${k}" ${tipo?`type="${tipo}"`:''} value="${esc(c[k]||'')}">`;
+  mod(`<h2>${nova?'Nova cidade':'Editar · '+esc(c.municipio)}<button data-x>✕</button></h2>
+  ${nova||c.novo==='sim'?`<div class="row"><div>${f('municipio','Cidade')}</div><div style="flex:0 0 70px">${f('uf','UF')}</div></div>${f('regiao','Região')}<label>Bloco do plano</label><select data-k="grupo"><option value="">—</option>${['já contrataram','Lucas já tocou','vizinhas'].map(g=>`<option${c.grupo===g?' selected':''}>${g}</option>`).join('')}</select>`:''}
+  ${f('contato_nome','Nome do contato')}${f('contato_cargo','Cargo / secretaria')}${f('telefone','Telefone / WhatsApp')}${f('email','E-mail','email')}${f('festa','Data da festa principal')}
+  <div class="row"><div><label>Status</label><select data-k="status">${SIT.map(s=>`<option${s===(c.status||'Não contatado')?' selected':''}>${esc(s)}</option>`).join('')}</select></div><div><label>Chance</label><select data-k="chance">${[['','—'],['alta','alta'],['média','média'],['baixa','baixa']].map(([v,t])=>`<option value="${v||'-'}"${(c.chance||'')===v?' selected':''}>${t}</option>`).join('')}</select></div></div>
+  ${f('proximo','Próximo passo')}${f('data_prox','Data do próximo passo','date')}<label>Observações</label><textarea data-k="obs">${esc(c.obs||'')}</textarea>
+  <div class="msg"></div><div class="bts"><button class="bt" data-x>Cancelar</button><button class="bt p" data-ok>Salvar</button></div>`,(m,fecha)=>{
+    m.querySelector('[data-ok]').onclick=async e=>{const b=e.target,it={id:c.id};m.querySelectorAll('[data-k]').forEach(i=>it[i.dataset.k]=i.value.trim());
+      if(nova){if(!it.municipio){m.querySelector('.msg').textContent='Escreva o nome da cidade.';return}it.novo='sim';it.id=(it.municipio+'-'+(it.uf||'MG')).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');if(cid(it.id)){m.querySelector('.msg').textContent='Essa cidade já está na lista.';return}}
+      for(const k of ['contato_nome','contato_cargo','telefone','email','festa','proximo','obs'])if(!nova&&!it[k]&&c[k])it[k]='-'; // apagar um campo que vinha da planilha
+      b.disabled=true;b.textContent='Salvando…';try{await api({acao:'salvar_prospeccao',item:it});fecha();render()}catch(er){m.querySelector('.msg').textContent='Não salvou ('+er.message+'). Tente de novo.';b.disabled=false;b.textContent='Salvar'}}})}
+function registrar(id){const c=cid(id);mod(`<h2>Registrar contato · ${esc(c.municipio)}<button data-x>✕</button></h2>
+  <label>Data</label><input type="date" data-k="data" value="${HOJE}"><label>O que foi feito / combinado</label><textarea data-k="texto" placeholder="Ex.: liguei, falei com a secretária de Cultura; pediu a proposta por e-mail"></textarea>
+  <label>Status agora</label><select data-k="status">${SIT.map(s=>`<option${s===(c.status==='Não contatado'?'Contato feito':c.status)?' selected':''}>${esc(s)}</option>`).join('')}</select>
+  <label>Próximo passo</label><input data-k="proximo" value="${esc(c.proximo||'')}"><label>Data do próximo passo</label><input type="date" data-k="data_prox" value="${esc(c.data_prox&&c.data_prox>HOJE?c.data_prox:'')}">
+  <div class="msg"></div><div class="bts"><button class="bt" data-x>Cancelar</button><button class="bt p" data-ok>Registrar</button></div>`,(m,fecha)=>{
+    m.querySelector('[data-ok]').onclick=async e=>{const b=e.target,o={acao:'contato_prospeccao',id:c.id};m.querySelectorAll('[data-k]').forEach(i=>o[i.dataset.k]=i.value.trim());if(!o.texto){m.querySelector('.msg').textContent='Escreva o que foi feito.';return}
+      b.disabled=true;b.textContent='Salvando…';try{await api(o);fecha();render()}catch(er){m.querySelector('.msg').textContent='Não salvou ('+er.message+'). Tente de novo.';b.disabled=false;b.textContent='Registrar'}}})}
+async function kit(i,b){const a=D.arquivos[i];const t=b.querySelector('small'),t0=t.textContent;t.textContent='abrindo…';
+  try{const buf=await LB.anexo(a.id,a.iv,'arquivos-prosp'),fl=new File([buf],a.arq,{type:a.tipo});
+    if(navigator.canShare&&navigator.canShare({files:[fl]})&&matchMedia('(pointer:coarse)').matches){await navigator.share({files:[fl],title:a.nome}).catch(()=>{})}
+    else{const u=URL.createObjectURL(fl),l=document.createElement('a');l.href=u;l.download=a.arq;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+    t.textContent=t0}catch(e){t.textContent='não abriu, tente de novo'}}
+/* ---------- eventos ---------- */
+document.getElementById('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;TAB=b.dataset.t;sst('lb_pr_tab',TAB);LIM=60;render();scrollTo({top:document.getElementById('tabs').offsetTop-70})};
+document.addEventListener('click',async e=>{const t=e.target;
+  const ab=t.closest('[data-abre]');if(ab){abreCidade(ab.dataset.abre);return}
+  const k=t.closest('[data-kit]');if(k){kit(+k.dataset.kit,k);return}
+  const a=t.closest('[data-a]');if(a){const cc=a.closest('.cc'),id=cc&&cc.dataset.id,k2=a.dataset.a;
+    if(k2==='mais'){cc.classList.toggle('ab');a.textContent=(cc.classList.contains('ab')?'▾':'▸')+' histórico e o que a cidade já contratou'}
+    if(k2==='ed')editar(id);if(k2==='reg')registrar(id);if(k2==='nova')editar(null);
+    if(k2==='irligar'){TAB='ligar';sst('lb_pr_tab',TAB);render()}
+    if(k2==='maisl'){LIM+=100;listaTodas()}
+    if(k2==='del'){e.preventDefault();if(!confirm('Apagar esta cidade da lista?'))return;try{await api({acao:'excluir_prospeccao',id});document.querySelectorAll('.mod').forEach(m=>m.remove());document.documentElement.style.overflow='';render()}catch(er){alert('Não apagou: '+er.message)}}
+    return}
+  const hd=t.closest('[data-hd]');if(hd){e.preventDefault();const id=hd.closest('.cc').dataset.id;try{await api({acao:'apagar_contato_prospeccao',id,hid:hd.dataset.hd});refresca()}catch(er){}}});
+document.addEventListener('change',async e=>{const s=e.target.closest('select[data-a=st]');if(s){const id=s.closest('.cc').dataset.id;s.disabled=true;
+    try{await api({acao:'salvar_prospeccao',item:{id,status:s.value}});refresca()}catch(er){s.disabled=false;alert('Não salvou: '+er.message)}return}
+  const f=e.target.closest('[data-f]');if(f&&f.dataset.f!=='q'){FT[f.dataset.f]=f.type==='checkbox'?f.checked:f.value;sst('lb_pr_ft',JSON.stringify(FT));LIM=60;listaTodas()}});
+document.addEventListener('input',e=>{const f=e.target.closest('[data-f=q]');if(f){FT.q=f.value;sst('lb_pr_ft',JSON.stringify(FT));LIM=60;listaTodas()}});
+function refresca(){const mc=document.querySelector('.mod #mc');render();if(mc){const id=mc.querySelector('.cc').dataset.id,c=cid(id);if(c){mc.innerHTML=card(c);mc.querySelector('.cc').classList.add('ab')}}}
+LB.entrar({pagina:'prospeccao',base:'../',titulo:'Prospecção',ok:async r=>{D=r.dados;LB.admin=(r.paginas||[]).includes('admin');document.getElementById('pg').style.display='block';document.getElementById('links').innerHTML=LB.links(r.paginas,'prospeccao','../');
+  document.getElementById('fn').textContent=`${D.cidades.length} cidades · planilha de ${D.atualizado}`;document.getElementById('fonte').textContent='Fonte: '+D.fonte;
+  render();
+  try{API=(await (await fetch('../config.json',{cache:'no-store'})).json()).api_url;await api({acao:'prospeccao'});ONL=true}catch(e){ONL=false}
+  render()}});
+</script>
+</body>
+</html>

@@ -265,7 +265,7 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 <body>
 <div id="pg">
 <header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
-<nav class="ptabs" id="setores"><button class="on" data-s="agenda">Agenda</button><button data-s="pags">Pagamentos</button><button data-s="equipe">Equipe</button><button data-s="fin">Financeiro</button><button data-s="ven">Vendas</button></nav></header>
+<nav class="ptabs" id="setores"><button class="on" data-s="agenda">Agenda</button><button data-s="pags">Pagamentos</button><button data-s="fin">Financeiro</button><button data-s="ven">Vendas</button></nav></header>
 <div class="wrap" id="main">
 <div class="avx" id="avx"><div id="orcbox"></div><div id="urg"></div></div><div class="urgd" id="avd"></div>
 <p class="eyebrow">Artista</p><h1>Lucas <em>Barros</em></h1>
@@ -304,9 +304,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwtjdamx"></script>
-<script src="../lbmetas.js?v=mwtjdamx"></script>
-<script src="../lbchat.js?v=mwtjdamx"></script>
+<script src="../lb.js?v=mwtk6mib"></script>
+<script src="../lbmetas.js?v=mwtk6mib"></script>
+<script src="../lbchat.js?v=mwtk6mib"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -693,7 +693,7 @@ async function abreVen(){if(VENOK)return;VENOK=true;const box=document.getElemen
 async function abreFin(){if(FINOK)return;FINOK=true;const box=document.getElementById('s_fin');
   try{if(!window.__ART_R)throw new Error('dados ainda não carregados');await LB.financeiro(box,window.__ART_R)}
   catch(e){FINOK=false;box.innerHTML='<div class="vazio">Não consegui abrir o financeiro agora ('+esc(String(e.message||e))+'). Tente de novo.</div>';console.error(e)}}
-function setor(s){if(!['agenda','pags','equipe','fin','ven'].includes(s))s='agenda';document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));['agenda','pags','equipe','fin','ven'].forEach(x=>document.getElementById('s_'+x).hidden=x!==s);ST.set('lb_art_setor',s);document.body.dataset.s=s;try{fixaAbas()}catch(e){}if(s==='fin')try{renderProx()}catch(e){console.error(e)}
+function setor(s){if(!['agenda','pags','fin','ven'].includes(s))s='agenda';document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));['agenda','pags','equipe','fin','ven'].forEach(x=>document.getElementById('s_'+x).hidden=x!==s);ST.set('lb_art_setor',s);document.body.dataset.s=s;try{fixaAbas()}catch(e){}if(s==='fin')try{renderProx()}catch(e){console.error(e)}
   if(s==='fin')abreFin();if(s==='ven')abreVen()}
 document.getElementById('setores').onclick=e=>{const b=e.target.closest('[data-s]');if(b){setor(b.dataset.s);scrollTo({top:0,behavior:'smooth'})}};
 

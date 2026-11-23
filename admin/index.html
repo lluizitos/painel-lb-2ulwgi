@@ -363,8 +363,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwtjdamx"></script>
-<script src="../lbmetas.js?v=mwtjdamx"></script>
+<script src="../lb.js?v=mwtk6mib"></script>
+<script src="../lbmetas.js?v=mwtk6mib"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -502,7 +502,7 @@ $('l_ok').onclick=async()=>{const m=$('l_msg'),u=$('l_u').value.trim(),s=$('l_s'
   m.textContent='Salvando…';
   const R0=EDL&&AD.rec&&LB.norm(EDL)===LB.norm(u)?AD.rec[EDL]||'':'',rec=s?R0:'',ponte=rec?await LB.ponteRec(u,s,rec):''; // senha vale na hora (sem esperar publicar)
   /* páginas liberadas agora: cofre extra com a chave reserva da pessoa (vale na hora; a próxima publicação já inclui a pessoa) */
-  const PPG={admin:['painel','admin','bordero','vendas','socio','contador','metas'],artista:['artista','metas'],socio:['socio'],vendedor:['vendas'],contador:['contador'],funcionario:['metas']};
+  const PPG={admin:['painel','admin','bordero','vendas','socio','contador','metas','prospeccao'],artista:['artista','metas','prospeccao'],socio:['socio'],vendedor:['vendas','prospeccao'],contador:['contador'],funcionario:['metas']};
   const chaves={};let semRec=false;for(const pg of [...new Set(ps.flatMap(x=>PPG[x]||[]))]){if(pg==='contador')continue;const cr=R0||s;if(!cr){semRec=true;continue}try{const c=await LB.cofreExtra(pg,u,cr);if(c)chaves[pg]=c}catch(e){}}
   try{const r=await api({acao:'salvar_usuario',login:{de:EDL||u,usuario:u,senha:s,senha_rsa:s?await cifra(s):'',ponte,chaves,papeis:ps,perfil:$('l_pf').value,ativo:$('l_at').value}});
     if(s&&eu(EDL||u))LB.senha=s;US=r.usuarios;limpaL();
@@ -978,7 +978,7 @@ function xtRender(){const el=$('xt_res');if(!XT.length){el.innerHTML='';return}c
     if(d){e.preventDefault();if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent='toque de novo para apagar';return}try{XT=(await api({acao:'excluir_extrato',id:d.dataset.xdel})).extratos||[];xtRender()}catch(er){d.textContent='erro'}}}}
 {const a0=lnAbre;lnAbre=async function(){await a0();xtCarrega()};const r0=lnRender;lnRender=function(){r0();if(XTOK)xtRender()}}
 </script>
-<script src="../lbchat.js?v=mwtjdamx"></script>
+<script src="../lbchat.js?v=mwtk6mib"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

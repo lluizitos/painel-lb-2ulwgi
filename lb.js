@@ -3,9 +3,9 @@
    para cada usuário liberado (cifrada com PBKDF2-SHA256(usuário|senha) → AES-GCM). O endereço do "cofre" de cada usuário
    é um hash do nome, então o arquivo público não mostra quem tem acesso. */
 (function () {
-  const NOMES = { artista: 'Artista', painel: 'Financeiro', vendas: 'Vendas', agenda: 'Agenda', socio: 'Sócio', contador: 'Prestação de contas', bordero: 'Borderôs', admin: 'Admin', metas: 'Metas' };
-  const ROTAS = { artista: 'artista/', painel: '', vendas: 'vendas/', agenda: 'agenda/', socio: 'socio/', contador: 'contador/', bordero: 'borderos/', admin: 'admin/', metas: 'metas/' };
-  const ORDEM = ['painel', 'artista', 'admin', 'bordero', 'vendas', 'metas', 'socio', 'contador'];
+  const NOMES = { artista: 'Artista', painel: 'Financeiro', vendas: 'Vendas', agenda: 'Agenda', socio: 'Sócio', contador: 'Prestação de contas', bordero: 'Borderôs', admin: 'Admin', metas: 'Metas', prospeccao: 'Prospecção' };
+  const ROTAS = { artista: 'artista/', painel: '', vendas: 'vendas/', agenda: 'agenda/', socio: 'socio/', contador: 'contador/', bordero: 'borderos/', admin: 'admin/', metas: 'metas/', prospeccao: 'prospeccao/' };
+  const ORDEM = ['painel', 'artista', 'admin', 'bordero', 'vendas', 'prospeccao', 'metas', 'socio', 'contador'];
   /* Lucas e sócio: página única e simples, sem menu de páginas (o Financeiro do Lucas é um link separado) */
   const semMenu = ps => !ps.includes('admin') && !ps.includes('artista') && ps.includes('socio'); // só o sócio fica sem menu
   /* Lucas (artista sem admin): menu normal, mas a Agenda só aparece se o Luiz ligar em Admin → Parâmetros; o Financeiro dele abre com #financeiro */
@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwtjdamx';
+  const BUILD = 'mwtk6mib';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -472,7 +472,7 @@
     const sv = (document.querySelector('script[src*="lb.js"]') || { getAttribute: () => '' }).getAttribute('src') || '', v = sv.split('?v=')[1] || '';
     const html = await (await fetch((o.pagina || '../index.html') + (v ? '?v=' + v : ''), { cache: 'no-store' })).text(); // o.pagina: outra página do site (ex.: ../socio/index.html para a aba Vendas do Artista)
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    const ajusta = t => t.replace(/href="(vendas|metas|tarefas|agenda|borderos|admin|artista|socio)\//g, 'href="../$1/')
+    const ajusta = t => t.replace(/href="(vendas|metas|tarefas|agenda|borderos|admin|artista|socio|prospeccao)\//g, 'href="../$1/')
       .replace(/onclick="fecharBord\(\)"/g, 'onclick="window.__finFecha&&window.__finFecha()"')
       .replace(/onclick="const s=document\.getElementById\('bds'\)/g, "onclick=\"const s=this.getRootNode().getElementById('bds')");
     const css = [...doc.querySelectorAll('style')].map(x => x.textContent).join('\n').replace(/:root/g, ':host').replace(/(^|[^\w.#-])html\b/g, '$1:host').replace(/(^|[^\w.#-])body\b/g, '$1.fbody');
