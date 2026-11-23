@@ -50,6 +50,8 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .ql span{flex:1;min-width:0;font-size:12.5px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}.ql small{display:block;font-weight:500;color:var(--muted);font-size:11px;margin-top:2px}
 .qv{font-size:12.5px;color:var(--muted);padding:4px 2px 8px;line-height:1.4}.qv b{color:var(--ink)}
 .vds{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.vdw{position:relative;display:flex}.vdw>.vdc{flex:1}
+.vdb{position:absolute;top:8px;right:8px;z-index:2;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}.vdb svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .vdc{display:flex;flex-direction:column;padding:0;text-align:left;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer}.vdc[disabled]{cursor:default}
 .vdp{position:relative;aspect-ratio:9/16;background:#0b0a0e;display:flex;align-items:center;justify-content:center;width:100%}.vdp video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .vpl{position:relative;width:52px;height:52px;border-radius:50%;background:var(--pink);color:#fff;font-style:normal;font-size:20px;display:flex;align-items:center;justify-content:center;padding-left:4px;box-shadow:0 6px 20px rgba(0,0,0,.5)}
@@ -300,9 +302,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwtctttl"></script>
-<script src="../lbmetas.js?v=mwtctttl"></script>
-<script src="../lbchat.js?v=mwtctttl"></script>
+<script src="../lb.js?v=mwtcwcj4"></script>
+<script src="../lbmetas.js?v=mwtcwcj4"></script>
+<script src="../lbchat.js?v=mwtcwcj4"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -377,8 +379,8 @@ let VIDS=[];
 const vidBaixar=u=>{const id=vidDrive(u)||(String(u||'').match(/drive\.google\.com\/file\/d\/([\w-]{20,})/)||[])[1];return id?'https://drive.usercontent.google.com/download?id='+id+'&export=download&confirm=t':u};
 const vidDrive=u=>{const m=String(u||'').match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([\w-]{20,})/);return m?m[1]:''};
 function abreVid(show){const L=(VIDS||[]).filter(v=>v.visivel!=='não'&&(!show||(v.show||'Vídeos')===show));
-  abre(topo('Vídeos',show||'Vídeos','')+`<div class="vds">${L.map((v,i)=>`<button type="button" class="vdc" data-vi="${i}"${v.previa?'':' disabled'}><span class="vdp">${v.previa&&!vidDrive(v.previa)?`<video src="${esc(v.previa)}#t=0.5" muted playsinline preload="metadata"></video>`:''}${v.previa?'<i class="vpl">▶</i>':`<span class="vsb">${esc(v.status==='em mixagem'?'Em mixagem':'Em breve')}</span>`}</span>
-    <span class="vdt"><b>${esc(v.titulo.replace(/ · Show .*$/,''))}</b><small>${esc(v.status||'')}</small></span></button>`).join('')||'<div class="vazio">Nenhum vídeo ainda.</div>'}</div>`);
+  abre(topo('Vídeos',show||'Vídeos','')+`<div class="vds">${L.map((v,i)=>`<div class="vdw">${v.previa&&!vidDrive(v.previa)?`<a class="vdb" href="${esc(v.previa)}" download="${esc(v.titulo.replace(/ · /g,' - ').replace(/\//g,'-').replace(/[\:*?"<>|]/g,''))} (prévia).mp4" aria-label="Baixar prévia" title="Baixar prévia">${RIC.bx}</a>`:''}<button type="button" class="vdc" data-vi="${i}"${v.previa?'':' disabled'}><span class="vdp">${v.previa&&!vidDrive(v.previa)?`<video src="${esc(v.previa)}#t=0.5" muted playsinline preload="metadata"></video>`:''}${v.previa?'<i class="vpl">▶</i>':`<span class="vsb">${esc(v.status==='em mixagem'?'Em mixagem':'Em breve')}</span>`}</span>
+    <span class="vdt"><b>${esc(v.titulo.replace(/ · Show .*$/,''))}</b><small>${esc(v.status||'')}</small></span></button></div>`).join('')||'<div class="vazio">Nenhum vídeo ainda.</div>'}</div>`);
   bds.querySelectorAll('.vdc[data-vi]').forEach(c=>c.onclick=()=>{const P=L.filter(v=>v.previa);reels(P,P.indexOf(L[+c.dataset.vi]))})}
 /* tela cheia vertical, estilo Instagram/Reels: um vídeo por tela, rola para cima = próximo; curtir (toque duplo também), comentar, compartilhar, baixar */
 const RIC={cor:'<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C1 8.6 3 5 6.6 5c2 0 3.4 1.1 4.4 2.6C12 6.1 13.4 5 15.4 5 19 5 21 8.6 19.6 11.8 17.5 16.4 12 21 12 21z"/></svg>',
