@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#000">
+<title>Vídeos · Lucas Barros</title>
+<link rel="icon" href="../../icone.png">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+.x{height:100dvh;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none}.x::-webkit-scrollbar{display:none}
+.r{position:relative;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;background:#000}
+.r video{width:100%;height:100%;object-fit:cover;max-width:min(100%,calc(100dvh*9/16));display:block}
+.r.pz::after{content:"▶";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:64px;opacity:.85;pointer-events:none;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.vz{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#ccc;font-weight:700;text-align:center}.vz small{font-weight:400;color:#888}
+.t{position:fixed;top:calc(14px + env(safe-area-inset-top));left:16px;right:16px;z-index:3;display:flex;align-items:baseline;gap:8px;pointer-events:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.7))}.t b{font-size:20px}.t span{font-size:13px;opacity:.85}
+.b{position:absolute;left:0;right:0;bottom:0;padding:90px 16px calc(20px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.75));display:flex;flex-direction:column;gap:10px}
+.u{display:flex;align-items:center;gap:8px}.u i{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F0507E,#CF1D51);border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900;font-size:11px}.u b{font-size:14.5px}
+.b p{margin:0;font-size:15px;line-height:1.35}.b p small{display:block;color:#ccc;font-size:12.5px;margin-top:2px}
+.dl{display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#111;border-radius:12px;padding:13px 16px;font-weight:800;font-size:15px;text-decoration:none}
+.dl svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.dl+small{color:#aaa;font-size:11.5px;text-align:center;margin-top:-4px}
+.som{position:fixed;top:calc(10px + env(safe-area-inset-top));right:12px;z-index:4;background:rgba(0,0,0,.45);border:0;color:#fff;border-radius:99px;padding:8px 12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.h{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:3;background:rgba(0,0,0,.5);border-radius:99px;padding:6px 12px;font-size:12.5px;pointer-events:none;animation:hb 1.6s ease-in-out infinite}@keyframes hb{50%{transform:translate(-50%,-6px)}}
+.vazio{height:100dvh;display:flex;align-items:center;justify-content:center;color:#aaa;text-align:center;padding:20px}
+</style>
+</head>
+<body>
+<div class="t"><b>Vídeos</b><span>Lucas Barros</span></div>
+<button class="som" type="button" hidden>🔇 Ativar som</button>
+<div class="x" id="x"></div>
+<script>
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const BX='<svg viewBox="0 0 24 24"><path d="M12 3.5v12m0 0-5-5m5 5 5-5M4.5 20.5h15"/></svg>';
+const dm=d=>{const m=/^(\d{4})-(\d\d)-(\d\d)/.exec(d||'');return m?m[3]+'/'+m[2]+'/'+m[1]:''};
+let MUDO=false;
+fetch('videos.json?v='+Date.now()).then(r=>r.json()).then(L=>{const x=document.getElementById('x');
+  if(!L.length){x.innerHTML='<div class="vazio">Nenhum vídeo liberado ainda.</div>';return}
+  x.innerHTML=L.map((v,i)=>`<section class="r" data-i="${i}">${v.previa?`<video src="${esc(v.previa)}" playsinline loop preload="${i?'metadata':'auto'}"></video>`:'<div class="vz">Prévia em preparo<small>o original já pode ser baixado</small></div>'}
+    <div class="b"><div class="u"><i>LB</i><b>lucasbarros</b></div><p>${esc(v.titulo)}<small>${esc([v.show,dm(v.data)].filter(Boolean).join(' · '))}</small></p>
+    ${v.original?`<a class="dl" href="${esc(v.original)}" download target="_blank" rel="noopener">${BX} Baixar original (.mov)</a><small>arquivo da câmera, qualidade cheia, para edição</small>`:''}</div></section>`).join('')+(L.length>1?'<div class="h">role para cima ↑</div>':'');
+  const som=document.querySelector('.som');
+  const toca=v=>v.play().catch(()=>{v.muted=true;MUDO=true;som.hidden=false;v.play().catch(()=>{})});
+  som.onclick=()=>{MUDO=false;som.hidden=true;x.querySelectorAll('video').forEach(v=>v.muted=false);const a=[...x.querySelectorAll('.r')].find(r=>r.getBoundingClientRect().top>=-5&&r.getBoundingClientRect().top<innerHeight/2);const v=a&&a.querySelector('video');if(v)toca(v)};
+  const io=new IntersectionObserver(es=>es.forEach(e=>{const v=e.target.querySelector('video');if(!v)return;if(e.isIntersecting){v.muted=MUDO;toca(v);e.target.classList.remove('pz');const h=document.querySelector('.h');if(h&&+e.target.dataset.i>0)h.remove()}else{v.pause();v.currentTime=0}}),{root:x,threshold:.6});
+  x.querySelectorAll('.r').forEach(r=>{io.observe(r);const v=r.querySelector('video');if(v)v.addEventListener('click',()=>{if(v.paused){toca(v);r.classList.remove('pz')}else{v.pause();r.classList.add('pz')}})});
+}).catch(()=>{document.getElementById('x').innerHTML='<div class="vazio">Não carregou. Tente de novo.</div>'});
+</script>
+</body>
+</html>
