@@ -66,6 +66,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .rla>*{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;color:#fff;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
 .rla svg{width:30px;height:30px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.rla .on svg{fill:#ff3040;stroke:#ff3040;animation:rpop .3s}.rla .ok svg{stroke:#7FDDA9}@keyframes rpop{50%{transform:scale(1.25)}}
 .rlk{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);pointer-events:none;opacity:0}.rlk svg{width:110px;height:110px;fill:#fff;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))}.rlk.an{animation:rheart .8s ease-out}@keyframes rheart{15%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}30%{transform:translate(-50%,-50%) scale(.95)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
+.rlv{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#ddd;font-weight:700;text-align:center;gap:6px}.rlv small{font-weight:400;color:#999}
 .rlt{position:absolute;top:calc(14px + env(safe-area-inset-top));left:16px;z-index:2;color:#fff;display:flex;align-items:baseline;gap:8px;pointer-events:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}.rlt b{font-size:20px}.rlt span{font-size:13px;opacity:.85}
 .rcm{position:absolute;left:0;right:0;bottom:0;z-index:5;height:62%;background:#1E1C24;border-radius:16px 16px 0 0;transform:translateY(105%);transition:transform .25s;display:flex;flex-direction:column;color:#F3F1F6}.rls.cm .rcm{transform:none}
 .rcmh{display:flex;justify-content:center;align-items:center;position:relative;padding:14px;border-bottom:1px solid #2E2B36}.rcmh button{position:absolute;right:10px;background:none;border:0;color:#F3F1F6;font-size:18px;cursor:pointer}
@@ -299,9 +300,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwtcku45"></script>
-<script src="../lbmetas.js?v=mwtcku45"></script>
-<script src="../lbchat.js?v=mwtcku45"></script>
+<script src="../lb.js?v=mwtcnajn"></script>
+<script src="../lbmetas.js?v=mwtcnajn"></script>
+<script src="../lbchat.js?v=mwtcnajn"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -386,7 +387,7 @@ const RIC={cor:'<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C1 8.6 
   bx:'<svg viewBox="0 0 24 24"><path d="M12 3.5v12m0 0-5-5m5 5 5-5M4.5 20.5h15"/></svg>'};
 function reels(P,ini){if(!P.length)return;const o=document.createElement('div');o.className='rls';const show=P[0].show||'Vídeos';
   const acts=v=>`<div class="rla"><button type="button" data-ra="cur" class="${v.curti?'on':''}" aria-label="Curtir">${RIC.cor}<span>${+v.curtidas||''}</span></button><button type="button" data-ra="com" aria-label="Comentários">${RIC.com}<span>${(v.comentarios||[]).length||''}</span></button><button type="button" data-ra="env" aria-label="Compartilhar">${RIC.env}</button>${v.original?`<a href="${esc(vidBaixar(v.original))}" download target="_blank" rel="noopener" aria-label="Baixar original (.mov)">${RIC.bx}<span>.mov</span></a>`:''}</div>`;
-  o.innerHTML=`<div class="rlx">${P.map((v,i)=>{const id=vidDrive(v.previa);return `<section class="rl" data-i="${i}">${id?`<iframe src="https://drive.google.com/file/d/${id}/preview" allow="autoplay; fullscreen" allowfullscreen></iframe>`:`<video src="${esc(v.previa)}" playsinline loop preload="${i===ini?'auto':'metadata'}"></video>`}
+  o.innerHTML=`<div class="rlx">${P.map((v,i)=>{const id=vidDrive(v.previa);return `<section class="rl" data-i="${i}">${id?`<div class="rlv">Prévia em preparo<br><small>use o botão baixar para o original</small></div>`:`<video src="${esc(v.previa)}" playsinline loop preload="${i===ini?'auto':'metadata'}"></video>`}
     <div class="rlb"><div class="rlu"><i>LB</i><b>lucasbarros</b></div><p>${esc(v.titulo)}</p>${v.status?`<small>${esc(v.status)}</small>`:''}</div>${acts(v)}<span class="rlp">▶</span><span class="rlk">${RIC.cor}</span></section>`}).join('')}</div>
     <div class="rlt"><b>Vídeos</b><span>${esc(show)}</span></div><button type="button" class="rlc" aria-label="Fechar">✕</button>${P.length>1?'<div class="rlh">role para cima ↑</div>':''}
     <div class="rcm"><div class="rcmh"><b>Comentários</b><button type="button" data-rcx aria-label="Fechar comentários">✕</button></div><div class="rcml"></div><form class="rcmf"><input maxlength="500" placeholder="Adicione um comentário…" autocomplete="off"><button>Publicar</button></form></div>`;
