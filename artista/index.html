@@ -202,7 +202,15 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 /* 19/11: faixa "Últimos lançamentos" (no topo, em todas as abas) */
 .ult{margin:0 0 18px}
 /* 22/11: cada aba só com o seu conteúdo — avisos na Agenda e no Financeiro; últimos lançamentos e pagamentos próximos só no Financeiro */
-body:not([data-s=agenda]):not([data-s=fin]) #orcbox,body:not([data-s=agenda]):not([data-s=fin]) #urg{display:none}
+body:not([data-s=agenda]):not([data-s=fin]) #avx,body:not([data-s=agenda]):not([data-s=fin]) #avd{display:none}
+/* 23/11: avisos lado a lado (aviso principal + avisos do topo), arrasta para o lado */
+.avx{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:0 -16px 6px;padding:2px 16px 4px;scroll-padding:0 16px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y}.avx::-webkit-scrollbar{display:none}.avx:not(:has(> #orcbox *)):not(:has(#urg *)){display:none}
+.avx>#orcbox{flex:0 0 86%;max-width:520px;scroll-snap-align:start;min-width:0}.avx>#orcbox:empty{display:none}.avx>#orcbox>*{height:100%;margin:0!important;width:100%}
+#urg{display:contents}.avx .avs{flex:0 0 86%;max-width:520px;scroll-snap-align:start;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:6px;padding:16px 18px;animation:none;border-radius:18px;min-height:150px}
+.avs .al{font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--pinkl);display:flex;align-items:center;gap:6px}.avs .al .ic{width:14px;height:14px}
+.avs b{font-size:19px;font-weight:800;line-height:1.25}.avs small{font-size:13px;color:var(--sub)}
+.avx.um>#orcbox,.avx.um .avs{flex-basis:100%;max-width:none}
+#avd:empty{display:none}#avd{margin:0 0 14px}
 body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 #fprox{opacity:.62;margin-top:26px}#fprox:empty{display:none}
 #fprox h3{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
@@ -229,8 +237,7 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 <header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
 <nav class="ptabs" id="setores"><button class="on" data-s="agenda">Agenda</button><button data-s="pags">Pagamentos</button><button data-s="equipe">Equipe</button><button data-s="fin">Financeiro</button><button data-s="ven">Vendas</button></nav></header>
 <div class="wrap" id="main">
-<div id="urg"></div>
-<div id="orcbox"></div>
+<div class="avx" id="avx"><div id="orcbox"></div><div id="urg"></div></div><div class="urgd" id="avd"></div>
 <p class="eyebrow">Artista</p><h1>Lucas <em>Barros</em></h1>
 <div id="lbq"></div>
 <div class="ult" id="ult"></div>
@@ -267,9 +274,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwsbbr0y"></script>
-<script src="../lbmetas.js?v=mwsbbr0y"></script>
-<script src="../lbchat.js?v=mwsbbr0y"></script>
+<script src="../lb.js?v=mwspad8j"></script>
+<script src="../lbmetas.js?v=mwspad8j"></script>
+<script src="../lbchat.js?v=mwspad8j"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -322,10 +329,11 @@ function urgentes(){const U=[];try{LB.orc.mostra(document.getElementById('orcbox
   if(SPa.length)SPn.push({t:SPa.length+' shows mais antigos pendentes',s:'somam '+brl(SPa.reduce((a,x)=>a+x.v,0))+' · toque para ver',d:'',k:'antigos',c:'upd',ic:IC.al});
   try{quadros(SW,SPn,SPa)}catch(e){console.error(e)}
   const UF=U.filter(u=>u.fixo),UL=UF.concat(U.filter(u=>!u.fixo)),min=ST.get('lb_urg_min2')==='1';
-  const el=document.getElementById('urg');
-  el.innerHTML=!UL.length?'':`<div class="urgh"><span>${LB.ic('sino')} <b>${UL.length} aviso${UL.length>1?'s':''}</b>${UL.length>1&&!min?' <small style="color:var(--muted);font-size:12.5px">· arraste para o lado</small>':''}</span><button type="button" data-urgmin>${min?'ver ▾':'minimizar ▴'}</button></div>`+(min?'':`<div class="urgc" id="urgc">${UL.map(u=>`<button class="urg${u.c?' '+u.c:''}" data-urd="${esc(u.d||'')}"${u.k?` data-urk="${esc(u.k)}"`:''}>${u.ic||IC.al}<span>${esc(u.t)}${u.s?`<small>${esc(u.s)}</small>`:''}</span></button>`).join('')}</div>${UL.length>1?`<div class="urgd" id="urgd">${UL.map((u,i)=>`<i${i?'':' class="on"'}></i>`).join('')}</div>`:''}`);
-  const c=document.getElementById('urgc'),dt=document.getElementById('urgd');
-  if(c&&dt)c.onscroll=()=>{const w=(c.firstElementChild||{}).offsetWidth||1,i=Math.round(c.scrollLeft/(w+8));[...dt.children].forEach((x,j)=>x.classList.toggle('on',j===Math.min(i,dt.children.length-1)))}}
+  const el=document.getElementById('urg'),DS=['dom','seg','ter','qua','qui','sex','sáb'];
+  el.innerHTML=UL.map(u=>`<button type="button" class="urg avs${u.c?' '+u.c:''}" data-urd="${esc(u.d||'')}"${u.k?` data-urk="${esc(u.k)}"`:''}><span class="al">${u.ic||IC.al} Aviso${u.d?' · '+DS[new Date(u.d+'T12:00').getDay()]+' '+ddmm(u.d):''}</span><b>${esc(u.t)}</b>${u.s?`<small>${esc(u.s)}</small>`:''}</button>`).join('');
+  const ax=document.getElementById('avx'),dt=document.getElementById('avd'),sl=[...ax.children].flatMap(x=>x.id==='urg'?[...x.children]:x.children.length?[x]:[]);
+  ax.classList.toggle('um',sl.length<=1);dt.innerHTML=sl.length>1?sl.map((u,i)=>`<i${i?'':' class="on"'}></i>`).join(''):'';
+  ax.onscroll=()=>{const w=(sl[0]||{}).offsetWidth||1,i=Math.round(ax.scrollLeft/(w+10));[...dt.children].forEach((x,j)=>x.classList.toggle('on',j===Math.min(i,dt.children.length-1)))}}
 /* 22/11: Financeiro → "Pagamentos próximos" (30 dias): contas/fixos e equipe dos próximos shows; tocar detalha */
 function renderProx(){const el=document.getElementById('fprox');if(!el||!D)return;const ate=new Date(Date.now()+30*864e5).toISOString().slice(0,10),L=[];
   if(PAGS_OK)PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada'&&g.ocultar!=='sim').forEach(g=>LB.pgx.ocorr(g,ate).filter(o=>!o.pago&&o.falta>0.004&&o.data>=HOJE&&!pAdiado(g,o.ref)).forEach(o=>L.push({d:o.data,t:g.descricao||g.nome,s:g.nome&&g.nome!==g.descricao?g.nome:(g.tipo==='fixo'?'fixo':'conta'),v:o.falta,k:'g|'+g.id+'|'+o.ref})));
