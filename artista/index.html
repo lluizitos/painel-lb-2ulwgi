@@ -49,6 +49,11 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .ql>b{flex:none;font-size:12px;font-weight:800;padding-top:1px}.qsem .ql>b{color:var(--blue)}.qpen .ql>b{color:var(--amber)}
 .ql span{flex:1;min-width:0;font-size:12.5px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}.ql small{display:block;font-weight:500;color:var(--muted);font-size:11px;margin-top:2px}
 .qv{font-size:12.5px;color:var(--muted);padding:4px 2px 8px;line-height:1.4}.qv b{color:var(--ink)}
+.vds{display:grid;gap:12px;margin-top:12px}.vdc{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.vdp{position:relative;aspect-ratio:16/9;background:#0b0a0e;display:flex;align-items:center;justify-content:center;cursor:pointer}.vdp iframe,.vdp video{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.vpl{width:64px;height:64px;border-radius:50%;border:0;background:var(--pink);color:#fff;font-size:24px;padding-left:5px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+.vsb{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);border:1px solid rgba(242,182,107,.5);border-radius:99px;padding:6px 12px}
+.vdt{padding:10px 12px 12px;display:flex;flex-direction:column;gap:2px}.vdt b{font-size:15px}.vdt span{font-size:12.5px;color:var(--muted)}.vdo{align-self:flex-start;margin-top:6px;font-size:12.5px;font-weight:700;color:var(--pinkl)}
 .urgd{display:flex;justify-content:center;gap:5px;margin-top:2px}.urgd i{width:6px;height:6px;border-radius:9px;background:var(--line)}.urgd i.on{background:var(--pinkl);width:16px}
 /* comuns */
 .list{display:flex;flex-direction:column;gap:8px}
@@ -208,6 +213,7 @@ body:not([data-s=agenda]):not([data-s=fin]) #avx,body:not([data-s=agenda]):not([
 .avx>#orcbox{flex:0 0 86%;max-width:520px;scroll-snap-align:start;min-width:0}.avx>#orcbox:empty{display:none}.avx>#orcbox>*{height:100%;margin:0!important;width:100%}
 #urg{display:contents}.avx .avs{flex:0 0 86%;max-width:520px;scroll-snap-align:start;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:6px;padding:16px 18px;animation:none;border-radius:18px;min-height:150px}
 .avs .al{font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--pinkl);display:flex;align-items:center;gap:6px}.avs .al .ic{width:14px;height:14px}
+.avx .avs.vidav{order:-1;background:rgba(122,184,255,.1);border-color:rgba(122,184,255,.55)}.avs.vidav .al{color:var(--blue)}
 .avs b{font-size:19px;font-weight:800;line-height:1.25}.avs small{font-size:13px;color:var(--sub)}
 .avx.um>#orcbox,.avx.um .avs{flex-basis:100%;max-width:none}
 #avd:empty{display:none}#avd{margin:0 0 14px}
@@ -274,9 +280,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwspad8j"></script>
-<script src="../lbmetas.js?v=mwspad8j"></script>
-<script src="../lbchat.js?v=mwspad8j"></script>
+<script src="../lb.js?v=mwtaw2kv"></script>
+<script src="../lbmetas.js?v=mwtaw2kv"></script>
+<script src="../lbchat.js?v=mwtaw2kv"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -328,10 +334,13 @@ function urgentes(){const U=[];try{LB.orc.mostra(document.getElementById('orcbox
   const SPn=SP.filter(x=>dias(x.d)>=-60),SPa=SP.filter(x=>dias(x.d)<-60);URGANT=SPa;
   if(SPa.length)SPn.push({t:SPa.length+' shows mais antigos pendentes',s:'somam '+brl(SPa.reduce((a,x)=>a+x.v,0))+' · toque para ver',d:'',k:'antigos',c:'upd',ic:IC.al});
   try{quadros(SW,SPn,SPa)}catch(e){console.error(e)}
+  /* 23/11: vídeos — um aviso por show ("Vídeos do show 19/11 · N novos"); tocar abre a área de vídeos */
+  {const G={};(VIDS||[]).filter(v=>v.visivel!=='não'&&v.avisar!=='não').forEach(v=>{const k=v.show||'Vídeos';(G[k]=G[k]||[]).push(v)});
+   Object.entries(G).forEach(([k,l])=>U.push({t:'Vídeos do '+k.replace(/^Show /i,'show ')+' · '+l.length+(l.length>1?' novos':' novo'),s:l.some(v=>v.previa)?'toque para assistir':'em mixagem · toque para ver a lista',d:'',k:'vid|'+k,ic:LB.ic('show'),fixo:1,c:'vidav'}))}
   const UF=U.filter(u=>u.fixo),UL=UF.concat(U.filter(u=>!u.fixo)),min=ST.get('lb_urg_min2')==='1';
   const el=document.getElementById('urg'),DS=['dom','seg','ter','qua','qui','sex','sáb'];
   el.innerHTML=UL.map(u=>`<button type="button" class="urg avs${u.c?' '+u.c:''}" data-urd="${esc(u.d||'')}"${u.k?` data-urk="${esc(u.k)}"`:''}><span class="al">${u.ic||IC.al} Aviso${u.d?' · '+DS[new Date(u.d+'T12:00').getDay()]+' '+ddmm(u.d):''}</span><b>${esc(u.t)}</b>${u.s?`<small>${esc(u.s)}</small>`:''}</button>`).join('');
-  const ax=document.getElementById('avx'),dt=document.getElementById('avd'),sl=[...ax.children].flatMap(x=>x.id==='urg'?[...x.children]:x.children.length?[x]:[]);
+  const ax=document.getElementById('avx'),dt=document.getElementById('avd'),sl=[...ax.children].flatMap(x=>x.id==='urg'?[...x.children]:x.children.length?[x]:[]).sort((a,b)=>(a.classList.contains('vidav')?-1:0)-(b.classList.contains('vidav')?-1:0));
   ax.classList.toggle('um',sl.length<=1);dt.innerHTML=sl.length>1?sl.map((u,i)=>`<i${i?'':' class="on"'}></i>`).join(''):'';
   ax.onscroll=()=>{const w=(sl[0]||{}).offsetWidth||1,i=Math.round(ax.scrollLeft/(w+10));[...dt.children].forEach((x,j)=>x.classList.toggle('on',j===Math.min(i,dt.children.length-1)))}}
 /* 22/11: Financeiro → "Pagamentos próximos" (30 dias): contas/fixos e equipe dos próximos shows; tocar detalha */
@@ -342,6 +351,16 @@ function renderProx(){const el=document.getElementById('fprox');if(!el||!D)retur
   L.sort((a,b)=>a.d<b.d?-1:1);
   el.innerHTML=L.length?`<h3>Pagamentos próximos · 30 dias</h3>${L.map(x=>`<button type="button" class="fpx" data-urk="${esc(x.k)}"><b>${ddmm(x.d)}</b><span>${esc(x.t)}<small>${esc(x.s)}</small></span><em>${brl(x.v)}</em></button>`).join('')}`:''}
 document.getElementById('fprox').onclick=e=>{const b=e.target.closest('[data-urk]');if(b)detalhe(b.dataset.urk)};
+/* 23/11: área de vídeos — card por vídeo com o nome e o play ali mesmo (prévia H.264 ou Drive) + baixar original */
+let VIDS=[];
+const vidDrive=u=>{const m=String(u||'').match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([\w-]{20,})/);return m?m[1]:''};
+function abreVid(show){const L=(VIDS||[]).filter(v=>v.visivel!=='não'&&(!show||(v.show||'Vídeos')===show));
+  abre(topo('Vídeos',show||'Vídeos','')+`<div class="vds">${L.map((v,i)=>`<div class="vdc"><div class="vdp" data-vp="${i}">${v.previa?`<button type="button" class="vpl" aria-label="Tocar ${esc(v.titulo)}">▶</button>`:`<span class="vsb">${esc(v.status==='em mixagem'?'Em mixagem':'Em breve')}</span>`}</div>
+    <div class="vdt"><b>${esc(v.titulo)}</b><span>${esc([v.status,v.obs].filter(Boolean).join(' · '))}</span>${v.original?`<a class="vdo" href="${esc(v.original)}" target="_blank" rel="noopener">Baixar original</a>`:''}</div></div>`).join('')||'<div class="vazio">Nenhum vídeo ainda.</div>'}</div>`);
+  const box=document.getElementById('bds');box.onclickVid&&box.removeEventListener('click',box.onclickVid);
+  box.onclickVid=e=>{const p=e.target.closest('.vdp');if(!p||p.dataset.on)return;const v=L[+p.dataset.vp];if(!v||!v.previa)return;p.dataset.on='1';const id=vidDrive(v.previa);
+    p.innerHTML=id?`<iframe src="https://drive.google.com/file/d/${id}/preview" allow="autoplay; fullscreen" allowfullscreen></iframe>`:`<video src="${esc(v.previa)}" controls autoplay playsinline preload="metadata"></video>`};
+  box.addEventListener('click',box.onclickVid)}
 /* 22/11: quadros "Shows da semana" e "Shows pendentes" (em cima da Agenda); tocar abre o borderô */
 function quadros(SW,SPn,SPa){const el=document.getElementById('qsh');if(!el)return;
   const prox=(D.shows||[]).filter(s=>!/cancel/i.test(s.sit||'')&&dias(s.data)>7).sort((a,b)=>a.data<b.data?-1:1)[0];
@@ -353,6 +372,7 @@ document.getElementById('qsh').onclick=e=>{const b=e.target.closest('[data-urk]'
   if(b.dataset.urk==='antigos'){abre(topo('Shows feitos pendentes','Mais de 60 dias atrás','')+`<div class="cxb">${URGANT.map(x=>`<button type="button" class="cxl" data-ant="${esc(x.k)}" style="width:100%;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer"><span>${esc(x.t.replace(/^Show feito pendente · /,''))}</span><b>${esc(x.s)}</b></button>`).join('')}</div>`);return}
   detalhe(b.dataset.urk)};
 document.addEventListener('click',e=>{const a=e.target.closest('[data-ant]');if(a)detalhe(a.dataset.ant)});
+document.getElementById('urg').addEventListener('click',e=>{const b=e.target.closest('[data-urk^="vid|"]');if(b){e.stopImmediatePropagation();abreVid(b.dataset.urk.slice(4))}},true);
 document.getElementById('urg').onclick=e=>{if(e.target.closest('[data-urgmin]')){ST.set('lb_urg_min2',ST.get('lb_urg_min2')==='1'?'0':'1');urgentes();return}const b=e.target.closest('.urg');if(!b)return;if(b.dataset.urk==='antigos'){abre(topo('Shows feitos pendentes','Mais de 60 dias atrás','')+`<div class="cxb">${URGANT.map(x=>`<div class="cxl"><span>${esc(x.t.replace(/^Show feito pendente · /,''))}</span><b>${esc(x.s)}</b></div>`).join('')}</div>`);return}if(b.dataset.urk){detalhe(b.dataset.urk);return}setor('agenda');if(b.dataset.urd)diaPop(b.dataset.urd)};
 
 /* ======================= AGENDA ======================= */
@@ -681,7 +701,7 @@ addEventListener('lb:mudou',()=>{try{carregar()}catch(e){}});
 async function carregar(){
   try{API=(await (await fetch('../config.json',{cache:'no-store'})).json()).api_url}catch(e){}
   if(!API){renderTudo();return}
-  const [t,m,p,b,ln]=await Promise.allSettled([api({acao:'tarefas'}),api({acao:'minhas_tarefas'}),api({acao:'pagamentos'}),api({acao:'borderos'}),api({acao:'lancamentos'})]);if(ln.status==='fulfilled')LNV=ln.value.lancamentos||[];
+  const [t,m,p,b,ln,vd]=await Promise.allSettled([api({acao:'tarefas'}),api({acao:'minhas_tarefas'}),api({acao:'pagamentos'}),api({acao:'borderos'}),api({acao:'lancamentos'}),api({acao:'videos'})]);if(vd.status==='fulfilled')VIDS=vd.value.videos||[];if(ln.status==='fulfilled')LNV=ln.value.lancamentos||[];
   if(t.status==='fulfilled')TAR=t.value;if(m.status==='fulfilled')MIN=m.value;if(p.status==='fulfilled'){PAGS=p.value.pagamentos||[];PAGS_OK=true}
   if(b.status==='fulfilled'){const r=b.value;PESS=r.pessoas||[];const px={};PESS.forEach(q=>px[q.id]=q.pix);Object.entries(r.borderos||{}).forEach(([k,x])=>{if(x.tipo==='despesa'||!x.equipe)return;x.equipe.forEach(e=>{if(e.pessoa&&px[e.pessoa])e.pix=px[e.pessoa];delete e.doc});D.borderos[k]=x})}
   renderTudo()}

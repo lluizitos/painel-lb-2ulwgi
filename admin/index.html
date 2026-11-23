@@ -106,7 +106,7 @@ label textarea{min-height:60px;resize:vertical}
   <p class="eyebrow">Administração</p>
   <h1>Ad<em>min</em></h1>
   <p class="note">Logins e equipe, tarefas, metas da empresa e pagamentos fora dos shows. Só a administração vê esta página.</p>
-  <div class="tabs" id="tabs"><button class="on" data-t="equipe">Equipe e logins</button><button data-t="mt">Metas e Tarefas</button><button data-t="not">Notificações</button><button data-t="pag">Pagamentos</button><button data-t="lan">Extrato <span id="env_n" style="color:var(--pinkl)"></span></button><button data-t="duv">Dúvidas <span id="duv_n"></span></button><button data-t="cfg">Parâmetros</button><button data-t="ia">Contexto da IA</button></div>
+  <div class="tabs" id="tabs"><button class="on" data-t="equipe">Equipe e logins</button><button data-t="mt">Metas e Tarefas</button><button data-t="not">Notificações</button><button data-t="pag">Pagamentos</button><button data-t="lan">Extrato <span id="env_n" style="color:var(--pinkl)"></span></button><button data-t="duv">Dúvidas <span id="duv_n"></span></button><button data-t="cfg">Parâmetros</button><button data-t="ia">Contexto da IA</button><button data-t="vid">Vídeos</button></div>
 
   <!-- METAS E TAREFAS (junta Para todos, Individuais e metas/tarefas da Empresa) -->
   <div id="t_mt" style="display:none">
@@ -270,6 +270,23 @@ label textarea{min-height:60px;resize:vertical}
 
   <!-- PÁGINA DO SÓCIO -->
   <!-- CONTEXTO DA IA: fatos que o Luiz escreve para o assistente responder melhor -->
+  <!-- VÍDEOS (23/11): área de vídeos da página do Artista -->
+  <div id="t_vid" style="display:none">
+    <p class="note">Vídeos que aparecem na página do Artista (aviso no topo → área de vídeos). <b>Prévia</b> = link que toca no navegador (MP4 H.264 ou link do Google Drive); <b>Original</b> = link para baixar o arquivo cheio. Sem link, o card aparece como "em breve". Só ponha link que o Luiz liberou.</p>
+    <div class="card" style="margin-top:10px"><div class="f">
+      <label class="w">Título<input id="vd_ti" maxlength="120" placeholder="ex.: Te Assumir · Show LB 19/11"></label>
+      <label>Show<input id="vd_sh" maxlength="80" placeholder="ex.: Show LB 19/11"></label>
+      <label>Data<input id="vd_dt" type="date"></label>
+      <label class="w">Link da prévia (toca no site)<input id="vd_pv" placeholder="https://drive.google.com/file/d/… ou https://….mp4"></label>
+      <label class="w">Link do original (baixar)<input id="vd_or" placeholder="https://…"></label>
+      <label>Situação<select id="vd_st"><option>em breve</option><option>em mixagem</option><option>aguardando aprovação</option><option>aprovado</option></select></label>
+      <label>Ordem<input id="vd_od" inputmode="numeric" placeholder="1"></label>
+      <label>Visível no site<select id="vd_vi"><option value="sim">Sim</option><option value="não">Não</option></select></label>
+      <label>Avisar no topo<select id="vd_av"><option value="sim">Sim</option><option value="não">Não</option></select></label>
+      <label class="w">Observação<input id="vd_ob" maxlength="300"></label>
+    </div><div class="acts"><button class="btn pkb" id="vd_salvar">Salvar vídeo</button><button class="btn" id="vd_cancel" style="display:none">Cancelar edição</button><span class="note" id="vd_msg"></span></div></div>
+    <div class="list" id="vd_l" style="margin-top:10px"></div>
+  </div>
   <div id="t_ia" style="display:none">
     <p class="note">Escreva aqui fatos que ajudam o assistente a entender a empresa (ex.: "A gestão do Gui foi de novembro/2025 até setembro/2026" · "Nessa gestão não havia controle financeiro adequado"). Vale na hora, em todos os chats, para quem você escolher. Não coloque senhas, PIX ou dados pessoais.</p>
     <div class="card" style="margin-top:10px"><div class="f">
@@ -346,8 +363,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwspad8j"></script>
-<script src="../lbmetas.js?v=mwspad8j"></script>
+<script src="../lb.js?v=mwtaw2kv"></script>
+<script src="../lbmetas.js?v=mwtaw2kv"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -762,6 +779,20 @@ $('ia_l').onclick=async e=>{const ed=e.target.closest('[data-iae]'),pa=e.target.
   if(ed){const x=IA.find(y=>y.id===ed.dataset.iae);if(!x)return;IAED=x.id;$('ia_tx').value=x.texto;$('ia_qm').value=x.quem||'gestao';$('ia_cancel').style.display='';$('ia_salvar').textContent='Salvar alteração';$('ia_tx').focus();scrollTo({top:$('t_ia').offsetTop-80,behavior:'smooth'});return}
   if(pa){const x=IA.find(y=>y.id===pa.dataset.iap);if(!x)return;pa.disabled=true;try{await iaApi({acao:'salvar_contexto_ia',item:Object.assign({},x,{ativo:x.ativo==='não'?'sim':'não'})})}catch(er){pa.disabled=false;pa.textContent='tente de novo'}return}
   if(de){if(!de.dataset.ok){de.dataset.ok='1';de.textContent='Confirmar exclusão';return}de.disabled=true;try{await iaApi({acao:'excluir_contexto_ia',id:de.dataset.iad})}catch(er){de.disabled=false;de.textContent='tente de novo'}}};
+/* aba Vídeos (23/11) */
+let VD=[],VDED=null;
+function vdRender(){$('vd_l').innerHTML=VD.length?VD.map(x=>`<div class="tf" style="${x.visivel==='não'?'opacity:.55':''}"><div class="hd"><div><b>${esc(x.titulo)}</b><div class="note" style="margin:2px 0 0">${[x.show,x.data?x.data.split('-').reverse().join('/'):'',x.status,'ordem '+(x.ordem||0),x.avisar==='sim'?'avisa no topo':'sem aviso',x.previa?'tem prévia':'sem prévia',x.original?'tem original':''].filter(Boolean).map(esc).join(' · ')}</div></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" data-vde="${esc(x.id)}">Editar</button><button class="btn sm" data-vdv="${esc(x.id)}">${x.visivel==='não'?'Mostrar':'Esconder'}</button><button class="btn sm" data-vdd="${esc(x.id)}">Excluir</button></div></div></div>`).join(''):'<div class="empty">Nenhum vídeo ainda.</div>'}
+async function vdApi(c){const r=await api(c);if(!r.ok)throw new Error(r.erro||'erro');VD=r.videos||[];vdRender()}
+async function vdAbre(){$('vd_l').innerHTML='<div class="empty">Carregando…</div>';try{await vdApi({acao:'videos'})}catch(e){$('vd_l').innerHTML=`<div class="empty">Não consegui carregar (${esc(e.message)}).</div>`}}
+const vdLimpa=()=>{VDED=null;['vd_ti','vd_sh','vd_dt','vd_pv','vd_or','vd_od','vd_ob'].forEach(i=>$(i).value='');$('vd_st').value='em breve';$('vd_vi').value='sim';$('vd_av').value='sim';$('vd_cancel').style.display='none';$('vd_salvar').textContent='Salvar vídeo'};
+$('vd_cancel').onclick=vdLimpa;
+$('vd_salvar').onclick=async()=>{const t=$('vd_ti').value.trim();if(!t){$('vd_msg').textContent='Escreva o título.';return}const b=$('vd_salvar');b.disabled=true;$('vd_msg').textContent='Salvando…';
+  try{await vdApi({acao:'salvar_video',item:{id:VDED||'',titulo:t,show:$('vd_sh').value,data:$('vd_dt').value,previa:$('vd_pv').value.trim(),original:$('vd_or').value.trim(),status:$('vd_st').value,ordem:$('vd_od').value,visivel:$('vd_vi').value,avisar:$('vd_av').value,obs:$('vd_ob').value}});vdLimpa();$('vd_msg').textContent='Salvo ✓'}catch(e){$('vd_msg').textContent='Não salvou ('+e.message+')'}b.disabled=false};
+$('vd_l').onclick=async e=>{const ed=e.target.closest('[data-vde]'),vv=e.target.closest('[data-vdv]'),de=e.target.closest('[data-vdd]');
+  if(ed){const x=VD.find(y=>y.id===ed.dataset.vde);if(!x)return;VDED=x.id;$('vd_ti').value=x.titulo;$('vd_sh').value=x.show||'';$('vd_dt').value=x.data||'';$('vd_pv').value=x.previa||'';$('vd_or').value=x.original||'';$('vd_st').value=x.status||'em breve';$('vd_od').value=x.ordem||'';$('vd_vi').value=x.visivel||'sim';$('vd_av').value=x.avisar||'sim';$('vd_ob').value=x.obs||'';$('vd_cancel').style.display='';$('vd_salvar').textContent='Salvar alterações';$('vd_ti').scrollIntoView({block:'center'});return}
+  if(vv){const x=VD.find(y=>y.id===vv.dataset.vdv);if(!x)return;vv.disabled=true;try{await vdApi({acao:'salvar_video',item:Object.assign({},x,{visivel:x.visivel==='não'?'sim':'não'})})}catch(er){vv.disabled=false;vv.textContent='tente de novo'}return}
+  if(de){if(!de.dataset.ok){de.dataset.ok='1';de.textContent='Confirmar exclusão';return}de.disabled=true;try{await vdApi({acao:'excluir_video',id:de.dataset.vdd})}catch(er){de.disabled=false;de.textContent='tente de novo'}}};
 /* aba Sócio */
 let SO=[],SOOK=false,SOF='ocorrencia',SOED=null;
 async function socAbre(){if(!SOOK){$('so_lista').innerHTML='<div class="empty">Carregando…</div>';try{SO=(await api({acao:'socio'})).socio||[];SOOK=true}catch(e){$('so_lista').innerHTML=`<div class="empty">Não consegui carregar (${esc(e.message)}).</div>`;return}}socRender()}
@@ -805,7 +836,7 @@ $('ln_del').onclick=async()=>{const d=$('ln_del'),x=LED,id=x&&(x.novo?x.novo.id:
   if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent=x.novo?'Toque de novo para excluir':'Toque de novo: volta como veio do extrato';return}
   try{LN=(await api({acao:'excluir_lancamento',id})).lancamentos||[];lnRender();lnFecha()}catch(e){$('ln_msg').innerHTML='<span class="neg">erro</span>'}};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')lnFecha()});
-$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','mt','not','pag','lan','duv','cfg','ia','todos','ind','emp','soc'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='mt')mtVer();if(b.dataset.t==='not'){$('not_al').appendChild($('e_lista'));EFIL='alerta,despesa';renderEmp();socAbre()}if(b.dataset.t==='ia')iaAbre();if(b.dataset.t==='cfg')cfgAbre();if(b.dataset.t==='lan')lnAbre();if(b.dataset.t==='pag')arecAbre();if(b.dataset.t==='duv')duvAbre()};
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));['equipe','mt','not','pag','lan','duv','cfg','ia','vid','todos','ind','emp','soc'].forEach(t=>$('t_'+t).style.display=t===b.dataset.t?'block':'none');if(b.dataset.t==='vid')vdAbre();if(b.dataset.t==='mt')mtVer();if(b.dataset.t==='not'){$('not_al').appendChild($('e_lista'));EFIL='alerta,despesa';renderEmp();socAbre()}if(b.dataset.t==='ia')iaAbre();if(b.dataset.t==='cfg')cfgAbre();if(b.dataset.t==='lan')lnAbre();if(b.dataset.t==='pag')arecAbre();if(b.dataset.t==='duv')duvAbre()};
 /* ---------- COMPROVANTES enviados pelo painel (📎 no assistente) ---------- */
 let ENV=[],ENVID=null,ENVT=false;
 async function envCarrega(){try{ENV=(await api({acao:'envios'})).envios||[];envRender()}catch(e){}}
@@ -947,7 +978,7 @@ function xtRender(){const el=$('xt_res');if(!XT.length){el.innerHTML='';return}c
     if(d){e.preventDefault();if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent='toque de novo para apagar';return}try{XT=(await api({acao:'excluir_extrato',id:d.dataset.xdel})).extratos||[];xtRender()}catch(er){d.textContent='erro'}}}}
 {const a0=lnAbre;lnAbre=async function(){await a0();xtCarrega()};const r0=lnRender;lnRender=function(){r0();if(XTOK)xtRender()}}
 </script>
-<script src="../lbchat.js?v=mwspad8j"></script>
+<script src="../lbchat.js?v=mwtaw2kv"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>
