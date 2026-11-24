@@ -248,7 +248,7 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
   <div class="acts" style="justify-content:space-between"><button type="button" class="btn dg" id="pm_del">Excluir</button><span style="display:flex;gap:8px"><button type="button" class="btn" id="pm_x">Cancelar</button><button type="submit" class="btn pkb">Salvar</button></span></div>
 </form></div>
 
-<script src="../lb.js?v=mwtkattl"></script>
+<script src="../lb.js?v=mwuo6h6j"></script>
 <script>
 const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
 const brl2=v=>v==null||isNaN(v)?'—':'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -276,6 +276,7 @@ LB.entrar({pagina:'bordero',base:'../',titulo:'Borderôs',ok:async r=>{
   if(LOCAL){const l=carregaLocal();Object.assign(BORD,l.borderos);l.excluidos.forEach(id=>delete BORD[id]);if(l.pessoas)PES=l.pessoas}
   Object.assign(DESP,D.despesas||{});Object.values(BORD).filter(b=>b.tipo==='despesa'||!b.equipe).forEach(b=>{DESP[b.id]=b;delete BORD[b.id]});
   document.getElementById('app').style.display='block';
+  setTimeout(()=>{const h=/[#&]b=([^&]+)/.exec(location.hash||'');if(h){const k=decodeURIComponent(h[1]),b=BORD[k]||Object.values(BORD).find(x=>String(x.id)===k);if(b)abrir(JSON.parse(JSON.stringify(b)),false)}},0); // 24/11: Admin → Pagamentos → editar abre o borderô
   document.getElementById('links').innerHTML=LB.links(r.paginas,'bordero','../');
   document.getElementById('modo').innerHTML=LOCAL?`<div class="aviso">Modo deste aparelho: a planilha ainda não está ligada, então o que você salvar fica guardado só neste celular/PC (e não aparece para o Lucas). Ao ligar a planilha, tudo passa a salvar nela e as pessoas são editadas direto na LB Lista de Equipe. <button class="btn sm" id="exp" style="margin-left:6px">Exportar alterações</button></div>`:'';
   if(LOCAL)document.getElementById('exp').onclick=exportar;
@@ -622,7 +623,7 @@ $('cj_salvar').onclick=()=>{CFG.base=$('cj_base').value.trim()||'Divinópolis, M
   store.set('lb_bord_cfg',JSON.stringify({base:CFG.base,onibus_kml:CFG.onibus_kml,diesel_preco:CFG.diesel_preco,adicional_pct:CFG.adicional_pct,gasolina_preco:CFG.gasolina_preco,veiculos:CFG.veiculos}));
   $('cj_msg').textContent='Salvo neste aparelho.';setTimeout(()=>$('cj_msg').textContent='',2500)};
 </script>
-<script src="../lbchat.js?v=mwtkattl"></script>
+<script src="../lbchat.js?v=mwuo6h6j"></script>
 <script>LBCHAT.auto(document.querySelector('main.wrap').firstElementChild,{base:'../',pagina:'Borderôs',exemplo:'quanto gastei de diesel em outubro?'})</script>
 </body>
 </html>

@@ -260,19 +260,37 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 .nfn .nff{display:none;gap:8px;flex-wrap:wrap;background:var(--card);border-radius:12px;padding:12px;margin-top:8px}.nfn.on .nff{display:flex}.nfn.on .nfa{display:none}
 .nff input,.nff select{flex:1 1 140px;min-width:0;background:var(--card2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px;font:inherit;font-size:14px}
 .nff .nfok{flex:1 1 100%;background:var(--pink);color:#fff;border:0;border-radius:10px;padding:11px;font:inherit;font-weight:800;cursor:pointer}.nff .nfm{flex:1 1 100%;font-size:12.5px;color:var(--muted)}
+
+/* 24/11: widgets da Principal (vídeo vertical, vendas, financeiro) */
+#dstw:has(#urg:empty):has(#orcbox:empty){display:none}
+#vidw:empty,#wven:empty,#wfin:empty{display:none}
+.vw{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px;scrollbar-width:none}.vw::-webkit-scrollbar{display:none}
+.vwc{flex:none;width:31%;max-width:150px;aspect-ratio:9/16;border-radius:14px;overflow:hidden;position:relative;background:#000;border:1px solid var(--line);scroll-snap-align:start;padding:0;cursor:pointer}
+.vwc video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.vwc span{position:absolute;left:0;right:0;bottom:0;padding:18px 8px 7px;font-size:11px;font-weight:700;color:#fff;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.75));line-height:1.25}
+.wg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 12px;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.wg div{min-width:0}.wg small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.wg b{display:block;font-size:17px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wg b.pos{color:var(--pos)}.wg b.neg{color:var(--neg)}
+.wg em{grid-column:1/-1;font-style:normal;font-size:12px;color:var(--sub)}
+.urg.dst{border-color:var(--pinkl)!important}
 </style>
 </head>
 <body>
 <div id="pg">
 <header><div class="wrap"><img src="../logo.png" alt="Lucas Barros"><div class="links" id="links"></div></div>
-<nav class="ptabs" id="setores"><button class="on" data-s="agenda">Agenda</button><button data-s="pags">Pagamentos</button><button data-s="fin">Financeiro</button><button data-s="ven">Vendas</button></nav></header>
+<nav class="ptabs" id="setores"><button class="on" data-s="agenda">Principal</button><button data-s="fin">Financeiro</button></nav></header>
 <div class="wrap" id="main">
-<div class="avx" id="avx"><div id="orcbox"></div><div id="urg"></div></div><div class="urgd" id="avd"></div>
-<p class="eyebrow">Artista</p><h1>Lucas <em>Barros</em></h1>
 <div id="lbq"></div>
-<div class="ult" id="ult"></div>
 
 <section id="s_agenda">
+  <div id="s_pags" hidden>
+    <h2 class="tt">Pagamentos pendentes <small id="tpag"></small></h2>
+    <div id="pgk"></div>
+    <div class="list" id="pgl" style="margin-top:10px"></div>
+    <div id="pgad"></div>
+  </div>
+  <div id="dstw"><h2 class="tt">Destaque</h2><div class="avx" id="avx"><div id="orcbox"></div><div id="urg"></div></div><div class="urgd" id="avd"></div></div>
+  <div id="vidw"></div>
   <div class="qsh" id="qsh"></div>
   <h2 class="tt">Agenda</h2>
   <div class="cbar"><button class="nv" id="cprev" aria-label="Anterior">‹</button><div class="tit" id="ctit"></div><button class="nv" id="cnext" aria-label="Próximo">›</button><button class="chip" id="choje">Hoje</button></div>
@@ -283,14 +301,12 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
   <div id="tlresumo" class="grid g3"></div>
   <div class="tlwrap"><div class="tl" id="tl"></div></div>
   <div class="tlnav"><button class="btn" id="tlp" aria-label="Voltar">‹</button><button class="btn" id="tlh">Hoje</button><button class="btn" id="tln" aria-label="Avançar">›</button></div>
+  <div id="wven"></div>
+  <div id="wfin"></div>
 </section>
+<div class="ult" id="ult"></div>
 
-<section id="s_pags" hidden>
-  <h2 class="tt">Pagamentos <small id="tpag"></small></h2>
-  <div id="pgk"></div>
-  <div class="list" id="pgl" style="margin-top:10px"><div class="vazio">Carregando…</div></div>
-  <div id="pgad"></div>
-</section>
+
 
 <section id="s_fin" hidden></section>
 <div id="fprox"></div>
@@ -304,9 +320,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwtkattl"></script>
-<script src="../lbmetas.js?v=mwtkattl"></script>
-<script src="../lbchat.js?v=mwtkattl"></script>
+<script src="../lb.js?v=mwuo6h6j"></script>
+<script src="../lbmetas.js?v=mwuo6h6j"></script>
+<script src="../lbchat.js?v=mwuo6h6j"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -324,7 +340,7 @@ const fimMes=(()=>{const d=new Date(+MA.slice(0,4),+MA.slice(5,7),0);return MA+'
 const jso=t=>{try{return JSON.parse(t||'{}')||{}}catch(e){return {}}};
 const limpaPix=x=>String(x||'').replace(/\s*\((nubank|picpay|inter|banco c6)\)\s*$/i,'').replace(/\s+(Inter|Banco c6)$/i,'').trim();
 const ST={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
-let D=null,API='',TAR=null,MIN=null,PAGS=[],PAGS_OK=false,PESS=[];
+let D=null,API='',TAR=null,MIN=null,PAGS=[],PAGS_OK=false,PESS=[],PCFG={},SHV=null; // 24/11: PCFG = o que o Admin escolheu para esta página; SHV = shows ao vivo (Vendas)
 async function api(c){const r=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({usuario:LB.login,senha:LB.senha,nome:LB.usuario},c))})).json();if(!r.ok)throw new Error(r.erro||'erro');return r}
 function copiar(t,btn){const ok=()=>{if(btn){const o=btn.textContent;btn.textContent='copiado';btn.classList.add('ok');setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok')},1500)}};
   const fb=()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove()};
@@ -341,30 +357,35 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-vm]');if(!
 const orcPrin=()=>((TAR&&TAR.metas)||[]).filter(m=>m.tipo==='despesa'&&m.painel==='sim'&&!/Pago|Resolvido/.test(m.situacao||'')); // 18/11: aviso principal (orçamento)
 let URGANT=[];
 function urgentes(){const U=[];try{LB.orc.mostra(document.getElementById('orcbox'),orcPrin())}catch(e){console.error(e)}
-  ((TAR&&TAR.metas)||[]).forEach(m=>{if(FEITO.test(m.situacao||''))return;if(m.tipo==='despesa'&&m.painel==='sim')return;
-    if(m.painel==='sim')U.push({t:m.titulo,s:[m.alvo,m.prazo?'prazo '+(ISO.test(m.prazo)?ddmm(m.prazo):m.prazo):''].filter(Boolean).join(' · '),d:ISO.test(m.prazo||'')?m.prazo:'',fixo:1}); // marcado no Admin "Aviso no topo": sempre aparece
-    else if(m.tipo==='alerta')U.push({t:m.titulo,s:[m.alvo,m.prazo?'prazo '+ddmm(m.prazo):''].filter(Boolean).join(' · '),d:ISO.test(m.prazo||'')?m.prazo:''});
-    else if(ISO.test(m.prazo||'')&&dias(m.prazo)<=2&&m.tipo!=='despesa')U.push({t:m.titulo,s:dias(m.prazo)<0?'atrasada desde '+ddmm(m.prazo):dias(m.prazo)===0?'é hoje':'falta '+dias(m.prazo)+' dia'+(dias(m.prazo)>1?'s':''),d:m.prazo})});
-  ((MIN&&MIN.tarefas)||[]).forEach(t=>{if(t.status==='Concluída'||!ISO.test(t.prazo||''))return;const n=dias(t.prazo);
-    if(n<=1)U.push({t:'Sua tarefa: '+t.titulo,s:n<0?'atrasada desde '+ddmm(t.prazo):n===0?'é hoje':'é amanhã',d:t.prazo})});
-  /* shows dos próximos 7 dias e shows já feitos que ainda têm valor a receber ou equipe a pagar */
-  const SW=[],SP=[],dsem=['dom','seg','ter','qua','qui','sex','sáb'];
-  (D.shows||[]).forEach((s,i)=>{if(/cancel/i.test(s.sit||''))return;const n=dias(s.data);
-    if(n>=0&&n<=7){const conf=/confirmado|realizado/i.test(s.sit||'');SW.push({t:'Show '+dsem[new Date(s.data+'T12:00').getDay()]+' '+ddmm(s.data)+' · '+s.nome,s:[s.local,n===0?'é hoje':n===1?'é amanhã':'faltam '+n+' dias',conf?'':'a confirmar'].filter(Boolean).join(' · '),d:s.data,k:'s|'+i,c:'ush',ic:LB.ic('show')})}
-    else if(n<0&&s.data>='2026-01-01'&&!/projeto/i.test(s.sit||'')){const fr=+s.falta||0,b=bordDe(s);let fe=0;if(b&&b.equipe)try{LB.pg.porData(b).forEach(q=>{fe+=q.falta||0})}catch(e){}
-      if(fr>=1||fe>=1)SP.push({t:'Show feito pendente · '+ddmm(s.data)+' '+s.nome,s:[fr>=1?'falta receber '+brl(fr):'',fe>=1?'equipe a pagar '+brl(fe):''].filter(Boolean).join(' · '),d:s.data,k:'s|'+i,c:'upd',ic:IC.al,v:fr+fe})}});
-  SW.sort((a,b)=>a.d<b.d?-1:1);SP.sort((a,b)=>a.d<b.d?1:-1);
-  /* pendentes de mais de 60 dias: um cartão só (tocar mostra a lista) */
-  const SPn=SP.filter(x=>dias(x.d)>=-60),SPa=SP.filter(x=>dias(x.d)<-60);URGANT=SPa;
-  if(SPa.length)SPn.push({t:SPa.length+' shows mais antigos pendentes',s:'somam '+brl(SPa.reduce((a,x)=>a+x.v,0))+' · toque para ver',d:'',k:'antigos',c:'upd',ic:IC.al});
-  try{quadros(SW,SPn,SPa)}catch(e){console.error(e)}
-  /* 23/11: vídeos — um aviso por show ("Vídeos do show 19/11 · N novos"); tocar abre a área de vídeos */
-  {const G={};(VIDS||[]).filter(v=>v.visivel!=='não'&&v.avisar!=='não').forEach(v=>{const k=v.show||'Vídeos';(G[k]=G[k]||[]).push(v)});
-   Object.entries(G).forEach(([k,l])=>U.push({t:'Vídeos do '+k.replace(/^Show /i,'show ')+' · '+l.length+(l.length>1?' novos':' novo'),s:l.some(v=>v.previa)?'toque para assistir':'em mixagem · toque para ver a lista',d:'',k:'vid|'+k,ic:LB.ic('show'),fixo:1,c:'vidav'}))}
+  /* 24/11: destaque = 1º o que o Luiz escolheu no Admin (Notificações → Página do Lucas); depois avisos, movimentações de hoje, show vendido hoje e tarefas marcadas "Exibir pro Artista" */
+  const DST=PCFG&&PCFG.destaque,MT=(TAR&&TAR.metas)||[];
+  if(DST&&DST.tipo&&!(DST.ate&&DST.ate<HOJE)){const[t1,t2]=String(DST.id||'').split('|');
+    if(DST.tipo==='aviso')U.push({t:DST.texto||DST.titulo||'Aviso',s:'',d:'',fixo:1,c:'dst'});
+    else if(DST.tipo==='video'){const n=(VIDS||[]).filter(v=>v.visivel!=='não'&&(v.show||'Vídeos')===DST.id).length;U.push({t:'Vídeos do '+String(DST.id).replace(/^Show /i,'show '),s:n?n+(n>1?' vídeos':' vídeo')+' · toque para assistir':'toque para ver',d:'',k:'vid|'+DST.id,ic:LB.ic('show'),fixo:1,c:'dst vidav'})}
+    else if(DST.tipo==='pagamento'){const g=PAGS.find(x=>x.id===t1);let o=null;try{o=g&&LB.pgx.ocorr(g,'9999-12-31').find(y=>y.ref===t2)}catch(e){}
+      if(g&&o&&!o.pago&&o.falta>0.004)U.push({t:'Pagar: '+(g.descricao||g.nome),s:brl(o.falta)+' · '+(o.data<HOJE?'venceu ':'vence ')+ddmm(o.data),d:'',k:'g|'+g.id+'|'+o.ref,ic:LB.ic('pag'),fixo:1,c:'dst'})}
+    else{const m=MT.find(x=>String(x.id)===String(DST.id));if(m&&!FEITO.test(m.situacao||''))U.push({t:m.titulo,s:m.tipo==='evento'?[ddmm(m.termino||m.prazo),m.hora,m.local].filter(Boolean).join(' · '):[m.alvo,m.valor?brl(+m.valor):''].filter(Boolean).join(' · '),d:'',k:'m|'+m.id,fixo:1,c:'dst'})}}
+  MT.forEach(m=>{if(FEITO.test(m.situacao||'')||/cancel/i.test(m.situacao||''))return;if(DST&&String(DST.id)===String(m.id))return;if(m.tipo==='despesa'&&m.painel==='sim')return;
+    if(m.painel==='sim')U.push({t:m.titulo,s:[m.alvo,m.prazo?'prazo '+(ISO.test(m.prazo)?ddmm(m.prazo):m.prazo):''].filter(Boolean).join(' · '),d:ISO.test(m.prazo)?m.prazo:'',fixo:1,k:'m|'+m.id});
+    else if(m.artista==='sim')U.push({t:(m.tipo==='evento'?'':m.tipo==='tarefa'?'Tarefa: ':'')+m.titulo,s:m.tipo==='evento'?[ddmm(m.termino||m.prazo),m.hora,m.local].filter(Boolean).join(' · '):[m.alvo,ISO.test(m.prazo||'')?'prazo '+ddmm(m.prazo):''].filter(Boolean).join(' · '),d:'',k:'m|'+m.id,ic:LB.ic(m.tipo==='evento'?'emp':'tar')})});
+  /* movimentações de hoje na conta (máx. definido no Admin) */
+  {const lim=PCFG&&PCFG.mov_lim!=null?+PCFG.mov_lim:3;let mv=[];try{mv=ultMovs().filter(m=>m.data===HOJE)}catch(e){}
+   mv.slice(0,lim).forEach(m=>U.push({t:(+m.valor>=0?'Entrou ':'Saiu ')+brl(Math.abs(+m.valor||0)),s:[m.quem,m.cat].filter(Boolean).join(' · ')+' · hoje',d:'',c:+m.valor>=0?'mvp':'mvn',ic:LB.ic('pag')}));
+   if(mv.length>lim&&lim>0)U.push({t:'+'+(mv.length-lim)+' movimentações hoje',s:'veja no Financeiro',d:'',k:'fin',ic:LB.ic('pag')})}
+  /* show vendido hoje (Vendas ao vivo) */
+  (SHV||[]).filter(x=>String(x.data_venda||'').slice(0,10)===HOJE&&!/cancel/i.test(x.status||'')).forEach(x=>U.push({t:'Show vendido hoje 🎉',s:[ISO.test(x.data||'')?ddmm(x.data):'',x.cidade,x.evento].filter(Boolean).join(' · '),d:'',fixo:1,ic:LB.ic('show'),c:'mvp'}));
+  /* vídeos: só viram aviso se o widget de vídeo estiver oculto no Admin */
+  if(PCFG&&PCFG.video_widget==='não'){const G={};(VIDS||[]).filter(v=>v.visivel!=='não'&&v.avisar!=='não').forEach(v=>{const k=v.show||'Vídeos';(G[k]=G[k]||[]).push(v)});
+   Object.entries(G).forEach(([k,l])=>{if(DST&&DST.tipo==='video'&&DST.id===k)return;U.push({t:'Vídeos do '+k.replace(/^Show /i,'show ')+' · '+l.length+(l.length>1?' novos':' novo'),s:l.some(v=>v.previa)?'toque para assistir':'em mixagem · toque para ver a lista',d:'',k:'vid|'+k,ic:LB.ic('show'),fixo:1,c:'vidav'})})}
+  /* shows da semana ficam no quadro acima da agenda; shows feitos pendentes saíram (24/11) */
+  const SW=[],dsem=['dom','seg','ter','qua','qui','sex','sáb'];
+  (D.shows||[]).forEach((s,i)=>{if(/cancel/i.test(s.sit||''))return;const n=dias(s.data);if(n>=0&&n<=7){const conf=/confirmado|realizado/i.test(s.sit||'');SW.push({t:'Show '+dsem[new Date(s.data+'T12:00').getDay()]+' '+ddmm(s.data)+' · '+s.nome,s:[s.local,n===0?'é hoje':n===1?'é amanhã':'faltam '+n+' dias',conf?'':'a confirmar'].filter(Boolean).join(' · '),d:s.data,k:'s|'+i,c:'ush',ic:LB.ic('show')})}});
+  SW.sort((a,b)=>a.d<b.d?-1:1);URGANT=[];
+  try{quadros(SW,[],[])}catch(e){console.error(e)}
   const UF=U.filter(u=>u.fixo),UL=UF.concat(U.filter(u=>!u.fixo)),min=ST.get('lb_urg_min2')==='1';
   const el=document.getElementById('urg'),DS=['dom','seg','ter','qua','qui','sex','sáb'];
   el.innerHTML=UL.map(u=>`<button type="button" class="urg avs${u.c?' '+u.c:''}" data-urd="${esc(u.d||'')}"${u.k?` data-urk="${esc(u.k)}"`:''}><span class="al">${u.ic||IC.al} Aviso${u.d?' · '+DS[new Date(u.d+'T12:00').getDay()]+' '+ddmm(u.d):''}</span><b>${esc(u.t)}</b>${u.s?`<small>${esc(u.s)}</small>`:''}</button>`).join('');
-  const ax=document.getElementById('avx'),dt=document.getElementById('avd'),sl=[...ax.children].flatMap(x=>x.id==='urg'?[...x.children]:x.children.length?[x]:[]).sort((a,b)=>(a.classList.contains('vidav')?-1:0)-(b.classList.contains('vidav')?-1:0));
+  const ax=document.getElementById('avx'),dt=document.getElementById('avd'),sl=[...ax.children].flatMap(x=>x.id==='urg'?[...x.children]:x.children.length?[x]:[]).sort((a,b)=>(b.classList.contains('dst')?1:0)-(a.classList.contains('dst')?1:0));
   ax.classList.toggle('um',sl.length<=1);dt.innerHTML=sl.length>1?sl.map((u,i)=>`<i${i?'':' class="on"'}></i>`).join(''):'';
   ax.onscroll=()=>{const w=(sl[0]||{}).offsetWidth||1,i=Math.round(ax.scrollLeft/(w+10));const D=dt.querySelectorAll('i'),fim=ax.scrollLeft>=ax.scrollWidth-ax.clientWidth-4;D.forEach((x,j)=>x.classList.toggle('on',j===(fim?D.length-1:Math.min(i,D.length-1))))}
   /* 23/11: no computador: bolinhas e setas ‹ › clicáveis, e arrastar com o mouse */
@@ -438,28 +459,21 @@ document.getElementById('qsh').onclick=e=>{const b=e.target.closest('[data-urk]'
   detalhe(b.dataset.urk)};
 document.addEventListener('click',e=>{const a=e.target.closest('[data-ant]');if(a)detalhe(a.dataset.ant)});
 document.getElementById('urg').addEventListener('click',e=>{const b=e.target.closest('[data-urk^="vid|"]');if(b){e.stopImmediatePropagation();abreVid(b.dataset.urk.slice(4))}},true);
-document.getElementById('urg').onclick=e=>{if(e.target.closest('[data-urgmin]')){ST.set('lb_urg_min2',ST.get('lb_urg_min2')==='1'?'0':'1');urgentes();return}const b=e.target.closest('.urg');if(!b)return;if(b.dataset.urk==='antigos'){abre(topo('Shows feitos pendentes','Mais de 60 dias atrás','')+`<div class="cxb">${URGANT.map(x=>`<div class="cxl"><span>${esc(x.t.replace(/^Show feito pendente · /,''))}</span><b>${esc(x.s)}</b></div>`).join('')}</div>`);return}if(b.dataset.urk){detalhe(b.dataset.urk);return}setor('agenda');if(b.dataset.urd)diaPop(b.dataset.urd)};
+document.getElementById('urg').onclick=e=>{if(e.target.closest('[data-urgmin]')){ST.set('lb_urg_min2',ST.get('lb_urg_min2')==='1'?'0':'1');urgentes();return}const b=e.target.closest('.urg');if(!b)return;if(b.dataset.urk==='antigos'){abre(topo('Shows feitos pendentes','Mais de 60 dias atrás','')+`<div class="cxb">${URGANT.map(x=>`<div class="cxl"><span>${esc(x.t.replace(/^Show feito pendente · /,''))}</span><b>${esc(x.s)}</b></div>`).join('')}</div>`);return}if(b.dataset.urk==='fin'){setor('fin');scrollTo({top:0,behavior:'smooth'});return}if(b.dataset.urk){detalhe(b.dataset.urk);return}if(!b.dataset.urd)return;setor('agenda');if(b.dataset.urd)diaPop(b.dataset.urd)};
 
 /* ======================= AGENDA ======================= */
-const CAT={show:{n:'Shows',c:'pt-s',i:LB.ic('show')},pag:{n:'Pagamentos',c:'pt-c',i:LB.ic('pag')},tar:{n:'Tarefas',c:'pt-t',i:LB.ic('tar')},emp:{n:'Empresa',c:'pt-e',i:LB.ic('emp')}};
+const CAT={show:{n:'Shows',c:'pt-s',i:LB.ic('show')},emp:{n:'Eventos',c:'pt-e',i:LB.ic('emp')}};
 const ICO=x=>`<i class="ic2">${(CAT[x.cat]||{}).i||''}</i>`;
 let OCULTO=new Set(jso(ST.get('lb_art_oculto')).l||[]),VIS=ST.get('lb_art_vis')||'mes',REF=HOJE;
 function bordDe(s){const B=D.borderos||{};if(s.cod&&B[s.cod])return B[s.cod];if(s.bordero_app&&B[s.bordero_app])return B[s.bordero_app];
   const l=Object.values(B).filter(b=>b.data===s.data&&b.equipe);if(l.length<2)return l[0]||null;
   const w=LB.norm(s.nome).split(' ').filter(x=>x.length>3);return l.find(b=>w.some(x=>LB.norm(b.show||'').includes(x)))||l[0]}
 /* tudo o que aparece no calendário entre d0 e d1 */
-function eventos(d0,d1){const E=[];
+function eventos(d0,d1){const E=[]; // 24/11: agenda do Lucas = só shows e eventos (não puxa as tarefas de quem está vendo)
   (D.shows||[]).forEach((s,i)=>{if(/cancel/i.test(s.sit||'')||s.data<d0||s.data>d1)return;const conf=/confirmado|realizado/i.test(s.sit||'');
-    E.push({d:s.data,cat:'show',cls:'pt-s',txt:s.nome,sub:(s.local||'')+(conf?'':' · a confirmar'),k:'s|'+i,ord:0});
-    const b=bordDe(s);if(b&&b.equipe)LB.pg.porData(b).forEach(q=>{if(q.tot<=0||q.d<d0||q.d>d1)return;const f=q.falta,ok=f<=0.004,venc=q.d<=HOJE; // cada pagamento da equipe na data em que vence
-      E.push({d:q.d,cat:'pag',cls:ok?'pt-ok':venc?'pt-a':'pt-c',txt:'Equipe · '+s.nome,sub:(q.d<s.data?'antecipado · ':q.d>s.data?'combinado para depois do show · ':'')+(ok?'tudo pago':venc?'falta pagar':'a pagar'),v:ok?q.tot:f,k:'s|'+i,ord:1,fe:ok})})});
-  (PAGS||[]).forEach(g=>{if(g.ativo==='não'||g.direcao==='entrada')return;const ad=jso(g.adiados);let oc=[];try{oc=LB.pgx.ocorr(g,d1)}catch(e){}
-    oc.filter(o=>o.data>=d0).forEach(o=>{const pago=!!o.pago||o.falta<=0.004,venc=!pago&&o.data<HOJE;
-      E.push({d:o.data,cat:'pag',cls:pago?'pt-ok':venc?'pt-a':'pt-c',txt:g.descricao||g.nome,sub:(g.nome&&g.nome!==g.descricao?g.nome+' · ':'')+(pago?'pago':ad[o.ref]?'adiado':venc?'vencido':'a vencer'),v:pago?+g.valor:o.falta,k:'g|'+g.id+'|'+o.ref,ord:1,fe:pago})})});
-  ((MIN&&MIN.tarefas)||[]).forEach(t=>{if(!ISO.test(t.prazo||'')||t.prazo<d0||t.prazo>d1)return;const ok=t.status==='Concluída',atr=!ok&&t.prazo<HOJE;
-    E.push({d:t.prazo,cat:'tar',cls:atr?'pt-a':'pt-t',txt:t.titulo,sub:ok?'feita':atr?'atrasada':t.status==='Em andamento'?'fazendo':'a fazer',k:'t|'+t.id,ord:2,fe:ok})});
-  ((TAR&&TAR.metas)||[]).forEach(m=>{if(!ISO.test(m.prazo||'')||m.prazo<d0||m.prazo>d1||m.tipo==='despesa')return;const ok=FEITO.test(m.situacao||''),atr=!ok&&m.prazo<HOJE;
-    E.push({d:m.prazo,cat:'emp',cls:atr?'pt-a':'pt-e',txt:m.titulo,sub:(m.tipo==='alerta'?'alerta':'meta da empresa')+(m.alvo?' · '+m.alvo:''),k:'m|'+m.id,ord:3,fe:ok})});
+    E.push({d:s.data,cat:'show',cls:'pt-s',txt:s.nome,sub:(s.local||'')+(conf?'':' · a confirmar'),k:'s|'+i,ord:0})});
+  ((TAR&&TAR.metas)||[]).forEach(m=>{if(m.tipo!=='evento'||/cancel/i.test(m.situacao||''))return;const d=ISO.test(m.termino||'')?m.termino:m.prazo;if(!ISO.test(d||'')||d<d0||d>d1)return;
+    E.push({d,cat:'emp',cls:'pt-e',txt:m.titulo,sub:[m.hora,m.local].filter(Boolean).join(' · ')||'evento',k:'m|'+m.id,ord:1,fe:/realizado/i.test(m.situacao||'')})});
   return E.filter(x=>!OCULTO.has(x.cat)).sort((a,b)=>a.d.localeCompare(b.d)||a.ord-b.ord)}
 function renderFiltros(){document.getElementById('cfil').innerHTML=Object.entries(CAT).map(([k,c])=>`<button class="chip ${OCULTO.has(k)?'off':'on'}" data-cat="${k}" title="${OCULTO.has(k)?'Mostrar':'Ocultar'} ${c.n.toLowerCase()}"><em class="${c.c}"></em>${c.i} ${c.n}</button>`).join('')}
 document.getElementById('cfil').onclick=e=>{const b=e.target.closest('[data-cat]');if(!b)return;const k=b.dataset.cat;OCULTO.has(k)?OCULTO.delete(k):OCULTO.add(k);ST.set('lb_art_oculto',JSON.stringify({l:[...OCULTO]}));renderFiltros();renderCal()};
@@ -510,7 +524,7 @@ function detalhe(k,d){const vol=d?`<button class="vl" data-volta="${d}">‹ volt
   if(t==='s'){const s=D.shows[+a];if(s)abre(vol+bordHtml(s));return}
   if(t==='g'){const g=PAGS.find(x=>x.id===a);if(g)abre(vol+pagHtml(g,b));return}
   if(t==='t'){const x=((MIN&&MIN.tarefas)||[]).find(y=>String(y.id)===a);if(x)abre(vol+topo('Tarefa',x.titulo,x.prazo?'prazo '+ddmm(x.prazo):'')+`<div class="cxb">${x.descricao?`<div class="cxl"><b style="font-weight:400">${esc(x.descricao)}</b></div>`:''}<div class="cxl"><span>Situação</span><b>${esc(x.status||'A fazer')}</b></div></div>${x.status!=='Concluída'?`<button class="btn fiz" style="margin-top:12px" data-fiz="${esc(x.id)}">Marcar como feita</button>`:''}`);return}
-  if(t==='m'){const m=((TAR&&TAR.metas)||[]).find(y=>String(y.id)===a);if(m)abre(vol+topo(m.tipo==='alerta'?'Alerta da empresa':'Meta da empresa',m.titulo,m.prazo?'prazo '+ddmm(m.prazo):'')+`<div class="cxb">${m.alvo?`<div class="cxl"><span>Quem</span><b>${esc(m.alvo)}</b></div>`:''}<div class="cxl"><span>Situação</span><b>${esc(m.situacao||'em aberto')}</b></div>${m.obs?`<div class="cxl"><b style="font-weight:400">${esc(m.obs)}</b></div>`:''}</div>`)}}
+  if(t==='m'){const m=((TAR&&TAR.metas)||[]).find(y=>String(y.id)===a);if(m)abre(vol+topo(m.tipo==='evento'?'Evento':m.tipo==='alerta'?'Alerta da empresa':m.tipo==='tarefa'?'Tarefa da empresa':'Meta da empresa',m.titulo,m.tipo==='evento'?[ddmm(m.termino||m.prazo),m.hora].filter(Boolean).join(' · '):m.prazo?'prazo '+ddmm(m.prazo):'')+`<div class="cxb">${m.local?`<div class="cxl"><span>Local</span><b>${esc(m.local)}</b></div>`:''}${m.alvo?`<div class="cxl"><span>${m.tipo==='evento'?'O que é':'Quem'}</span><b>${esc(m.alvo)}</b></div>`:''}${m.progresso?`<div class="cxl"><b style="font-weight:400">${esc(m.progresso)}</b></div>`:''}<div class="cxl"><span>Situação</span><b>${esc(m.situacao||'em aberto')}</b></div>${m.obs?`<div class="cxl"><b style="font-weight:400">${esc(m.obs)}</b></div>`:''}</div>`)}}
 const pixBox=(pix)=>pix?`<div class="cxpix"><span>Chave PIX</span><b>${esc(limpaPix(pix))}</b><button class="cp" data-cp="${esc(limpaPix(pix))}">copiar PIX</button></div>`:`<div class="cxpix"><span>Chave PIX</span><b style="font-size:14px;color:var(--muted)">sem PIX no cadastro</b></div>`;
 function pagHtml(g,ref){const o=(LB.pgx.ocorr(g,'2099-12-31').find(x=>x.ref===ref))||{};const pe=(g.pessoa&&PESS.find(p=>p.id===g.pessoa))||null,pix=g.pix||(pe&&pe.pix)||'',pago=!!o.pago||o.falta<=0.004;
   const ln=(r,v,cp)=>`<div class="cxl"><span>${r}</span><b>${esc(v)}</b>${cp?`<button class="cp" data-cp="${esc(cp)}">copiar</button>`:''}</div>`;
@@ -576,9 +590,10 @@ function pgPop(id){const x=PGB[id];if(!x){fecha();return}const pode=!!API,its=x.
 function renderPagar(){const pode=!!API,B={},C=[];let NAD=0;
   const pixDe=(id,nome,px)=>px||((PESS.find(p=>p.id===id)||PESS.find(p=>LB.norm(p.nome||'')===LB.norm(nome||''))||{}).pix)||'';
   const grp=b=>B[b.id]=B[b.id]||{id:b.id,show:b.show||'Show',data:b.data,it:[],tot:0};
-  Object.values(D.borderos||{}).filter(b=>b.equipe).forEach(b=>b.equipe.forEach((e,i)=>{if(e.fora||e.grupo==='Comissão')return;
+  const BOC=new Set((PCFG&&PCFG.bord_ocultos)||[]),bvis=(k,b)=>!BOC.has(String(k))&&!BOC.has(String(b.id)); // 24/11: Admin → Pagamentos → 👁
+  Object.entries(D.borderos||{}).filter(([k,b])=>b.equipe&&bvis(k,b)).map(x=>x[1]).forEach(b=>b.equipe.forEach((e,i)=>{if(e.fora||e.grupo==='Comissão')return;
     LB.pg.pend(b,e,HOJE).forEach(q=>{const x=grp(b);x.tot+=q.f;x.it.push({b,e,i,nome:e.nome,pix:pixDe(e.pessoa,e.nome,e.pix),f:q.f,ps:q.ps,d:q.d,fut:q.d>HOJE,ant:q.d<b.data})})}));
-  Object.values(D.borderos||{}).filter(b=>b.equipe).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!t.para||!(+t.valor>0))return;const dI=t.pag_em||b.data;if(!t.pag_em&&b.data>HOJE)return; // 22/11: item tem prazo próprio (vazio = dia do show)
+  Object.entries(D.borderos||{}).filter(([k,b])=>b.equipe&&bvis(k,b)).map(x=>x[1]).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!t.para||!(+t.valor>0))return;const dI=t.pag_em||b.data;if(!t.pag_em&&b.data>HOJE)return; // 22/11: item tem prazo próprio (vazio = dia do show)
     const x=grp(b);x.tot+=+t.valor;x.it.push({b,e:{funcao:'item: '+(t.desc||''),pessoa:t.pessoa},item:j,nome:t.para,pix:pixDe(t.pessoa,t.para,t.pix),f:+t.valor,ps:[{k:'item',n:t.desc||'item',v:+t.valor}],d:dI,fut:dI>HOJE})}));
   PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada'&&g.ocultar!=='sim').forEach(g=>LB.pgx.ocorr(g,fimMes).filter(o=>!o.pago&&o.falta>0.004&&(!pAdiado(g,o.ref)||(NAD++,false))).forEach(o=>C.push({g,o,d:o.data,f:o.falta,fut:o.data>HOJE,pix:pixDe(g.pessoa,g.nome,g.pix)})));
   Object.values(B).forEach(x=>{const ds=x.it.map(i=>i.d).sort();x.np=new Set(x.it.map(i=>i.e.pessoa||LB.norm(i.nome))).size;x.d=ds[ds.length-1];x.dmin=ds[0]});
@@ -586,7 +601,7 @@ function renderPagar(){const pode=!!API,B={},C=[];let NAD=0;
   const L=Object.values(B).map(x=>({d:x.d,h:pgBordCard(x)})).concat(C.map(i=>({d:i.d,h:pgContaCard(i,pode)}))).sort((a,b)=>b.d.localeCompare(a.d));
   const all=Object.values(B).flatMap(x=>x.it).concat(C),tot=all.reduce((a,i)=>a+i.f,0),vtot=all.filter(i=>!i.fut).reduce((a,i)=>a+i.f,0);
   document.getElementById('pgk').innerHTML=pgResumo(tot,vtot,L.length,fimMes,NAD);
-  document.getElementById('pgl').innerHTML=L.length?vm('pags',L.map(x=>x.h),8):'<div class="empty">Nenhum pagamento pendente. Show só entra aqui depois que acontece; contas e fixos do mês entram todos, menos os adiados.</div>';
+  document.getElementById('pgl').innerHTML=L.length?vm('pags',L.map(x=>x.h),8):'';document.getElementById('s_pags').hidden=!L.length; // 24/11: sem pendência, o bloco some
   renderAdiados(pode);if(PGPOP&&bd.classList.contains('open'))pgPop(PGPOP)}
 document.addEventListener('click',e=>{const c=e.target.closest('[data-pgbd]');if(c){pgPop(c.dataset.pgbd);return}
   const a=e.target.closest('[data-pgball]');if(a){const x=PGB[a.dataset.pgball];if(x)marcarPago(x.it.filter(i=>!i.fut).map(i=>i.item!=null?{id:i.b.id,it:i.item,data:HOJE}:{id:i.b.id,i:i.i,partes:i.ps.map(p=>p.k),data:HOJE}),a,[])}});
@@ -693,8 +708,8 @@ async function abreVen(){if(VENOK)return;VENOK=true;const box=document.getElemen
 async function abreFin(){if(FINOK)return;FINOK=true;const box=document.getElementById('s_fin');
   try{if(!window.__ART_R)throw new Error('dados ainda não carregados');await LB.financeiro(box,window.__ART_R)}
   catch(e){FINOK=false;box.innerHTML='<div class="vazio">Não consegui abrir o financeiro agora ('+esc(String(e.message||e))+'). Tente de novo.</div>';console.error(e)}}
-function setor(s){if(!['agenda','pags','fin','ven'].includes(s))s='agenda';document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));['agenda','pags','equipe','fin','ven'].forEach(x=>document.getElementById('s_'+x).hidden=x!==s);ST.set('lb_art_setor',s);document.body.dataset.s=s;try{fixaAbas()}catch(e){}if(s==='fin')try{renderProx()}catch(e){console.error(e)}
-  if(s==='fin')abreFin();if(s==='ven')abreVen()}
+function setor(s){if(!['agenda','fin'].includes(s))s='agenda';document.querySelectorAll('#setores button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));['agenda','equipe','fin','ven'].forEach(x=>document.getElementById('s_'+x).hidden=!(x===s||(s==='fin'&&x==='ven')));ST.set('lb_art_setor',s);document.body.dataset.s=s;try{fixaAbas()}catch(e){}if(s==='fin')try{renderProx()}catch(e){console.error(e)}
+  if(s==='fin'){abreFin();abreVen()}}
 document.getElementById('setores').onclick=e=>{const b=e.target.closest('[data-s]');if(b){setor(b.dataset.s);scrollTo({top:0,behavior:'smooth'})}};
 
 /* ---------- shows: linha do tempo (o mesmo cartão do Financeiro); tocar abre o borderô ---------- */
@@ -720,7 +735,27 @@ function renderTL(){const el=document.getElementById('tl');if(!el||!D||!D.shows)
   requestAnimationFrame(()=>go(false));if(!el._ro&&window.ResizeObserver){let w0=0;el._ro=new ResizeObserver(()=>{const w=el.clientWidth;if(w&&!w0)go(false);w0=w});el._ro.observe(el)}
   document.getElementById('tlp').onclick=()=>el.scrollBy({left:-274,behavior:'smooth'});document.getElementById('tln').onclick=()=>el.scrollBy({left:274,behavior:'smooth'});document.getElementById('tlh').onclick=()=>go(true);
   el.onclick=e=>{const c=e.target.closest('[data-tls]');if(c)detalhe('s|'+c.dataset.tls)}}
-function renderTudo(){renderFiltros();renderCal();renderTL();renderMetas();renderPagar();renderEquipe();urgentes();try{renderUlt()}catch(e){console.error(e)}try{renderProx()}catch(e){console.error(e)}}
+
+/* 24/11: widget de vídeo — miniaturas verticais tocando sozinhas (sem som); tocar abre em tela cheia */
+function renderVidW(){const el=document.getElementById('vidw');if(!el)return;
+  if(PCFG&&PCFG.video_widget==='não'){el.innerHTML='';return}
+  const P=(VIDS||[]).filter(v=>v.visivel!=='não'&&v.previa&&!vidDrive(v.previa));if(!P.length){el.innerHTML='';return}
+  el.innerHTML=`<h2 class="tt">Vídeos</h2><div class="vw">${P.map((v,i)=>`<button type="button" class="vwc" data-vw="${i}" aria-label="${esc(v.titulo)}"><video src="${esc(v.previa)}#t=0.5" muted loop playsinline autoplay preload="metadata"></video><span>${esc(String(v.titulo||'').replace(/ · Show .*$/,''))}</span></button>`).join('')}</div>`;
+  el.querySelectorAll('video').forEach(v=>{v.muted=true;v.play().catch(()=>{})});
+  el.querySelector('.vw').onclick=e=>{const b=e.target.closest('[data-vw]');if(!b)return;el.querySelectorAll('video').forEach(v=>v.pause());reels(P,+b.dataset.vw);
+    const volta=()=>{if(document.querySelector('.rls'))return setTimeout(volta,500);el.querySelectorAll('video').forEach(v=>v.play().catch(()=>{}))};setTimeout(volta,800)}}
+/* 24/11: widget de vendas — mês atual, próximos confirmados e falta receber; tocar abre o Financeiro */
+function renderWVen(){const el=document.getElementById('wven');if(!el||!D)return;const L=(SHV&&SHV.length?SHV:((D.vendas||{}).shows||[])).filter(x=>!/cancel/i.test(x.status||'')),m=HOJE.slice(0,7);
+  if(!L.length){el.innerHTML='';return}
+  const vm=L.filter(x=>String(x.data_venda||'').slice(0,7)===m),pr=L.filter(x=>(x.data||'')>=HOJE&&!/a confirmar/i.test(x.status||'')),fr=L.reduce((a,x)=>a+Math.max(0,(+x.valor||0)-(+x.recebido||0)),0);
+  const nx=pr.sort((a,b)=>a.data<b.data?-1:1)[0];
+  el.innerHTML=`<h2 class="tt">Vendas</h2><button type="button" class="wg" data-wg="fin"><div><small>Vendidos no mês</small><b>${vm.length}</b></div><div><small>Próximos shows</small><b>${pr.length}</b></div><div><small>Falta receber</small><b class="pos">${brl(fr)}</b></div>${nx?`<em>Próximo: ${ddmm(nx.data)} · ${esc(nx.cidade||nx.evento||'')}</em>`:''}</button>`}
+/* 24/11: widget financeiro — saldo de agora e o mês (entra, sai, termina com); tocar abre o Financeiro */
+function renderWFin(){const el=document.getElementById('wfin');if(!el||!D)return;const M=(D.meses||{})[HOJE.slice(0,7)]||{};const sd=D.saldo_real;
+  if(sd==null&&M.fim==null){el.innerHTML='';return}
+  el.innerHTML=`<h2 class="tt">Financeiro</h2><button type="button" class="wg" data-wg="fin"><div><small>Saldo agora</small><b class="${sd<0?'neg':''}">${sd!=null?brl(sd):'—'}</b></div><div><small>Entra no mês</small><b class="pos">${M.ent!=null?brl(M.ent):'—'}</b></div><div><small>Sai no mês</small><b class="neg">${M.sai!=null?brl(Math.abs(M.sai)):'—'}</b></div>${M.fim!=null?`<em>O mês deve terminar com ${brl(M.fim)}</em>`:''}</button>`}
+['wven','wfin'].forEach(k=>document.getElementById(k).addEventListener('click',e=>{if(e.target.closest('[data-wg]')){setor('fin');scrollTo({top:0,behavior:'smooth'})}}));
+function renderTudo(){renderFiltros();renderCal();renderTL();renderMetas();renderPagar();renderEquipe();urgentes();try{renderVidW()}catch(e){console.error(e)}try{renderWVen();renderWFin()}catch(e){console.error(e)}try{renderUlt()}catch(e){console.error(e)}try{renderProx()}catch(e){console.error(e)}}
 
 /* ---------- 19/11: últimos lançamentos (extrato + app) no topo; o que é de um orçamento, borderô ou show aparece junto: pago / total ---------- */
 let LNV=null,ULT=[];
@@ -766,7 +801,7 @@ addEventListener('lb:mudou',()=>{try{carregar()}catch(e){}});
 async function carregar(){
   try{API=(await (await fetch('../config.json',{cache:'no-store'})).json()).api_url}catch(e){}
   if(!API){renderTudo();return}
-  const [t,m,p,b,ln,vd]=await Promise.allSettled([api({acao:'tarefas'}),api({acao:'minhas_tarefas'}),api({acao:'pagamentos'}),api({acao:'borderos'}),api({acao:'lancamentos'}),api({acao:'videos'})]);if(vd.status==='fulfilled')VIDS=vd.value.videos||[];if(ln.status==='fulfilled')LNV=ln.value.lancamentos||[];
+  const [t,m,p,b,ln,vd,pc,sv]=await Promise.allSettled([api({acao:'tarefas'}),api({acao:'minhas_tarefas'}),api({acao:'pagamentos'}),api({acao:'borderos'}),api({acao:'lancamentos'}),api({acao:'videos'}),api({acao:'pagina_cfg'}),api({acao:'listar'})]);if(pc.status==='fulfilled'&&pc.value.ok)PCFG=pc.value.cfg||{};if(sv.status==='fulfilled'&&sv.value.ok)SHV=sv.value.shows||null;if(vd.status==='fulfilled')VIDS=vd.value.videos||[];if(ln.status==='fulfilled')LNV=ln.value.lancamentos||[];
   if(t.status==='fulfilled')TAR=t.value;if(m.status==='fulfilled')MIN=m.value;if(p.status==='fulfilled'){PAGS=p.value.pagamentos||[];PAGS_OK=true}
   if(b.status==='fulfilled'){const r=b.value;PESS=r.pessoas||[];const px={};PESS.forEach(q=>px[q.id]=q.pix);Object.entries(r.borderos||{}).forEach(([k,x])=>{if(x.tipo==='despesa'||!x.equipe)return;x.equipe.forEach(e=>{if(e.pessoa&&px[e.pessoa])e.pix=px[e.pessoa];delete e.doc});D.borderos[k]=x})}
   renderTudo()}
