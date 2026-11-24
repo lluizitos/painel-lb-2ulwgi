@@ -283,7 +283,7 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 .vsc .vst{position:absolute;left:0;right:0;bottom:0;padding:34px 12px 12px;color:#fff;font-size:13px;font-weight:700;line-height:1.3;background:linear-gradient(transparent,rgba(0,0,0,.8));pointer-events:none}
 .vsc .vss{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:16px;cursor:pointer;display:grid;place-items:center}
 .vsc .vsh{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:99px;padding:9px 14px;font:inherit;font-size:12.5px;font-weight:700;white-space:nowrap;cursor:pointer}
-.vsd{display:flex;justify-content:center;gap:6px;margin-top:4px}.vsd i{width:6px;height:6px;border-radius:99px;background:var(--line);transition:all .2s}.vsd i.on{width:16px;background:var(--pinkl)}
+.vsd{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:4px}.vsd .avs-a{display:none;background:none;border:1px solid var(--line);color:var(--ink);width:28px;height:28px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer;margin:0 8px;padding:0;font-family:inherit}@media (hover:hover) and (pointer:fine){.vsd .avs-a{display:inline-flex;align-items:center;justify-content:center}}.vsd i{width:6px;height:6px;border-radius:99px;background:var(--line);transition:all .2s}.vsd i.on{width:16px;background:var(--pinkl)}
 </style>
 </head>
 <body>
@@ -331,9 +331,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwupnvzr"></script>
-<script src="../lbmetas.js?v=mwupnvzr"></script>
-<script src="../lbchat.js?v=mwupnvzr"></script>
+<script src="../lb.js?v=mwv0c2ro"></script>
+<script src="../lbmetas.js?v=mwv0c2ro"></script>
+<script src="../lbchat.js?v=mwv0c2ro"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -748,8 +748,11 @@ function renderTL(){const el=document.getElementById('tl');if(!el||!D||!D.shows)
 
 /* 24/11: widget de vídeo — miniaturas verticais tocando sozinhas (sem som); tocar abre em tela cheia */
 let VSOM=false,VSIO=null,VSPG=null;
-function renderVidW(){const el=document.getElementById('vidw');if(!el)return;if(VSIO){VSIO.disconnect();VSIO=null}if(VSPG){VSPG.disconnect();VSPG=null}
+function renderVidW(){const el=document.getElementById('vidw');if(!el)return;
   const modo=(PCFG&&PCFG.video_widget)||'slide';
+  /* não remontar (e voltar pro 1º vídeo) quando os dados recarregam e nada mudou */
+  const chave=modo+'|'+(VIDS||[]).filter(v=>v.visivel!=='não'&&v.previa).map(v=>v.id+v.previa).join(',');if(el.dataset.k===chave&&el.innerHTML)return;el.dataset.k=chave;
+  if(VSIO){VSIO.disconnect();VSIO=null}if(VSPG){VSPG.disconnect();VSPG=null}
   if(modo==='não'){el.innerHTML='';return}
   const P=(VIDS||[]).filter(v=>v.visivel!=='não'&&v.previa&&!vidDrive(v.previa));if(!P.length){el.innerHTML='';return}
   const nome=v=>String(v.titulo||'').replace(/ · Show .*$/,'');
@@ -761,17 +764,22 @@ function renderVidW(){const el=document.getElementById('vidw');if(!el)return;if(
   /* slide: um por vez, em formato de celular, com som (o navegador só deixa o som depois do primeiro toque) */
   el.innerHTML=`<h2 class="tt">Vídeos</h2><div class="vsl">${P.map((v,i)=>`<div class="vsc" data-i="${i}"><video src="${esc(v.previa)}#t=0.1" loop playsinline preload="metadata" muted></video><div class="vsu"><i>LB</i>lucasbarros</div><div class="vst">${esc(nome(v))}</div><button type="button" class="vss" aria-label="Som">🔇</button>${VSOM?'':'<button type="button" class="vsh">🔊 Toque para ouvir</button>'}</div>`).join('')}</div>${P.length>1?`<div class="vsd">${P.map((v,i)=>`<i${i?'':' class="on"'}></i>`).join('')}</div>`:''}`;
   const tr=el.querySelector('.vsl'),cs=[...tr.children],dots=[...el.querySelectorAll('.vsd i')];let cur=0,vis=false;
-  const som=()=>cs.forEach(c=>{const v=c.querySelector('video');v.muted=!VSOM;c.querySelector('.vss').textContent=VSOM?'🔊':'🔇';const h=c.querySelector('.vsh');if(h&&VSOM)h.remove()});
+  const centra=c=>{const x=Math.max(0,Math.min(tr.scrollLeft+c.getBoundingClientRect().left-tr.getBoundingClientRect().left-(tr.clientWidth-c.offsetWidth)/2,tr.scrollWidth-tr.clientWidth)),a=tr.scrollLeft,t0=performance.now();tr.style.scrollSnapType='none';const f=()=>{const k=Math.min(1,(performance.now()-t0)/320),e=1-Math.pow(1-k,3);tr.scrollLeft=a+(x-a)*e;if(k<1)setTimeout(f,16);else{tr.style.scrollSnapType='';meio()}};f()},som=()=>cs.forEach(c=>{const v=c.querySelector('video');v.muted=!VSOM;c.querySelector('.vss').textContent=VSOM?'🔊':'🔇';const h=c.querySelector('.vsh');if(h&&VSOM)h.remove()});
   const toca=()=>cs.forEach((c,i)=>{const v=c.querySelector('video');c.classList.toggle('on',i===cur);if(i===cur&&vis&&!document.querySelector('.rls')){v.muted=!VSOM;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})})}else v.pause()});
-  VSIO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting&&e.intersectionRatio>.6){cur=+e.target.dataset.i;dots.forEach((d,j)=>d.classList.toggle('on',j===cur))}});toca()},{root:tr,threshold:[.6]});cs.forEach(c=>VSIO.observe(c));
+  /* o vídeo "da frente" = o mais perto do centro da faixa (no computador cabem dois inteiros) */
+  const meio=()=>{const r=tr.getBoundingClientRect(),m=r.left+r.width/2;let b=0,bd=1e9;cs.forEach((c,i)=>{const q=c.getBoundingClientRect(),d=Math.abs(q.left+q.width/2-m);if(d<bd){bd=d;b=i}});if(b!==cur||!cs[b].classList.contains('on')){cur=b;dots.forEach((d,j)=>d.classList.toggle('on',j===cur));toca()}};
+  let tq=0;tr.addEventListener('scroll',()=>{clearTimeout(tq);tq=setTimeout(meio,90)},{passive:true});
   VSPG=new IntersectionObserver(es=>{vis=es[0].isIntersecting;toca()},{threshold:.35});VSPG.observe(tr);
   tr.onclick=e=>{const c=e.target.closest('.vsc');if(!c)return;const i=+c.dataset.i;
     if(e.target.closest('.vss,.vsh')){VSOM=e.target.closest('.vsh')?true:!VSOM;som();toca();return}
-    if(i!==cur){c.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});return}
+    if(i!==cur){centra(c);return}
     cs.forEach(x=>x.querySelector('video').pause());reels(P,i);
     const volta=()=>{if(document.querySelector('.rls'))return setTimeout(volta,500);toca()};setTimeout(volta,800)};
-  dots.forEach((d,j)=>d.onclick=()=>cs[j].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}));
-  tr.scrollLeft=0;som();toca()}
+  dots.forEach((d,j)=>d.onclick=()=>centra(cs[j]));
+  /* computador: setas ‹ › nas pontas das bolinhas */
+  const vd=el.querySelector('.vsd');if(vd){const vai=d=>{const j=Math.max(0,Math.min(cs.length-1,cur+d));centra(cs[j])};
+    const pa=document.createElement('button'),na=document.createElement('button');pa.type=na.type='button';pa.className=na.className='avs-a';pa.textContent='‹';na.textContent='›';pa.setAttribute('aria-label','Vídeo anterior');na.setAttribute('aria-label','Próximo vídeo');pa.onclick=()=>vai(-1);na.onclick=()=>vai(1);vd.prepend(pa);vd.append(na)}
+  tr.scrollLeft=0;som();meio();toca()}
 /* 24/11: widget de vendas — mês atual, próximos confirmados e falta receber; tocar abre o Financeiro */
 function renderWVen(){const el=document.getElementById('wven');if(!el||!D)return;const L=(SHV&&SHV.length?SHV:((D.vendas||{}).shows||[])).filter(x=>!/cancel/i.test(x.status||'')),m=HOJE.slice(0,7);
   if(!L.length){el.innerHTML='';return}
