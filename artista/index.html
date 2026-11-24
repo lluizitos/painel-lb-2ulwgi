@@ -273,6 +273,17 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 .wg b{display:block;font-size:17px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wg b.pos{color:var(--pos)}.wg b.neg{color:var(--neg)}
 .wg em{grid-column:1/-1;font-style:normal;font-size:12px;color:var(--sub)}
 .urg.dst{border-color:var(--pinkl)!important}.avx .avs.dst{order:-2}
+
+/* 24/11: widget de vídeo em slide — um por vez, formato de celular, com som; arrasta pro lado = próximo; toque = tela cheia */
+.vsl{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:0 -16px;padding:4px calc(50% - min(32vw,135px)) 8px;overscroll-behavior-x:contain}.vsl::-webkit-scrollbar{display:none}
+.vsc{flex:none;width:min(64vw,270px);aspect-ratio:9/16;border-radius:28px;overflow:hidden;position:relative;background:#000;border:3px solid #2E2B36;box-shadow:0 10px 30px rgba(0,0,0,.45);scroll-snap-align:center;scroll-snap-stop:always;transition:transform .25s,opacity .25s;transform:scale(.9);opacity:.55}
+.vsc.on{transform:none;opacity:1}
+.vsc video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;cursor:pointer}
+.vsc .vsu{position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:7px;color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.6);pointer-events:none}.vsc .vsu i{font-style:normal;width:24px;height:24px;border-radius:50%;background:var(--pink);display:grid;place-items:center;font-size:9px;font-weight:900}
+.vsc .vst{position:absolute;left:0;right:0;bottom:0;padding:34px 12px 12px;color:#fff;font-size:13px;font-weight:700;line-height:1.3;background:linear-gradient(transparent,rgba(0,0,0,.8));pointer-events:none}
+.vsc .vss{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:16px;cursor:pointer;display:grid;place-items:center}
+.vsc .vsh{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:99px;padding:9px 14px;font:inherit;font-size:12.5px;font-weight:700;white-space:nowrap;cursor:pointer}
+.vsd{display:flex;justify-content:center;gap:6px;margin-top:4px}.vsd i{width:6px;height:6px;border-radius:99px;background:var(--line);transition:all .2s}.vsd i.on{width:16px;background:var(--pinkl)}
 </style>
 </head>
 <body>
@@ -320,9 +331,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwuoe39u"></script>
-<script src="../lbmetas.js?v=mwuoe39u"></script>
-<script src="../lbchat.js?v=mwuoe39u"></script>
+<script src="../lb.js?v=mwuoycak"></script>
+<script src="../lbmetas.js?v=mwuoycak"></script>
+<script src="../lbchat.js?v=mwuoycak"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -736,13 +747,31 @@ function renderTL(){const el=document.getElementById('tl');if(!el||!D||!D.shows)
   el.onclick=e=>{const c=e.target.closest('[data-tls]');if(c)detalhe('s|'+c.dataset.tls)}}
 
 /* 24/11: widget de vídeo — miniaturas verticais tocando sozinhas (sem som); tocar abre em tela cheia */
-function renderVidW(){const el=document.getElementById('vidw');if(!el)return;
-  if(PCFG&&PCFG.video_widget==='não'){el.innerHTML='';return}
+let VSOM=false,VSIO=null,VSPG=null;
+function renderVidW(){const el=document.getElementById('vidw');if(!el)return;if(VSIO){VSIO.disconnect();VSIO=null}if(VSPG){VSPG.disconnect();VSPG=null}
+  const modo=(PCFG&&PCFG.video_widget)||'slide';
+  if(modo==='não'){el.innerHTML='';return}
   const P=(VIDS||[]).filter(v=>v.visivel!=='não'&&v.previa&&!vidDrive(v.previa));if(!P.length){el.innerHTML='';return}
-  el.innerHTML=`<h2 class="tt">Vídeos</h2><div class="vw">${P.map((v,i)=>`<button type="button" class="vwc" data-vw="${i}" aria-label="${esc(v.titulo)}"><video src="${esc(v.previa)}#t=0.5" muted loop playsinline autoplay preload="metadata"></video><span>${esc(String(v.titulo||'').replace(/ · Show .*$/,''))}</span></button>`).join('')}</div>`;
-  el.querySelectorAll('video').forEach(v=>{v.muted=true;v.play().catch(()=>{})});
-  el.querySelector('.vw').onclick=e=>{const b=e.target.closest('[data-vw]');if(!b)return;el.querySelectorAll('video').forEach(v=>v.pause());reels(P,+b.dataset.vw);
-    const volta=()=>{if(document.querySelector('.rls'))return setTimeout(volta,500);el.querySelectorAll('video').forEach(v=>v.play().catch(()=>{}))};setTimeout(volta,800)}}
+  const nome=v=>String(v.titulo||'').replace(/ · Show .*$/,'');
+  if(modo==='sim'){ /* miniaturas: várias lado a lado, tocando sem som */
+    el.innerHTML=`<h2 class="tt">Vídeos</h2><div class="vw">${P.map((v,i)=>`<button type="button" class="vwc" data-vw="${i}" aria-label="${esc(v.titulo)}"><video src="${esc(v.previa)}#t=0.5" muted loop playsinline autoplay preload="metadata"></video><span>${esc(nome(v))}</span></button>`).join('')}</div>`;
+    el.querySelectorAll('video').forEach(v=>{v.muted=true;v.play().catch(()=>{})});
+    el.querySelector('.vw').onclick=e=>{const b=e.target.closest('[data-vw]');if(!b)return;el.querySelectorAll('video').forEach(v=>v.pause());reels(P,+b.dataset.vw);
+      const volta=()=>{if(document.querySelector('.rls'))return setTimeout(volta,500);el.querySelectorAll('video').forEach(v=>v.play().catch(()=>{}))};setTimeout(volta,800)};return}
+  /* slide: um por vez, em formato de celular, com som (o navegador só deixa o som depois do primeiro toque) */
+  el.innerHTML=`<h2 class="tt">Vídeos</h2><div class="vsl">${P.map((v,i)=>`<div class="vsc" data-i="${i}"><video src="${esc(v.previa)}#t=0.1" loop playsinline preload="metadata" muted></video><div class="vsu"><i>LB</i>lucasbarros</div><div class="vst">${esc(nome(v))}</div><button type="button" class="vss" aria-label="Som">🔇</button>${VSOM?'':'<button type="button" class="vsh">🔊 Toque para ouvir</button>'}</div>`).join('')}</div>${P.length>1?`<div class="vsd">${P.map((v,i)=>`<i${i?'':' class="on"'}></i>`).join('')}</div>`:''}`;
+  const tr=el.querySelector('.vsl'),cs=[...tr.children],dots=[...el.querySelectorAll('.vsd i')];let cur=0,vis=false;
+  const som=()=>cs.forEach(c=>{const v=c.querySelector('video');v.muted=!VSOM;c.querySelector('.vss').textContent=VSOM?'🔊':'🔇';const h=c.querySelector('.vsh');if(h&&VSOM)h.remove()});
+  const toca=()=>cs.forEach((c,i)=>{const v=c.querySelector('video');c.classList.toggle('on',i===cur);if(i===cur&&vis&&!document.querySelector('.rls')){v.muted=!VSOM;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})})}else v.pause()});
+  VSIO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting&&e.intersectionRatio>.6){cur=+e.target.dataset.i;dots.forEach((d,j)=>d.classList.toggle('on',j===cur))}});toca()},{root:tr,threshold:[.6]});cs.forEach(c=>VSIO.observe(c));
+  VSPG=new IntersectionObserver(es=>{vis=es[0].isIntersecting;toca()},{threshold:.35});VSPG.observe(tr);
+  tr.onclick=e=>{const c=e.target.closest('.vsc');if(!c)return;const i=+c.dataset.i;
+    if(e.target.closest('.vss,.vsh')){VSOM=e.target.closest('.vsh')?true:!VSOM;som();toca();return}
+    if(i!==cur){c.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});return}
+    cs.forEach(x=>x.querySelector('video').pause());reels(P,i);
+    const volta=()=>{if(document.querySelector('.rls'))return setTimeout(volta,500);toca()};setTimeout(volta,800)};
+  dots.forEach((d,j)=>d.onclick=()=>cs[j].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}));
+  tr.scrollLeft=0;som();toca()}
 /* 24/11: widget de vendas — mês atual, próximos confirmados e falta receber; tocar abre o Financeiro */
 function renderWVen(){const el=document.getElementById('wven');if(!el||!D)return;const L=(SHV&&SHV.length?SHV:((D.vendas||{}).shows||[])).filter(x=>!/cancel/i.test(x.status||'')),m=HOJE.slice(0,7);
   if(!L.length){el.innerHTML='';return}

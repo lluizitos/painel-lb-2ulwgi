@@ -123,7 +123,7 @@ label textarea{min-height:60px;resize:vertical}
       <label class="w">Destaque agora<select id="pl_dst"></select></label>
       <label class="w" id="pl_txw" style="display:none">Texto do aviso<textarea id="pl_tx" placeholder="ex.: Ensaio geral quinta 14h no galpão"></textarea></label>
       <label>Mostrar até (opcional)<input type="date" id="pl_ate"></label>
-      <label>Widget de vídeo<select id="pl_vw"><option value="sim">Mostrar</option><option value="não">Ocultar</option></select></label>
+      <label>Widget de vídeo<select id="pl_vw"><option value="slide">Slide (um por vez, com som)</option><option value="sim">Miniaturas (várias, sem som)</option><option value="não">Ocultar</option></select></label>
       <label>Movimentações do dia no destaque (máx.)<input id="pl_ml" inputmode="numeric" placeholder="3"></label>
       <label class="w">Página do sócio · aviso quando a estimativa do mês fica negativa<input id="pl_obs" placeholder="ex.: Pró-labore do Lucas será adiado para manter no positivo"></label>
     </div><div class="acts"><button class="btn pkb" id="pl_ok">Salvar</button><span class="msg" id="pl_msg"></span></div></div>
@@ -375,8 +375,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwuoe39u"></script>
-<script src="../lbmetas.js?v=mwuoe39u"></script>
+<script src="../lb.js?v=mwuoycak"></script>
+<script src="../lbmetas.js?v=mwuoycak"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -613,7 +613,7 @@ async function plAbre(){try{if(!PCFG)PCFG=(await api({acao:'pagina_cfg'})).cfg||
   const d=PCFG.destaque,cur=d&&d.tipo?(d.tipo+'|'+(d.id||'')):'';
   if(cur&&!O.some(o=>o[0]===cur))O.push([cur,(d.titulo||cur)+' (não está mais na lista)']);
   $('pl_dst').innerHTML=O.map(([v,t])=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(t)}</option>`).join('');
-  $('pl_tx').value=d&&d.tipo==='aviso'?d.texto||'':'';$('pl_ate').value=d&&d.ate||'';$('pl_vw').value=PCFG.video_widget==='não'?'não':'sim';
+  $('pl_tx').value=d&&d.tipo==='aviso'?d.texto||'':'';$('pl_ate').value=d&&d.ate||'';$('pl_vw').value=['não','sim','slide'].includes(PCFG.video_widget)?PCFG.video_widget:'slide';
   $('pl_ml').value=PCFG.mov_lim!=null?PCFG.mov_lim:3;$('pl_obs').value=PCFG.obs_socio_neg||'';plVis()}
 function plVis(){$('pl_txw').style.display=$('pl_dst').value==='aviso|'?'':'none'}
 $('pl_dst').onchange=plVis;
@@ -1023,7 +1023,7 @@ function xtRender(){const el=$('xt_res');if(!XT.length){el.innerHTML='';return}c
     if(d){e.preventDefault();if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent='toque de novo para apagar';return}try{XT=(await api({acao:'excluir_extrato',id:d.dataset.xdel})).extratos||[];xtRender()}catch(er){d.textContent='erro'}}}}
 {const a0=lnAbre;lnAbre=async function(){await a0();xtCarrega()};const r0=lnRender;lnRender=function(){r0();if(XTOK)xtRender()}}
 </script>
-<script src="../lbchat.js?v=mwuoe39u"></script>
+<script src="../lbchat.js?v=mwuoycak"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>
