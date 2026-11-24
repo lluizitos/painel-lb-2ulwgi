@@ -157,7 +157,7 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 .aev>em{flex:none;width:4px;align-self:stretch;border-radius:4px}.aev .t{flex:1;min-width:0}.aev .t b{display:block;font-size:14px;font-weight:600}.aev .t span{font-size:12px;color:var(--muted)}.aev .v{flex:none;font-weight:700;white-space:nowrap;font-size:13.5px}.aev.fe .t b{text-decoration:line-through;color:var(--muted)}
 .adia{margin-bottom:8px}.adh{display:flex;justify-content:space-between;width:100%;background:none;border:0;font:inherit;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 2px;cursor:pointer}.adh.hj{color:var(--pinkl)}
 @media(max-width:480px){.acd{min-height:58px}.ace{font-size:0;height:6px;padding:0}.ace .ico{display:none}}
-.obsneg{position:relative;margin:-4px 0 12px auto;max-width:320px;background:rgba(242,182,107,.12);border:1px solid rgba(242,182,107,.55);color:var(--ink);border-radius:12px;padding:9px 12px;font-size:12.5px;line-height:1.4}.obsneg b{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#F2B66B;margin-bottom:2px}
+.obsneg{position:relative;margin:8px 0 0 auto;max-width:320px;background:rgba(242,182,107,.12);border:1px solid rgba(242,182,107,.55);color:var(--ink);border-radius:12px;padding:9px 12px;font-size:12.5px;line-height:1.4}.obsneg b{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#F2B66B;margin-bottom:2px}
 </style>
 </head>
 <body>
@@ -242,9 +242,9 @@ footer{color:var(--muted);font-size:11.5px;text-align:center;margin-top:34px}
 </main>
 </div>
 <div class="jp" id="jp"><div class="bk"></div><div class="bx" id="jpb"></div></div>
-<script src="../lb.js?v=mwuo6h6j"></script>
-<script src="../lbchat.js?v=mwuo6h6j"></script>
-<script src="../lbvendas.js?v=mwuo6h6j"></script>
+<script src="../lb.js?v=mwuoe39u"></script>
+<script src="../lbchat.js?v=mwuoe39u"></script>
+<script src="../lbvendas.js?v=mwuoe39u"></script>
 <script>
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MES3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -281,13 +281,14 @@ function render(){
   document.getElementById('app').style.display='block';
   document.getElementById('upd').textContent='Atualizado em '+D.atualizado.split('-').reverse().join('/')+' · extrato até '+(D.extrato_ate||(D.agora&&D.agora.ate)||'');
   try{LB.orc.mostra(document.getElementById('orcbox'),(D.alertas||[]).filter(a=>a.tipo==='despesa'&&a.painel==='sim'))}catch(e){console.error(e)}
-  for(const f of [renderFin,renderJornal,renderAgendaMes,renderVendas,renderEquipe,renderFinSoc])try{f()}catch(e){console.error(e)}
+  for(const f of [renderFin,renderJornal,renderAgendaMes,renderVendas,renderEquipe,renderFinSoc])try{f()}catch(e){console.error(e)}try{obsNeg()}catch(e){}
 }
 
 /* 24/11: estimativa de dezembro negativa → quadrinho no gráfico com a observação escrita no Admin (Notificações → Página do Lucas) */
-async function obsNeg(){const el=document.getElementById('fch');if(!el||!D||!D.dez_neg)return;let t='';
-  try{const u=(await (await fetch('../config.json',{cache:'no-store'})).json()).api_url;const r=await (await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({usuario:LB.login,senha:LB.senha,nome:LB.usuario,acao:'pagina_cfg'})})).json();t=(r&&r.cfg&&r.cfg.obs_socio_neg)||''}catch(e){}
-  if(!t||el.querySelector('.obsneg'))return;const d=document.createElement('div');d.className='obsneg';d.innerHTML='<b>Dezembro</b>';d.appendChild(document.createTextNode(t));el.prepend(d)}
+async function obsNeg(){if(!D||!D.dez_neg)return;let t=obsNeg.t;
+  if(t==null){try{const u=(await (await fetch('../config.json',{cache:'no-store'})).json()).api_url;const r=await (await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({usuario:LB.login,senha:LB.senha,nome:LB.usuario,acao:'pagina_cfg'})})).json();t=(r&&r.cfg&&r.cfg.obs_socio_neg)||''}catch(e){t=''}obsNeg.t=t}
+  if(!t)return;const alvos=[document.getElementById('fch'),...[...document.querySelectorAll('.gf')].filter(g=>/Saldo no fim de cada mês/.test(g.textContent))].filter(Boolean);
+  alvos.forEach(el=>{if(el.querySelector('.obsneg'))return;const d=document.createElement('div');d.className='obsneg';d.innerHTML='<b>Dezembro</b>';d.appendChild(document.createTextNode(t));el.appendChild(d)})}
 /* ===================== FINANCEIRO ===================== */
 function renderFin(){
   const A=D.agora,P=D.proximos,G=D.geral,a=G.ano,mk=D.mes;

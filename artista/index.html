@@ -41,7 +41,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .urgc .urg{flex:0 0 86%;max-width:420px;scroll-snap-align:start;align-self:stretch}.urgc .urg:only-child{flex-basis:100%;max-width:none}
 .urg.ush{background:rgba(122,184,255,.1);border-color:rgba(122,184,255,.5);animation:none}.urg.ush small{color:var(--blue)}.urg.ush .ic{color:var(--blue)}
 .urg.upd{background:rgba(242,182,107,.1);border-color:rgba(242,182,107,.55);animation:none}.urg.upd small{color:var(--amber)}.urg.upd .ic{color:var(--amber)}
-.qsh{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 18px}@media(max-width:380px){.qsh{gap:7px}}
+.qsh{display:grid;grid-template-columns:1fr;gap:10px;margin:4px 0 18px}@media(max-width:380px){.qsh{gap:7px}}
 .qb{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 10px 8px;min-width:0}.qb.qsem{border-color:rgba(122,184,255,.45)}.qb.qpen{border-color:rgba(242,182,107,.5)}
 .qh{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin:0 2px 8px}.qh .ic{width:14px;height:14px;flex:none}.qsem .qh .ic{color:var(--blue)}.qpen .qh .ic{color:var(--amber)}
 .qh i{font-style:normal;margin-left:auto;background:var(--card2);border-radius:99px;padding:1px 7px;color:var(--ink);letter-spacing:0}
@@ -272,7 +272,7 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 .wg div{min-width:0}.wg small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 .wg b{display:block;font-size:17px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wg b.pos{color:var(--pos)}.wg b.neg{color:var(--neg)}
 .wg em{grid-column:1/-1;font-style:normal;font-size:12px;color:var(--sub)}
-.urg.dst{border-color:var(--pinkl)!important}
+.urg.dst{border-color:var(--pinkl)!important}.avx .avs.dst{order:-2}
 </style>
 </head>
 <body>
@@ -320,9 +320,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwuo6h6j"></script>
-<script src="../lbmetas.js?v=mwuo6h6j"></script>
-<script src="../lbchat.js?v=mwuo6h6j"></script>
+<script src="../lb.js?v=mwuoe39u"></script>
+<script src="../lbmetas.js?v=mwuoe39u"></script>
+<script src="../lbchat.js?v=mwuoe39u"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -452,8 +452,7 @@ function quadros(SW,SPn,SPa){const el=document.getElementById('qsh');if(!el)retu
   const prox=(D.shows||[]).filter(s=>!/cancel/i.test(s.sit||'')&&dias(s.data)>7).sort((a,b)=>a.data<b.data?-1:1)[0];
   const lin=(u,c)=>`<button type="button" class="ql ${c}" data-urk="${esc(u.k)}"><b>${ddmm(u.d)}</b><span>${esc(u.t.replace(/^Show (feito pendente · )?(\S+ )?\d\d\/\d\d( · | )/,''))}<small>${esc(u.s)}</small></span></button>`;
   const rec=SPn.filter(u=>u.k!=='antigos');
-  el.innerHTML=`<div class="qb qsem"><div class="qh">${LB.ic('show')} Shows da semana <i>${SW.length}</i></div>${SW.length?SW.map(u=>lin(u,'')).join(''):`<div class="qv">Nenhum show nos próximos 7 dias${prox?`<br>Próximo: <b>${ddmm(prox.data)} ${esc(prox.nome)}</b>`:''}</div>`}</div>
-  <div class="qb qpen"><div class="qh">${IC.al} Shows pendentes <i>${rec.length+SPa.length}</i></div>${rec.length?rec.map(u=>lin(u,'')).join(''):(SPa.length?'':'<div class="qv">Nada pendente 🎉</div>')}${SPa.length?`<button type="button" class="ql qant" data-urk="antigos"><b>+${SPa.length}</b><span>mais antigos<small>somam ${brl(SPa.reduce((a,x)=>a+x.v,0))}</small></span></button>`:''}</div>`}
+  el.innerHTML=`<div class="qb qsem"><div class="qh">${LB.ic('show')} Shows da semana <i>${SW.length}</i></div>${SW.length?SW.map(u=>lin(u,'')).join(''):`<div class="qv">Nenhum show nos próximos 7 dias${prox?`<br>Próximo: <b>${ddmm(prox.data)} ${esc(prox.nome)}</b>`:''}</div>`}</div>`}
 document.getElementById('qsh').onclick=e=>{const b=e.target.closest('[data-urk]');if(!b)return;
   if(b.dataset.urk==='antigos'){abre(topo('Shows feitos pendentes','Mais de 60 dias atrás','')+`<div class="cxb">${URGANT.map(x=>`<button type="button" class="cxl" data-ant="${esc(x.k)}" style="width:100%;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer"><span>${esc(x.t.replace(/^Show feito pendente · /,''))}</span><b>${esc(x.s)}</b></button>`).join('')}</div>`);return}
   detalhe(b.dataset.urk)};
@@ -747,9 +746,9 @@ function renderVidW(){const el=document.getElementById('vidw');if(!el)return;
 /* 24/11: widget de vendas — mês atual, próximos confirmados e falta receber; tocar abre o Financeiro */
 function renderWVen(){const el=document.getElementById('wven');if(!el||!D)return;const L=(SHV&&SHV.length?SHV:((D.vendas||{}).shows||[])).filter(x=>!/cancel/i.test(x.status||'')),m=HOJE.slice(0,7);
   if(!L.length){el.innerHTML='';return}
-  const vm=L.filter(x=>String(x.data_venda||'').slice(0,7)===m),pr=L.filter(x=>(x.data||'')>=HOJE&&!/a confirmar/i.test(x.status||'')),fr=L.reduce((a,x)=>a+Math.max(0,(+x.valor||0)-(+x.recebido||0)),0);
+  const vm=L.filter(x=>String(x.data_venda||'').slice(0,7)===m),pr=L.filter(x=>(x.data||'')>=HOJE&&!/a confirmar/i.test(x.status||'')),fa=x=>Math.max(0,(+x.valor||0)-(+x.recebido||0)),fr=L.filter(x=>!/a confirmar/i.test(x.status||'')).reduce((a,x)=>a+fa(x),0),ff=L.filter(x=>(x.data||'')<=HOJE).reduce((a,x)=>a+fa(x),0);
   const nx=pr.sort((a,b)=>a.data<b.data?-1:1)[0];
-  el.innerHTML=`<h2 class="tt">Vendas</h2><button type="button" class="wg" data-wg="fin"><div><small>Vendidos no mês</small><b>${vm.length}</b></div><div><small>Próximos shows</small><b>${pr.length}</b></div><div><small>Falta receber</small><b class="pos">${brl(fr)}</b></div>${nx?`<em>Próximo: ${ddmm(nx.data)} · ${esc(nx.cidade||nx.evento||'')}</em>`:''}</button>`}
+  el.innerHTML=`<h2 class="tt">Vendas</h2><button type="button" class="wg" data-wg="fin"><div><small>Vendidos no mês</small><b>${vm.length}</b></div><div><small>Próximos shows</small><b>${pr.length}</b></div><div><small>A receber</small><b class="pos">${brl(fr)}</b></div><em>${[nx?'Próximo: '+ddmm(nx.data)+' · '+esc(nx.cidade||nx.evento||''):'',ff>=1?'de shows já feitos: '+brl(ff):''].filter(Boolean).join(' · ')}</em></button>`}
 /* 24/11: widget financeiro — saldo de agora e o mês (entra, sai, termina com); tocar abre o Financeiro */
 function renderWFin(){const el=document.getElementById('wfin');if(!el||!D)return;const M=(D.meses||{})[HOJE.slice(0,7)]||{};const sd=D.saldo_real;
   if(sd==null&&M.fim==null){el.innerHTML='';return}

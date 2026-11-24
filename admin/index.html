@@ -349,7 +349,7 @@ label textarea{min-height:60px;resize:vertical}
   <div id="t_pag" style="display:none">
     <p class="note">Tudo o que é programado e não é de show: contas e fixos (aluguel, contabilidade, equipe fixa, pró-labore) e entradas programadas (aportes do investidor). É daqui que saem as contas a pagar e o saldo previsto do painel. "Fora da estimativa" = aparece como pendente, mas não entra no saldo previsto.</p>
     <div class="nv2"><button class="btn pkb" id="pg_ns">＋ Nova saída</button><button class="btn" id="pg_ne">＋ Nova entrada</button></div><div class="chips" id="g2_fil"><button class="chip on" data-f="">Tudo</button><button class="chip" data-f="pend">Só pendentes</button></div>
-    <div class="list" id="pg_lista"></div>
+    <div class="list" id="pg_lista" data-max="0"></div>
     <div id="pg_arec"></div>
     <h3 id="pg_h">Novo pagamento</h3>
     <div class="card"><div class="f">
@@ -375,8 +375,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwuo6h6j"></script>
-<script src="../lbmetas.js?v=mwuo6h6j"></script>
+<script src="../lb.js?v=mwuoe39u"></script>
+<script src="../lbmetas.js?v=mwuoe39u"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -598,7 +598,7 @@ function bordSec(){const oc=new Set((PCFG&&PCFG.bord_ocultos)||[]),lim=new Date(
   const L=Object.entries(BORDS).filter(([k,b])=>b&&b.tipo!=='despesa'&&(b.equipe||[]).length&&b.data>=lim).map(([k,b])=>{let fa=0,tot=0;try{LB.pg.porData(b).forEach(q=>{fa+=+q.falta||0;tot+=+q.tot||0})}catch(e){}return {k,b,fa:Math.round(fa*100)/100,tot}})
     .filter(x=>G2F!=='pend'||x.fa>0.004).sort((a,c)=>(c.fa>0.004)-(a.fa>0.004)||String(c.b.data).localeCompare(String(a.b.data)));
   const pd=L.reduce((a,x)=>a+x.fa,0);
-  return `<div class="sec"><h3>Equipe de shows <small style="letter-spacing:0;text-transform:none;font-weight:400;color:var(--muted)">borderôs dos últimos 4 meses</small></h3><small>${L.length} ${L.length===1?'borderô':'borderôs'}${pd>0.004?' · <span class="neg">pendente '+brl(pd)+'</span>':''}</small></div><div class="list">${L.length?L.map(({k,b,fa,tot})=>`<div class="tf ${fa>0.004?'s-atrasada':'s-concluida'}" style="${oc.has(k)?'opacity:.6':''}"><div class="hd"><div><span class="pill">borderô</span>${oc.has(k)?' <span class="pill">oculto do Lucas</span>':''} <b style="display:inline">${esc(b.show||'Show')} · ${ddmm(b.data)}</b><div class="ds" style="color:var(--muted)">${(b.equipe||[]).filter(e=>!e.fora&&e.grupo!=='Comissão').length} pessoas${tot?' · equipe '+brl(tot):''}${fa>0.004?' · <span class="neg">falta pagar '+brl(fa)+'</span>':' · tudo pago'}</div></div><span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><a class="btn sm" href="../bordero/#b=${encodeURIComponent(k)}">editar</a><button class="btn sm" data-boc="${esc(k)}">${oc.has(k)?'🚫 Lucas não vê':'👁 Lucas vê'}</button></span></div></div>`).join(''):'<div class="empty">Nenhum borderô recente.</div>'}</div>`}
+  return `<div class="sec"><h3>Equipe de shows <small style="letter-spacing:0;text-transform:none;font-weight:400;color:var(--muted)">borderôs dos últimos 4 meses</small></h3><small>${L.length} ${L.length===1?'borderô':'borderôs'}${pd>0.004?' · <span class="neg">pendente '+brl(pd)+'</span>':''}</small></div><div class="list">${L.length?L.map(({k,b,fa,tot})=>`<div class="tf ${fa>0.004?'s-atrasada':'s-concluida'}" style="${oc.has(k)?'opacity:.6':''}"><div class="hd"><div><span class="pill">borderô</span>${oc.has(k)?' <span class="pill">oculto do Lucas</span>':''} <b style="display:inline">${esc(b.show||'Show')} · ${ddmm(b.data)}</b><div class="ds" style="color:var(--muted)">${(b.equipe||[]).filter(e=>!e.fora&&e.grupo!=='Comissão').length} pessoas${tot?' · equipe '+brl(tot):''}${fa>0.004?' · <span class="neg">falta pagar '+brl(fa)+'</span>':' · tudo pago'}</div></div><span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><a class="btn sm" style="color:var(--ink);text-decoration:none" href="../bordero/#b=${encodeURIComponent(k)}">editar</a><button class="btn sm" data-boc="${esc(k)}">${oc.has(k)?'🚫 Lucas não vê':'👁 Lucas vê'}</button></span></div></div>`).join(''):'<div class="empty">Nenhum borderô recente.</div>'}</div>`}
 async function salvaPCfg(x){const r=await api({acao:'salvar_pagina_cfg',cfg:x});if(!r.ok)throw new Error(r.erro||'erro');PCFG=r.cfg;return r.cfg}
 
 /* 24/11: Admin → Notificações → Página do Lucas (pagina_cfg) */
@@ -702,7 +702,8 @@ const salvaMeta=x=>api({acao:'salvar_meta',meta:x});
 function fqVis(){const ev=$('e_tp').value==='evento',tf=$('e_tp').value==='tarefa'||ev;$('e_hrw').style.display=$('e_lcw').style.display=ev?'':'none';if(tf)$('e_fq').value='uma';const o=$('e_fq').value==='outro';$('e_pzw').style.display=o&&!tf?'':'none';
   $('e_fqw').style.display=tf?'none':'';$('e_iniw').style.display=tf?'none':'';$('e_dpzw').style.display=tf?'none':'';if(tf)$('e_ini').value='';
   $('e_tm').closest('label').firstChild.textContent=ev?'Data do evento':tf?'Entregar até':$('e_fq').value==='uma'?'Prazo (data)':'Data de término';
-  $('e_pzn').innerHTML=tf?'Passou da data de entrega sem concluir → aparece como <b style="color:var(--neg)">atrasada</b>. A data também aparece nas agendas.':'Passou do término sem cumprir, ou uma meta individual ligada falhou num dia/semana que já passou → aparece como <b style="color:var(--neg)">atrasada</b>.'}
+  {const T=$('e_tit'),A=$('e_alvo');if(T){T.dataset.ph0=T.dataset.ph0||T.placeholder;T.placeholder=ev?'ex.: Gravação de clipe':T.dataset.ph0}if(A){A.dataset.ph0=A.dataset.ph0||A.placeholder;A.placeholder=ev?'ex.: ensaio com a banda, levar figurino':A.dataset.ph0}}
+  $('e_pzn').innerHTML=ev?'Aparece na agenda do Lucas no dia, com horário e local.':tf?'Passou da data de entrega sem concluir → aparece como <b style="color:var(--neg)">atrasada</b>. A data também aparece nas agendas.':'Passou do término sem cumprir, ou uma meta individual ligada falhou num dia/semana que já passou → aparece como <b style="color:var(--neg)">atrasada</b>.'}
 $('e_fq').onchange=fqVis;
 function pzMonta(){const f=$('e_fq').value;if(f==='outro')return $('e_pz').value;if(f==='uma')return $('e_tm').value||'';return LBROT.prazoTxt({freq:f,inicio:$('e_ini').value,termino:$('e_tm').value}).slice(0,40)}
 function pzCarrega(x){const iso=/^\d{4}-\d{2}-\d{2}$/.test(x.prazo||'');$('e_fq').value=x.freq||(iso||!x.prazo?'uma':'outro');$('e_pz').value=x.freq||iso?'':(x.prazo||'');$('e_ini').value=x.inicio||'';$('e_tm').value=x.termino||(iso?x.prazo:'');fqVis()}
@@ -1022,7 +1023,7 @@ function xtRender(){const el=$('xt_res');if(!XT.length){el.innerHTML='';return}c
     if(d){e.preventDefault();if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent='toque de novo para apagar';return}try{XT=(await api({acao:'excluir_extrato',id:d.dataset.xdel})).extratos||[];xtRender()}catch(er){d.textContent='erro'}}}}
 {const a0=lnAbre;lnAbre=async function(){await a0();xtCarrega()};const r0=lnRender;lnRender=function(){r0();if(XTOK)xtRender()}}
 </script>
-<script src="../lbchat.js?v=mwuo6h6j"></script>
+<script src="../lbchat.js?v=mwuoe39u"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>
