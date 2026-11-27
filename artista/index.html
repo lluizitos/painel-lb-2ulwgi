@@ -211,7 +211,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .pgj .pjh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.pgj .pjh small{display:block;font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--amber,#F5C451)}
 .pgj .pjh b{display:block;font-size:16px;margin-top:3px}.pgj .pjh .pv{font-size:19px;font-weight:800;white-space:nowrap;text-align:right}.pgj .pjh .pv span{display:block;font-size:11.5px;font-weight:600;color:var(--sub)}
 .pgj .pji{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:7px 0;border-top:1px solid var(--line)}.pgj .pji:first-of-type{margin-top:8px}.pgj .pji span{min-width:0;color:var(--sub)}.pgj .pji span b{color:var(--ink);font-weight:600}.pgj .pji i{font-style:normal;font-weight:700;white-space:nowrap}.pgj .pji em{font-style:normal;font-size:11px;font-weight:700;color:var(--amber,#F5C451);margin-left:4px}
-.pgj .pbs{display:flex;margin-top:10px}.pgj .pbs .pb{flex:1}
+.pgj .pbs{display:flex;gap:8px;margin-top:10px}.pgj .pbs .pb{flex:1}.pgj .pbs .pb.ok{flex:2}
 .pgp{display:grid;grid-template-columns:1fr auto;gap:2px 10px;background:var(--card2);border-radius:12px;padding:10px 12px;margin-top:8px}
 .pgp .t b{display:block;font-size:14px}.pgp .t span{display:block;font-size:12px;color:var(--sub);margin-top:1px}.pgp .t em{font-style:normal;font-size:11px;font-weight:700}.pgp .t em.vd{color:var(--neg)}.pgp .t em.vn{color:var(--amber)}
 .pgp .v{font-weight:800;font-size:15px;white-space:nowrap}.pgp .pbs{grid-column:1/-1}
@@ -336,9 +336,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwyy2tsm"></script>
-<script src="../lbmetas.js?v=mwyy2tsm"></script>
-<script src="../lbchat.js?v=mwyy2tsm"></script>
+<script src="../lb.js?v=mwyyrldv"></script>
+<script src="../lbmetas.js?v=mwyyrldv"></script>
+<script src="../lbchat.js?v=mwyyrldv"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -596,7 +596,7 @@ const pgCurto=t=>{t=String(t).split(/ [–-] | \(|\. /)[0].trim();return t.lengt
 function pgJuntoCard(x,pode){const its=x.it.slice().sort((a,b)=>a.d.localeCompare(b.d)),fut=x.tot-x.vtot;
   const li=its.map(i=>`<div class="pji"><span><b>${esc(i.g?pgCurto(i.g.descricao||'Pagamento'):(i.b.show||'Show'))}</b> · ${ddmm(i.d)}${i.g?'':(i.e.funcao&&!/^item: $/.test(i.e.funcao)?' · '+esc(i.e.funcao):'')}${i.fut?'<em>vence '+ddmm(i.d)+'</em>':''}</span><i>${brl(i.f)}</i></div>`).join('');
   return `<div class="pgc pgj"><div class="pjh"><div><small>Pagar junto · ${x.it.length} pagamentos</small><b>${esc(x.nome)}</b></div><div class="pv">${brl(x.nv?x.vtot:x.tot)}${x.nv&&fut>0.004?`<span>+ ${brl(fut)} que vence depois</span>`:!x.nv?'<span>ainda não venceu</span>':''}</div></div>
-    ${li}${pgPix(x.pix)}${pode&&x.nv?`<div class="pbs"><button class="pb ok" data-pgp="${esc(x.k)}">Marcar ${x.nv>1?'os '+x.nv+' ':''}como pago · ${brl(x.vtot)}</button></div>`:''}</div>`}
+    ${li}${pgPix(x.pix)}${pode?`<div class="pbs">${x.nv?`<button class="pb ok" data-pgp="${esc(x.k)}">Marcar ${x.nv>1?'os '+x.nv+' ':''}como pago · ${brl(x.vtot)}</button>`:''}${x.it.some(i=>i.g)?`<button class="pb" data-pgpad="${esc(x.k)}">Adiar</button>`:''}</div>`:''}</div>`}
 function pgContaCard(i,pode){const g=i.g,o=i.o;
   const sub=[g.nome&&g.nome!==g.descricao?g.nome:'',g.tipo==='fixo'?'fixo de '+MES3[+o.ref.slice(5,7)-1]:'avulso',o.pg?'já pago '+brl(o.pg):'',g.meio&&g.meio!=='Pix'?g.meio:''].filter(Boolean).join(' · ');
   return `<div class="pgc"><div class="pr">${pgData(o.data)}<div class="pt2"><b>${esc(g.descricao||g.nome)}</b>${sub?`<span>${esc(sub)}</span>`:''}<em class="${o.data>HOJE?'vn':'vd'}">${pgVenc(o.data)}</em></div><div class="pv">${brl(o.falta)}</div>
@@ -624,10 +624,13 @@ function renderPagar(){const pode=!!API,B={},C=[];let NAD=0;
   Object.values(B).forEach(x=>x.it.forEach(i=>addP(pk(i.e.pessoa,i.nome),i.nome,i.pix,i)));
   C.forEach(i=>addP(pk(i.g.pessoa,i.g.nome),i.g.nome,i.pix,i));
   Object.keys(PAGP).forEach(k=>{if(PAGP[k].it.length<2)delete PAGP[k]});
+  const NOJ=new Set(Object.values(PAGP).flatMap(x=>x.it)); // 27/11: o que está no "Pagar junto" não aparece de novo solto
+  const CS=C.filter(i=>!NOJ.has(i)),BS=Object.values(B).map(x=>{const it=x.it.filter(i=>!NOJ.has(i));if(!it.length)return null;if(it.length===x.it.length)return x;
+    const ds=it.map(i=>i.d).sort();return Object.assign({},x,{it,tot:it.reduce((a,i)=>a+i.f,0),np:new Set(it.map(i=>i.e.pessoa||LB.norm(i.nome))).size,d:ds[ds.length-1],dmin:ds[0]})}).filter(Boolean);
   const PJ=Object.values(PAGP).map(x=>{x.tot=x.it.reduce((a,i)=>a+i.f,0);x.vtot=x.it.filter(i=>!i.fut).reduce((a,i)=>a+i.f,0);x.nv=x.it.filter(i=>!i.fut).length;return x}).sort((a,b)=>b.vtot-a.vtot||b.tot-a.tot);
-  const L=Object.values(B).map(x=>({d:x.d,h:pgBordCard(x)})).concat(C.map(i=>({d:i.d,h:pgContaCard(i,pode)}))).sort((a,b)=>b.d.localeCompare(a.d));
+  const L=BS.map(x=>({d:x.d,h:pgBordCard(x)})).concat(CS.map(i=>({d:i.d,h:pgContaCard(i,pode)}))).sort((a,b)=>b.d.localeCompare(a.d));
   const all=Object.values(B).flatMap(x=>x.it).concat(C),tot=all.reduce((a,i)=>a+i.f,0),vtot=all.filter(i=>!i.fut).reduce((a,i)=>a+i.f,0);
-  document.getElementById('pgk').innerHTML=pgResumo(tot,vtot,L.length,fimMes,NAD);
+  document.getElementById('pgk').innerHTML=pgResumo(tot,vtot,L.length+PJ.reduce((a,x)=>a+x.it.length,0),fimMes,NAD);
   document.getElementById('pgl').innerHTML=(PJ.length?PJ.map(x=>pgJuntoCard(x,pode)).join(''):'')+(L.length?vm('pags',L.map(x=>x.h),8):'');document.getElementById('s_pags').hidden=!L.length; // 24/11: sem pendência, o bloco some
   renderAdiados(pode);if(PGPOP&&bd.classList.contains('open'))pgPop(PGPOP)}
 document.addEventListener('click',e=>{const c=e.target.closest('[data-pgbd]');if(c){pgPop(c.dataset.pgbd);return}
@@ -657,6 +660,7 @@ document.addEventListener('click',e=>{
   const ds=e.target.closest('[data-pgdes]');if(ds){adiar(ds.dataset.pgdes,false,ds);return}
   const mc=e.target.closest('[data-mc]');if(mc){const bt=mc.closest('button');if(bt&&bt._run){e.preventDefault();e.stopPropagation();bt._run(mc.dataset.mc)}return}
   const ad=e.target.closest('[data-pgad]');if(ad){adiar(ad.dataset.pgad,true,ad);return}
+  const aj=e.target.closest('[data-pgpad]');if(aj){const x=PAGP[aj.dataset.pgpad];if(!x||!API)return;aj.disabled=true;aj.textContent='…';(async()=>{try{for(const i of x.it.filter(i=>i.g)){const r=await api({acao:'adiar_pagamento',id:i.g.id,ref:i.o.ref,adiar:true});PAGS=r.pagamentos}const y=scrollY;renderPagar();renderCal();scrollTo(0,y)}catch(er){aj.disabled=false;aj.textContent='erro'}})();return}
   if(e.target.closest('button.cf'))return;
   const a=e.target.closest('[data-pgk]');if(a){const[id,i,k]=a.dataset.pgk.split('|');marcarPago([i.startsWith('it')?{id,it:+i.slice(2),data:HOJE}:{id,i:+i,partes:k.split(','),data:HOJE}],a);return}
   const g=e.target.closest('[data-pga]');if(g){const[id,ref]=g.dataset.pga.split('|'),pg=PAGS.find(x=>x.id===id);
