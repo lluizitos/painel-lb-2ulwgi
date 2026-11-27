@@ -360,9 +360,9 @@ label textarea{min-height:60px;resize:vertical}
       <label>É<select id="pg_dir"><option value="saida">Saída (a pagar)</option><option value="entrada">Entrada (a receber: aporte etc.)</option></select></label>
       <label>Tipo<select id="pg_tp"><option value="avulso">Avulso (uma vez)</option><option value="fixo">Fixo mensal</option></select></label>
       <label><span id="pg_qrl">Quem recebe</span><input id="pg_pes" list="pes_dl" autocomplete="off" placeholder="da lista da equipe, ou escreva (ex.: padaria)"></label>
-      <label>Meio<select id="pg_meio"><option>Pix</option><option>Transferência bancária</option><option>Dinheiro</option><option>Boleto</option></select></label>
+      <label>Meio<select id="pg_meio"><option>Pix</option><option value="Transferência bancária">Transferência / depósito</option><option>Dinheiro</option><option>Boleto</option></select></label>
       <label>Chave PIX<input id="pg_pix"><small id="pg_pixh" class="note" style="display:block;margin-top:3px"></small></label>
-      <label class="w" id="pg_dl" style="display:none">Dados bancários / boleto<input id="pg_dados" placeholder="banco, agência, conta, titular · ou linha do boleto"></label>
+      <label class="w" id="pg_dl" style="display:none"><span id="pg_dlt">Dados bancários</span><textarea id="pg_dados" rows="5" placeholder="Banco&#10;Agência&#10;Conta e operação&#10;CPF/CNPJ do titular&#10;Nome do titular"></textarea><small class="note" style="display:block;margin-top:3px">Cole como recebeu (um dado por linha). Aparece na página do Lucas com o botão "Copiar dados".</small></label>
       <label class="w">Descrição<input id="pg_desc" placeholder="ex.: edição do vídeo · salário · aluguel do estúdio"></label>
       <label><span id="pg_vl">Valor (R$)</span><input id="pg_val" inputmode="decimal"></label>
       <label class="fx" style="display:none">O valor muda todo mês?<select id="pg_var"><option value="">Não, é sempre o mesmo</option><option value="sim">Sim, varia (água, luz…): o valor acima é a média</option></select></label>
@@ -379,8 +379,8 @@ label textarea{min-height:60px;resize:vertical}
   </div>
 </div>
 </div>
-<script src="../lb.js?v=mwyyrldv"></script>
-<script src="../lbmetas.js?v=mwyyrldv"></script>
+<script src="../lb.js?v=mwyywrdf"></script>
+<script src="../lbmetas.js?v=mwyywrdf"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const HOJE=new Date(Date.now()-3*3600e3).toISOString().slice(0,10);
@@ -593,7 +593,7 @@ function pgVw(){const oc=new Set((PCFG&&PCFG.bord_ocultos)||[]),n={ativos:0,ocul
 function renderPag(){pgVw();const fe=g=>g.tipo==='fixo'&&g.fim&&g.fim<HOJE.slice(0,7)?1:0;const l=PAGS.filter(g=>pgAba(g)===PGV&&pgBusca(g.nome,g.descricao,g.meio,g.valor,String(g.valor).replace('.',','),g.data&&g.data.split('-').reverse().join('/'))).filter(g=>!G2F||(G2F==='pend'?pendDe(g).length:G2F==='entrada'?g.direcao==='entrada':g.tipo===G2F)).sort((a,b)=>fe(a)-fe(b)||pendDe(b).length-pendDe(a).length||a.tipo.localeCompare(b.tipo)||a.nome.localeCompare(b.nome));
   const card=g=>{const pd=pendDe(g),pr=LB.pgx.prox(g,HOJE),pagos=LB.pgx.ocorr(g,'9999-12-31').filter(o=>o.pago);
     const enc=g.tipo==='fixo'&&g.fim&&g.fim<HOJE.slice(0,7);
-    return `<div class="tf ${g.ativo==='não'||enc?'':pd.length?'s-atrasada':'s-concluida'}" style="${g.ativo==='não'||enc?'opacity:.55':''}"><div class="hd"><div>${g.direcao==='entrada'?'<span class="pill ok">entrada</span> ':''}<span class="pill">${g.tipo==='fixo'?'fixo mensal':'avulso'}</span>${g.estimativa==='não'?' <span class="pill am">fora da estimativa</span>':''}${g.ocultar==='sim'?' <span class="pill">oculto do Lucas</span>':''}${enc?' <span class="pill">encerrado</span>':g.tipo==='fixo'&&g.fim?' <span class="pill am">até '+mesn(g.fim)+'</span>':''} <b style="display:inline">${esc(g.nome)} · ${brl(g.valor)}</b>${g.descricao?`<div class="ds">${esc(g.descricao)}</div>`:''}<div class="ds" style="color:var(--muted)">${esc(g.meio)}${g.meio==='Pix'&&g.pix?' · '+esc(g.pix):''}${g.dados&&g.meio!=='Pix'?' · '+esc(g.dados):''}</div></div><button class="btn sm" data-eg="${esc(g.id)}">editar</button><button class="btn sm" data-goc="${esc(g.id)}" title="mostra ou esconde este pagamento na página do Lucas" style="margin-left:6px">${g.ocultar==='sim'?'🚫 Lucas não vê':'👁 Lucas vê'}</button></div>
+    return `<div class="tf ${g.ativo==='não'||enc?'':pd.length?'s-atrasada':'s-concluida'}" style="${g.ativo==='não'||enc?'opacity:.55':''}"><div class="hd"><div>${g.direcao==='entrada'?'<span class="pill ok">entrada</span> ':''}<span class="pill">${g.tipo==='fixo'?'fixo mensal':'avulso'}</span>${g.estimativa==='não'?' <span class="pill am">fora da estimativa</span>':''}${g.ocultar==='sim'?' <span class="pill">oculto do Lucas</span>':''}${enc?' <span class="pill">encerrado</span>':g.tipo==='fixo'&&g.fim?' <span class="pill am">até '+mesn(g.fim)+'</span>':''} <b style="display:inline">${esc(g.nome)} · ${brl(g.valor)}</b>${g.descricao?`<div class="ds">${esc(g.descricao)}</div>`:''}<div class="ds" style="color:var(--muted)">${esc(g.meio)}${g.meio==='Pix'&&g.pix?' · '+esc(g.pix):''}${g.dados&&g.meio!=='Pix'?' · '+esc(String(g.dados).replace(/\s*\n\s*/g,' · ')):''}</div></div><button class="btn sm" data-eg="${esc(g.id)}">editar</button><button class="btn sm" data-goc="${esc(g.id)}" title="mostra ou esconde este pagamento na página do Lucas" style="margin-left:6px">${g.ocultar==='sim'?'🚫 Lucas não vê':'👁 Lucas vê'}</button></div>
       <div class="mt">${g.tipo==='fixo'?'todo dia '+g.dia+' · desde '+mesn(g.inicio)+(g.fim?' até '+mesn(g.fim):''):(g.direcao==='entrada'?'receber em ':'pagar em ')+g.data.split('-').reverse().join('/')}${pr?' · próximo '+ddmm(pr.data):''}${g.ativo==='não'?' · pausado':''}</div>
       ${pd.length?`<div class="resumo">${pd.map(o=>`<div class="pdl"><span class="pill pk">${o.pg?(g.direcao==='entrada'?'recebido em parte':'pago em parte'):g.direcao==='entrada'?'não recebido':'não pago'}${g.tipo==='fixo'?' · '+mesn(o.ref):''} · ${o.data<HOJE?'venceu':'vence'} ${ddmm(o.data)}</span>${o.pg?`<span class="pill am">${brl(o.pg)} de ${brl(g.valor)} · falta ${brl(o.falta)}</span>`:''}${g.varia==='sim'&&g.direcao!=='entrada'?`<button class="btn pkb sm" data-gpp="${esc(g.id)}|${o.ref}|${o.falta}|v">Pagar a conta${g.tipo==='fixo'?' de '+mesn(o.ref):''}</button><small style="color:var(--muted)">valor varia · média ${brl(+g.valor)}</small>`:`<button class="btn sm" data-gp="${esc(g.id)}|${o.ref}">${o.pg?'Quitar o que falta':'Marcar como '+(g.direcao==='entrada'?'recebido':'pago')}</button><button class="btn sm" data-gpp="${esc(g.id)}|${o.ref}|${o.falta}">${g.direcao==='entrada'?'Recebi uma parte':'Pagar uma parte'}</button>`}</div><div class="ppf" data-ppf="${esc(g.id)}|${o.ref}"></div>`).join('')}</div>`:''}
       ${parcHtml(g)}${pagos.length?`<div class="mt">${g.direcao==='entrada'?'recebido':'pago'}: ${pagos.slice(-3).map(o=>`${g.tipo==='fixo'?mesn(o.ref)+' ':''}em ${ddmm(o.pago)} ${extPg(g,o)} <a href="#" data-gu="${esc(g.id)}|${o.ref}" style="color:var(--muted)">desfazer</a>`).join(' · ')}</div>`:''}
@@ -634,7 +634,7 @@ $('pl_ok').onclick=async()=>{const v=$('pl_dst').value,m=$('pl_msg'),op=$('pl_ds
 function tipoPg(){const f=$('pg_tp').value==='fixo';document.querySelectorAll('#ppg .fx').forEach(x=>x.style.display=f?'':'none');document.querySelectorAll('#ppg .av').forEach(x=>x.style.display=f?'none':'')}
 function dirPg(){const e=$('pg_dir').value==='entrada';$('pg_qrl').textContent=e?'Quem paga':'Quem recebe';$('pg_sit').options[0].text=e?'A receber':'A pagar (entra no assistente)';$('pg_sit').options[1].text=e?'Já recebido':'Já pago (ex.: lanche, compra feita)'}
 $('pg_dir').onchange=dirPg;
-function meioPg(){$('pg_dl').style.display=$('pg_meio').value==='Pix'?'none':''}
+function meioPg(){const m=$('pg_meio').value;$('pg_dl').style.display=m==='Pix'||m==='Dinheiro'?'none':'';$('pg_dlt').textContent=m==='Boleto'?'Linha digitável do boleto':'Dados bancários';$('pg_dados').rows=m==='Boleto'?2:5}
 $('pg_tp').onchange=tipoPg;$('pg_meio').onchange=meioPg;
 function acharPes(t){const v=String(t||'');if(PESK[v])return PESK[v];const k=LB.norm(v.replace(/\s*\(.*\)\s*$/,''));if(!k)return null;
   let m=PES.filter(p=>LB.norm(p.nome||'')===k||LB.norm(p.apelido||'')===k);if(m.length===1)return m[0];
@@ -664,7 +664,7 @@ $('pg_lista').addEventListener('click',async e=>{const oc=e.target.closest('[dat
   const fm=e.target.closest('[data-gfim]');if(fm){e.preventDefault();const[id,fim]=fm.dataset.gfim.split('|'),g=PAGS.find(y=>y.id===id);fm.textContent='salvando…';
     try{const r=await api({acao:'salvar_pagamento',pagamento:Object.assign({},g,{fim})});PAGS=r.pagamentos;render()}catch(err){fm.textContent='erro: '+err.message}return}
   const ed=e.target.closest('[data-eg]'),pg=e.target.closest('[data-gp]'),un=e.target.closest('[data-gu]'),dx=e.target.closest('[data-gx]');if(!ed&&!pg&&!un&&!dx)return;e.preventDefault();
-  if(ed){const g=PAGS.find(y=>y.id===ed.dataset.eg);EDG=g.id;PGID=g.pessoa;$('pg_tp').value=g.tipo;$('pg_pes').value=rotPes(pesDe(g.pessoa))||g.nome;$('pg_pix').value=g.pix;$('pg_meio').value=g.meio;$('pg_dados').value=g.dados;
+  if(ed){const g=PAGS.find(y=>y.id===ed.dataset.eg);EDG=g.id;PGID=g.pessoa;$('pg_tp').value=g.tipo;$('pg_pes').value=rotPes(pesDe(g.pessoa))||g.nome;$('pg_pix').value=g.pix;$('pg_meio').value=g.meio;$('pg_dados').value=g.dados;meioPg();
     $('pg_desc').value=g.descricao;$('pg_val').value=String(g.valor).replace('.',',');$('pg_data').value=g.data;$('pg_dia').value=g.dia;$('pg_ini').value=g.inicio||HOJE.slice(0,7);$('pg_fim').value=g.fim;$('pg_at').value=g.ativo==='não'?'não':'sim';$('pg_dir').value=g.direcao==='entrada'?'entrada':'saida';$('pg_est').value=g.estimativa==='não'?'não':'sim';$('pg_orc').innerHTML=orcOpts(g.orc||'');$('pg_oc').value=g.ocultar==='sim'?'sim':'';$('pg_var').value=g.varia==='sim'?'sim':'';
     tipoPg();meioPg();dirPg();$('pg_can').style.display='';$('pg_h').textContent='Editar pagamento';$('pg_msg').textContent='';$('pg_pes').scrollIntoView({block:'center'});return}
   const b=pg||un||dx;if(b.dataset.ok!=='1'){b.dataset.ok='1';b.textContent=dx?'toque de novo para excluir':'toque de novo para confirmar';return}
@@ -1035,7 +1035,7 @@ function xtRender(){const el=$('xt_res');if(!XT.length){el.innerHTML='';return}c
     if(d){e.preventDefault();if(d.dataset.ok!=='1'){d.dataset.ok='1';d.textContent='toque de novo para apagar';return}try{XT=(await api({acao:'excluir_extrato',id:d.dataset.xdel})).extratos||[];xtRender()}catch(er){d.textContent='erro'}}}}
 {const a0=lnAbre;lnAbre=async function(){await a0();xtCarrega()};const r0=lnRender;lnRender=function(){r0();if(XTOK)xtRender()}}
 </script>
-<script src="../lbchat.js?v=mwyyrldv"></script>
+<script src="../lbchat.js?v=mwyywrdf"></script>
 <script>{const w=document.querySelector('header+.wrap');if(w)LBCHAT.auto(w.firstElementChild,{base:'../',pagina:'Admin',exemplo:'quais pagamentos estão atrasados?'})}</script>
 </body>
 </html>

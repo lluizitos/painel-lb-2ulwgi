@@ -204,6 +204,7 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .pxk{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding:9px 0 2px;margin-top:10px;grid-column:1/-1}.pxk small{font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--muted)}
 .pxk b{flex:1;min-width:0;font-size:13.5px;font-weight:600;overflow-wrap:anywhere}.pxk button{flex:none;border:1px solid var(--line);background:transparent;color:var(--pinkl);border-radius:99px;padding:4px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;margin:0}
 .pxk.sem{color:var(--muted);font-size:12.5px}
+.pxk.pxt{align-items:flex-start}.pxk.pxt b{line-height:1.45;font-size:13px}.pxk.pxt small{padding-top:2px}
 .pgbd{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;border:0}.pgbd .pr{border-top:0;padding:0}.pgc>.pr{border-top:0;padding:0}
 .pgc .pr>.pbs{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0;padding:0}.pgc .pr>.pbs .pb{flex:1}
 .pgver{font-size:12.5px;font-weight:700;color:var(--pinkl);margin-top:10px}
@@ -336,9 +337,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwyyrldv"></script>
-<script src="../lbmetas.js?v=mwyyrldv"></script>
-<script src="../lbchat.js?v=mwyyrldv"></script>
+<script src="../lb.js?v=mwyywrdf"></script>
+<script src="../lbmetas.js?v=mwyywrdf"></script>
+<script src="../lbchat.js?v=mwyywrdf"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -543,7 +544,7 @@ function detalhe(k,d){const vol=d?`<button class="vl" data-volta="${d}">‹ volt
 const pixBox=(pix)=>pix?`<div class="cxpix"><span>Chave PIX</span><b>${esc(limpaPix(pix))}</b><button class="cp" data-cp="${esc(limpaPix(pix))}">copiar PIX</button></div>`:`<div class="cxpix"><span>Chave PIX</span><b style="font-size:14px;color:var(--muted)">sem PIX no cadastro</b></div>`;
 function pagHtml(g,ref){const o=(LB.pgx.ocorr(g,'2099-12-31').find(x=>x.ref===ref))||{};const pe=(g.pessoa&&PESS.find(p=>p.id===g.pessoa))||null,pix=g.pix||(pe&&pe.pix)||'',pago=!!o.pago||o.falta<=0.004;
   const ln=(r,v,cp)=>`<div class="cxl"><span>${r}</span><b>${esc(v)}</b>${cp?`<button class="cp" data-cp="${esc(cp)}">copiar</button>`:''}</div>`;
-  return topo('Pagamento · '+(pago?'pago':o.data<HOJE?'vencido '+ddmm(o.data):'vence '+ddmm(o.data)),g.descricao||g.nome,g.nome!==g.descricao?g.nome:'')+`<div class="cxb">${pixBox(pix)}${ln('Valor',brl2(pago?+g.valor:o.falta),(pago?+g.valor:o.falta).toFixed(2).replace('.',','))}${o.pg&&!pago?ln('Já pago',brl2(o.pg)):''}${ln('Vencimento',ddmm(o.data)+'/'+String(o.data).slice(0,4))}${g.meio?ln('Meio',g.meio):''}${g.dados?ln('Dados',g.dados,g.dados):''}</div>`}
+  return topo('Pagamento · '+(pago?'pago':o.data<HOJE?'vencido '+ddmm(o.data):'vence '+ddmm(o.data)),g.descricao||g.nome,g.nome!==g.descricao?g.nome:'')+`<div class="cxb">${g.meio!=='Pix'&&g.meio!=='Dinheiro'&&String(g.dados||'').trim()?`<div class="cxpix"><span>${/boleto/i.test(g.meio)?'Boleto':'Transferência / depósito'}</span><b style="font-size:14px;line-height:1.45">${esc(String(g.dados).trim()).replace(/\n/g,'<br>')}</b><button class="cp" data-cp="${esc(String(g.dados).trim())}">copiar dados</button></div>`:pixBox(pix)}${ln('Valor',brl2(pago?+g.valor:o.falta),(pago?+g.valor:o.falta).toFixed(2).replace('.',','))}${o.pg&&!pago?ln('Já pago',brl2(o.pg)):''}${ln('Vencimento',ddmm(o.data)+'/'+String(o.data).slice(0,4))}${g.meio?ln('Meio',g.meio==='Transferência bancária'?'Transferência / depósito':g.meio):''}</div>`}
 /* borderô do show: cachê, custo, equipe por grupo; tocar no nome mostra o PIX */
 function bordHtml(s){const b=bordDe(s),dt=new Date(s.data+'T12:00'),t=(b&&b.totais)||{},valor=s.valor||(b&&b.valor)||0,gasto=t.gasto!=null?t.gasto:s.gasto,sobra=valor&&gasto!=null?valor-gasto:null;
   let h=topo('Show · '+DS[dt.getDay()]+' '+ddmm(s.data),s.nome,s.local||'')+`<div class="bt"><div>Cachê<b>${valor?brl(valor):'a definir'}</b></div><div>Custo<b>${gasto!=null?brl(gasto):'—'}</b></div><div>Sobra<b style="color:${sobra==null?'inherit':sobra>=0?'var(--pos)':'var(--neg)'}">${sobra!=null?brl(sobra):'—'}</b></div></div>`;
@@ -581,6 +582,8 @@ let PAGP={},ADV=false;
 /* ---------- pagamentos: um quadro por pessoa, letras grandes ---------- */
 const PGM3=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const pgLimpa=x=>String(x||'').replace(/\s*\((nubank|picpay|inter|banco c6)\)\s*$/i,'').replace(/\s+(Inter|Banco c6)$/i,'').trim();
+const pgBanco=(d,m)=>{const t=String(d).trim();return `<div class="pxk pxt"><small>${/boleto/i.test(m||'')?'BOLETO':'TRANSFERÊNCIA'}</small><b>${esc(t).replace(/\n/g,'<br>')}</b><button class="cp" data-cp="${esc(t)}">Copiar dados</button></div>`};
+const pgPaga=(pix,dados,m)=>dados?pgBanco(dados,m):pgPix(pix);
 const pgPix=x=>x?`<div class="pxk"><small>PIX</small><b>${esc(pgLimpa(x))}</b><button class="cp" data-cp="${esc(pgLimpa(x))}">Copiar PIX</button></div>`:'<div class="pxk sem">Sem PIX no cadastro</div>';
 function pgResumo(tot,vtot,n,ate,nad){const fut=Math.max(0,tot-vtot);
   return `<div class="prz"><div class="l">Falta pagar</div><div class="v">${brl(tot)}</div>
@@ -596,11 +599,11 @@ const pgCurto=t=>{t=String(t).split(/ [–-] | \(|\. /)[0].trim();return t.lengt
 function pgJuntoCard(x,pode){const its=x.it.slice().sort((a,b)=>a.d.localeCompare(b.d)),fut=x.tot-x.vtot;
   const li=its.map(i=>`<div class="pji"><span><b>${esc(i.g?pgCurto(i.g.descricao||'Pagamento'):(i.b.show||'Show'))}</b> · ${ddmm(i.d)}${i.g?'':(i.e.funcao&&!/^item: $/.test(i.e.funcao)?' · '+esc(i.e.funcao):'')}${i.fut?'<em>vence '+ddmm(i.d)+'</em>':''}</span><i>${brl(i.f)}</i></div>`).join('');
   return `<div class="pgc pgj"><div class="pjh"><div><small>Pagar junto · ${x.it.length} pagamentos</small><b>${esc(x.nome)}</b></div><div class="pv">${brl(x.nv?x.vtot:x.tot)}${x.nv&&fut>0.004?`<span>+ ${brl(fut)} que vence depois</span>`:!x.nv?'<span>ainda não venceu</span>':''}</div></div>
-    ${li}${pgPix(x.pix)}${pode?`<div class="pbs">${x.nv?`<button class="pb ok" data-pgp="${esc(x.k)}">Marcar ${x.nv>1?'os '+x.nv+' ':''}como pago · ${brl(x.vtot)}</button>`:''}${x.it.some(i=>i.g)?`<button class="pb" data-pgpad="${esc(x.k)}">Adiar</button>`:''}</div>`:''}</div>`}
+    ${li}${pgPaga(x.pix,x.dados,x.meio)}${pode?`<div class="pbs">${x.nv?`<button class="pb ok" data-pgp="${esc(x.k)}">Marcar ${x.nv>1?'os '+x.nv+' ':''}como pago · ${brl(x.vtot)}</button>`:''}${x.it.some(i=>i.g)?`<button class="pb" data-pgpad="${esc(x.k)}">Adiar</button>`:''}</div>`:''}</div>`}
 function pgContaCard(i,pode){const g=i.g,o=i.o;
   const sub=[g.nome&&g.nome!==g.descricao?g.nome:'',g.tipo==='fixo'?'fixo de '+MES3[+o.ref.slice(5,7)-1]:'avulso',o.pg?'já pago '+brl(o.pg):'',g.meio&&g.meio!=='Pix'?g.meio:''].filter(Boolean).join(' · ');
   return `<div class="pgc"><div class="pr">${pgData(o.data)}<div class="pt2"><b>${esc(g.descricao||g.nome)}</b>${sub?`<span>${esc(sub)}</span>`:''}<em class="${o.data>HOJE?'vn':'vd'}">${pgVenc(o.data)}</em></div><div class="pv">${brl(o.falta)}</div>
-    ${pgPix(i.pix)}${pode?`<div class="pbs"><button class="pb ok" data-pga="${esc(g.id+'|'+o.ref)}">Marcar como pago</button><button class="pb" data-pgad="${esc(g.id+'|'+o.ref)}">Adiar</button></div>`:''}</div></div>`}
+    ${pgPaga(i.pix,i.dados,i.meio)}${pode?`<div class="pbs"><button class="pb ok" data-pga="${esc(g.id+'|'+o.ref)}">Marcar como pago</button><button class="pb" data-pgad="${esc(g.id+'|'+o.ref)}">Adiar</button></div>`:''}</div></div>`}
 function pgPessoa(i,pode){const sub=[i.e.funcao,i.ant?'antecipado':'',i.e.status==='Parcial'?'parte já paga':'',i.ps.length>1?i.ps.map(p=>p.n+' '+brl(p.v)).join(' + '):''].filter(Boolean).join(' · ');
   const mk=i.item!=null?i.b.id+'|it'+i.item+'|item':i.b.id+'|'+i.i+'|'+i.ps.map(p=>p.k).join(',');
   return `<div class="pgp"><div class="t"><b>${esc(i.nome)}</b>${sub?`<span>${esc(sub)}</span>`:''}<em class="${i.fut?'vn':'vd'}">${pgVenc(i.d)}</em></div><div class="v">${brl(i.f)}</div>${pgPix(i.pix)}${pode?`<div class="pbs"><button class="pb ok" data-pgk="${esc(mk)}">Marcar como pago</button></div>`:''}</div>`}
@@ -615,14 +618,14 @@ function renderPagar(){const pode=!!API,B={},C=[];let NAD=0;
     LB.pg.pend(b,e,HOJE).forEach(q=>{const x=grp(b);x.tot+=q.f;x.it.push({b,e,i,nome:e.nome,pix:pixDe(e.pessoa,e.nome,e.pix),f:q.f,ps:q.ps,d:q.d,fut:q.d>HOJE,ant:q.d<b.data})})}));
   Object.entries(D.borderos||{}).filter(([k,b])=>b.equipe&&bvis(k,b)).map(x=>x[1]).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!t.para||!(+t.valor>0))return;const dI=t.pag_em||b.data;if(!t.pag_em&&b.data>HOJE)return; // 22/11: item tem prazo próprio (vazio = dia do show)
     const x=grp(b);x.tot+=+t.valor;x.it.push({b,e:{funcao:'item: '+(t.desc||''),pessoa:t.pessoa},item:j,nome:t.para,pix:pixDe(t.pessoa,t.para,t.pix),f:+t.valor,ps:[{k:'item',n:t.desc||'item',v:+t.valor}],d:dI,fut:dI>HOJE})}));
-  PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada'&&g.ocultar!=='sim').forEach(g=>LB.pgx.ocorr(g,fimMes).filter(o=>!o.pago&&o.falta>0.004&&(!pAdiado(g,o.ref)||(NAD++,false))).forEach(o=>C.push({g,o,d:o.data,f:o.falta,fut:o.data>HOJE,pix:pixDe(g.pessoa,g.nome,g.pix)})));
+  PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada'&&g.ocultar!=='sim').forEach(g=>LB.pgx.ocorr(g,fimMes).filter(o=>!o.pago&&o.falta>0.004&&(!pAdiado(g,o.ref)||(NAD++,false))).forEach(o=>C.push({g,o,d:o.data,f:o.falta,fut:o.data>HOJE,pix:pixDe(g.pessoa,g.nome,g.pix),dados:g.meio!=='Pix'&&g.meio!=='Dinheiro'&&String(g.dados||'').trim()?String(g.dados).trim():'',meio:g.meio})));
   Object.values(B).forEach(x=>{const ds=x.it.map(i=>i.d).sort();x.np=new Set(x.it.map(i=>i.e.pessoa||LB.norm(i.nome))).size;x.d=ds[ds.length-1];x.dmin=ds[0]});
   PGB=B;
   /* 27/11: mesma pessoa com mais de um pagamento (shows diferentes, borderô + avulso) → um quadro com a soma, para pagar tudo num PIX só */
   const pk=(id,nome)=>{if(id)return 'p:'+id;const n=LB.norm(nome||''),q=PESS.find(p=>LB.norm(p.nome||'')===n||(p.apelido&&LB.norm(p.apelido)===n));return q?'p:'+q.id:'n:'+n};
   PAGP={};const addP=(k,nome,pix,it)=>{if(!k||k==='n:')return;const x=PAGP[k]=PAGP[k]||{k,nome,pix:'',it:[]};x.it.push(it);if(!x.pix&&pix)x.pix=pix};
   Object.values(B).forEach(x=>x.it.forEach(i=>addP(pk(i.e.pessoa,i.nome),i.nome,i.pix,i)));
-  C.forEach(i=>addP(pk(i.g.pessoa,i.g.nome),i.g.nome,i.pix,i));
+  C.forEach(i=>{addP(pk(i.g.pessoa,i.g.nome),i.g.nome,i.pix,i);const x=PAGP[pk(i.g.pessoa,i.g.nome)];if(x&&i.dados&&!x.dados){x.dados=i.dados;x.meio=i.meio}});
   Object.keys(PAGP).forEach(k=>{if(PAGP[k].it.length<2)delete PAGP[k]});
   const NOJ=new Set(Object.values(PAGP).flatMap(x=>x.it)); // 27/11: o que está no "Pagar junto" não aparece de novo solto
   const CS=C.filter(i=>!NOJ.has(i)),BS=Object.values(B).map(x=>{const it=x.it.filter(i=>!NOJ.has(i));if(!it.length)return null;if(it.length===x.it.length)return x;
