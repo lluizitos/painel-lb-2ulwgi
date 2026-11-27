@@ -337,9 +337,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwyywrdf"></script>
-<script src="../lbmetas.js?v=mwyywrdf"></script>
-<script src="../lbchat.js?v=mwyywrdf"></script>
+<script src="../lb.js?v=mwzd6a78"></script>
+<script src="../lbmetas.js?v=mwzd6a78"></script>
+<script src="../lbchat.js?v=mwzd6a78"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -592,12 +592,12 @@ function pgResumo(tot,vtot,n,ate,nad){const fut=Math.max(0,tot-vtot);
 /* pagamentos: os mais recentes primeiro; equipe de cada show num cartão só (tocar abre o pop-up com cada pessoa) */
 const pgData=d=>`<div class="pd ${d>HOJE?'fu':'ve'}"><b>${d.slice(8,10)}</b><span>${PGM3[+d.slice(5,7)-1]}</span></div>`;
 const pgVenc=d=>d>HOJE?'vence '+ddmm(d):d===HOJE?'vence hoje':'vencido';
-let PGB={},PGPOP=null;
+let PGB={},PGPOP=null,DSPB={}; // 27/11: DSPB = borderôs de despesa (manutenção etc.), pagos igual aos do show
 function pgBordCard(x){const venc=x.it.filter(i=>!i.fut).length;
-  return `<button class="pgc pgbd" data-pgbd="${esc(x.id)}"><div class="pr">${pgData(x.d)}<div class="pt2"><b>${esc(x.show)}</b><span>Equipe do show · ${x.np} pessoa${x.np>1?'s':''}${x.it.length>x.np?' · '+x.it.length+' pagamentos':''}</span><em class="${venc?'vd':'vn'}">${venc?(venc===x.it.length?'vencido':venc+' vencido'+(venc>1?'s':'')):'vence '+ddmm(x.dmin)}</em></div><div class="pv">${brl(x.tot)}</div></div><div class="pgver">Ver quem recebe e marcar como pago ›</div></button>`}
+  return `<button class="pgc pgbd" data-pgbd="${esc(x.id)}"><div class="pr">${pgData(x.d)}<div class="pt2"><b>${esc(x.show)}</b><span>${x.desp?'Despesa':'Equipe do show'} · ${x.np} pessoa${x.np>1?'s':''}${x.it.length>x.np?' · '+x.it.length+' pagamentos':''}</span><em class="${venc?'vd':'vn'}">${venc?(venc===x.it.length?'vencido':venc+' vencido'+(venc>1?'s':'')):'vence '+ddmm(x.dmin)}</em></div><div class="pv">${brl(x.tot)}</div></div><div class="pgver">Ver quem recebe e marcar como pago ›</div></button>`}
 const pgCurto=t=>{t=String(t).split(/ [–-] | \(|\. /)[0].trim();return t.length>60?t.slice(0,58)+'…':t};
 function pgJuntoCard(x,pode){const its=x.it.slice().sort((a,b)=>a.d.localeCompare(b.d)),fut=x.tot-x.vtot;
-  const li=its.map(i=>`<div class="pji"><span><b>${esc(i.g?pgCurto(i.g.descricao||'Pagamento'):(i.b.show||'Show'))}</b> · ${ddmm(i.d)}${i.g?'':(i.e.funcao&&!/^item: $/.test(i.e.funcao)?' · '+esc(i.e.funcao):'')}${i.fut?'<em>vence '+ddmm(i.d)+'</em>':''}</span><i>${brl(i.f)}</i></div>`).join('');
+  const li=its.map(i=>`<div class="pji"><span><b>${esc(i.g?pgCurto(i.g.descricao||'Pagamento'):(i.b.tipo==='despesa'?(i.b.titulo||'Despesa'):(i.b.show||'Show')))}</b> · ${ddmm(i.d)}${i.g?'':(i.e.funcao&&!/^item: $/.test(i.e.funcao)?' · '+esc(i.e.funcao):'')}${i.fut?'<em>vence '+ddmm(i.d)+'</em>':''}</span><i>${brl(i.f)}</i></div>`).join('');
   return `<div class="pgc pgj"><div class="pjh"><div><small>Pagar junto · ${x.it.length} pagamentos</small><b>${esc(x.nome)}</b></div><div class="pv">${brl(x.nv?x.vtot:x.tot)}${x.nv&&fut>0.004?`<span>+ ${brl(fut)} que vence depois</span>`:!x.nv?'<span>ainda não venceu</span>':''}</div></div>
     ${li}${pgPaga(x.pix,x.dados,x.meio)}${pode?`<div class="pbs">${x.nv?`<button class="pb ok" data-pgp="${esc(x.k)}">Marcar ${x.nv>1?'os '+x.nv+' ':''}como pago · ${brl(x.vtot)}</button>`:''}${x.it.some(i=>i.g)?`<button class="pb" data-pgpad="${esc(x.k)}">Adiar</button>`:''}</div>`:''}</div>`}
 function pgContaCard(i,pode){const g=i.g,o=i.o;
@@ -608,7 +608,7 @@ function pgPessoa(i,pode){const sub=[i.e.funcao,i.ant?'antecipado':'',i.e.status
   const mk=i.item!=null?i.b.id+'|it'+i.item+'|item':i.b.id+'|'+i.i+'|'+i.ps.map(p=>p.k).join(',');
   return `<div class="pgp"><div class="t"><b>${esc(i.nome)}</b>${sub?`<span>${esc(sub)}</span>`:''}<em class="${i.fut?'vn':'vd'}">${pgVenc(i.d)}</em></div><div class="v">${brl(i.f)}</div>${pgPix(i.pix)}${pode?`<div class="pbs"><button class="pb ok" data-pgk="${esc(mk)}">Marcar como pago</button></div>`:''}</div>`}
 function pgPop(id){const x=PGB[id];if(!x){fecha();return}const pode=!!API,its=x.it.slice().sort((a,b)=>a.nome.localeCompare(b.nome)),venc=its.filter(i=>!i.fut);
-  abre(topo('Equipe do show · '+ddmm(x.data),x.show,its.length+' pagamento'+(its.length>1?'s':'')+' · falta '+brl(x.tot))+its.map(i=>pgPessoa(i,pode)).join('')+
+  abre(topo((x.desp?'Despesa · ':'Equipe do show · ')+ddmm(x.data),x.show,its.length+' pagamento'+(its.length>1?'s':'')+' · falta '+brl(x.tot))+its.map(i=>pgPessoa(i,pode)).join('')+
     (pode&&venc.length>1?`<button class="pall" data-pgball="${esc(id)}">Marcar ${venc.length===its.length?'todos':'os vencidos'} como pago</button>`:''));PGPOP=id}
 function renderPagar(){const pode=!!API,B={},C=[];let NAD=0;
   const pixDe=(id,nome,px)=>px||((PESS.find(p=>p.id===id)||PESS.find(p=>LB.norm(p.nome||'')===LB.norm(nome||''))||{}).pix)||'';
@@ -618,6 +618,8 @@ function renderPagar(){const pode=!!API,B={},C=[];let NAD=0;
     LB.pg.pend(b,e,HOJE).forEach(q=>{const x=grp(b);x.tot+=q.f;x.it.push({b,e,i,nome:e.nome,pix:pixDe(e.pessoa,e.nome,e.pix),f:q.f,ps:q.ps,d:q.d,fut:q.d>HOJE,ant:q.d<b.data})})}));
   Object.entries(D.borderos||{}).filter(([k,b])=>b.equipe&&bvis(k,b)).map(x=>x[1]).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!t.para||!(+t.valor>0))return;const dI=t.pag_em||b.data;if(!t.pag_em&&b.data>HOJE)return; // 22/11: item tem prazo próprio (vazio = dia do show)
     const x=grp(b);x.tot+=+t.valor;x.it.push({b,e:{funcao:'item: '+(t.desc||''),pessoa:t.pessoa},item:j,nome:t.para,pix:pixDe(t.pessoa,t.para,t.pix),f:+t.valor,ps:[{k:'item',n:t.desc||'item',v:+t.valor}],d:dI,fut:dI>HOJE})}));
+  Object.entries(DSPB).filter(([k,b])=>bvis(k,b)).map(x=>x[1]).forEach(b=>(b.itens||[]).forEach((t,j)=>{if(t.status==='Pago'||!(+t.valor>0))return;const dI=t.pag_em||b.data; // 27/11: borderô de despesa igual ao do show
+    const x=grp(b);x.desp=1;x.show=b.titulo||'Despesa';x.tot+=+t.valor;x.it.push({b,e:{funcao:t.desc||''},item:j,nome:t.fornecedor||t.desc||'Despesa',pix:pixDe('',t.fornecedor,''),f:+t.valor,ps:[{k:'item',n:t.desc||'item',v:+t.valor}],d:dI,fut:dI>HOJE})}));
   PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada'&&g.ocultar!=='sim').forEach(g=>LB.pgx.ocorr(g,fimMes).filter(o=>!o.pago&&o.falta>0.004&&(!pAdiado(g,o.ref)||(NAD++,false))).forEach(o=>C.push({g,o,d:o.data,f:o.falta,fut:o.data>HOJE,pix:pixDe(g.pessoa,g.nome,g.pix),dados:g.meio!=='Pix'&&g.meio!=='Dinheiro'&&String(g.dados||'').trim()?String(g.dados).trim():'',meio:g.meio})));
   Object.values(B).forEach(x=>{const ds=x.it.map(i=>i.d).sort();x.np=new Set(x.it.map(i=>i.e.pessoa||LB.norm(i.nome))).size;x.d=ds[ds.length-1];x.dmin=ds[0]});
   PGB=B;
@@ -653,7 +655,7 @@ function pedeMeio(btn,padrao,run){if(btn.dataset.ok==='1')return;btn.dataset.ok=
 async function marcarPago(marcas,btn,gms=[],meio){
   if(btn){if(!meio){const g0=gms[0]&&PAGS.find(x=>x.id===gms[0].id);pedeMeio(btn,g0&&g0.meio==='Dinheiro'?'dinheiro':'conta',m=>marcarPago(marcas,btn,gms,m));return}btn.disabled=true;btn.innerHTML='salvando…'}
   marcas=marcas.map(x=>Object.assign({},x,meio?{meio}:{}));
-  try{if(marcas.length){const r=await api({acao:'marcar_pago',marcas});Object.entries(r.borderos||{}).forEach(([k,b])=>{if(b.tipo==='despesa'||!b.equipe)return;b.equipe.forEach(e=>{delete e.doc;const pe=PESS.find(p=>p.id===e.pessoa);if(pe&&pe.pix)e.pix=pe.pix});D.borderos[k]=b})}
+  try{if(marcas.length){const r=await api({acao:'marcar_pago',marcas});Object.entries(r.borderos||{}).forEach(([k,b])=>{if(b.tipo==='despesa'){DSPB[k]=b;return}if(!b.equipe)return;b.equipe.forEach(e=>{delete e.doc;const pe=PESS.find(p=>p.id===e.pessoa);if(pe&&pe.pix)e.pix=pe.pix});D.borderos[k]=b})}
     const porId={},VV={};gms.forEach(g=>{(porId[g.id]=porId[g.id]||[]).push(g.ref);if(g.valor)VV[g.id]=g.valor});
     for(const [id,ref] of Object.entries(porId)){const r=await api({acao:'pagar_pagamento',id,ref,data:HOJE,...(meio?{meio}:{}),...(VV[id]?{valor:VV[id],quitar:true}:{})});PAGS=r.pagamentos}
     renderPagar();renderCal()}
@@ -863,7 +865,7 @@ async function carregar(){
   if(!API){renderTudo();return}
   const [t,m,p,b,ln,vd,pc,sv]=await Promise.allSettled([api({acao:'tarefas'}),api({acao:'minhas_tarefas'}),api({acao:'pagamentos'}),api({acao:'borderos'}),api({acao:'lancamentos'}),api({acao:'videos'}),api({acao:'pagina_cfg'}),api({acao:'listar'})]);if(pc.status==='fulfilled'&&pc.value.ok)PCFG=pc.value.cfg||{};if(sv.status==='fulfilled'&&sv.value.ok)SHV=sv.value.shows||null;if(vd.status==='fulfilled')VIDS=vd.value.videos||[];if(ln.status==='fulfilled')LNV=ln.value.lancamentos||[];
   if(t.status==='fulfilled')TAR=t.value;if(m.status==='fulfilled')MIN=m.value;if(p.status==='fulfilled'){PAGS=p.value.pagamentos||[];PAGS_OK=true}
-  if(b.status==='fulfilled'){const r=b.value;PESS=r.pessoas||[];const px={};PESS.forEach(q=>px[q.id]=q.pix);Object.entries(r.borderos||{}).forEach(([k,x])=>{if(x.tipo==='despesa'||!x.equipe)return;x.equipe.forEach(e=>{if(e.pessoa&&px[e.pessoa])e.pix=px[e.pessoa];delete e.doc});D.borderos[k]=x})}
+  if(b.status==='fulfilled'){const r=b.value;PESS=r.pessoas||[];const px={};PESS.forEach(q=>px[q.id]=q.pix);Object.entries(r.borderos||{}).forEach(([k,x])=>{if(x.tipo==='despesa'){DSPB[k]=x;return}if(!x.equipe)return;x.equipe.forEach(e=>{if(e.pessoa&&px[e.pessoa])e.pix=px[e.pessoa];delete e.doc});D.borderos[k]=x})}
   renderTudo()}
 
 LB.entrar({pagina:'artista',base:'../',titulo:'Artista',ok:r=>{try{window.__ART_R=structuredClone(r)}catch(e){window.__ART_R=JSON.parse(JSON.stringify(r))}D=r.dados;D.borderos=D.borderos||{};

@@ -205,7 +205,7 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
       <label>Data<input type="date" id="dp_data"></label>
       <label class="w">Orçamento ligado<select id="dp_orc"><option value="">— nenhum —</option></select></label>
     </div>
-    <datalist id="dl_dcat"></datalist>
+    <datalist id="dl_dcat"></datalist><datalist id="dl_dpes"></datalist>
     <details class="massa" id="dp_copia"><summary>Copiar de outra despesa</summary>
       <div class="f4" style="grid-template-columns:1fr;margin-top:8px"><label>Despesa<select id="dpc_de"></select></label></div>
       <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap"><button type="button" class="btn sm pkb" id="dpc_ok">Copiar itens</button><span class="note" id="dpc_res" style="margin:0"></span></div>
@@ -249,7 +249,7 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
   <div class="acts" style="justify-content:space-between"><button type="button" class="btn dg" id="pm_del">Excluir</button><span style="display:flex;gap:8px"><button type="button" class="btn" id="pm_x">Cancelar</button><button type="submit" class="btn pkb">Salvar</button></span></div>
 </form></div>
 
-<script src="../lb.js?v=mwyywrdf"></script>
+<script src="../lb.js?v=mwzd6a78"></script>
 <script>
 const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
 const brl2=v=>v==null||isNaN(v)?'—':'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -546,6 +546,7 @@ function renderDesp(){let l=Object.values(DESP).sort((a,b)=>b.data.localeCompare
 $('dfil').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;dfil=b.dataset.f;document.querySelectorAll('#dfil .chip').forEach(c=>c.classList.toggle('on',c===b));renderDesp()};
 $('ldesp').onclick=e=>{const b=e.target.closest('[data-dab]');if(b)abrirDesp(JSON.parse(JSON.stringify(DESP[b.dataset.dab])))};
 function abrirDesp(b){DP=b||{id:'D'+HOJE+'-'+Math.random().toString(36).slice(2,6),tipo:'despesa',titulo:'',categoria:'',data:HOJE,itens:[{desc:'',fornecedor:'',valor:'',status:'Pendente'}],obs:'',fonte:'app',_novo:1};
+  $('dl_dpes').innerHTML=(PES||[]).map(p=>`<option value="${esc(p.nome)}">`).join('');
   $('dl_dcat').innerHTML=[...new Set(DCATS.concat(Object.values(DESP).map(x=>x.categoria).filter(Boolean)))].map(c=>`<option value="${esc(c)}">`).join('');
   $('dp_tit').value=DP.titulo||'';$('dp_cat').value=DP.categoria||'';$('dp_data').value=DP.data;$('dp_obs').value=DP.obs||'';$('dp_t').textContent=b?(DP.titulo||'Despesa'):'Nova despesa';
   orcOpts(String(DP.orc||''));$('dp_del').style.display=b?'':'none';$('dp_msg').textContent='';$('dpc_res').textContent='';$('dp_copia').open=false;
@@ -555,8 +556,9 @@ let ORCS=null;async function orcOpts(v){const el=$('dp_orc');const pinta=()=>{co
   if(ORCS===null&&!LOCAL){ORCS=[];try{const r=await api({acao:'tarefas'});if(r.ok)ORCS=r.metas||[]}catch(e){}pinta()}}
 function lerDp(){DP.orc=$('dp_orc').value;if(!DP.orc)delete DP.orc;DP.titulo=$('dp_tit').value.trim();DP.categoria=$('dp_cat').value.trim();DP.data=$('dp_data').value;DP.obs=$('dp_obs').value.trim()}
 function renderDpIt(){$('dp_it').innerHTML=(DP.itens||[]).map((t,i)=>`<div class="pp" data-di="${i}"><div class="f4" style="grid-template-columns:2fr 1.4fr 1fr auto;align-items:end">
-  <label>Item<input data-k="desc" value="${esc(t.desc)}" placeholder="ex.: troca de óleo"></label><label>Quem recebeu<input data-k="fornecedor" value="${esc(t.fornecedor)}" placeholder="oficina, loja…"></label>
+  <label>Item<input data-k="desc" value="${esc(t.desc)}" placeholder="ex.: troca de óleo"></label><label>Quem recebe<input data-k="fornecedor" list="dl_dpes" value="${esc(t.fornecedor)}" placeholder="pessoa, oficina, loja…"></label>
   <label>Valor (R$)<input data-k="valor" inputmode="decimal" value="${nf(t.valor)}"></label><button type="button" class="x" data-drm>×</button></div>
+  <div class="f4" style="grid-template-columns:1fr;margin-top:6px"><label>Pagar em <small style="color:var(--muted);font-weight:400">vazio = data da despesa</small><input type="date" data-k="pag_em" value="${esc(t.pag_em||'')}"></label></div>
   <div class="f4" style="grid-template-columns:1fr 1fr 1fr;margin-top:6px;align-items:end"><label>Situação<select data-k="status"><option${t.status!=='Pago'?' selected':''}>Pendente</option><option${t.status==='Pago'?' selected':''}>Pago</option></select></label>
   <label>Pago em<input type="date" data-k="pago_em" value="${esc(t.pago_em||'')}"${t.status==='Pago'?'':' disabled'}></label><label>Como<select data-k="meio"${t.status==='Pago'?'':' disabled'}><option${t.meio!=='Dinheiro'?' selected':''}>Conta</option><option${t.meio==='Dinheiro'?' selected':''}>Dinheiro</option></select></label></div>
   <label style="margin-top:6px">Comprovante / nota (link, opcional)<input data-k="comprovante" value="${esc(t.comprovante||'')}" placeholder="https://…"></label>
@@ -626,7 +628,7 @@ $('cj_salvar').onclick=()=>{CFG.base=$('cj_base').value.trim()||'Divinópolis, M
   store.set('lb_bord_cfg',JSON.stringify({base:CFG.base,onibus_kml:CFG.onibus_kml,diesel_preco:CFG.diesel_preco,adicional_pct:CFG.adicional_pct,gasolina_preco:CFG.gasolina_preco,veiculos:CFG.veiculos}));
   $('cj_msg').textContent='Salvo neste aparelho.';setTimeout(()=>$('cj_msg').textContent='',2500)};
 </script>
-<script src="../lbchat.js?v=mwyywrdf"></script>
+<script src="../lbchat.js?v=mwzd6a78"></script>
 <script>LBCHAT.auto(document.querySelector('main.wrap').firstElementChild,{base:'../',pagina:'Borderôs',exemplo:'quanto gastei de diesel em outubro?'})</script>
 </body>
 </html>
