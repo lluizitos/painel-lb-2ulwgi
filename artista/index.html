@@ -207,6 +207,11 @@ h2.tt small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--mut
 .pgbd{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;border:0}.pgbd .pr{border-top:0;padding:0}.pgc>.pr{border-top:0;padding:0}
 .pgc .pr>.pbs{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0;padding:0}.pgc .pr>.pbs .pb{flex:1}
 .pgver{font-size:12.5px;font-weight:700;color:var(--pinkl);margin-top:10px}
+.pgj{border:1px solid rgba(245,196,81,.45);background:linear-gradient(135deg,rgba(245,196,81,.10),transparent 55%),var(--card)}
+.pgj .pjh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.pgj .pjh small{display:block;font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--amber,#F5C451)}
+.pgj .pjh b{display:block;font-size:16px;margin-top:3px}.pgj .pjh .pv{font-size:19px;font-weight:800;white-space:nowrap;text-align:right}.pgj .pjh .pv span{display:block;font-size:11.5px;font-weight:600;color:var(--sub)}
+.pgj .pji{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:7px 0;border-top:1px solid var(--line)}.pgj .pji:first-of-type{margin-top:8px}.pgj .pji span{min-width:0;color:var(--sub)}.pgj .pji span b{color:var(--ink);font-weight:600}.pgj .pji i{font-style:normal;font-weight:700;white-space:nowrap}.pgj .pji em{font-style:normal;font-size:11px;font-weight:700;color:var(--amber,#F5C451);margin-left:4px}
+.pgj .pbs{display:flex;margin-top:10px}.pgj .pbs .pb{flex:1}
 .pgp{display:grid;grid-template-columns:1fr auto;gap:2px 10px;background:var(--card2);border-radius:12px;padding:10px 12px;margin-top:8px}
 .pgp .t b{display:block;font-size:14px}.pgp .t span{display:block;font-size:12px;color:var(--sub);margin-top:1px}.pgp .t em{font-style:normal;font-size:11px;font-weight:700}.pgp .t em.vd{color:var(--neg)}.pgp .t em.vn{color:var(--amber)}
 .pgp .v{font-weight:800;font-size:15px;white-space:nowrap}.pgp .pbs{grid-column:1/-1}
@@ -331,9 +336,9 @@ body:not([data-s=fin]) #ult,body:not([data-s=fin]) #fprox{display:none}
 </div>
 <div id="bd"><div class="sh" id="bds"></div></div>
 </div>
-<script src="../lb.js?v=mwv0c2ro"></script>
-<script src="../lbmetas.js?v=mwv0c2ro"></script>
-<script src="../lbchat.js?v=mwv0c2ro"></script>
+<script src="../lb.js?v=mwyxa0ue"></script>
+<script src="../lbmetas.js?v=mwyxa0ue"></script>
+<script src="../lbchat.js?v=mwyxa0ue"></script>
 <script>
 const SV=d=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const IC={al:SV('<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),ok:SV('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>')};
@@ -367,7 +372,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-vm]');if(!
 /* ---------- avisos urgentes no topo ---------- */
 const orcPrin=()=>((TAR&&TAR.metas)||[]).filter(m=>m.tipo==='despesa'&&m.painel==='sim'&&!/Pago|Resolvido/.test(m.situacao||'')); // 18/11: aviso principal (orçamento)
 let URGANT=[];
-function urgentes(){const U=[];try{LB.orc.mostra(document.getElementById('orcbox'),orcPrin())}catch(e){console.error(e)}
+function urgentes(){const U=[];try{LB.orc.bord=D.orc_bord||{};LB.orc.mostra(document.getElementById('orcbox'),orcPrin())}catch(e){console.error(e)}
   /* 24/11: destaque = 1º o que o Luiz escolheu no Admin (Notificações → Página do Lucas); depois avisos, movimentações de hoje, show vendido hoje e tarefas marcadas "Exibir pro Artista" */
   const DST=PCFG&&PCFG.destaque,MT=(TAR&&TAR.metas)||[];
   if(DST&&DST.tipo&&!(DST.ate&&DST.ate<HOJE)){const[t1,t2]=String(DST.id||'').split('|');
@@ -587,6 +592,11 @@ const pgVenc=d=>d>HOJE?'vence '+ddmm(d):d===HOJE?'vence hoje':'vencido';
 let PGB={},PGPOP=null;
 function pgBordCard(x){const venc=x.it.filter(i=>!i.fut).length;
   return `<button class="pgc pgbd" data-pgbd="${esc(x.id)}"><div class="pr">${pgData(x.d)}<div class="pt2"><b>${esc(x.show)}</b><span>Equipe do show · ${x.np} pessoa${x.np>1?'s':''}${x.it.length>x.np?' · '+x.it.length+' pagamentos':''}</span><em class="${venc?'vd':'vn'}">${venc?(venc===x.it.length?'vencido':venc+' vencido'+(venc>1?'s':'')):'vence '+ddmm(x.dmin)}</em></div><div class="pv">${brl(x.tot)}</div></div><div class="pgver">Ver quem recebe e marcar como pago ›</div></button>`}
+const pgCurto=t=>{t=String(t).split(/ [–-] | \(|\. /)[0].trim();return t.length>60?t.slice(0,58)+'…':t};
+function pgJuntoCard(x,pode){const its=x.it.slice().sort((a,b)=>a.d.localeCompare(b.d)),fut=x.tot-x.vtot;
+  const li=its.map(i=>`<div class="pji"><span><b>${esc(i.g?pgCurto(i.g.descricao||'Pagamento'):(i.b.show||'Show'))}</b> · ${ddmm(i.d)}${i.g?'':(i.e.funcao&&!/^item: $/.test(i.e.funcao)?' · '+esc(i.e.funcao):'')}${i.fut?'<em>vence '+ddmm(i.d)+'</em>':''}</span><i>${brl(i.f)}</i></div>`).join('');
+  return `<div class="pgc pgj"><div class="pjh"><div><small>Pagar junto · ${x.it.length} pagamentos</small><b>${esc(x.nome)}</b></div><div class="pv">${brl(x.nv?x.vtot:x.tot)}${x.nv&&fut>0.004?`<span>+ ${brl(fut)} que vence depois</span>`:!x.nv?'<span>ainda não venceu</span>':''}</div></div>
+    ${li}${pgPix(x.pix)}${pode&&x.nv?`<div class="pbs"><button class="pb ok" data-pgp="${esc(x.k)}">Marcar ${x.nv>1?'os '+x.nv+' ':''}como pago · ${brl(x.vtot)}</button></div>`:''}</div>`}
 function pgContaCard(i,pode){const g=i.g,o=i.o;
   const sub=[g.nome&&g.nome!==g.descricao?g.nome:'',g.tipo==='fixo'?'fixo de '+MES3[+o.ref.slice(5,7)-1]:'avulso',o.pg?'já pago '+brl(o.pg):'',g.meio&&g.meio!=='Pix'?g.meio:''].filter(Boolean).join(' · ');
   return `<div class="pgc"><div class="pr">${pgData(o.data)}<div class="pt2"><b>${esc(g.descricao||g.nome)}</b>${sub?`<span>${esc(sub)}</span>`:''}<em class="${o.data>HOJE?'vn':'vd'}">${pgVenc(o.data)}</em></div><div class="pv">${brl(o.falta)}</div>
@@ -608,10 +618,17 @@ function renderPagar(){const pode=!!API,B={},C=[];let NAD=0;
   PAGS.filter(g=>g.ativo!=='não'&&g.direcao!=='entrada'&&g.ocultar!=='sim').forEach(g=>LB.pgx.ocorr(g,fimMes).filter(o=>!o.pago&&o.falta>0.004&&(!pAdiado(g,o.ref)||(NAD++,false))).forEach(o=>C.push({g,o,d:o.data,f:o.falta,fut:o.data>HOJE,pix:pixDe(g.pessoa,g.nome,g.pix)})));
   Object.values(B).forEach(x=>{const ds=x.it.map(i=>i.d).sort();x.np=new Set(x.it.map(i=>i.e.pessoa||LB.norm(i.nome))).size;x.d=ds[ds.length-1];x.dmin=ds[0]});
   PGB=B;
+  /* 27/11: mesma pessoa com mais de um pagamento (shows diferentes, borderô + avulso) → um quadro com a soma, para pagar tudo num PIX só */
+  const pk=(id,nome)=>{if(id)return 'p:'+id;const n=LB.norm(nome||''),q=PESS.find(p=>LB.norm(p.nome||'')===n||(p.apelido&&LB.norm(p.apelido)===n));return q?'p:'+q.id:'n:'+n};
+  PAGP={};const addP=(k,nome,pix,it)=>{if(!k||k==='n:')return;const x=PAGP[k]=PAGP[k]||{k,nome,pix:'',it:[]};x.it.push(it);if(!x.pix&&pix)x.pix=pix};
+  Object.values(B).forEach(x=>x.it.forEach(i=>addP(pk(i.e.pessoa,i.nome),i.nome,i.pix,i)));
+  C.forEach(i=>addP(pk(i.g.pessoa,i.g.nome),i.g.nome,i.pix,i));
+  Object.keys(PAGP).forEach(k=>{if(PAGP[k].it.length<2)delete PAGP[k]});
+  const PJ=Object.values(PAGP).map(x=>{x.tot=x.it.reduce((a,i)=>a+i.f,0);x.vtot=x.it.filter(i=>!i.fut).reduce((a,i)=>a+i.f,0);x.nv=x.it.filter(i=>!i.fut).length;return x}).sort((a,b)=>b.vtot-a.vtot||b.tot-a.tot);
   const L=Object.values(B).map(x=>({d:x.d,h:pgBordCard(x)})).concat(C.map(i=>({d:i.d,h:pgContaCard(i,pode)}))).sort((a,b)=>b.d.localeCompare(a.d));
   const all=Object.values(B).flatMap(x=>x.it).concat(C),tot=all.reduce((a,i)=>a+i.f,0),vtot=all.filter(i=>!i.fut).reduce((a,i)=>a+i.f,0);
   document.getElementById('pgk').innerHTML=pgResumo(tot,vtot,L.length,fimMes,NAD);
-  document.getElementById('pgl').innerHTML=L.length?vm('pags',L.map(x=>x.h),8):'';document.getElementById('s_pags').hidden=!L.length; // 24/11: sem pendência, o bloco some
+  document.getElementById('pgl').innerHTML=(PJ.length?PJ.map(x=>pgJuntoCard(x,pode)).join(''):'')+(L.length?vm('pags',L.map(x=>x.h),8):'');document.getElementById('s_pags').hidden=!L.length; // 24/11: sem pendência, o bloco some
   renderAdiados(pode);if(PGPOP&&bd.classList.contains('open'))pgPop(PGPOP)}
 document.addEventListener('click',e=>{const c=e.target.closest('[data-pgbd]');if(c){pgPop(c.dataset.pgbd);return}
   const a=e.target.closest('[data-pgball]');if(a){const x=PGB[a.dataset.pgball];if(x)marcarPago(x.it.filter(i=>!i.fut).map(i=>i.item!=null?{id:i.b.id,it:i.item,data:HOJE}:{id:i.b.id,i:i.i,partes:i.ps.map(p=>p.k),data:HOJE}),a,[])}});

@@ -203,6 +203,7 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
       <label class="w">Título<input id="dp_tit" placeholder="ex.: Manutenção do ônibus – novembro"></label>
       <label>Categoria<input id="dp_cat" list="dl_dcat" placeholder="ex.: Manutenção do ônibus"></label>
       <label>Data<input type="date" id="dp_data"></label>
+      <label class="w">Orçamento ligado<select id="dp_orc"><option value="">— nenhum —</option></select></label>
     </div>
     <datalist id="dl_dcat"></datalist>
     <details class="massa" id="dp_copia"><summary>Copiar de outra despesa</summary>
@@ -248,7 +249,7 @@ label input,label select,label textarea{display:block;width:100%;margin-top:4px;
   <div class="acts" style="justify-content:space-between"><button type="button" class="btn dg" id="pm_del">Excluir</button><span style="display:flex;gap:8px"><button type="button" class="btn" id="pm_x">Cancelar</button><button type="submit" class="btn pkb">Salvar</button></span></div>
 </form></div>
 
-<script src="../lb.js?v=mwv0c2ro"></script>
+<script src="../lb.js?v=mwyxa0ue"></script>
 <script>
 const brl=v=>v==null||isNaN(v)?'—':(v<0?'−':'')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0});
 const brl2=v=>v==null||isNaN(v)?'—':'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -276,7 +277,7 @@ LB.entrar({pagina:'bordero',base:'../',titulo:'Borderôs',ok:async r=>{
   if(LOCAL){const l=carregaLocal();Object.assign(BORD,l.borderos);l.excluidos.forEach(id=>delete BORD[id]);if(l.pessoas)PES=l.pessoas}
   Object.assign(DESP,D.despesas||{});Object.values(BORD).filter(b=>b.tipo==='despesa'||!b.equipe).forEach(b=>{DESP[b.id]=b;delete BORD[b.id]});
   document.getElementById('app').style.display='block';
-  setTimeout(()=>{const h=/[#&]b=([^&]+)/.exec(location.hash||'');if(h){const k=decodeURIComponent(h[1]),b=BORD[k]||Object.values(BORD).find(x=>String(x.id)===k);if(b)abrir(JSON.parse(JSON.stringify(b)),false)}},0); // 24/11: Admin → Pagamentos → editar abre o borderô
+  setTimeout(()=>{const h=/[#&]b=([^&]+)/.exec(location.hash||'');if(h){const k=decodeURIComponent(h[1]),b=BORD[k]||Object.values(BORD).find(x=>String(x.id)===k);if(b)abrir(JSON.parse(JSON.stringify(b)),false);else if(DESP[k]){document.querySelector('#tabs [data-t="desp"]')?.click();abrirDesp(JSON.parse(JSON.stringify(DESP[k])))}}},0); // 24/11: Admin → Pagamentos → editar abre o borderô
   document.getElementById('links').innerHTML=LB.links(r.paginas,'bordero','../');
   document.getElementById('modo').innerHTML=LOCAL?`<div class="aviso">Modo deste aparelho: a planilha ainda não está ligada, então o que você salvar fica guardado só neste celular/PC (e não aparece para o Lucas). Ao ligar a planilha, tudo passa a salvar nela e as pessoas são editadas direto na LB Lista de Equipe. <button class="btn sm" id="exp" style="margin-left:6px">Exportar alterações</button></div>`:'';
   if(LOCAL)document.getElementById('exp').onclick=exportar;
@@ -547,10 +548,12 @@ $('ldesp').onclick=e=>{const b=e.target.closest('[data-dab]');if(b)abrirDesp(JSO
 function abrirDesp(b){DP=b||{id:'D'+HOJE+'-'+Math.random().toString(36).slice(2,6),tipo:'despesa',titulo:'',categoria:'',data:HOJE,itens:[{desc:'',fornecedor:'',valor:'',status:'Pendente'}],obs:'',fonte:'app',_novo:1};
   $('dl_dcat').innerHTML=[...new Set(DCATS.concat(Object.values(DESP).map(x=>x.categoria).filter(Boolean)))].map(c=>`<option value="${esc(c)}">`).join('');
   $('dp_tit').value=DP.titulo||'';$('dp_cat').value=DP.categoria||'';$('dp_data').value=DP.data;$('dp_obs').value=DP.obs||'';$('dp_t').textContent=b?(DP.titulo||'Despesa'):'Nova despesa';
-  $('dp_del').style.display=b?'':'none';$('dp_msg').textContent='';$('dpc_res').textContent='';$('dp_copia').open=false;
+  orcOpts(String(DP.orc||''));$('dp_del').style.display=b?'':'none';$('dp_msg').textContent='';$('dpc_res').textContent='';$('dp_copia').open=false;
   const ou=Object.values(DESP).filter(x=>x.id!==DP.id).sort((a,c)=>c.data.localeCompare(a.data));$('dp_copia').style.display=ou.length?'':'none';
   $('dpc_de').innerHTML=ou.map(x=>`<option value="${esc(x.id)}">${ddmm(x.data)}/${x.data.slice(2,4)} · ${esc(x.titulo||'Despesa')} · ${brl(dTot(x).g)}</option>`).join('');renderDpIt();$('dp').classList.add('open');$('dp').scrollTop=0;if(!b)setTimeout(()=>$('dp_tit').focus(),50)}
-function lerDp(){DP.titulo=$('dp_tit').value.trim();DP.categoria=$('dp_cat').value.trim();DP.data=$('dp_data').value;DP.obs=$('dp_obs').value.trim()}
+let ORCS=null;async function orcOpts(v){const el=$('dp_orc');const pinta=()=>{const l=(ORCS||[]).filter(m=>m.tipo==='despesa'||String(m.id)===v);el.innerHTML='<option value="">— nenhum —</option>'+l.map(m=>`<option value="${esc(m.id)}"${String(m.id)===v?' selected':''}>${esc(m.titulo)}</option>`).join('')+(v&&!l.length?`<option value="${esc(v)}" selected>orçamento ${esc(v)}</option>`:'')};pinta();
+  if(ORCS===null&&!LOCAL){ORCS=[];try{const r=await api({acao:'tarefas'});if(r.ok)ORCS=r.metas||[]}catch(e){}pinta()}}
+function lerDp(){DP.orc=$('dp_orc').value;if(!DP.orc)delete DP.orc;DP.titulo=$('dp_tit').value.trim();DP.categoria=$('dp_cat').value.trim();DP.data=$('dp_data').value;DP.obs=$('dp_obs').value.trim()}
 function renderDpIt(){$('dp_it').innerHTML=(DP.itens||[]).map((t,i)=>`<div class="pp" data-di="${i}"><div class="f4" style="grid-template-columns:2fr 1.4fr 1fr auto;align-items:end">
   <label>Item<input data-k="desc" value="${esc(t.desc)}" placeholder="ex.: troca de óleo"></label><label>Quem recebeu<input data-k="fornecedor" value="${esc(t.fornecedor)}" placeholder="oficina, loja…"></label>
   <label>Valor (R$)<input data-k="valor" inputmode="decimal" value="${nf(t.valor)}"></label><button type="button" class="x" data-drm>×</button></div>
@@ -570,7 +573,7 @@ $('dp_it').addEventListener('change',e=>{const c=e.target.closest('[data-di]'),k
   if(k==='status'){t.status=e.target.value;if(t.status==='Pago'){t.pago_em=t.pago_em||HOJE;t.meio=t.meio||'Conta'}else{delete t.pago_em;delete t.meio}renderDpIt()}else t[k]=e.target.value;DP._sujo=true});
 $('dp_it').addEventListener('click',e=>{const c=e.target.closest('[data-di]');if(!c||!e.target.closest('[data-drm]'))return;DP.itens.splice(+c.dataset.di,1);DP._sujo=true;renderDpIt()});
 $('dp_x').onclick=()=>{if(!DP){$('dp').classList.remove('open');return}lerDp();if(DP._sujo&&!confirm('Sair sem salvar?'))return;$('dp').classList.remove('open');DP=null};
-['dp_tit','dp_cat','dp_data','dp_obs'].forEach(k=>$(k).addEventListener('input',()=>{if(DP)DP._sujo=true}));
+['dp_tit','dp_cat','dp_data','dp_obs','dp_orc'].forEach(k=>$(k).addEventListener(k==='dp_orc'?'change':'input',()=>{if(DP)DP._sujo=true}));
 $('dp_s').onclick=async()=>{lerDp();const m=$('dp_msg');
   if(!DP.titulo){m.innerHTML='<span class="neg">Dê um título (ex.: Manutenção do ônibus).</span>';return}
   if(!DP.data){m.innerHTML='<span class="neg">Informe a data.</span>';return}
@@ -623,7 +626,7 @@ $('cj_salvar').onclick=()=>{CFG.base=$('cj_base').value.trim()||'Divinópolis, M
   store.set('lb_bord_cfg',JSON.stringify({base:CFG.base,onibus_kml:CFG.onibus_kml,diesel_preco:CFG.diesel_preco,adicional_pct:CFG.adicional_pct,gasolina_preco:CFG.gasolina_preco,veiculos:CFG.veiculos}));
   $('cj_msg').textContent='Salvo neste aparelho.';setTimeout(()=>$('cj_msg').textContent='',2500)};
 </script>
-<script src="../lbchat.js?v=mwv0c2ro"></script>
+<script src="../lbchat.js?v=mwyxa0ue"></script>
 <script>LBCHAT.auto(document.querySelector('main.wrap').firstElementChild,{base:'../',pagina:'Borderôs',exemplo:'quanto gastei de diesel em outubro?'})</script>
 </body>
 </html>

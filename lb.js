@@ -24,7 +24,7 @@
   async function slotId(pagina, u) {
     return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lb|' + pagina + '|' + norm(u)))).slice(0, 20);
   }
-  const BUILD = 'mwv0c2ro';
+  const BUILD = 'mwyxa0ue';
   function versao(base) { // site publicado mais novo que esta página (cache do celular/GitHub)? recarrega uma vez com ?v=nova
     fetch(base + 'versao.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
       if (!j.v || j.v === BUILD || BUILD.startsWith('__')) return;
@@ -530,8 +530,18 @@
 #orcv .ok small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8B8697;margin-bottom:3px}#orcv .ok b{font-size:18px;font-weight:800}
 #orcv .ok .g{border-top-color:#7FDDA9}#orcv .ok .g b{color:#7FDDA9}
 #orcv .lbq{margin:0}#orcv .qt{background:none!important;padding:0!important;border-radius:0!important;border:0!important;display:block!important}#orcv .orf{font-size:12px;color:#8B8697;margin-top:14px;border-top:1px solid #2E2B36;padding-top:10px}
+#orcv .obd{background:#26232D;border-radius:14px;padding:12px 14px;margin:0 0 16px;border-left:3px solid #F5C451}#orcv .obh{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:6px}#orcv .obh b{font-size:14.5px}#orcv .obh small{color:#8B8697;font-size:12px;white-space:nowrap}
+#orcv .obi{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid #2E2B36;font-size:13.5px}#orcv .obi span{flex:1;min-width:0}#orcv .obi span small{display:block;color:#8B8697;font-size:12px}#orcv .obi b{white-space:nowrap}
+#orcv .obi i{font-style:normal;font-size:11px;font-weight:700;border-radius:99px;padding:2px 8px;background:rgba(255,143,168,.15);color:#FF8FA8;white-space:nowrap}#orcv .obi i.p{background:rgba(127,221,169,.15);color:#7FDDA9}
+#orcv .obt{display:flex;justify-content:space-between;padding:7px 0 0;border-top:1px solid #2E2B36;font-size:14px}#orcv .obt b{font-size:15px}#orcv .obt.g b{color:#7FDDA9}
 #orcv .ocp{margin-top:12px;border:1px solid #2E2B36;background:#26232D;color:#F3F1F6;border-radius:10px;padding:9px 14px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}`;
     document.head.appendChild(st); };
+  /* 27/11: borderô de despesa ligado ao orçamento (LB.orc.bord[id do orçamento] = {id, titulo, data, itens:[{desc, forn, valor, pago}]}) */
+  function bordHtml(b) { if (!b || !(b.itens || []).length) return '';
+    const tot = b.itens.reduce((a, t) => a + (+t.valor || 0), 0), pg = b.itens.filter(t => t.pago).reduce((a, t) => a + (+t.valor || 0), 0);
+    return `<div class="obd"><div class="obh"><b>🧾 Borderô: ${esc(b.titulo)}</b><small>${b.itens.length} ${b.itens.length === 1 ? 'item' : 'itens'}</small></div>
+      ${b.itens.map(t => `<div class="obi"><span>${esc(t.desc)}${t.forn ? `<small>${esc(t.forn)}</small>` : ''}</span><b>${brl(t.valor)}</b><i class="${t.pago ? 'p' : ''}">${t.pago ? 'pago' : 'a pagar'}</i></div>`).join('')}
+      <div class="obt"><span>Total</span><b>${brl(tot)}</b></div>${pg ? `<div class="obt g"><span>Já pago</span><b>${brl(pg)}</b></div><div class="obt"><span>Falta pagar</span><b>${brl(tot - pg)}</b></div>` : ''}</div>`; }
   /* m = {id, titulo, alvo, valor, prazo, situacao, texto|progresso} */
   function card(m) { css(); if (!m) return '';
     return `<button type="button" class="orcc" data-orc="${esc(m.id || '')}"><div class="ol"><span>Aviso principal · orçamento</span><i>${esc(m.situacao || 'Previsto')}</i></div>
@@ -545,6 +555,7 @@
     const link = location.origin + location.pathname.replace(/[^/]*$/, '') + '#orc';
     v.innerHTML = `<div class="op"><button class="ox" aria-label="Fechar">×</button><div class="ol">Orçamento</div><h2>${esc(m.titulo)}</h2>${m.alvo ? `<div class="os">${esc(m.alvo)}</div>` : ''}
       ${tot || fe ? `<div class="ok">${tot ? `<div><small>Orçamento</small><b>R$ ${esc(tot)}</b></div>` : ''}${fe ? `<div class="g"><small>Valor fechado</small><b>R$ ${esc(fe)}</b></div>` : ''}</div>` : (m.valor ? `<div class="ok"><div><small>Valor</small><b>${brl(m.valor)}</b></div></div>` : '')}
+      ${bordHtml((LB.orc.bord || {})[String(m.id)])}
       <div class="lbq"><div class="qt fm">${fm ? fm(det) : `<p style="white-space:pre-line">${esc(det)}</p>`}</div></div>
       <div class="orf">${esc(m.situacao || 'Previsto')}${m.prazo ? ' · ' + esc(m.prazo) : ''}</div>
       <button class="ocp" type="button">Copiar link deste orçamento</button></div>`;
@@ -557,5 +568,5 @@
     el.onclick = e => { if (e.target.closest('[data-orc]')) abre(m); };
     if (m && /^#orc/.test(location.hash) && !document.getElementById('orcv')) abre(m); }
   addEventListener('keydown', e => { if (e.key === 'Escape') fecha(); });
-  LB.orc = { card, abre, mostra, fecha };
+  LB.orc = { card, abre, mostra, fecha, bord: {} };
 })();
